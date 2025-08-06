@@ -141,13 +141,13 @@ impl ColumnSameAsNetwork {
                     continue;
                 }
 
-                let src_extension_tables = src_table.extension_tables(conn)?;
-                let dst_extension_tables = dst_table.extension_tables(conn)?;
+                let src_ancestral_extension_tables = src_table.ancestral_extension_tables(conn)?;
+                let dst_ancestral_extension_tables = dst_table.ancestral_extension_tables(conn)?;
 
                 // If the `src_table` is an extension of the `dst_table`, or vice versa,
                 // we do not need to infer an edge.
-                if src_extension_tables.contains(&dst_table)
-                    || dst_extension_tables.contains(&src_table)
+                if src_ancestral_extension_tables.contains(&dst_table)
+                    || dst_ancestral_extension_tables.contains(&src_table)
                 {
                     continue;
                 }

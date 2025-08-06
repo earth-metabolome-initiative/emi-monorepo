@@ -7,18 +7,18 @@ pub enum InsertableOrganizationAttributes {
     AlphaTwoCode,
     StateProvince,
     Domain,
+    Id,
 }
 impl core::fmt::Display for InsertableOrganizationAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableOrganizationAttributes::Name => write!(f, "name"),
-            InsertableOrganizationAttributes::Url => write!(f, "url"),
-            InsertableOrganizationAttributes::Country => write!(f, "country"),
-            InsertableOrganizationAttributes::AlphaTwoCode => write!(f, "alpha_two_code"),
-            InsertableOrganizationAttributes::StateProvince => {
-                write!(f, "state_province")
-            }
-            InsertableOrganizationAttributes::Domain => write!(f, "domain"),
+            Self::Name => write!(f, "name"),
+            Self::Url => write!(f, "url"),
+            Self::Country => write!(f, "country"),
+            Self::AlphaTwoCode => write!(f, "alpha_two_code"),
+            Self::StateProvince => write!(f, "state_province"),
+            Self::Domain => write!(f, "domain"),
+            Self::Id => write!(f, "id"),
         }
     }
 }
@@ -31,15 +31,15 @@ impl core::fmt::Display for InsertableOrganizationAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganization {
-    name: String,
-    url: String,
-    country: String,
-    alpha_two_code: ::iso_codes::CountryCode,
-    state_province: Option<String>,
-    domain: String,
+    pub(crate) name: String,
+    pub(crate) url: String,
+    pub(crate) country: String,
+    pub(crate) alpha_two_code: ::iso_codes::CountryCode,
+    pub(crate) state_province: Option<String>,
+    pub(crate) domain: String,
 }
 impl InsertableOrganization {}
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganizationBuilder {
     pub(crate) name: Option<String>,
@@ -49,7 +49,42 @@ pub struct InsertableOrganizationBuilder {
     pub(crate) state_province: Option<String>,
     pub(crate) domain: Option<String>,
 }
-impl InsertableOrganizationBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableOrganizationBuilder {
+    type Attributes = InsertableOrganizationAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(url) = other.url {
+            self = self.url(url)?;
+        }
+        if let Some(country) = other.country {
+            self = self.country(country)?;
+        }
+        if let Some(alpha_two_code) = other.alpha_two_code {
+            self = self.alpha_two_code(alpha_two_code)?;
+        }
+        if let Some(state_province) = other.state_province {
+            self = self.state_province(Some(state_province))?;
+        }
+        if let Some(domain) = other.domain {
+            self = self.domain(domain)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableOrganizationBuilder {
+    type PrimaryKey = i16;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.name` column from table
+    /// `organizations`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -64,6 +99,10 @@ impl InsertableOrganizationBuilder {
         self.name = Some(name);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.url` column from table
+    /// `organizations`.
     pub fn url<P>(
         mut self,
         url: P,
@@ -78,6 +117,10 @@ impl InsertableOrganizationBuilder {
         self.url = Some(url);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.country` column from table
+    /// `organizations`.
     pub fn country<P>(
         mut self,
         country: P,
@@ -92,6 +135,10 @@ impl InsertableOrganizationBuilder {
         self.country = Some(country);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.alpha_two_code` column from table
+    /// `organizations`.
     pub fn alpha_two_code<P>(
         mut self,
         alpha_two_code: P,
@@ -108,6 +155,10 @@ impl InsertableOrganizationBuilder {
         self.alpha_two_code = Some(alpha_two_code);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.state_province` column from table
+    /// `organizations`.
     pub fn state_province<P>(
         mut self,
         state_province: P,
@@ -123,6 +174,10 @@ impl InsertableOrganizationBuilder {
         self.state_province = state_province;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.domain` column from table
+    /// `organizations`.
     pub fn domain<P>(
         mut self,
         domain: P,
@@ -138,32 +193,32 @@ impl InsertableOrganizationBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableOrganizationBuilder> for InsertableOrganization {
-    type Error = common_traits::prelude::BuilderError<InsertableOrganizationAttributes>;
-    fn try_from(
-        builder: InsertableOrganizationBuilder,
-    ) -> Result<InsertableOrganization, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableOrganizationAttributes::Name,
-            ))?,
-            url: builder.url.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableOrganizationAttributes::Url,
-            ))?,
-            country: builder.country.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::Country,
-                ),
-            )?,
-            alpha_two_code: builder.alpha_two_code.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganizationAttributes::AlphaTwoCode,
-                ),
-            )?,
-            state_province: builder.state_province,
-            domain: builder.domain.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableOrganizationAttributes::Domain,
-            ))?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableOrganizationBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::organizations::Organization,
+            Error = web_common_traits::database::InsertError<InsertableOrganizationAttributes>,
+        >,
+{
+    type Attributes = InsertableOrganizationAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.url.is_some()
+            && self.country.is_some()
+            && self.alpha_two_code.is_some()
+            && self.domain.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::organizations::Organization =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

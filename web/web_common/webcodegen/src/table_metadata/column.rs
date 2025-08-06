@@ -157,85 +157,92 @@ fn requires_partial_builder(
     }
     // First, we retrieve the table that contains the column
     let table = column.table(conn)?;
-    // Then, we check if the table is an extension table
-    if table.extension_table(conn)?.is_none() {
+
+    // - The table T is an extension table, meaning it extends some other table E.
+    let ancestral_extension_tables = table.ancestral_extension_tables(conn)?;
+    if ancestral_extension_tables.is_empty() {
+        // If the table is not an extension table, we do not need a partial builder
         return Ok(None);
     }
-    // Next, we retrieve the foreign keys of the column
-    let foreign_keys = column.foreign_keys(conn)?;
-    // If there are no foreign keys, we return false
-    if foreign_keys.is_empty() {
-        return Ok(None);
-    }
-    // We check whether there exist a single column foreign key
-    // which refers to the primary key of the foreign table.
-    let mut single_column_fk_to_pk = None;
-    for foreign_key in &foreign_keys {
-        if foreign_key.is_foreign_primary_key(conn)? && foreign_key.number_of_columns(conn)? == 1 {
-            // If we have already found a single column foreign key to the
-            // primary key of the foreign table, we raise a unimplemented error
-            // as it is unclear how to handle this case.
-            if single_column_fk_to_pk.is_some() {
-                unimplemented!(
-                    "Column \"{}\".\"{}\" has multiple single-column foreign keys to the primary key of the foreign table. This is not supported yet.",
-                    column.table_name,
-                    column.column_name
-                );
-            }
 
-            single_column_fk_to_pk = Some(foreign_key);
-        }
-    }
-
-    let Some(single_column_fk_to_pk) = single_column_fk_to_pk else {
-        // If we have not found a single column foreign key to the primary key of the
-        // foreign table, we return false as we cannot handle this case.
-        return Ok(None);
-    };
-
-    // Now, after having identified the single column foreign key to the primary key
-    // of the foreign table, we try to identify a composite foreign key
-    // which is composed of the column and the primary key of the table that
-    // contains the column.
-    let primary_key_columns = table.primary_key_columns(conn)?;
-    let Some(foreign_table) = single_column_fk_to_pk.foreign_table(conn)? else {
-        return Ok(None);
-    };
-
-    // We expect the composite foreign key to be composed of the column
-    // and the primary key of the table that contains the column.
-    let mut expected_foreign_columns = vec![column.clone()];
-    expected_foreign_columns.extend(primary_key_columns);
-
-    let mut found_composite_fk = None;
-
-    for foreign_key in &foreign_keys {
-        if foreign_key == single_column_fk_to_pk {
-            // We skip the single column foreign key to the primary key of the foreign table
+    // - The column C from table T is a foreign key to the primary key of the table
+    //   F, and F != E.
+    let mut found_foreign_key = None;
+    for foreign_key in column.foreign_keys(conn)? {
+        if !foreign_key.is_foreign_primary_key(conn)? {
+            // If the foreign key is not a foreign primary key, this column
+            // does not require a partial builder.
             continue;
         }
-        if foreign_key.foreign_table(conn)?.as_ref() != Some(&foreign_table) {
-            // We skip foreign keys which do not refer to the same foreign table
+        if foreign_key.is_local_primary_key(conn)? {
+            // If the foreign key is a local primary key, this column does not
+            // require a partial builder.
             continue;
         }
-        let columns = foreign_key.columns(conn)?;
-        if columns == expected_foreign_columns {
-            if found_composite_fk.is_some() {
-                // If we have already found a composite foreign key, we raise a
-                // unimplemented error as it is unclear how to handle this case.
-                unimplemented!(
-                    "Column \"{}\".\"{}\" has multiple composite foreign keys to the foreign table \"{}\". This is not supported yet: {foreign_keys:#?}",
-                    column.table_name,
-                    column.column_name,
-                    foreign_table.table_name
-                );
-            }
-
-            found_composite_fk = Some(foreign_key.clone());
+        let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
+            // If the foreign table is not found, we do not need a partial builder.
+            continue;
+        };
+        if ancestral_extension_tables.contains(&foreign_table) {
+            // If the foreign table is one of the extended tables, we do not
+            // need a partial builder.
+            continue;
         }
+
+        // - The table F has a same-as UNIQUE index constraint on the primary key of the
+        //   table E.
+        let same_as_indices = foreign_table
+            .same_as_indices(conn)?
+            .into_iter()
+            .filter(|index| {
+                let Ok(Some(foreign_key_constraint)) = index.is_same_as(conn) else {
+                    return false;
+                };
+                let Ok(Some(foreign_key_constraint_table)) =
+                    foreign_key_constraint.foreign_table(conn)
+                else {
+                    return false;
+                };
+                ancestral_extension_tables.contains(&foreign_key_constraint_table)
+            })
+            .collect::<Vec<_>>();
+
+        if same_as_indices.is_empty() {
+            // If the foreign table does not have a same-as index constraint on
+            // the primary key of the extended table, we do not need a partial
+            // builder.
+            continue;
+        }
+
+        // - The table T has a foreign key same-as constraint to the same-as UNIQUE
+        //   index constraint of the table F.
+        if !table.foreign_keys(conn)?.into_iter().any(|table_foreign_key| {
+            let Ok(Some(same_as_index)) = table_foreign_key.is_same_as_constraint(conn) else {
+                // If the foreign key is not a same-as constraint, we do not
+                // need a partial builder.
+                return false;
+            };
+            same_as_indices.contains(&same_as_index)
+        }) {
+            // If the table does not have a foreign key same-as constraint to
+            // the same-as UNIQUE index constraint of the foreign table, we do
+            // not need a partial builder.
+            continue;
+        }
+
+        // If we have already found a foreign key with these properties,
+        // it is not clear what to do, so we raise an unreachable panic.
+        if found_foreign_key.is_some() {
+            panic!(
+                "Multiple foreign keys found for column {} in table {}. This is not supported.",
+                column.column_name, column.table_name
+            );
+        }
+
+        found_foreign_key = Some(foreign_key);
     }
 
-    Ok(found_composite_fk)
+    Ok(found_foreign_key)
 }
 
 /// Struct defining the `information_schema.columns` table.
@@ -864,10 +871,8 @@ impl Column {
     /// - it has a default value that starts with `nextval`
     /// - it has a default value that starts with `CURRENT_TIMESTAMP`
     /// - it is an identity column
-    ///
-    /// # Returns
-    ///
-    /// A `bool` indicating whether the column is automatically generated
+    /// - it is the extension primary key and its referenced primary key column
+    ///   is automatically generated.
     pub fn is_always_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
@@ -1104,6 +1109,15 @@ impl Column {
         foreign_keys(self, conn)
     }
 
+    /// Returns whether the column has foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    pub fn has_foreign_keys(&self, conn: &mut PgConnection) -> bool {
+        self.foreign_keys(conn).map_or(false, |keys| !keys.is_empty())
+    }
+
     /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
     /// constraint.
     ///
@@ -1160,6 +1174,23 @@ impl Column {
         }
     }
 
+    /// Returns whether the column is part of an extension primary key
+    /// constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_part_of_extension_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self.foreign_keys(conn)?.into_iter().find(|key| key.is_extension(conn).unwrap_or(false)))
+    }
+
     /// Returns whether the column is to be handled as a partial builder.
     ///
     /// # Arguments
@@ -1173,12 +1204,15 @@ impl Column {
     /// # Implementation details
     ///
     /// A column must be handled as a partial builder if:
-    /// - the column is not nullable
-    /// - the table that contains the column, L, is an extension table
-    /// - the column is part of a foreign key to a table T
-    /// - the foreign key refers to the primary key of T
-    /// - the column is ALSO part of a composite foreign key (CFK) to T
-    /// - the CFK is composed of the column and the primary key of L
+    /// - The column C from table T is not nullable
+    /// - The table T is an extension table, meaning it extends some other table
+    ///   E.
+    /// - The column C from table T is a foreign key to the primary key of the
+    ///   table F, and F != E.
+    /// - The table F has a same-as UNIQUE index constraint on the primary key
+    ///   of the table E.
+    /// - The table T has a foreign key same-as constraint to the same-as UNIQUE
+    ///   index constraint of the table F.
     pub fn requires_partial_builder(
         &self,
         conn: &mut PgConnection,
@@ -1220,7 +1254,12 @@ impl Column {
         Ok(self
             .foreign_keys(conn)?
             .into_iter()
-            .filter(|foreign_key| foreign_key.is_same_as_constraint(conn).unwrap_or(false))
+            .filter(|foreign_key| {
+                foreign_key
+                    .is_same_as_constraint(conn)
+                    .map(|index| index.is_some())
+                    .unwrap_or(false)
+            })
             .collect())
     }
 

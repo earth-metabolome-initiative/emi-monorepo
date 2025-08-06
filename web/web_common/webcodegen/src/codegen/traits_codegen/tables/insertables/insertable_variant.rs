@@ -1,14 +1,418 @@
 //! Submodule providing the code to generate the implementation of the
 //! [`InsertableVariant`] trait for all required tables.
 
-use std::{collections::HashMap, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
+use quote::quote;
+use syn::Ident;
 
-use crate::{Codegen, Column, KeyColumnUsage, Table};
+use crate::{Codegen, Column, Table, errors::WebCodeGenError};
 
 impl Codegen<'_> {
+    /// Returns the implementation of the `TryInsert` trait for the insertable
+    /// builder struct.
+    ///
+    /// # Arguments
+    ///
+    /// * `table` - The table for which the implementation is generated.
+    /// * `conn` - The database connection to use for querying the database.
+    ///
+    /// # Errors
+    ///
+    /// If the provided connection to the database fails.
+    ///
+    /// # Implementation details
+    ///
+    /// The `TryInsert` trait has the goal to return the completed insertable
+    /// variant of the insertable builder struct, which may entail inserting
+    /// some dependant tables in the database.
+    ///
+    /// All insertable builders for which it is desirable to implement the
+    /// `TryInsert` trait have one or more generics, which represent their
+    /// immediately extended tables. Depending on their position in the DAG
+    /// of table extensions, these generics may have as value either the parent
+    /// table builder or an option of the primary key type of the parent
+    /// table. A priori, we do not know which of these generics will have the
+    /// primary key type value.
+    fn generate_insertable_builder_try_insert_implementation(
+        &self,
+        table: &Table,
+        conn: &mut PgConnection,
+    ) -> Result<(TokenStream, Vec<TokenStream>), WebCodeGenError> {
+        let Some(user_table) = self.users_table else {
+            return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
+        };
+        let user_id_type = user_table.primary_key_type(conn)?;
+        let insertable_enum = table.insertable_enum_ty()?;
+        let table_extension_network = self.table_extension_network().unwrap();
+        let extension_tables = table_extension_network.extension_tables(table);
+        let mut additional_use_imports = Vec::new();
+        let right_generics = extension_tables
+            .iter()
+            .map(|extension_table| {
+                let generic_ident = extension_table.struct_ident()?;
+                Ok(quote! {#generic_ident})
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+        let primary_key_type = table.primary_key_type(conn)?;
+        let mut additional_where_requirements = vec![quote! {
+            C: diesel::connection::LoadConnection
+        }];
+        let mut try_insert_generic_constraint: HashSet<Table> = HashSet::new();
+        let mut attribute_availability_checks = Vec::new();
+
+        let generics_recursive_operation = if !right_generics.is_empty() {
+            let extension_foreign_keys =
+                table_extension_network.extension_foreign_keys(table, conn)?;
+
+            let primary_keys = table.primary_key_columns(conn)?;
+
+            let primary_key = if primary_keys.len() == 1 {
+                &primary_keys[0]
+            } else {
+                unimplemented!(
+                    "At this time, we only support DAG tables with a non-composite primary key"
+                );
+            };
+            let primary_key_ident = primary_key.snake_case_ident()?;
+
+            let primary_key_minting = match extension_foreign_keys.len() {
+                0 => unreachable!("The table should have at least one extended table"),
+                1 => {
+                    // In the case of a single generic, it always must be complete
+                    // and ready to be inserted or at the very least, in the case
+                    // of a `Option<Primary Key Type>`, it must contain the primary key.
+                    // As such, we can simply determine the primary key by calling
+                    // the `mint_primary_key` method from the `TryInsertGeneric` trait.
+                    let extension_foreign_key = &extension_foreign_keys[0];
+                    let extension_foreign_key_ident =
+                        extension_foreign_key.constraint_ident(conn)?;
+                    let foreign_table = extension_foreign_key.foreign_table(conn)?.unwrap();
+                    let foreign_table_generic = foreign_table.struct_ident()?;
+
+                    let foreign_columns = extension_foreign_key.foreign_columns(conn)?;
+                    assert_eq!(
+                        foreign_columns.len(),
+                        1,
+                        "The foreign key should have exactly one column"
+                    );
+                    let foreign_column = &foreign_columns[0];
+
+                    let enum_path = self.column_enum_path(table, foreign_column, None, conn)?;
+
+                    additional_where_requirements.push(quote! {
+                        #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = #primary_key_type>
+                    });
+                    quote! {
+                        self.#extension_foreign_key_ident.mint_primary_key(user_id, conn).map_err(|err| {
+                            err.into_field_name(|_| #enum_path)
+                        })?
+                    }
+                }
+                _ => {
+                    // When the table extends several parent tables, we need to insert the primary
+                    // parent builders first to obtain the primary key, which we then use to
+                    // complete the secondary parent builders. Issue being,
+                    // apriori, we do not know which of the generics will be
+                    // representing the primary and secondary parent builders,
+                    // and therefore unfortunately we need to use an if-else chain.
+
+                    for extension_foreign_key in &extension_foreign_keys {
+                        let foreign_table = extension_foreign_key.foreign_table(conn)?.unwrap();
+                        let foreign_table_generic = foreign_table.struct_ident()?;
+                        additional_where_requirements.push(quote! {
+                            #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey=#primary_key_type>
+                        });
+                    }
+
+                    let chained_if_else = extension_foreign_keys
+                        .iter()
+                        .map(|extension_foreign_key| {
+                            let is_last = extension_foreign_key == extension_foreign_keys.last().unwrap();
+                            let is_first = extension_foreign_key == extension_foreign_keys.first().unwrap();
+                            let foreign_columns = extension_foreign_key.foreign_columns(conn)?;
+                            assert_eq!(
+                                foreign_columns.len(),
+                                1,
+                                "The foreign key should have exactly one column"
+                            );
+                            let foreign_column = &foreign_columns[0];
+
+                            let enum_path = self.column_enum_path(table, foreign_column, None, conn)?;
+                            let extension_foreign_key_ident = extension_foreign_key.constraint_ident(conn)?;
+
+                            let other_foreign_keys_handling = extension_foreign_keys.iter().filter(|other_extension_foreign_key| {
+                                other_extension_foreign_key != &extension_foreign_key
+                            })
+                            .map(|other_extension_foreign_key| {
+                                let other_foreign_columns = other_extension_foreign_key.foreign_columns(conn)?;
+                                assert_eq!(
+                                    other_foreign_columns.len(),
+                                    1,
+                                    "The foreign key should have exactly one column"
+                                );
+                                let other_foreign_column = &other_foreign_columns[0];
+                                let other_enum_path = self.column_enum_path(table, other_foreign_column, None, conn)?;
+
+                                let other_extension_foreign_key_ident = other_extension_foreign_key.constraint_ident(conn)?;
+                                Ok(quote! {
+                                    let _ = self.#other_extension_foreign_key_ident
+                                        .set_primary_key(#primary_key_ident)
+                                        .mint_primary_key(user_id, conn)
+                                        .map_err(|err| {
+                                            err.into_field_name(|_| #other_enum_path)
+                                        })?;
+                                })
+                            }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+                            let check_statement = if is_last {
+                                quote! {
+                                    else
+                                }
+                            } else if is_first {
+                                quote! {
+                                    if self.#extension_foreign_key_ident.is_complete()
+                                }
+                            } else {
+                                quote! {
+                                    else if self.#extension_foreign_key_ident.is_complete()
+                                }
+                            };
+
+                            Ok(quote! {
+                                // If this parent builder is complete, we can mint the primary key.
+                                #check_statement {
+                                    // We call the `mint_primary_key` method from the `TryInsertGeneric` trait
+                                    // which in the case of a `Option<Primary Key Type>` just returns the primary key,
+                                    // and in the case of a parent builder, it inserts it into the database and returns
+                                    // the primary key.
+                                    let #primary_key_ident = self.#extension_foreign_key_ident.mint_primary_key(user_id, conn)
+                                        .map_err(|err| {
+                                            err.into_field_name(|_| #enum_path)
+                                        })?;
+                                    #(#other_foreign_keys_handling)*
+
+                                    // Finally, we return the primary key.
+                                    #primary_key_ident
+                                }
+                            })
+                        })
+                        .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+                    quote! {
+                        #(#chained_if_else)*
+                    }
+                }
+            };
+
+            Some(quote! {
+                let #primary_key_ident = #primary_key_minting;
+            })
+        } else {
+            None
+        };
+
+        let assignments = table
+            .insertable_columns(conn, true)?
+            .iter()
+            .map(|column| {
+                let column_ident = column.snake_case_ident()?;
+                Ok(if column.is_nullable() {
+                    quote! {
+                        #column_ident: self.#column_ident
+                    }
+                } else {
+                    if !column.is_part_of_extension_primary_key(conn)?.is_some()
+                        && column.requires_partial_builder(conn)?.is_none()
+                    {
+                        let camel_cased_column_ident = column.camel_case_ident()?;
+                        attribute_availability_checks.push(quote! {
+                        let #column_ident = self.#column_ident.ok_or(
+                            common_traits::prelude::BuilderError::IncompleteBuild(
+                                #insertable_enum::#camel_cased_column_ident
+                            ))?;
+                        });
+                    }
+                    quote! {
+                        #column_ident
+                    }
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+        // Next, we need to set the missing attributes for the dependant tables which
+        // require the newly minted primary key. First, we need to determine which of
+        // these tables are dependant on the primary key of the current table,
+        // information which is stored in the `column_same_as` network.
+        //
+        // Such cases are like the following example: consider a table `A`, with a
+        // column `id`, which appears as the target of a foreign key associated
+        // to a column `a_id` in table `B`. Next, consider a table `C`, which
+        // extends table `A` and additionally has a column `b_id`.
+        // When we insert a new row in table `C`, we first insert the parent extended
+        // row in table `A`, but up until that time we cannot complete the
+        // `a_id` column in table `B`, and in turn we cannot complete the `b_id`
+        // column in table `C`. Therefore, we need to insert the row `A` first,
+        // next we complete and insert the row `B`, and finally we can complete and
+        // insert the row `C`.
+        //
+        // ASCII illustration of the relationship:
+        //
+        //     Table A           Table B           Table C
+        //   ┌─────────┐       ┌─────────┐       ┌─────────┐
+        //   │ id (PK) │◄──────┤ a_id    │◄──────┤ b_id    │
+        //   └─────────┘       │ ...     │       │ id (PK) │
+        //       ▲             └─────────┘       │ (ext A) │
+        //       │                               └─────────┘
+        //       │                                     │
+        //       │              Extension relationship │
+        //       │              (1:1, same value)      │
+        //       └─────────────────────────────────────┘
+        //
+        // Insertion order: A → B → C
+        // Dependencies: C.b_id → B.id, B.a_id → A.id, C.id = A.id
+        //
+
+        let mut dependant_tables_completion: Vec<TokenStream> = Vec::new();
+
+        // We retrieve the columns that compose the primary key of the current table.
+        let primary_key_columns = table.primary_key_columns(conn)?;
+        // Then, for each column in the primary key, we determine the same-as
+        // relationships and complete the dependant tables. It is possible that
+        // multiple primary key columns have the same local same-as column attribute,
+        // in which case it is needful to group by the foreign keys by the local same-as
+        // column.
+        let mut grouped_same_as_columns: HashMap<Column, Vec<(&Column, Column)>> = HashMap::new();
+        for primary_key_column in &primary_key_columns {
+            for same_as_constraint in primary_key_column.same_as_constraints(conn)? {
+                let local_columns = same_as_constraint.columns(conn)?;
+                let foreign_table = same_as_constraint.foreign_table(conn)?.unwrap();
+
+                if !try_insert_generic_constraint.contains(&foreign_table) {
+                    let foreign_builder = foreign_table.insertable_builder_ty()?;
+                    let foreign_attributes = foreign_table.insertable_enum_ty()?;
+                    let foreign_table_primary_key_type = foreign_table.primary_key_type(conn)?;
+                    additional_where_requirements.push(quote! {
+                        #foreign_builder: web_common_traits::database::TryInsertGeneric<
+                            C,
+                            Attributes = #foreign_attributes,
+                            PrimaryKey = #foreign_table_primary_key_type
+                        >
+                    });
+                    try_insert_generic_constraint.insert(foreign_table);
+                }
+
+                assert_eq!(
+                    local_columns.len(),
+                    2,
+                    "The same-as constraint should have exactly two columns"
+                );
+
+                let foreign_columns = same_as_constraint.foreign_columns(conn)?;
+
+                assert_eq!(
+                    foreign_columns.len(),
+                    2,
+                    "The same-as constraint should have exactly two foreign columns"
+                );
+
+                // We find the foreign column which should be set to the primary key
+                // column of the current table.
+                let associated_foreign_column = foreign_columns
+                    .into_iter()
+                    .zip(local_columns.iter())
+                    .find(|(_, local_column)| {
+                        local_column == &primary_key_column
+                    })
+                    .expect("The same-as constraint should contain the primary key column and another column")
+                    .0;
+
+                // One of the columns is the primary key column, the other is the
+                // column attribute meant to contain the foreign primary key of the
+                // dependant table.
+                let local_column = local_columns.into_iter().find(|col| {
+                    col != primary_key_column
+                }).expect("The same-as constraint should contain the primary key column and another column");
+
+                // If the local column is not a partial builder foreign key,
+                // we can ignore it.
+                if !local_column.requires_partial_builder(conn)?.is_some() {
+                    continue;
+                }
+
+                grouped_same_as_columns
+                    .entry(local_column)
+                    .or_default()
+                    .push((primary_key_column, associated_foreign_column));
+            }
+        }
+
+        // Now we iterate over the grouped same-as columns and generate
+        // the completion code for each foreign table.
+        for (local_column, same_as_columns) in grouped_same_as_columns {
+            let mut completion_assignments: Vec<TokenStream> = Vec::new();
+            let camel_cased_column_ident = local_column.camel_case_ident()?;
+            for (primary_key_column, associated_foreign_column) in same_as_columns {
+                let primary_key_column_ident = primary_key_column.snake_case_ident()?;
+                let associated_foreign_column_ident = associated_foreign_column.getter_ident()?;
+                completion_assignments.push(quote! {
+                    .#associated_foreign_column_ident(#primary_key_column_ident)
+                    .map_err(|err| {
+                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                    })?
+                });
+            }
+            let local_column_ident = local_column.snake_case_ident()?;
+            dependant_tables_completion.push(quote! {
+                let #local_column_ident = self.#local_column_ident
+                    #(#completion_assignments)*
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                    })?;
+            });
+        }
+
+        if !dependant_tables_completion.is_empty() {
+            additional_use_imports.push(quote! {
+                use web_common_traits::database::TryInsertGeneric;
+            });
+        }
+
+        let (user_id_ident, conn_ident) = if right_generics.is_empty() {
+            (quote! {_user_id}, quote! {_conn})
+        } else {
+            (quote! {user_id}, quote! {conn})
+        };
+
+        Ok((
+            quote! {
+                fn try_insert(
+                    self,
+                    #user_id_ident: #user_id_type,
+                    #conn_ident: &mut C
+                ) -> Result<
+                    Self::InsertableVariant,
+                    Self::Error
+                >
+                {
+                    #(#additional_use_imports)*
+                    #(#attribute_availability_checks)*
+                    #generics_recursive_operation
+                    #(#dependant_tables_completion)*
+                    Ok(Self::InsertableVariant {
+                        #(#assignments),*
+                    })
+                }
+            },
+            additional_where_requirements,
+        ))
+    }
+
     #[allow(clippy::too_many_lines)]
     /// Generates the [`InsertableVariant`] trait implementation for the tables
     ///
@@ -43,7 +447,6 @@ impl Codegen<'_> {
             let table_ident = table.snake_case_ident()?;
             let insertable_struct = table.insertable_variant_ty()?;
             let insertable_builder = table.insertable_builder_ty()?;
-            let extension_table = table.extension_table(conn)?;
 
             // We build a check to see whether the user is authorized to update
             // the parent tables.
@@ -52,42 +455,35 @@ impl Codegen<'_> {
             let mut parent_check_trait_requirements = HashMap::new();
 
             for parent_key in table.parent_keys(conn)? {
-                let parent_key_method = parent_key.getter_ident()?;
-                let mut parent_tables = Vec::new();
+                let parent_key_method = parent_key.constraint_ident(conn)?;
+                let parent_table = parent_key.foreign_table(conn)?.expect("Parent table not found");
 
-                for foreign_key in parent_key.foreign_keys(conn)? {
-                    if foreign_key.columns(conn)?.len() > 1 {
-                        continue;
-                    }
-                    parent_tables
-                        .push(foreign_key.foreign_table(conn)?.expect("Parent table not found"));
+                // If the parent table must be inserted alongside the current table,
+                // there is no need to check if the user can update it.
+                if table.must_be_inserted_alongside_with(&parent_table, conn)? {
+                    continue;
                 }
 
-                if parent_tables.len() > 1 {
-                    unimplemented!("This is a new case!")
-                }
-
-                let parent_table = parent_tables.pop().expect("Parent table not found");
                 if !parent_table.allows_updatable(conn)? {
                     continue;
                 }
                 let parent_table_path = parent_table.import_struct_path()?;
 
-                parent_check.extend(if parent_key.is_nullable() {
-                        quote::quote! {
-                            if let Some(parent) = insertable_struct.#parent_key_method(conn)? {
-                                if !parent.can_update(user_id, conn)? {
-                                    return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
-                                }
-                            }
-                        }
-                    } else {
-                        quote::quote! {
-                            if !insertable_struct.#parent_key_method(conn)?.can_update(user_id, conn)? {
+                parent_check.extend(if parent_key.is_nullable(conn)? {
+                    quote::quote! {
+                        if let Some(parent) = insertable_struct.#parent_key_method(conn)? {
+                            if !parent.can_update(user_id, conn)? {
                                 return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
                             }
                         }
-                    });
+                    }
+                } else {
+                    quote::quote! {
+                        if !insertable_struct.#parent_key_method(conn)?.can_update(user_id, conn)? {
+                            return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
+                        }
+                    }
+                });
 
                 let current_constraints = parent_check_trait_requirements
                     .entry(parent_table.clone())
@@ -114,97 +510,44 @@ impl Codegen<'_> {
                 }
             }
 
-            let additional_imports = if parent_check.is_empty() {
-                TokenStream::new()
-            } else {
-                quote::quote! {
-                    use web_common_traits::database::Updatable;
-                }
-            };
+            let mut additional_imports = Vec::new();
 
-            let user_id = if parent_check.is_empty() && extension_table.is_none() {
-                quote::quote! { _user_id }
-            } else {
-                quote::quote! { user_id }
-            };
+            if !parent_check.is_empty() {
+                additional_imports.push(quote::quote! {
+                    use web_common_traits::database::Updatable;
+                });
+            }
 
             let mut additional_where_clause = if parent_check_trait_requirements.is_empty() {
-                TokenStream::new()
+                Vec::new()
             } else {
-                let constraints =
-                    parent_check_trait_requirements.values().cloned().collect::<Vec<_>>();
-
-                quote::quote! { #(#constraints),*, }
+                parent_check_trait_requirements.values().cloned().collect::<Vec<_>>()
             };
 
             let attributes_enum = table.insertable_enum_ty()?;
 
-            let maybe_insert_recursion = if let Some(extension_table) = &extension_table {
-                let extension_insertable_builder = extension_table.insertable_builder_ty()?;
-                let extension_row = extension_table.import_struct_path()?;
-                let extension_attributes_enum = extension_table.insertable_enum_ty()?;
+            let (try_insert, try_insert_additional_where_clause) =
+                self.generate_insertable_builder_try_insert_implementation(table, conn)?;
 
-                // We need to add to the where constraints that the extension insertable builder
-                // actually implements the `InsertableVariant` trait.
-                additional_where_clause.extend(quote::quote! {
-                    #extension_insertable_builder: web_common_traits::database::InsertableVariant<
-                        C,
-                        UserId = #user_id_type,
-                        Row = #extension_row,
-                        Error = web_common_traits::database::InsertError<#extension_attributes_enum>,
-                    >,
-                });
+            additional_where_clause.extend(try_insert_additional_where_clause);
 
-                let mut partial_builder_columns: HashMap<Column, KeyColumnUsage> = HashMap::new();
-                for column in table.columns(conn)? {
-                    if let Some(foreign_key) = column.requires_partial_builder(conn)? {
-                        partial_builder_columns.insert(column, foreign_key);
-                    }
-                }
-
-                let mut covered_implementations = vec![extension_table.table_name.clone()];
-
-                for foreign_key in partial_builder_columns.values() {
-                    let foreign_table =
-                        foreign_key.foreign_table(conn)?.expect("Foreign table not found");
-
-                    if covered_implementations.contains(&foreign_table.table_name) {
-                        continue;
-                    }
-
-                    covered_implementations.push(foreign_table.table_name.clone());
-                    let foreign_table_path = foreign_table.import_struct_path()?;
-                    let attributes_enum = foreign_table.insertable_enum_ty()?;
-                    let builder = foreign_table.insertable_builder_ty()?;
-
-                    additional_where_clause.extend(quote::quote! {
-                        #builder: web_common_traits::database::InsertableVariant<
-                            C,
-                            UserId = #user_id_type,
-                            Row = #foreign_table_path,
-                            Error = web_common_traits::database::InsertError<#attributes_enum>,
-                        >,
-                    });
-                }
-
-                quote::quote! {
-                    let insertable_struct: #insertable_struct = self.try_insert(#user_id, conn)?;
-                }
-            } else {
-                quote::quote! {
-                    let insertable_struct: #insertable_struct = self.try_into()?;
-                }
-            };
+            let extension_tables = table.extension_tables(conn)?;
+            let generics = extension_tables
+                .iter()
+                .map(|extension_table| extension_table.struct_ident())
+                .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
+            let maybe_right_generics =
+                if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
-				impl<C: diesel::connection::LoadConnection> web_common_traits::database::InsertableVariant<C> for #insertable_builder
+				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_right_generics
                 where
                     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
                     diesel::query_builder::InsertStatement<
                         <#table_path as diesel::associations::HasTable>::Table,
                         <#insertable_struct as diesel::Insertable<<#table_path as diesel::associations::HasTable>::Table>>::Values,
                     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, #table_path>,
-                    #additional_where_clause
+                    #(#additional_where_clause),*
                 {
 					type Row = #table_path;
                     type InsertableVariant = #insertable_struct;
@@ -213,14 +556,14 @@ impl Codegen<'_> {
 
                     fn insert(
                         self,
-                        #user_id: Self::UserId,
+                        user_id: Self::UserId,
                         conn: &mut C,
                     ) -> Result<Self::Row, Self::Error> {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;
-                        #additional_imports
+                        #(#additional_imports)*
 
-                        #maybe_insert_recursion
+                        let insertable_struct: #insertable_struct = self.try_insert(user_id, conn)?;
 
                         #parent_check
 
@@ -228,6 +571,8 @@ impl Codegen<'_> {
                             .values(insertable_struct)
                             .get_result(conn)?)
                     }
+
+                    #try_insert
 				}
 			})?)?;
 

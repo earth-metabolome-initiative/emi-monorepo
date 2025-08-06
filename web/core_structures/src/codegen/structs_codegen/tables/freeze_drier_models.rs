@@ -14,7 +14,7 @@ impl web_common_traits::prelude::TableName for FreezeDrierModel {
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
     > for FreezeDrierModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -22,7 +22,7 @@ where
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
     > for FreezeDrierModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,

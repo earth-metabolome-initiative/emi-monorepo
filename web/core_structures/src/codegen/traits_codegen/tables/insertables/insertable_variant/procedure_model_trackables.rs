@@ -44,6 +44,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::trackables::Trackable,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackable;
@@ -60,7 +61,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackable = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.procedure_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -78,5 +79,69 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let name = self
+            .name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Name,
+                ),
+            )?;
+        let procedure_model_id = self
+            .procedure_model_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
+                ),
+            )?;
+        let trackable_id = self
+            .trackable_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                ),
+            )?;
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::CreatedAt,
+                ),
+            )?;
+        let updated_by = self
+            .updated_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::UpdatedBy,
+                ),
+            )?;
+        let updated_at = self
+            .updated_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::UpdatedAt,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            name,
+            procedure_model_id,
+            trackable_id,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at,
+        })
     }
 }

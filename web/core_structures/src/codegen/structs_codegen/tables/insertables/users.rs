@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableUserAttributes {
+    Id,
     FirstName,
     LastName,
     CreatedAt,
@@ -9,10 +10,11 @@ pub enum InsertableUserAttributes {
 impl core::fmt::Display for InsertableUserAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableUserAttributes::FirstName => write!(f, "first_name"),
-            InsertableUserAttributes::LastName => write!(f, "last_name"),
-            InsertableUserAttributes::CreatedAt => write!(f, "created_at"),
-            InsertableUserAttributes::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "id"),
+            Self::FirstName => write!(f, "first_name"),
+            Self::LastName => write!(f, "last_name"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -23,10 +25,10 @@ impl core::fmt::Display for InsertableUserAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUser {
-    first_name: String,
-    last_name: String,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) first_name: String,
+    pub(crate) last_name: String,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
 #[derive(Clone, Debug)]
@@ -47,7 +49,35 @@ impl Default for InsertableUserBuilder {
         }
     }
 }
-impl InsertableUserBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableUserBuilder {
+    type Attributes = InsertableUserAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(first_name) = other.first_name {
+            self = self.first_name(first_name)?;
+        }
+        if let Some(last_name) = other.last_name {
+            self = self.last_name(last_name)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(updated_at) = other.updated_at {
+            self = self.updated_at(updated_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableUserBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
+    /// Sets the value of the `users.first_name` column from table `users`.
     pub fn first_name<P>(
         mut self,
         first_name: P,
@@ -64,6 +94,9 @@ impl InsertableUserBuilder {
         self.first_name = Some(first_name);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
+    /// Sets the value of the `users.last_name` column from table `users`.
     pub fn last_name<P>(
         mut self,
         last_name: P,
@@ -80,6 +113,9 @@ impl InsertableUserBuilder {
         self.last_name = Some(last_name);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
+    /// Sets the value of the `users.created_at` column from table `users`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -105,6 +141,9 @@ impl InsertableUserBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
+    /// Sets the value of the `users.updated_at` column from table `users`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -131,30 +170,31 @@ impl InsertableUserBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableUserBuilder> for InsertableUser {
-    type Error = common_traits::prelude::BuilderError<InsertableUserAttributes>;
-    fn try_from(builder: InsertableUserBuilder) -> Result<InsertableUser, Self::Error> {
-        Ok(Self {
-            first_name: builder.first_name.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserAttributes::FirstName,
-                ),
-            )?,
-            last_name: builder.last_name.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserAttributes::LastName,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserAttributes::CreatedAt,
-                ),
-            )?,
-            updated_at: builder.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserAttributes::UpdatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::users::User,
+            Error = web_common_traits::database::InsertError<InsertableUserAttributes>,
+        >,
+{
+    type Attributes = InsertableUserAttributes;
+    fn is_complete(&self) -> bool {
+        self.first_name.is_some()
+            && self.last_name.is_some()
+            && self.created_at.is_some()
+            && self.updated_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::users::User =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

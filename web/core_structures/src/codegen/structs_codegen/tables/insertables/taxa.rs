@@ -9,10 +9,10 @@ pub enum InsertableTaxonAttributes {
 impl core::fmt::Display for InsertableTaxonAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableTaxonAttributes::Id => write!(f, "id"),
-            InsertableTaxonAttributes::Name => write!(f, "name"),
-            InsertableTaxonAttributes::ParentId => write!(f, "parent_id"),
-            InsertableTaxonAttributes::RankId => write!(f, "rank_id"),
+            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "name"),
+            Self::ParentId => write!(f, "parent_id"),
+            Self::RankId => write!(f, "rank_id"),
         }
     }
 }
@@ -23,10 +23,10 @@ impl core::fmt::Display for InsertableTaxonAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTaxon {
-    id: i32,
-    name: String,
-    parent_id: Option<i32>,
-    rank_id: i16,
+    pub(crate) id: i32,
+    pub(crate) name: String,
+    pub(crate) parent_id: Option<i32>,
+    pub(crate) rank_id: i16,
 }
 impl InsertableTaxon {
     pub fn rank<C: diesel::connection::LoadConnection>(
@@ -62,7 +62,7 @@ impl InsertableTaxon {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTaxonBuilder {
     pub(crate) id: Option<i32>,
@@ -70,7 +70,35 @@ pub struct InsertableTaxonBuilder {
     pub(crate) parent_id: Option<i32>,
     pub(crate) rank_id: Option<i16>,
 }
-impl InsertableTaxonBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableTaxonBuilder {
+    type Attributes = InsertableTaxonAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(id) = other.id {
+            self = self.id(id)?;
+        }
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(parent_id) = other.parent_id {
+            self = self.parent(Some(parent_id))?;
+        }
+        if let Some(rank_id) = other.rank_id {
+            self = self.rank(rank_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableTaxonBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
+    /// Sets the value of the `taxa.id` column from table `taxa`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -85,6 +113,9 @@ impl InsertableTaxonBuilder {
         self.id = Some(id);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
+    /// Sets the value of the `taxa.name` column from table `taxa`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -99,7 +130,10 @@ impl InsertableTaxonBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn parent_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
+    /// Sets the value of the `taxa.parent_id` column from table `taxa`.
+    pub fn parent<P>(
         mut self,
         parent_id: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
@@ -114,37 +148,39 @@ impl InsertableTaxonBuilder {
         self.parent_id = parent_id;
         Ok(self)
     }
-    pub fn rank_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
+    /// Sets the value of the `taxa.rank_id` column from table `taxa`.
+    pub fn rank(
         mut self,
-        rank_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
-    where
-        P: TryInto<i16>,
-        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let rank_id = rank_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
-            Into::into(err).rename_field(InsertableTaxonAttributes::RankId)
-        })?;
+        rank_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>> {
         self.rank_id = Some(rank_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableTaxonBuilder> for InsertableTaxon {
-    type Error = common_traits::prelude::BuilderError<InsertableTaxonAttributes>;
-    fn try_from(builder: InsertableTaxonBuilder) -> Result<InsertableTaxon, Self::Error> {
-        Ok(Self {
-            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableTaxonAttributes::Id,
-            ))?,
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableTaxonAttributes::Name,
-            ))?,
-            parent_id: builder.parent_id,
-            rank_id: builder.rank_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTaxonAttributes::RankId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTaxonBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
+            Error = web_common_traits::database::InsertError<InsertableTaxonAttributes>,
+        >,
+{
+    type Attributes = InsertableTaxonAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_some() && self.name.is_some() && self.rank_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::taxa::Taxon =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

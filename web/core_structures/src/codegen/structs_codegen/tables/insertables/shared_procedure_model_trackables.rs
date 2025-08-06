@@ -13,30 +13,14 @@ pub enum InsertableSharedProcedureModelTrackableAttributes {
 impl core::fmt::Display for InsertableSharedProcedureModelTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableSharedProcedureModelTrackableAttributes::ParentId => {
-                write!(f, "parent_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::ParentTrackableId => {
-                write!(f, "parent_trackable_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::ParentProcedureModelId => {
-                write!(f, "parent_procedure_model_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::ChildId => {
-                write!(f, "child_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::ChildTrackableId => {
-                write!(f, "child_trackable_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::ChildProcedureModelId => {
-                write!(f, "child_procedure_model_id")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::CreatedBy => {
-                write!(f, "created_by")
-            }
-            InsertableSharedProcedureModelTrackableAttributes::CreatedAt => {
-                write!(f, "created_at")
-            }
+            Self::ParentId => write!(f, "parent_id"),
+            Self::ParentTrackableId => write!(f, "parent_trackable_id"),
+            Self::ParentProcedureModelId => write!(f, "parent_procedure_model_id"),
+            Self::ChildId => write!(f, "child_id"),
+            Self::ChildTrackableId => write!(f, "child_trackable_id"),
+            Self::ChildProcedureModelId => write!(f, "child_procedure_model_id"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
         }
     }
 }
@@ -49,14 +33,14 @@ impl core::fmt::Display for InsertableSharedProcedureModelTrackableAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSharedProcedureModelTrackable {
-    parent_id: i32,
-    parent_trackable_id: ::rosetta_uuid::Uuid,
-    parent_procedure_model_id: i32,
-    child_id: i32,
-    child_trackable_id: ::rosetta_uuid::Uuid,
-    child_procedure_model_id: i32,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) parent_id: i32,
+    pub(crate) parent_trackable_id: ::rosetta_uuid::Uuid,
+    pub(crate) parent_procedure_model_id: i32,
+    pub(crate) child_id: i32,
+    pub(crate) child_trackable_id: ::rosetta_uuid::Uuid,
+    pub(crate) child_procedure_model_id: i32,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableSharedProcedureModelTrackable {
     pub fn parent<C: diesel::connection::LoadConnection>(
@@ -344,229 +328,213 @@ impl Default for InsertableSharedProcedureModelTrackableBuilder {
         }
     }
 }
-impl InsertableSharedProcedureModelTrackableBuilder {
-    pub fn parent_id<P>(
+impl web_common_traits::database::ExtendableBuilder
+    for InsertableSharedProcedureModelTrackableBuilder
+{
+    type Attributes = InsertableSharedProcedureModelTrackableAttributes;
+    fn extend_builder(
         mut self,
-        parent_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(parent_id) = other.parent_id {
+            self = self.parent(parent_id)?;
+        }
+        if let Some(parent_trackable_id) = other.parent_trackable_id {
+            self = self.parent_trackable(parent_trackable_id)?;
+        }
+        if let Some(parent_procedure_model_id) = other.parent_procedure_model_id {
+            self = self.parent_procedure_model(parent_procedure_model_id)?;
+        }
+        if let Some(child_id) = other.child_id {
+            self = self.child(child_id)?;
+        }
+        if let Some(child_trackable_id) = other.child_trackable_id {
+            self = self.child_trackable(child_trackable_id)?;
+        }
+        if let Some(child_procedure_model_id) = other.child_procedure_model_id {
+            self = self.child_procedure_model(child_procedure_model_id)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableSharedProcedureModelTrackableBuilder {
+    type PrimaryKey = (i32, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.parent_id` column from table `shared_procedure_model_trackables`.
+    pub fn parent(
+        mut self,
+        parent_id: i32,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_id = parent_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err)
-                .rename_field(InsertableSharedProcedureModelTrackableAttributes::ParentId)
-        })?;
-        if let Some(child_id) = self.child_id {
-            pgrx_validation::must_be_distinct_i32(parent_id, child_id).map_err(|e| {
-                e.rename_fields(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentId,
-                    InsertableSharedProcedureModelTrackableAttributes::ChildId,
-                )
-            })?;
-        }
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.parent_id = Some(parent_id);
         Ok(self)
     }
-    pub fn parent_trackable_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.parent_trackable_id` column from table `shared_procedure_model_trackables`.
+    pub fn parent_trackable(
         mut self,
-        parent_trackable_id: P,
+        parent_trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_trackable_id = parent_trackable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentTrackableId,
-                )
-            },
-        )?;
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.parent_trackable_id = Some(parent_trackable_id);
         Ok(self)
     }
-    pub fn parent_procedure_model_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.parent_procedure_model_id` column from table `shared_procedure_model_trackables`.
+    pub fn parent_procedure_model(
         mut self,
-        parent_procedure_model_id: P,
+        parent_procedure_model_id: i32,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_procedure_model_id =
-            parent_procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentProcedureModelId,
-                )
-            })?;
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.parent_procedure_model_id = Some(parent_procedure_model_id);
         Ok(self)
     }
-    pub fn child_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.child_id` column from table `shared_procedure_model_trackables`.
+    pub fn child(
         mut self,
-        child_id: P,
+        child_id: i32,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let child_id = child_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableSharedProcedureModelTrackableAttributes::ChildId)
-        })?;
-        if let Some(parent_id) = self.parent_id {
-            pgrx_validation::must_be_distinct_i32(parent_id, child_id).map_err(|e| {
-                e.rename_fields(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentId,
-                    InsertableSharedProcedureModelTrackableAttributes::ChildId,
-                )
-            })?;
-        }
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.child_id = Some(child_id);
         Ok(self)
     }
-    pub fn child_trackable_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.child_trackable_id` column from table `shared_procedure_model_trackables`.
+    pub fn child_trackable(
         mut self,
-        child_trackable_id: P,
+        child_trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let child_trackable_id = child_trackable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableSharedProcedureModelTrackableAttributes::ChildTrackableId,
-                )
-            },
-        )?;
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.child_trackable_id = Some(child_trackable_id);
         Ok(self)
     }
-    pub fn child_procedure_model_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.child_procedure_model_id` column from table `shared_procedure_model_trackables`.
+    pub fn child_procedure_model(
         mut self,
-        child_procedure_model_id: P,
+        child_procedure_model_id: i32,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let child_procedure_model_id =
-            child_procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableSharedProcedureModelTrackableAttributes::ChildProcedureModelId,
-                )
-            })?;
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.child_procedure_model_id = Some(child_procedure_model_id);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.created_by` column from table `shared_procedure_model_trackables`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err)
-                .rename_field(InsertableSharedProcedureModelTrackableAttributes::CreatedBy)
-        })?;
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    > {
         self.created_by = Some(created_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureModelTrackableBuilder {
+    ///Sets the value of the `shared_procedure_model_trackables.created_at` column from table `shared_procedure_model_trackables`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSharedProcedureModelTrackableAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
     >
     where
         P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        <P as TryInto<
+            ::rosetta_timestamp::TimestampUTC,
+        >>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+        let created_at = created_at
+            .try_into()
+            .map_err(|err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err)
-                    .rename_field(InsertableSharedProcedureModelTrackableAttributes::CreatedAt)
-            },
-        )?;
+                    .rename_field(
+                        InsertableSharedProcedureModelTrackableAttributes::CreatedAt,
+                    )
+            })?;
         self.created_at = Some(created_at);
         Ok(self)
     }
 }
-impl TryFrom<InsertableSharedProcedureModelTrackableBuilder>
-    for InsertableSharedProcedureModelTrackable
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableSharedProcedureModelTrackableBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable,
+        Error = web_common_traits::database::InsertError<
+            InsertableSharedProcedureModelTrackableAttributes,
+        >,
+    >,
 {
-    type Error =
-        common_traits::prelude::BuilderError<InsertableSharedProcedureModelTrackableAttributes>;
-    fn try_from(
-        builder: InsertableSharedProcedureModelTrackableBuilder,
-    ) -> Result<InsertableSharedProcedureModelTrackable, Self::Error> {
-        Ok(Self {
-            parent_id: builder.parent_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentId,
-                ),
-            )?,
-            parent_trackable_id: builder.parent_trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentTrackableId,
-                ),
-            )?,
-            parent_procedure_model_id: builder.parent_procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ParentProcedureModelId,
-                ),
-            )?,
-            child_id: builder.child_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ChildId,
-                ),
-            )?,
-            child_trackable_id: builder.child_trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ChildTrackableId,
-                ),
-            )?,
-            child_procedure_model_id: builder.child_procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::ChildProcedureModelId,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableSharedProcedureModelTrackableAttributes::CreatedAt,
-                ),
-            )?,
-        })
+    type Attributes = InsertableSharedProcedureModelTrackableAttributes;
+    fn is_complete(&self) -> bool {
+        self.parent_id.is_some() && self.parent_trackable_id.is_some()
+            && self.parent_procedure_model_id.is_some() && self.child_id.is_some()
+            && self.child_trackable_id.is_some()
+            && self.child_procedure_model_id.is_some() && self.created_by.is_some()
+            && self.created_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

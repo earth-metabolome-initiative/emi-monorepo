@@ -9,10 +9,10 @@ pub enum InsertableOrganismTaxonAttributes {
 impl core::fmt::Display for InsertableOrganismTaxonAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableOrganismTaxonAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableOrganismTaxonAttributes::CreatedAt => write!(f, "created_at"),
-            InsertableOrganismTaxonAttributes::OrganismId => write!(f, "organism_id"),
-            InsertableOrganismTaxonAttributes::TaxonId => write!(f, "taxon_id"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::OrganismId => write!(f, "organism_id"),
+            Self::TaxonId => write!(f, "taxon_id"),
         }
     }
 }
@@ -25,10 +25,10 @@ impl core::fmt::Display for InsertableOrganismTaxonAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismTaxon {
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    organism_id: ::rosetta_uuid::Uuid,
-    taxon_id: i32,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) organism_id: ::rosetta_uuid::Uuid,
+    pub(crate) taxon_id: i32,
 }
 impl InsertableOrganismTaxon {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -146,21 +146,48 @@ impl Default for InsertableOrganismTaxonBuilder {
         }
     }
 }
-impl InsertableOrganismTaxonBuilder {
-    pub fn created_by<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableOrganismTaxonBuilder {
+    type Attributes = InsertableOrganismTaxonAttributes;
+    fn extend_builder(
         mut self,
-        created_by: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(organism_id) = other.organism_id {
+            self = self.organism(organism_id)?;
+        }
+        if let Some(taxon_id) = other.taxon_id {
+            self = self.taxon(taxon_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableOrganismTaxonBuilder {
+    type PrimaryKey = (::rosetta_uuid::Uuid, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
+    /// Sets the value of the `organism_taxa.created_by` column from table
+    /// `organism_taxa`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableOrganismTaxonAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
+    /// Sets the value of the `organism_taxa.created_at` column from table
+    /// `organism_taxa`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -178,63 +205,56 @@ impl InsertableOrganismTaxonBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn organism_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
+    /// Sets the value of the `organism_taxa.organism_id` column from table
+    /// `organism_taxa`.
+    pub fn organism(
         mut self,
-        organism_id: P,
+        organism_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let organism_id = organism_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableOrganismTaxonAttributes::OrganismId)
-            },
-        )?;
         self.organism_id = Some(organism_id);
         Ok(self)
     }
-    pub fn taxon_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
+    /// Sets the value of the `organism_taxa.taxon_id` column from table
+    /// `organism_taxa`.
+    pub fn taxon(
         mut self,
-        taxon_id: P,
+        taxon_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let taxon_id = taxon_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableOrganismTaxonAttributes::TaxonId)
-        })?;
         self.taxon_id = Some(taxon_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableOrganismTaxonBuilder> for InsertableOrganismTaxon {
-    type Error = common_traits::prelude::BuilderError<InsertableOrganismTaxonAttributes>;
-    fn try_from(
-        builder: InsertableOrganismTaxonBuilder,
-    ) -> Result<InsertableOrganismTaxon, Self::Error> {
-        Ok(Self {
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismTaxonAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismTaxonAttributes::CreatedAt,
-                ),
-            )?,
-            organism_id: builder.organism_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismTaxonAttributes::OrganismId,
-                ),
-            )?,
-            taxon_id: builder.taxon_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableOrganismTaxonAttributes::TaxonId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableOrganismTaxonBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
+            Error = web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>,
+        >,
+{
+    type Attributes = InsertableOrganismTaxonAttributes;
+    fn is_complete(&self) -> bool {
+        self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.organism_id.is_some()
+            && self.taxon_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

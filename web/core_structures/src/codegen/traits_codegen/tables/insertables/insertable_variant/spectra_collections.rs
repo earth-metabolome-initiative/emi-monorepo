@@ -29,6 +29,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::trackables::Trackable,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection;
@@ -45,7 +46,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.trackable(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -57,5 +58,62 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let id = self
+            .id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::Id,
+                ),
+            )?;
+        let trackable_id = self
+            .trackable_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::TrackableId,
+                ),
+            )?;
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
+                ),
+            )?;
+        let updated_by = self
+            .updated_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedBy,
+                ),
+            )?;
+        let updated_at = self
+            .updated_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            id,
+            notes: self.notes,
+            trackable_id,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at,
+        })
     }
 }

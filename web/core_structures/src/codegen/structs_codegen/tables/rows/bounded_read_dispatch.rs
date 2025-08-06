@@ -6,6 +6,9 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -96,13 +99,7 @@ where
     crate::codegen::structs_codegen::tables::materials::Material: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -129,6 +126,9 @@ where
     crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::phone_models::PhoneModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -136,6 +136,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::prelude::BoundedRead<
@@ -196,6 +199,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::prelude::BoundedRead<
@@ -269,6 +275,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::AliquotingProcedureModel => {
                 crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::AliquotingProcedure => {
+                crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -515,24 +529,8 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::MixCountableProcedureModel => {
-                crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::MixSolidProcedureModel => {
-                crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::MountTipProcedureModel => {
-                crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel::bounded_read(
+            crate::codegen::tables::table_names::TableName::MixingProcedureModel => {
+                crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -603,6 +601,14 @@ where
                     )
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::PhoneModel => {
+                crate::codegen::structs_codegen::tables::phone_models::PhoneModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::PhotographProcedureModel => {
                 crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel::bounded_read(
                         offset,
@@ -621,6 +627,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::PipetteTipModel => {
                 crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PlacingProcedureModel => {
+                crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -781,6 +795,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::SupernatantProcedureModel => {
                 crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::SupernatantProcedure => {
+                crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

@@ -178,7 +178,7 @@ impl PgIndex {
         // and that refers to a primary key of another table. If we find any
         // foreign key which satisfies this condition, then we can conclude that
         // the index is a same-as index.
-        let extension_tables = table.extension_tables(conn)?;
+        let extension_tables = table.ancestral_extension_tables(conn)?;
 
         let mut foreign_keys = table
             .foreign_keys(conn)?

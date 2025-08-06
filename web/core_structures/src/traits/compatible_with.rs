@@ -48,8 +48,8 @@ where
         // Then, we create a new NextProcedureModel entry linking the parent
         // procedure to the new child procedure.
         CompatibilityRule::new()
-            .left_trackable_id(*self.id())?
-            .right_trackable_id(*other.id())?
+            .left_trackable(*self.id())?
+            .right_trackable(*other.id())?
             .created_by(user.id)?
             .insert(user.id, conn)
     }
@@ -87,8 +87,8 @@ where
         // Then, we create a new NextProcedureModel entry linking the parent
         // procedure to the new child procedure.
         CompatibilityRule::new()
-            .left_trackable_id(*self.id())?
-            .right_trackable_id(*other.id())?
+            .left_trackable(*self.id())?
+            .right_trackable(*other.id())?
             .quantity(quantity)?
             .created_by(user.id)?
             .insert(user.id, conn)

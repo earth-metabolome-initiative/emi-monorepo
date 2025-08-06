@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    ProcedureModel,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
+    ProcedureModel,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -29,14 +32,8 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-        >,
-    >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Row = crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModel;
@@ -65,5 +62,32 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let trackable_id = self
+            .trackable_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelAttributes::TrackableId,
+                ),
+            )?;
+        let procedure_model_id = self
+            .procedure_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes::Id,
+                    ),
+                ))
+            })?;
+        Ok(Self::InsertableVariant {
+            procedure_model_id,
+            trackable_id,
+        })
     }
 }

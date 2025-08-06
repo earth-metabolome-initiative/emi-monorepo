@@ -41,25 +41,46 @@ CREATE TABLE IF NOT EXISTS team_projects (
 );
 
 CREATE TABLE IF NOT EXISTS trackables (
-	id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS procedure_models (
-	id SERIAL PRIMARY KEY
+CREATE TABLE IF NOT EXISTS containers (
+    id INTEGER PRIMARY KEY REFERENCES trackables(id) ON DELETE CASCADE,
+    parent_container_id INTEGER REFERENCES containers(id) ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS trackable_procedure_models (
-	id INTEGER PRIMARY KEY,
-	FOREIGN KEY (id) REFERENCES trackables(id),
-	FOREIGN KEY (id) REFERENCES procedure_models(id)
+CREATE TABLE IF NOT EXISTS instruments (
+    id INTEGER PRIMARY KEY REFERENCES trackables(id) ON DELETE CASCADE,
+    brand TEXT NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS weighing_procedure_models (
-	id INTEGER PRIMARY KEY REFERENCES procedure_models(id)
+CREATE TABLE IF NOT EXISTS android_devices (
+    id INTEGER PRIMARY KEY REFERENCES instruments(id) ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS weighing_trackable_procedure_models (
-	id INTEGER PRIMARY KEY,
-	FOREIGN KEY (id) REFERENCES trackable_procedure_models(id),
-	FOREIGN KEY (id) REFERENCES weighing_procedure_models(id)
+CREATE TABLE IF NOT EXISTS freezers (
+    id INTEGER PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES containers(id) ON DELETE CASCADE,
+    FOREIGN KEY (id) REFERENCES instruments(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS android_freezers (
+    id INTEGER PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES freezers(id) ON DELETE CASCADE,
+    FOREIGN KEY (id) REFERENCES android_devices(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS gps (
+    id INTEGER PRIMARY KEY REFERENCES instruments(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS cameras (
+    id INTEGER PRIMARY KEY REFERENCES instruments(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS video_cameras (
+    id INTEGER PRIMARY KEY REFERENCES cameras(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS phones (
+    id INTEGER PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES gps(id) ON DELETE CASCADE,
+    FOREIGN KEY (id) REFERENCES video_cameras(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS android_phones (
+    id INTEGER PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES android_devices(id) ON DELETE CASCADE,
+    FOREIGN KEY (id) REFERENCES phones(id) ON DELETE CASCADE
 );

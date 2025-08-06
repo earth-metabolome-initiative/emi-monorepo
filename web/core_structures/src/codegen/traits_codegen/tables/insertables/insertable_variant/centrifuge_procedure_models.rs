@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    ProcedureModel,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+    ProcedureModel,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -29,13 +32,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder: web_common_traits::database::InsertableVariant<
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes,
-        >,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel;
@@ -65,5 +67,103 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::TryInsertGeneric;
+        let kelvin = self
+            .kelvin
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::Kelvin,
+                ),
+            )?;
+        let kelvin_tolerance_percentage = self
+            .kelvin_tolerance_percentage
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::KelvinTolerancePercentage,
+                ),
+            )?;
+        let seconds = self
+            .seconds
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::Seconds,
+                ),
+            )?;
+        let rotation_per_minute = self
+            .rotation_per_minute
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::RotationPerMinute,
+                ),
+            )?;
+        let centrifuged_with = self
+            .centrifuged_with
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::CentrifugedWith,
+                ),
+            )?;
+        let centrifuged_container_id = self
+            .centrifuged_container_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::CentrifugedContainerId,
+                ),
+            )?;
+        let procedure_model_id = self
+            .procedure_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes::Id,
+                    ),
+                ))
+            })?;
+        let procedure_centrifuged_with = self
+            .procedure_centrifuged_with
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
+            })?;
+        let procedure_centrifuged_container_id = self
+            .procedure_centrifuged_container_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId,
+                )
+            })?;
+        Ok(Self::InsertableVariant {
+            procedure_model_id,
+            kelvin,
+            kelvin_tolerance_percentage,
+            seconds,
+            rotation_per_minute,
+            centrifuged_with,
+            procedure_centrifuged_with,
+            centrifuged_container_id,
+            procedure_centrifuged_container_id,
+        })
     }
 }

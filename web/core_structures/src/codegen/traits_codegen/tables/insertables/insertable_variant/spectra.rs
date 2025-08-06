@@ -29,6 +29,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::spectra::Spectrum;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum;
@@ -45,7 +46,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.spectra_collection(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -57,5 +58,29 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let id = self
+            .id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes::Id,
+                ),
+            )?;
+        let spectra_collection_id = self
+            .spectra_collection_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes::SpectraCollectionId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            id,
+            spectra_collection_id,
+        })
     }
 }

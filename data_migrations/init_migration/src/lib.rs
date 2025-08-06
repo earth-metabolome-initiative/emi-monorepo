@@ -26,8 +26,8 @@ use users::init_root_user;
 /// * If the connection to the database fails.
 pub fn init_migration(conn: &mut PgConnection) -> Result<(), error::Error> {
     conn.transaction(|conn| {
-        init_login_providers(conn)?;
         let darwin = init_root_user(conn)?;
+        init_login_providers(&darwin, conn)?;
         init_trackables(&darwin, conn);
         init_procedure_models(&darwin, conn);
         Ok(())

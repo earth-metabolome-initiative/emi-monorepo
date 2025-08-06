@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    Processable,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialReagentBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialReagentBuilder<
+    Processable,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,13 +17,10 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder: web_common_traits::database::InsertableVariant<
+    C: diesel::connection::LoadConnection,
+    Processable: web_common_traits::database::TryInsertGeneric<
         C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::processables::Processable,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes,
-        >,
+        PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent;
@@ -43,5 +43,32 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let commercial_product_lot_id = self
+            .commercial_product_lot_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialReagentAttributes::CommercialProductLotId,
+                ),
+            )?;
+        let id = self
+            .id
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialReagentAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialReagentExtensionAttributes::Processable(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes::Id,
+                    ),
+                ))
+            })?;
+        Ok(Self::InsertableVariant {
+            id,
+            commercial_product_lot_id,
+        })
     }
 }

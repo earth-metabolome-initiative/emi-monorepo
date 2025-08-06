@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::rooms::Room,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::rooms::Room;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRoom;
@@ -23,17 +24,97 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableRoom = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let name = self
+            .name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Name,
+                ),
+            )?;
+        let description = self
+            .description
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Description,
+                ),
+            )?;
+        let qrcode = self
+            .qrcode
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Qrcode,
+                ),
+            )?;
+        let addresses_id = self
+            .addresses_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::AddressesId,
+                ),
+            )?;
+        let geolocation = self
+            .geolocation
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Geolocation,
+                ),
+            )?;
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
+                ),
+            )?;
+        let updated_by = self
+            .updated_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedBy,
+                ),
+            )?;
+        let updated_at = self
+            .updated_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            name,
+            description,
+            qrcode,
+            addresses_id,
+            geolocation,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at,
+        })
     }
 }

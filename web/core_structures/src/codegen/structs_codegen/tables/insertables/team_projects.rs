@@ -7,8 +7,8 @@ pub enum InsertableTeamProjectAttributes {
 impl core::fmt::Display for InsertableTeamProjectAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableTeamProjectAttributes::TeamId => write!(f, "team_id"),
-            InsertableTeamProjectAttributes::ProjectId => write!(f, "project_id"),
+            Self::TeamId => write!(f, "team_id"),
+            Self::ProjectId => write!(f, "project_id"),
         }
     }
 }
@@ -21,8 +21,8 @@ impl core::fmt::Display for InsertableTeamProjectAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamProject {
-    team_id: i32,
-    project_id: i32,
+    pub(crate) team_id: i32,
+    pub(crate) project_id: i32,
 }
 impl InsertableTeamProject {
     pub fn team<C: diesel::connection::LoadConnection>(
@@ -90,58 +90,79 @@ impl InsertableTeamProject {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamProjectBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) project_id: Option<i32>,
 }
-impl InsertableTeamProjectBuilder {
-    pub fn team_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableTeamProjectBuilder {
+    type Attributes = InsertableTeamProjectAttributes;
+    fn extend_builder(
         mut self,
-        team_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(team_id) = other.team_id {
+            self = self.team(team_id)?;
+        }
+        if let Some(project_id) = other.project_id {
+            self = self.project(project_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamProjectBuilder {
+    type PrimaryKey = (i32, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
+    /// Sets the value of the `team_projects.team_id` column from table
+    /// `team_projects`.
+    pub fn team(
+        mut self,
+        team_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let team_id = team_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamProjectAttributes::TeamId)
-        })?;
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn project_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
+    /// Sets the value of the `team_projects.project_id` column from table
+    /// `team_projects`.
+    pub fn project(
         mut self,
-        project_id: P,
+        project_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let project_id = project_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamProjectAttributes::ProjectId)
-        })?;
         self.project_id = Some(project_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableTeamProjectBuilder> for InsertableTeamProject {
-    type Error = common_traits::prelude::BuilderError<InsertableTeamProjectAttributes>;
-    fn try_from(
-        builder: InsertableTeamProjectBuilder,
-    ) -> Result<InsertableTeamProject, Self::Error> {
-        Ok(Self {
-            team_id: builder.team_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamProjectAttributes::TeamId,
-                ),
-            )?,
-            project_id: builder.project_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamProjectAttributes::ProjectId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamProjectBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject,
+            Error = web_common_traits::database::InsertError<InsertableTeamProjectAttributes>,
+        >,
+{
+    type Attributes = InsertableTeamProjectAttributes;
+    fn is_complete(&self) -> bool {
+        self.team_id.is_some() && self.project_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::team_projects::TeamProject =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

@@ -1,5 +1,6 @@
 mod addresses;
 mod aliquoting_procedure_models;
+mod aliquoting_procedures;
 mod ball_mill_machine_models;
 mod ball_mill_procedure_models;
 mod binary_question_procedure_models;
@@ -31,9 +32,7 @@ mod instrument_models;
 mod instrument_states;
 mod login_providers;
 mod materials;
-mod mix_countable_procedure_models;
-mod mix_solid_procedure_models;
-mod mount_tip_procedure_models;
+mod mixing_procedure_models;
 mod next_procedure_models;
 mod observation_subjects;
 mod organism_taxa;
@@ -42,9 +41,11 @@ mod organizations;
 mod packaging_procedure_models;
 mod parent_procedure_models;
 mod permanence_categories;
+mod phone_models;
 mod photograph_procedure_models;
 mod pipette_models;
 mod pipette_tip_models;
+mod placing_procedure_models;
 mod positioning_device_models;
 mod pouring_procedure_models;
 mod procedure_model_trackables;
@@ -66,6 +67,7 @@ mod spectra;
 mod spectra_collections;
 mod storage_procedure_models;
 mod supernatant_procedure_models;
+mod supernatant_procedures;
 mod tabular;
 mod taxa;
 mod team_members;
@@ -90,6 +92,9 @@ pub enum Row {
     Address(crate::codegen::structs_codegen::tables::addresses::Address),
     AliquotingProcedureModel(
         crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+    ),
+    AliquotingProcedure(
+        crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
     ),
     BallMillMachineModel(
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
@@ -163,14 +168,8 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
     ),
     Material(crate::codegen::structs_codegen::tables::materials::Material),
-    MixCountableProcedureModel(
-        crate::codegen::structs_codegen::tables::mix_countable_procedure_models::MixCountableProcedureModel,
-    ),
-    MixSolidProcedureModel(
-        crate::codegen::structs_codegen::tables::mix_solid_procedure_models::MixSolidProcedureModel,
-    ),
-    MountTipProcedureModel(
-        crate::codegen::structs_codegen::tables::mount_tip_procedure_models::MountTipProcedureModel,
+    MixingProcedureModel(
+        crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel,
     ),
     NextProcedureModel(
         crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
@@ -190,12 +189,16 @@ pub enum Row {
     PermanenceCategory(
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ),
+    PhoneModel(crate::codegen::structs_codegen::tables::phone_models::PhoneModel),
     PhotographProcedureModel(
         crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
     ),
     PipetteModel(crate::codegen::structs_codegen::tables::pipette_models::PipetteModel),
     PipetteTipModel(
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    ),
+    PlacingProcedureModel(
+        crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel,
     ),
     PositioningDeviceModel(
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
@@ -234,6 +237,9 @@ pub enum Row {
     ),
     SupernatantProcedureModel(
         crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+    ),
+    SupernatantProcedure(
+        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
     ),
     Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
     TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
@@ -281,6 +287,9 @@ impl Row {
             Row::Address(addresses) => addresses.upsert(conn)?.map(Row::from),
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::AliquotingProcedure(aliquoting_procedures) => {
+                aliquoting_procedures.upsert(conn)?.map(Row::from)
             }
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.upsert(conn)?.map(Row::from)
@@ -348,14 +357,8 @@ impl Row {
             }
             Row::LoginProvider(login_providers) => login_providers.upsert(conn)?.map(Row::from),
             Row::Material(materials) => materials.upsert(conn)?.map(Row::from),
-            Row::MixCountableProcedureModel(mix_countable_procedure_models) => {
-                mix_countable_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                mix_solid_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::MountTipProcedureModel(mount_tip_procedure_models) => {
-                mount_tip_procedure_models.upsert(conn)?.map(Row::from)
+            Row::MixingProcedureModel(mixing_procedure_models) => {
+                mixing_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::NextProcedureModel(next_procedure_models) => {
                 next_procedure_models.upsert(conn)?.map(Row::from)
@@ -375,12 +378,16 @@ impl Row {
             Row::PermanenceCategory(permanence_categories) => {
                 permanence_categories.upsert(conn)?.map(Row::from)
             }
+            Row::PhoneModel(phone_models) => phone_models.upsert(conn)?.map(Row::from),
             Row::PhotographProcedureModel(photograph_procedure_models) => {
                 photograph_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::PipetteModel(pipette_models) => pipette_models.upsert(conn)?.map(Row::from),
             Row::PipetteTipModel(pipette_tip_models) => {
                 pipette_tip_models.upsert(conn)?.map(Row::from)
+            }
+            Row::PlacingProcedureModel(placing_procedure_models) => {
+                placing_procedure_models.upsert(conn)?.map(Row::from)
             }
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.upsert(conn)?.map(Row::from)
@@ -417,6 +424,9 @@ impl Row {
             }
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.upsert(conn)?.map(Row::from)
+            }
+            Row::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures.upsert(conn)?.map(Row::from)
             }
             Row::Taxon(taxa) => taxa.upsert(conn)?.map(Row::from),
             Row::TeamMember(team_members) => team_members.upsert(conn)?.map(Row::from),
@@ -460,6 +470,7 @@ impl web_common_traits::prelude::Row for Row {
             Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 aliquoting_procedure_models.primary_key()
             }
+            Row::AliquotingProcedure(aliquoting_procedures) => aliquoting_procedures.primary_key(),
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_key()
             }
@@ -512,14 +523,8 @@ impl web_common_traits::prelude::Row for Row {
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
             Row::Material(materials) => materials.primary_key(),
-            Row::MixCountableProcedureModel(mix_countable_procedure_models) => {
-                mix_countable_procedure_models.primary_key()
-            }
-            Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                mix_solid_procedure_models.primary_key()
-            }
-            Row::MountTipProcedureModel(mount_tip_procedure_models) => {
-                mount_tip_procedure_models.primary_key()
+            Row::MixingProcedureModel(mixing_procedure_models) => {
+                mixing_procedure_models.primary_key()
             }
             Row::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_key(),
             Row::ObservationSubject(observation_subjects) => observation_subjects.primary_key(),
@@ -533,11 +538,15 @@ impl web_common_traits::prelude::Row for Row {
                 parent_procedure_models.primary_key()
             }
             Row::PermanenceCategory(permanence_categories) => permanence_categories.primary_key(),
+            Row::PhoneModel(phone_models) => phone_models.primary_key(),
             Row::PhotographProcedureModel(photograph_procedure_models) => {
                 photograph_procedure_models.primary_key()
             }
             Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
             Row::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_key(),
+            Row::PlacingProcedureModel(placing_procedure_models) => {
+                placing_procedure_models.primary_key()
+            }
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_key()
             }
@@ -569,6 +578,9 @@ impl web_common_traits::prelude::Row for Row {
             }
             Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 supernatant_procedure_models.primary_key()
+            }
+            Row::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures.primary_key()
             }
             Row::Taxon(taxa) => taxa.primary_key(),
             Row::TeamMember(team_members) => team_members.primary_key(),

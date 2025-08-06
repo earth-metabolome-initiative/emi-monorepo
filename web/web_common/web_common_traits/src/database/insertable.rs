@@ -21,6 +21,26 @@ pub trait Insertable {
     }
 }
 
+/// A trait defining a builder which can be extended by a builder of the same
+/// type. This is necessary when there exist for any of several reasons two
+/// instances of the same builder type which at some point need to be merged
+/// together.
+pub trait ExtendableBuilder: Sized {
+    /// The attributes of the builder.
+    type Attributes;
+
+    /// Extends the current builder with another builder of the same type.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other builder to extend the current builder with.
+    ///
+    /// # Errors
+    ///
+    /// * If the extension fails due to a validation error or a build error.
+    fn extend_builder(self, other: Self) -> Result<Self, InsertError<Self::Attributes>>;
+}
+
 /// A trait for Row Builder types which allow for the setting of a primary key
 /// in the insertable variant.
 pub trait SetPrimaryKey {
@@ -70,19 +90,17 @@ where
 
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
-pub trait InsertableVariant<C>: Sized {
+pub trait InsertableVariant<C> {
     /// The associated row type which can be inserted into the database.
-    type Row: Insertable<
-            InsertableBuilder = Self,
-            InsertableVariant = <Self as InsertableVariant<C>>::InsertableVariant,
-        > + diesel::associations::HasTable;
+    type Row: Insertable<InsertableVariant = <Self as InsertableVariant<C>>::InsertableVariant>
+        + diesel::associations::HasTable;
     /// The associated insertable variant type which can be constructed in the
     /// frontend or backend to execute the insert operation.
     type InsertableVariant: diesel::Insertable<<Self::Row as diesel::associations::HasTable>::Table>;
-    /// The error type which may occur during the insert operation.
-    type Error: From<diesel::result::Error>;
     /// The expected user ID type.
     type UserId;
+    /// The error type returned by the insert operation.
+    type Error: From<diesel::result::Error>;
 
     /// Inserts the row into the database.
     ///
@@ -100,67 +118,21 @@ pub trait InsertableVariant<C>: Sized {
     /// * If the row cannot be inserted.
     /// * If the user is not authorized to insert the row.
     fn insert(self, user_id: Self::UserId, conn: &mut C) -> Result<Self::Row, Self::Error>;
-}
 
-#[cfg(feature = "postgres")]
-/// A trait for types that can be constructed solely in the backend to
-/// execute the insert operation.
-pub trait UncheckedInsertableVariant:
-    InsertableVariant<diesel::pg::PgConnection> + TryInto<Self::InsertableVariant>
-where
-    <Self as InsertableVariant<diesel::pg::PgConnection>>::Error:
-        From<<Self as TryInto<Self::InsertableVariant>>::Error>,
-    diesel::query_builder::InsertStatement<
-        <Self::Row as diesel::associations::HasTable>::Table,
-        <Self::InsertableVariant as diesel::Insertable<
-            <Self::Row as diesel::associations::HasTable>::Table,
-        >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, diesel::pg::PgConnection, Self::Row>,
-{
-    /// Inserts the row into the database.
+    /// Attempts to convert the builder into an insertable object, executing
+    /// the necessary database operations if required.
     ///
     /// # Arguments
     ///
-    /// * `conn` - The connection to the database.
-    ///
-    /// # Returns
-    ///
-    /// The inserted row, if the operation was successful.
+    /// * `user_id` - The ID of the user performing the insert operation.
+    /// * `conn` - A mutable reference to the database connection.
     ///
     /// # Errors
     ///
-    /// * If the row cannot be inserted.
-    ///
-    /// # Safety
-    ///
-    /// This method is unsafe because it does not perform a check
-    /// on the user ID on the applicative side. It is meant to be
-    /// used on structural tables which are not meant to be inserted
-    /// or modified by users, but rather by the backend itself.
-    fn unchecked_insert(
-        self,
-        conn: &mut diesel::pg::PgConnection,
-    ) -> Result<Self::Row, <Self as InsertableVariant<diesel::pg::PgConnection>>::Error> {
-        use diesel::{RunQueryDsl, associations::HasTable};
-        let insertable_struct: Self::InsertableVariant = self.try_into()?;
-        Ok(diesel::insert_into(Self::Row::table()).values(insertable_struct).get_result(conn)?)
-    }
-}
-
-#[cfg(feature = "postgres")]
-impl<T> UncheckedInsertableVariant for T
-where
-    T: InsertableVariant<diesel::pg::PgConnection> + TryInto<Self::InsertableVariant>,
-    <Self as InsertableVariant<diesel::pg::PgConnection>>::Error:
-        From<<Self as TryInto<Self::InsertableVariant>>::Error>,
-    diesel::query_builder::InsertStatement<
-        <Self::Row as diesel::associations::HasTable>::Table,
-        <Self::InsertableVariant as diesel::Insertable<
-            <Self::Row as diesel::associations::HasTable>::Table,
-        >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, diesel::pg::PgConnection, Self::Row>,
-{
-    // The implementation is provided by the trait definition.
+    /// * `InsertError` - If the insert operation fails, it returns an error
+    ///   containing the attributes of the insertable object.
+    fn try_insert(self, user_id: i32, conn: &mut C)
+    -> Result<Self::InsertableVariant, Self::Error>;
 }
 
 #[derive(Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]

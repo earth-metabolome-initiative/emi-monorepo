@@ -10,15 +10,11 @@ pub enum InsertableCompatibilityRuleAttributes {
 impl core::fmt::Display for InsertableCompatibilityRuleAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCompatibilityRuleAttributes::LeftTrackableId => {
-                write!(f, "left_trackable_id")
-            }
-            InsertableCompatibilityRuleAttributes::RightTrackableId => {
-                write!(f, "right_trackable_id")
-            }
-            InsertableCompatibilityRuleAttributes::Quantity => write!(f, "quantity"),
-            InsertableCompatibilityRuleAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableCompatibilityRuleAttributes::CreatedAt => write!(f, "created_at"),
+            Self::LeftTrackableId => write!(f, "left_trackable_id"),
+            Self::RightTrackableId => write!(f, "right_trackable_id"),
+            Self::Quantity => write!(f, "quantity"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
         }
     }
 }
@@ -31,11 +27,11 @@ impl core::fmt::Display for InsertableCompatibilityRuleAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCompatibilityRule {
-    left_trackable_id: ::rosetta_uuid::Uuid,
-    right_trackable_id: ::rosetta_uuid::Uuid,
-    quantity: Option<i16>,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) left_trackable_id: ::rosetta_uuid::Uuid,
+    pub(crate) right_trackable_id: ::rosetta_uuid::Uuid,
+    pub(crate) quantity: Option<i16>,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableCompatibilityRule {
     pub fn left_trackable<C: diesel::connection::LoadConnection>(
@@ -155,60 +151,63 @@ impl Default for InsertableCompatibilityRuleBuilder {
         }
     }
 }
-impl InsertableCompatibilityRuleBuilder {
-    pub fn left_trackable_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableCompatibilityRuleBuilder {
+    type Attributes = InsertableCompatibilityRuleAttributes;
+    fn extend_builder(
         mut self,
-        left_trackable_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let left_trackable_id = left_trackable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableCompatibilityRuleAttributes::LeftTrackableId)
-            },
-        )?;
-        if let Some(right_trackable_id) = self.right_trackable_id {
-            pgrx_validation::must_be_distinct_uuid(left_trackable_id, right_trackable_id).map_err(
-                |e| {
-                    e.rename_fields(
-                        InsertableCompatibilityRuleAttributes::LeftTrackableId,
-                        InsertableCompatibilityRuleAttributes::RightTrackableId,
-                    )
-                },
-            )?;
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(left_trackable_id) = other.left_trackable_id {
+            self = self.left_trackable(left_trackable_id)?;
         }
+        if let Some(right_trackable_id) = other.right_trackable_id {
+            self = self.right_trackable(right_trackable_id)?;
+        }
+        if let Some(quantity) = other.quantity {
+            self = self.quantity(Some(quantity))?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableCompatibilityRuleBuilder {
+    type PrimaryKey = (::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.left_trackable_id` column
+    /// from table `compatibility_rules`.
+    pub fn left_trackable(
+        mut self,
+        left_trackable_id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
+    {
         self.left_trackable_id = Some(left_trackable_id);
         Ok(self)
     }
-    pub fn right_trackable_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.right_trackable_id` column
+    /// from table `compatibility_rules`.
+    pub fn right_trackable(
         mut self,
-        right_trackable_id: P,
+        right_trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let right_trackable_id = right_trackable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableCompatibilityRuleAttributes::RightTrackableId)
-            },
-        )?;
-        if let Some(left_trackable_id) = self.left_trackable_id {
-            pgrx_validation::must_be_distinct_uuid(left_trackable_id, right_trackable_id).map_err(
-                |e| {
-                    e.rename_fields(
-                        InsertableCompatibilityRuleAttributes::LeftTrackableId,
-                        InsertableCompatibilityRuleAttributes::RightTrackableId,
-                    )
-                },
-            )?;
-        }
         self.right_trackable_id = Some(right_trackable_id);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.quantity` column from table
+    /// `compatibility_rules`.
     pub fn quantity<P>(
         mut self,
         quantity: P,
@@ -227,20 +226,22 @@ impl InsertableCompatibilityRuleBuilder {
         self.quantity = quantity;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.created_by` column from table
+    /// `compatibility_rules`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableCompatibilityRuleAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.created_at` column from table
+    /// `compatibility_rules`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -259,33 +260,31 @@ impl InsertableCompatibilityRuleBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableCompatibilityRuleBuilder> for InsertableCompatibilityRule {
-    type Error = common_traits::prelude::BuilderError<InsertableCompatibilityRuleAttributes>;
-    fn try_from(
-        builder: InsertableCompatibilityRuleBuilder,
-    ) -> Result<InsertableCompatibilityRule, Self::Error> {
-        Ok(Self {
-            left_trackable_id: builder.left_trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCompatibilityRuleAttributes::LeftTrackableId,
-                ),
-            )?,
-            right_trackable_id: builder.right_trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCompatibilityRuleAttributes::RightTrackableId,
-                ),
-            )?,
-            quantity: builder.quantity,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCompatibilityRuleAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableCompatibilityRuleAttributes::CreatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableCompatibilityRuleBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+            Error = web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>,
+        >,
+{
+    type Attributes = InsertableCompatibilityRuleAttributes;
+    fn is_complete(&self) -> bool {
+        self.left_trackable_id.is_some()
+            && self.right_trackable_id.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

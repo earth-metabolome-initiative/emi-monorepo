@@ -21,7 +21,7 @@ pub(super) fn init_wrappers(
                 .to_owned(),
         ))
         .unwrap()
-        .parent_id(Some(wet_lab_container.id))
+        .parent(Some(wet_lab_container.id))
         .unwrap()
         .created_by(user.id)
         .unwrap()

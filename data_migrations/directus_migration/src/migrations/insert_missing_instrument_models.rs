@@ -60,7 +60,7 @@ pub(crate) fn insert_missing_instrument_models(
             // We need to insert the product first
             PortalCommercialProduct::new()
                 .name(directus_instrument_model.instrument_model.clone())?
-                .brand_id(portal_brand.id)?
+                .brand(portal_brand.id)?
                 .created_by(portal_created_by.id)?
                 .updated_by(portal_updated_by.id)?
                 .updated_at(updated_at)?

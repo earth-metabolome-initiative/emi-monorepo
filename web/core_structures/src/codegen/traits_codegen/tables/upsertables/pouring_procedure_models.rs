@@ -21,7 +21,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 measured_with
                     .ne(excluded(measured_with))
                     .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination)))
+                    .or(poured_into.ne(excluded(poured_into)))
+                    .or(procedure_poured_into.ne(excluded(procedure_poured_into)))
                     .or(liters.ne(excluded(liters))),
             )
             .get_results(conn)
@@ -51,7 +52,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 measured_with
                     .ne(excluded(measured_with))
                     .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination)))
+                    .or(poured_into.ne(excluded(poured_into)))
+                    .or(procedure_poured_into.ne(excluded(procedure_poured_into)))
                     .or(liters.ne(excluded(liters))),
             )
             .get_results(conn)

@@ -15,7 +15,7 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    Column, ColumnSameAsNetwork, PgExtension, PgType, Table,
+    Column, ColumnSameAsNetwork, PgExtension, PgType, Table, TableExtensionNetwork,
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
@@ -103,12 +103,19 @@ pub struct Codegen<'a> {
     pub(super) enable_yew: bool,
     /// Graph representing the same-as relationships between columns.
     column_same_as_network: Option<ColumnSameAsNetwork>,
+    /// Graph representing the "extend" relationships between tables.
+    table_extension_network: Option<TableExtensionNetwork>,
 }
 
 impl<'a> Codegen<'a> {
     /// Returns a reference to the column same-as network.
     pub fn column_same_as_network(&self) -> Option<&ColumnSameAsNetwork> {
         self.column_same_as_network.as_ref()
+    }
+
+    /// Returns a reference to the table extension network.
+    pub fn table_extension_network(&self) -> Option<&TableExtensionNetwork> {
+        self.table_extension_network.as_ref()
     }
 
     #[must_use]
@@ -498,6 +505,11 @@ impl<'a> Codegen<'a> {
 
         let task = Task::new("Creating column same-as network");
         self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
+        time_tracker.add_completed_task(task);
+
+        let task = Task::new("Creating table extension network");
+        self.table_extension_network =
+            Some(TableExtensionNetwork::from_tables(conn, tables.clone())?);
         time_tracker.add_completed_task(task);
 
         let codegen_directory = self.get_output_directory()?.join(CODEGEN_DIRECTORY);

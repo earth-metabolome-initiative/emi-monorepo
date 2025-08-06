@@ -42,7 +42,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .trackable_id(camera.id)
+        .trackable(camera.id)
         .unwrap();
 
     let positioning_device_builder = ProcedureModelTrackable::new()
@@ -50,7 +50,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .trackable_id(positioning_device.id)
+        .trackable(positioning_device.id)
         .unwrap();
 
     let organism_builder = ProcedureModelTrackable::new()
@@ -58,7 +58,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .created_by(user.id)
         .unwrap()
-        .trackable_id(organism.id)
+        .trackable(organism.id)
         .unwrap();
 
     let observation_procedure = ProcedureModel::new()
@@ -94,7 +94,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .procedure_photographed_with(camera_builder.clone())
         .unwrap()
-        .trackable_id(organism_builder.clone())
+        .trackable(organism_builder.clone())
         .unwrap()
         .created_by(user.id)
         .unwrap()
@@ -109,7 +109,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .procedure_photographed_with(camera_builder.clone())
         .unwrap()
-        .trackable_id(organism_builder.clone())
+        .trackable(organism_builder.clone())
         .unwrap()
         .created_by(user.id)
         .unwrap()
@@ -125,7 +125,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .procedure_photographed_with(camera_builder.clone())
         .unwrap()
-        .trackable_id(organism_builder.clone())
+        .trackable(organism_builder.clone())
         .unwrap()
         .created_by(user.id)
         .unwrap()
@@ -140,7 +140,7 @@ pub(crate) fn init_organism_observation_procedure(
         .unwrap()
         .procedure_geolocated_with(positioning_device_builder.clone())
         .unwrap()
-        .trackable_id(organism_builder.clone())
+        .trackable(organism_builder.clone())
         .unwrap()
         .created_by(user.id)
         .unwrap()

@@ -14,21 +14,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::team_projects::TeamProject,
     >,
-    crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::teams::Team,
-    >,
     crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -44,6 +29,22 @@ where
         C,
         crate::codegen::structs_codegen::tables::projects::Project,
     >,
+    crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::teams::Team,
+    >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject;
@@ -60,7 +61,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.team(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -78,5 +79,29 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let team_id = self
+            .team_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttributes::TeamId,
+                ),
+            )?;
+        let project_id = self
+            .project_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttributes::ProjectId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            team_id,
+            project_id,
+        })
     }
 }

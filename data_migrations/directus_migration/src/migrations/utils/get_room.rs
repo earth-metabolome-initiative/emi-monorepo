@@ -35,7 +35,7 @@ pub(crate) fn get_room(
             .name(directus_room.room_name.clone())?
             .description(directus_room.comment.clone())?
             .qrcode(directus_room.qr_code)?
-            .addresses_id(address.id)?
+            .addresses(address.id)?
             .geolocation(match directus_room.geolocation.clone() {
                 postgis_diesel::types::GeometryContainer::Point(geolocation) => geolocation,
                 _ => {

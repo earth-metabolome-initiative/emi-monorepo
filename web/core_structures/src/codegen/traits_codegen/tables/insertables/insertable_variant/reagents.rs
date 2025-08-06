@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    Trackable,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<
+    Trackable,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,28 +17,10 @@ where
         C,
         crate::codegen::structs_codegen::tables::reagents::Reagent,
     >,
-    crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
+    C: diesel::connection::LoadConnection,
+    Trackable: web_common_traits::database::TryInsertGeneric<
         C,
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-        >,
+        PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::reagents::Reagent;
@@ -51,19 +36,55 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableReagent = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.id(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let purity = self
+            .purity
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::Purity,
+                ),
+            )?;
+        let cas_code = self
+            .cas_code
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::CasCode,
+                ),
+            )?;
+        let molecular_formula = self
+            .molecular_formula
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::MolecularFormula,
+                ),
+            )?;
+        let id = self
+            .id
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentExtensionAttributes::Trackable(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                    ),
+                ))
+            })?;
+        Ok(Self::InsertableVariant {
+            id,
+            purity,
+            cas_code,
+            molecular_formula,
+        })
     }
 }

@@ -15,7 +15,8 @@
 pub struct WeighingProcedure {
     pub procedure_id: ::rosetta_uuid::Uuid,
     pub procedure_model_id: i32,
-    pub instrument_id: ::rosetta_uuid::Uuid,
+    pub weighted_with: ::rosetta_uuid::Uuid,
+    pub weighted_container_id: ::rosetta_uuid::Uuid,
     pub kilograms: f32,
 }
 impl web_common_traits::prelude::TableName for WeighingProcedure {
@@ -100,39 +101,71 @@ impl WeighingProcedure {
             conn,
         )
     }
-    pub fn instrument<C: diesel::connection::LoadConnection>(
+    pub fn weighted_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
+            crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.instrument_id,
+                crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel::table(),
+                self.weighted_with,
             ),
             conn,
         )
     }
-    pub fn weighing_procedures_procedure_id_instrument_id_fkey<
+    pub fn weighted_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.weighted_container_id,
+            ),
+            conn,
+        )
+    }
+    pub fn weighing_procedures_procedure_id_weighted_with_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
@@ -161,7 +194,41 @@ impl WeighingProcedure {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.instrument_id),
+                (self.procedure_id, self.weighted_with),
+            ),
+            conn,
+        )
+    }
+    pub fn weighing_procedures_procedure_id_weighted_container_id_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
+                (self.procedure_id, self.weighted_container_id),
             ),
             conn,
         )
@@ -180,15 +247,28 @@ impl WeighingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_instrument_id(
-        instrument_id: &::rosetta_uuid::Uuid,
+    pub fn from_weighted_with(
+        weighted_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
         Self::table()
-            .filter(weighing_procedures::instrument_id.eq(instrument_id))
+            .filter(weighing_procedures::weighted_with.eq(weighted_with))
+            .order_by(weighing_procedures::procedure_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_weighted_container_id(
+        weighted_container_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(weighing_procedures::weighted_container_id.eq(weighted_container_id))
             .order_by(weighing_procedures::procedure_id.asc())
             .load::<Self>(conn)
     }
@@ -213,9 +293,9 @@ impl WeighingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_id_and_instrument_id(
+    pub fn from_procedure_id_and_weighted_with(
         procedure_id: &::rosetta_uuid::Uuid,
-        instrument_id: &::rosetta_uuid::Uuid,
+        weighted_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -227,7 +307,27 @@ impl WeighingProcedure {
             .filter(
                 weighing_procedures::procedure_id
                     .eq(procedure_id)
-                    .and(weighing_procedures::instrument_id.eq(instrument_id)),
+                    .and(weighing_procedures::weighted_with.eq(weighted_with)),
+            )
+            .order_by(weighing_procedures::procedure_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_id_and_weighted_container_id(
+        procedure_id: &::rosetta_uuid::Uuid,
+        weighted_container_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(
+                weighing_procedures::procedure_id
+                    .eq(procedure_id)
+                    .and(weighing_procedures::weighted_container_id.eq(weighted_container_id)),
             )
             .order_by(weighing_procedures::procedure_id.asc())
             .load::<Self>(conn)

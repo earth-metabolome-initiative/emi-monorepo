@@ -7,10 +7,8 @@ pub enum InsertableUserOrganizationAttributes {
 impl core::fmt::Display for InsertableUserOrganizationAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableUserOrganizationAttributes::UserId => write!(f, "user_id"),
-            InsertableUserOrganizationAttributes::OrganizationId => {
-                write!(f, "organization_id")
-            }
+            Self::UserId => write!(f, "user_id"),
+            Self::OrganizationId => write!(f, "organization_id"),
         }
     }
 }
@@ -23,8 +21,8 @@ impl core::fmt::Display for InsertableUserOrganizationAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserOrganization {
-    user_id: i32,
-    organization_id: i16,
+    pub(crate) user_id: i32,
+    pub(crate) organization_id: i16,
 }
 impl InsertableUserOrganization {
     pub fn user<C: diesel::connection::LoadConnection>(
@@ -92,59 +90,79 @@ impl InsertableUserOrganization {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserOrganizationBuilder {
     pub(crate) user_id: Option<i32>,
     pub(crate) organization_id: Option<i16>,
 }
-impl InsertableUserOrganizationBuilder {
-    pub fn user_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableUserOrganizationBuilder {
+    type Attributes = InsertableUserOrganizationAttributes;
+    fn extend_builder(
         mut self,
-        user_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(user_id) = other.user_id {
+            self = self.user(user_id)?;
+        }
+        if let Some(organization_id) = other.organization_id {
+            self = self.organization(organization_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableUserOrganizationBuilder {
+    type PrimaryKey = (i32, i16);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
+    /// Sets the value of the `user_organizations.user_id` column from table
+    /// `user_organizations`.
+    pub fn user(
+        mut self,
+        user_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let user_id = user_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableUserOrganizationAttributes::UserId)
-        })?;
         self.user_id = Some(user_id);
         Ok(self)
     }
-    pub fn organization_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
+    /// Sets the value of the `user_organizations.organization_id` column from
+    /// table `user_organizations`.
+    pub fn organization(
         mut self,
-        organization_id: P,
+        organization_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
-    where
-        P: TryInto<i16>,
-        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let organization_id =
-            organization_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
-                Into::into(err).rename_field(InsertableUserOrganizationAttributes::OrganizationId)
-            })?;
         self.organization_id = Some(organization_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableUserOrganizationBuilder> for InsertableUserOrganization {
-    type Error = common_traits::prelude::BuilderError<InsertableUserOrganizationAttributes>;
-    fn try_from(
-        builder: InsertableUserOrganizationBuilder,
-    ) -> Result<InsertableUserOrganization, Self::Error> {
-        Ok(Self {
-            user_id: builder.user_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserOrganizationAttributes::UserId,
-                ),
-            )?,
-            organization_id: builder.organization_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableUserOrganizationAttributes::OrganizationId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserOrganizationBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
+            Error = web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>,
+        >,
+{
+    type Attributes = InsertableUserOrganizationAttributes;
+    fn is_complete(&self) -> bool {
+        self.user_id.is_some() && self.organization_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

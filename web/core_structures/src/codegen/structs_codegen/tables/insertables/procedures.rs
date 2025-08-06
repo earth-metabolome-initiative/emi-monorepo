@@ -11,14 +11,12 @@ pub enum InsertableProcedureAttributes {
 impl core::fmt::Display for InsertableProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableProcedureAttributes::Id => write!(f, "id"),
-            InsertableProcedureAttributes::ProcedureModelId => {
-                write!(f, "procedure_model_id")
-            }
-            InsertableProcedureAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableProcedureAttributes::CreatedAt => write!(f, "created_at"),
-            InsertableProcedureAttributes::UpdatedBy => write!(f, "updated_by"),
-            InsertableProcedureAttributes::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "id"),
+            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::UpdatedBy => write!(f, "updated_by"),
+            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -29,12 +27,12 @@ impl core::fmt::Display for InsertableProcedureAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedure {
-    id: ::rosetta_uuid::Uuid,
-    procedure_model_id: i32,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_model_id: i32,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) updated_by: i32,
+    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedure {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -156,7 +154,41 @@ impl Default for InsertableProcedureBuilder {
         }
     }
 }
-impl InsertableProcedureBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableProcedureBuilder {
+    type Attributes = InsertableProcedureAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(id) = other.id {
+            self = self.id(id)?;
+        }
+        if let Some(procedure_model_id) = other.procedure_model_id {
+            self = self.procedure_model(procedure_model_id)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(updated_by) = other.updated_by {
+            self = self.updated_by(updated_by)?;
+        }
+        if let Some(updated_at) = other.updated_at {
+            self = self.updated_at(updated_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureBuilder {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.id` column from table `procedures`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -171,36 +203,33 @@ impl InsertableProcedureBuilder {
         self.id = Some(id);
         Ok(self)
     }
-    pub fn procedure_model_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.procedure_model_id` column from table
+    /// `procedures`.
+    pub fn procedure_model(
         mut self,
-        procedure_model_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let procedure_model_id =
-            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err).rename_field(InsertableProcedureAttributes::ProcedureModelId)
-            })?;
+        procedure_model_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>> {
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.created_by` column from table
+    /// `procedures`.
+    pub fn created_by(
         mut self,
-        created_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureAttributes::CreatedBy)
-        })?;
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>> {
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.created_at` column from table
+    /// `procedures`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -226,20 +255,21 @@ impl InsertableProcedureBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.updated_by` column from table
+    /// `procedures`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureAttributes::UpdatedBy)
-        })?;
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>> {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.updated_at` column from table
+    /// `procedures`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -266,38 +296,33 @@ impl InsertableProcedureBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableProcedureBuilder> for InsertableProcedure {
-    type Error = common_traits::prelude::BuilderError<InsertableProcedureAttributes>;
-    fn try_from(builder: InsertableProcedureBuilder) -> Result<InsertableProcedure, Self::Error> {
-        Ok(Self {
-            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProcedureAttributes::Id,
-            ))?,
-            procedure_model_id: builder.procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureAttributes::ProcedureModelId,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: builder.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: builder.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureAttributes::UpdatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableProcedureBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::procedures::Procedure,
+            Error = web_common_traits::database::InsertError<InsertableProcedureAttributes>,
+        >,
+{
+    type Attributes = InsertableProcedureAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.procedure_model_id.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::procedures::Procedure =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

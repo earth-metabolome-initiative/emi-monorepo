@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableBrandAttributes {
+    Id,
     Name,
     CreatedBy,
     CreatedAt,
@@ -10,11 +11,12 @@ pub enum InsertableBrandAttributes {
 impl core::fmt::Display for InsertableBrandAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableBrandAttributes::Name => write!(f, "name"),
-            InsertableBrandAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableBrandAttributes::CreatedAt => write!(f, "created_at"),
-            InsertableBrandAttributes::UpdatedBy => write!(f, "updated_by"),
-            InsertableBrandAttributes::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "name"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::UpdatedBy => write!(f, "updated_by"),
+            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -25,11 +27,11 @@ impl core::fmt::Display for InsertableBrandAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableBrand {
-    name: String,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) name: String,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) updated_by: i32,
+    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableBrand {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -117,7 +119,38 @@ impl Default for InsertableBrandBuilder {
         }
     }
 }
-impl InsertableBrandBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableBrandBuilder {
+    type Attributes = InsertableBrandAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(updated_by) = other.updated_by {
+            self = self.updated_by(updated_by)?;
+        }
+        if let Some(updated_at) = other.updated_at {
+            self = self.updated_at(updated_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.name` column from table `brands`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -134,21 +167,20 @@ impl InsertableBrandBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.created_by` column from table `brands`.
+    pub fn created_by(
         mut self,
-        created_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableBrandAttributes::CreatedBy)
-        })?;
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.created_at` column from table `brands`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -174,20 +206,19 @@ impl InsertableBrandBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.updated_by` column from table `brands`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableBrandAttributes::UpdatedBy)
-        })?;
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.updated_at` column from table `brands`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -214,33 +245,32 @@ impl InsertableBrandBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableBrandBuilder> for InsertableBrand {
-    type Error = common_traits::prelude::BuilderError<InsertableBrandAttributes>;
-    fn try_from(builder: InsertableBrandBuilder) -> Result<InsertableBrand, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableBrandAttributes::Name,
-            ))?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: builder.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: builder.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableBrandAttributes::UpdatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableBrandBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::brands::Brand,
+            Error = web_common_traits::database::InsertError<InsertableBrandAttributes>,
+        >,
+{
+    type Attributes = InsertableBrandAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::brands::Brand =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

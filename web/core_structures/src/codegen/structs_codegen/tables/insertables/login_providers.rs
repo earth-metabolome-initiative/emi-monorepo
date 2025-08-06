@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableLoginProviderAttributes {
+    Id,
     Name,
     Icon,
     ClientId,
@@ -11,12 +12,13 @@ pub enum InsertableLoginProviderAttributes {
 impl core::fmt::Display for InsertableLoginProviderAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableLoginProviderAttributes::Name => write!(f, "name"),
-            InsertableLoginProviderAttributes::Icon => write!(f, "icon"),
-            InsertableLoginProviderAttributes::ClientId => write!(f, "client_id"),
-            InsertableLoginProviderAttributes::RedirectUri => write!(f, "redirect_uri"),
-            InsertableLoginProviderAttributes::OauthUrl => write!(f, "oauth_url"),
-            InsertableLoginProviderAttributes::Scope => write!(f, "scope"),
+            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "name"),
+            Self::Icon => write!(f, "icon"),
+            Self::ClientId => write!(f, "client_id"),
+            Self::RedirectUri => write!(f, "redirect_uri"),
+            Self::OauthUrl => write!(f, "oauth_url"),
+            Self::Scope => write!(f, "scope"),
         }
     }
 }
@@ -29,15 +31,15 @@ impl core::fmt::Display for InsertableLoginProviderAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProvider {
-    name: String,
-    icon: String,
-    client_id: String,
-    redirect_uri: String,
-    oauth_url: String,
-    scope: String,
+    pub(crate) name: String,
+    pub(crate) icon: String,
+    pub(crate) client_id: String,
+    pub(crate) redirect_uri: String,
+    pub(crate) oauth_url: String,
+    pub(crate) scope: String,
 }
 impl InsertableLoginProvider {}
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProviderBuilder {
     pub(crate) name: Option<String>,
@@ -47,7 +49,42 @@ pub struct InsertableLoginProviderBuilder {
     pub(crate) oauth_url: Option<String>,
     pub(crate) scope: Option<String>,
 }
-impl InsertableLoginProviderBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableLoginProviderBuilder {
+    type Attributes = InsertableLoginProviderAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(icon) = other.icon {
+            self = self.icon(icon)?;
+        }
+        if let Some(client_id) = other.client_id {
+            self = self.client(client_id)?;
+        }
+        if let Some(redirect_uri) = other.redirect_uri {
+            self = self.redirect_uri(redirect_uri)?;
+        }
+        if let Some(oauth_url) = other.oauth_url {
+            self = self.oauth_url(oauth_url)?;
+        }
+        if let Some(scope) = other.scope {
+            self = self.scope(scope)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableLoginProviderBuilder {
+    type PrimaryKey = i16;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.name` column from table
+    /// `login_providers`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -64,6 +101,10 @@ impl InsertableLoginProviderBuilder {
         self.name = Some(name);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.icon` column from table
+    /// `login_providers`.
     pub fn icon<P>(
         mut self,
         icon: P,
@@ -80,7 +121,11 @@ impl InsertableLoginProviderBuilder {
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn client_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.client_id` column from table
+    /// `login_providers`.
+    pub fn client<P>(
         mut self,
         client_id: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
@@ -96,6 +141,10 @@ impl InsertableLoginProviderBuilder {
         self.client_id = Some(client_id);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.redirect_uri` column from table
+    /// `login_providers`.
     pub fn redirect_uri<P>(
         mut self,
         redirect_uri: P,
@@ -111,6 +160,10 @@ impl InsertableLoginProviderBuilder {
         self.redirect_uri = Some(redirect_uri);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.oauth_url` column from table
+    /// `login_providers`.
     pub fn oauth_url<P>(
         mut self,
         oauth_url: P,
@@ -125,6 +178,10 @@ impl InsertableLoginProviderBuilder {
         self.oauth_url = Some(oauth_url);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
+    /// Sets the value of the `login_providers.scope` column from table
+    /// `login_providers`.
     pub fn scope<P>(
         mut self,
         scope: P,
@@ -142,36 +199,33 @@ impl InsertableLoginProviderBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableLoginProviderBuilder> for InsertableLoginProvider {
-    type Error = common_traits::prelude::BuilderError<InsertableLoginProviderAttributes>;
-    fn try_from(
-        builder: InsertableLoginProviderBuilder,
-    ) -> Result<InsertableLoginProvider, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableLoginProviderAttributes::Name,
-            ))?,
-            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableLoginProviderAttributes::Icon,
-            ))?,
-            client_id: builder.client_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::ClientId,
-                ),
-            )?,
-            redirect_uri: builder.redirect_uri.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::RedirectUri,
-                ),
-            )?,
-            oauth_url: builder.oauth_url.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableLoginProviderAttributes::OauthUrl,
-                ),
-            )?,
-            scope: builder.scope.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableLoginProviderAttributes::Scope,
-            ))?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableLoginProviderBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+            Error = web_common_traits::database::InsertError<InsertableLoginProviderAttributes>,
+        >,
+{
+    type Attributes = InsertableLoginProviderAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.icon.is_some()
+            && self.client_id.is_some()
+            && self.redirect_uri.is_some()
+            && self.oauth_url.is_some()
+            && self.scope.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::login_providers::LoginProvider =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

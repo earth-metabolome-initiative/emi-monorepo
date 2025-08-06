@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    ProcedureModel,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
+    ProcedureModel,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,28 +17,27 @@ where
         C,
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
     >,
-    crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel: diesel::Identifiable
+    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
+    <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
+    <<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
+    <<<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder: web_common_traits::database::InsertableVariant<
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes,
-        >,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel;
@@ -65,5 +67,103 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::TryInsertGeneric;
+        let kelvin = self
+            .kelvin
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Kelvin,
+                ),
+            )?;
+        let kelvin_tolerance_percentage = self
+            .kelvin_tolerance_percentage
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
+                ),
+            )?;
+        let pascal = self
+            .pascal
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Pascal,
+                ),
+            )?;
+        let seconds = self
+            .seconds
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Seconds,
+                ),
+            )?;
+        let freeze_dried_with = self
+            .freeze_dried_with
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::FreezeDriedWith,
+                ),
+            )?;
+        let freeze_dried_container_id = self
+            .freeze_dried_container_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::FreezeDriedContainerId,
+                ),
+            )?;
+        let procedure_model_id = self
+            .procedure_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelExtensionAttributes::ProcedureModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes::Id,
+                    ),
+                ))
+            })?;
+        let procedure_freeze_dried_container_id = self
+            .procedure_freeze_dried_container_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedContainerId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedContainerId,
+                )
+            })?;
+        let procedure_freeze_dried_with = self
+            .procedure_freeze_dried_with
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
+                )
+            })?;
+        Ok(Self::InsertableVariant {
+            procedure_model_id,
+            kelvin,
+            kelvin_tolerance_percentage,
+            pascal,
+            seconds,
+            freeze_dried_with,
+            procedure_freeze_dried_with,
+            freeze_dried_container_id,
+            procedure_freeze_dried_container_id,
+        })
     }
 }

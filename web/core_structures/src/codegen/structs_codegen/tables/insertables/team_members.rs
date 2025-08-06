@@ -7,8 +7,8 @@ pub enum InsertableTeamMemberAttributes {
 impl core::fmt::Display for InsertableTeamMemberAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableTeamMemberAttributes::TeamId => write!(f, "team_id"),
-            InsertableTeamMemberAttributes::MemberId => write!(f, "member_id"),
+            Self::TeamId => write!(f, "team_id"),
+            Self::MemberId => write!(f, "member_id"),
         }
     }
 }
@@ -21,8 +21,8 @@ impl core::fmt::Display for InsertableTeamMemberAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamMember {
-    team_id: i32,
-    member_id: i32,
+    pub(crate) team_id: i32,
+    pub(crate) member_id: i32,
 }
 impl InsertableTeamMember {
     pub fn team<C: diesel::connection::LoadConnection>(
@@ -90,56 +90,79 @@ impl InsertableTeamMember {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamMemberBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) member_id: Option<i32>,
 }
-impl InsertableTeamMemberBuilder {
-    pub fn team_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableTeamMemberBuilder {
+    type Attributes = InsertableTeamMemberAttributes;
+    fn extend_builder(
         mut self,
-        team_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(team_id) = other.team_id {
+            self = self.team(team_id)?;
+        }
+        if let Some(member_id) = other.member_id {
+            self = self.member(member_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamMemberBuilder {
+    type PrimaryKey = (i32, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder {
+    /// Sets the value of the `team_members.team_id` column from table
+    /// `team_members`.
+    pub fn team(
+        mut self,
+        team_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let team_id = team_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamMemberAttributes::TeamId)
-        })?;
         self.team_id = Some(team_id);
         Ok(self)
     }
-    pub fn member_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder {
+    /// Sets the value of the `team_members.member_id` column from table
+    /// `team_members`.
+    pub fn member(
         mut self,
-        member_id: P,
+        member_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let member_id = member_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamMemberAttributes::MemberId)
-        })?;
         self.member_id = Some(member_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableTeamMemberBuilder> for InsertableTeamMember {
-    type Error = common_traits::prelude::BuilderError<InsertableTeamMemberAttributes>;
-    fn try_from(builder: InsertableTeamMemberBuilder) -> Result<InsertableTeamMember, Self::Error> {
-        Ok(Self {
-            team_id: builder.team_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamMemberAttributes::TeamId,
-                ),
-            )?,
-            member_id: builder.member_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableTeamMemberAttributes::MemberId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamMemberBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::team_members::TeamMember,
+            Error = web_common_traits::database::InsertError<InsertableTeamMemberAttributes>,
+        >,
+{
+    type Attributes = InsertableTeamMemberAttributes;
+    fn is_complete(&self) -> bool {
+        self.team_id.is_some() && self.member_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::team_members::TeamMember =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

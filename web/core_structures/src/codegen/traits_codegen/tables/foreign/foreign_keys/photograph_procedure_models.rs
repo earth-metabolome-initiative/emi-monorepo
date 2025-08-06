@@ -1,18 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhotographProcedureModelForeignKeys {
-    pub procedure_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-    >,
-    pub photographed_with: Option<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-    >,
-    pub procedure_photographed_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
-    pub trackable: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
+    pub photographed_with:
+        Option<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel {
@@ -38,28 +30,10 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_models::Photog
                     ),
                 ),
             );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.procedure_photographed_with,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.trackable_id,
-                    ),
-                ),
-            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
             && foreign_keys.photographed_with.is_some()
-            && foreign_keys.procedure_photographed_with.is_some()
-            && foreign_keys.trackable.is_some()
     }
     fn update(
         &self,
@@ -86,40 +60,6 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_models::Photog
             ) => {
                 if self.photographed_with == camera_models.id {
                     foreign_keys.photographed_with = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_photographed_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_photographed_with = Some(
-                        procedure_model_trackables.clone(),
-                    );
-                    updated = true;
-                }
-                if self.trackable_id == procedure_model_trackables.id {
-                    foreign_keys.trackable = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_photographed_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_photographed_with = None;
-                    updated = true;
-                }
-                if self.trackable_id == procedure_model_trackables.id {
-                    foreign_keys.trackable = None;
                     updated = true;
                 }
             }

@@ -21,7 +21,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 weighed_with
                     .ne(excluded(weighed_with))
                     .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
-                    .or(sample_container.ne(excluded(sample_container))),
+                    .or(sample_container_id.ne(excluded(sample_container_id)))
+                    .or(procedure_sample_container.ne(excluded(procedure_sample_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -50,7 +51,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 weighed_with
                     .ne(excluded(weighed_with))
                     .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
-                    .or(sample_container.ne(excluded(sample_container))),
+                    .or(sample_container_id.ne(excluded(sample_container_id)))
+                    .or(procedure_sample_container.ne(excluded(procedure_sample_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

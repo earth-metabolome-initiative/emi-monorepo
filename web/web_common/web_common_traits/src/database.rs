@@ -9,6 +9,7 @@ mod insertable;
 mod read;
 mod table_name;
 mod tabular;
+mod try_insert;
 mod updatable;
 mod upsertable;
 
@@ -17,11 +18,12 @@ pub use connection::AnyConnection;
 pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
-#[cfg(feature = "postgres")]
-pub use insertable::UncheckedInsertableVariant;
-pub use insertable::{InsertError, Insertable, InsertableVariant, SetPrimaryKey};
+pub use insertable::{
+    ExtendableBuilder, InsertError, Insertable, InsertableVariant, SetPrimaryKey,
+};
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};
+pub use try_insert::TryInsertGeneric;
 pub use updatable::Updatable;
 pub use upsertable::{UpsertVec, Upsertable};

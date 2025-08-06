@@ -78,6 +78,27 @@ fn foreign_columns(
     key = "String",
     convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
 )]
+fn load_key_table(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<Table, diesel::result::Error> {
+    use diesel::SelectableHelper;
+
+    use crate::schema::tables;
+
+    tables::table
+        .filter(tables::table_name.eq(&key_column_usage.table_name))
+        .filter(tables::table_schema.eq(&key_column_usage.table_schema))
+        .filter(tables::table_catalog.eq(&key_column_usage.table_catalog))
+        .select(Table::as_select())
+        .first::<Table>(conn)
+}
+
+#[cached(
+    result = true,
+    key = "String",
+    convert = r#"{ format!("{}-{}-{}-{}-{}-{}", key_column_usage.constraint_catalog, key_column_usage.constraint_schema, key_column_usage.constraint_name, key_column_usage.table_catalog, key_column_usage.table_schema, key_column_usage.table_name) }"#
+)]
 fn columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -168,6 +189,41 @@ pub struct KeyColumnUsage {
 }
 
 impl KeyColumnUsage {
+    /// Returns whether the key is a singleton foreign key, i.e. it is the only
+    /// foreign key to refer to a particular foreign table within the context
+    /// of its table of definition.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_singleton_foreign_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
+        let foreign_table = self.foreign_table(conn)?;
+        let table = self.table(conn)?;
+        Ok(table.foreign_keys(conn)?.iter().all(|fk| {
+            fk == self || fk.foreign_table(conn).ok().flatten().as_ref() == foreign_table.as_ref()
+        }))
+    }
+
+    /// Returns whether the key is on delete cascade
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    pub fn is_on_delete_cascade(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
+        let referential_constraint = self.referential_constraint(conn)?;
+        Ok(referential_constraint.delete_rule == "CASCADE")
+    }
+
     /// Load all the key column usages from the database
     ///
     /// # Arguments
@@ -250,16 +306,20 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the table from the database
     pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
-        use diesel::SelectableHelper;
+        load_key_table(self, conn)
+    }
 
-        use crate::schema::tables;
-
-        tables::table
-            .filter(tables::table_name.eq(&self.table_name))
-            .filter(tables::table_schema.eq(&self.table_schema))
-            .filter(tables::table_catalog.eq(&self.table_catalog))
-            .select(Table::as_select())
-            .first::<Table>(conn)
+    /// Returns whether the key column usage is self-referential, i.e. the
+    /// foreign table is the same as the local table
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    pub fn is_self_referential(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
+        Ok(Some(self.table(conn)?) == self.foreign_table(conn)?)
     }
 
     /// Returns the foreign table associated with this key column usage
@@ -378,6 +438,24 @@ impl KeyColumnUsage {
         }
     }
 
+    /// Returns whether the key column usage refers to a local primary key
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_local_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn)?;
+
+        // Check if the table has a primary key
+        let primary_keys = table.primary_key_columns(conn)?;
+        let columns = self.columns(conn)?;
+        Ok(primary_keys == columns)
+    }
+
     /// Returns whether the key column usage refers to a foreign unique key
     /// constraint
     ///
@@ -413,6 +491,21 @@ impl KeyColumnUsage {
         }
     }
 
+    /// Returns whether this key column usage defines an extension.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.is_foreign_primary_key(conn)?
+            && self.is_local_primary_key(conn)?
+            && !self.is_self_referential(conn)?)
+    }
+
     /// Returns the number of columns in this key column usage
     ///
     /// # Arguments
@@ -427,37 +520,50 @@ impl KeyColumnUsage {
         Ok(columns.len())
     }
 
-    /// Returns the standardized getter name for this key column usage
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while retrieving the getter name
-    pub fn getter_name(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        let columns = self.columns(conn)?;
-        if columns.len() == 1 {
-            // If there is only one column, we use the column name as the getter name
-            return columns[0].getter_name();
-        }
-
-        Ok(self.constraint_name.clone())
-    }
-
     /// Returns the identifier for this key column usage getter.
     ///
+    /// # Implementation details
+    ///
+    /// The name of the constraint is defined as follows:
+    ///
+    /// * If the constraint refers to several columns, the name is the name of
+    ///   the constraint as defined in the database.
+    /// * If the constraint refers to a single column, but there exist some
+    ///   other single-column constraint which also refers to the same column,
+    ///   the name is the name of the constraint as defined in the database.
+    /// * Otherwise, the name is the getter identifier of the column.
+    ///
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
     ///
-    /// * If an error occurs while retrieving the getter name
-    pub fn getter_ident(&self, conn: &mut PgConnection) -> Result<Ident, WebCodeGenError> {
-        let getter_name = self.getter_name(conn)?;
-        Ok(Ident::new(&getter_name, proc_macro2::Span::call_site()))
+    /// * If an error occurs while querying the database
+    pub fn constraint_ident(&self, conn: &mut PgConnection) -> Result<Ident, WebCodeGenError> {
+        let columns = self.columns(conn)?;
+        if columns.len() == 1 {
+            // We check whether there exist some other constraint which also refers
+            // to the same column in a single-column constraint.
+            let column = &columns[0];
+            let constraints = column.foreign_keys(conn)?;
+            let mut has_other_constraints = false;
+            for constraint in constraints {
+                if &constraint == self {
+                    continue;
+                }
+                if constraint.columns(conn)?.len() == 1 {
+                    has_other_constraints = true;
+                    break;
+                }
+            }
+            if !has_other_constraints {
+                // If there are no other constraints, we use the getter identifier
+                return Ok(column.getter_ident()?);
+            }
+        }
+
+        Ok(Ident::new(&self.constraint_name, proc_macro2::Span::call_site()))
     }
 
     /// Returns the where statement for this key column usage
@@ -557,11 +663,20 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_same_as_constraint(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn is_same_as_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
         let Some(foreign_unique_constraint) = self.is_foreign_unique_key(conn)? else {
-            return Ok(false);
+            return Ok(None);
         };
 
-        Ok(foreign_unique_constraint.is_same_as(conn)?.is_some())
+        if foreign_unique_constraint.is_same_as(conn)?.is_some() {
+            // If the foreign unique constraint is a same-as constraint, we return it
+            Ok(Some(foreign_unique_constraint))
+        } else {
+            // Otherwise, we return None
+            Ok(None)
+        }
     }
 }

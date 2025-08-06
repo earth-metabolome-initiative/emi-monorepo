@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WeighingProcedureModelForeignKeys {
     pub procedure_model: Option<
@@ -7,11 +7,8 @@ pub struct WeighingProcedureModelForeignKeys {
     pub weighed_with: Option<
         crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
     >,
-    pub procedure_weighed_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub sample_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -34,20 +31,14 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.procedure_weighed_with,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.sample_container,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                self.sample_container_id,
             ),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
             && foreign_keys.weighed_with.is_some()
-            && foreign_keys.procedure_weighed_with.is_some()
             && foreign_keys.sample_container.is_some()
     }
     fn update(
@@ -58,38 +49,6 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_weighed_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_weighed_with = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-                if self.sample_container == procedure_model_trackables.id {
-                    foreign_keys.sample_container = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_weighed_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_weighed_with = None;
-                    updated = true;
-                }
-                if self.sample_container == procedure_model_trackables.id {
-                    foreign_keys.sample_container = None;
-                    updated = true;
-                }
-            }
             (
                 crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
@@ -107,6 +66,30 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure_model_id == procedure_models.id {
                     foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.sample_container_id == volumetric_container_models.id {
+                    foreign_keys.sample_container = Some(volumetric_container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.sample_container_id == volumetric_container_models.id {
+                    foreign_keys.sample_container = None;
                     updated = true;
                 }
             }

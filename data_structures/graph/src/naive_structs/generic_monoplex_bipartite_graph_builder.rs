@@ -108,9 +108,7 @@ where
     type Attribute = MonoplexBipartiteGraphBuilder;
 
     fn is_complete(&self) -> bool {
-        self.left_nodes.is_some()
-            && self.right_nodes.is_some()
-            && self.edges.is_some()
+        self.left_nodes.is_some() && self.right_nodes.is_some() && self.edges.is_some()
     }
 
     fn build(self) -> Result<Self::Object, Self::Error> {

@@ -3,6 +3,7 @@
 pub enum TablePrimaryKey {
     Address(i32),
     AliquotingProcedureModel(i32),
+    AliquotingProcedure(::rosetta_uuid::Uuid),
     BallMillMachineModel(::rosetta_uuid::Uuid),
     BallMillProcedureModel(i32),
     BinaryQuestionProcedureModel(i32),
@@ -33,9 +34,7 @@ pub enum TablePrimaryKey {
     InstrumentState(i16),
     LoginProvider(i16),
     Material(i16),
-    MixCountableProcedureModel(i32),
-    MixSolidProcedureModel(i32),
-    MountTipProcedureModel(i32),
+    MixingProcedureModel(i32),
     NextProcedureModel((i32, i32, i32)),
     ObservationSubject(i16),
     OrganismTaxon((::rosetta_uuid::Uuid, i32)),
@@ -44,9 +43,11 @@ pub enum TablePrimaryKey {
     PackagingProcedureModel(i32),
     ParentProcedureModel((i32, i32)),
     PermanenceCategory(i16),
+    PhoneModel(::rosetta_uuid::Uuid),
     PhotographProcedureModel(i32),
     PipetteModel(::rosetta_uuid::Uuid),
     PipetteTipModel(::rosetta_uuid::Uuid),
+    PlacingProcedureModel(i32),
     PositioningDeviceModel(::rosetta_uuid::Uuid),
     PouringProcedureModel(i32),
     ProcedureModelTrackable(i32),
@@ -67,6 +68,7 @@ pub enum TablePrimaryKey {
     SpectraCollection(i32),
     StorageProcedureModel(i32),
     SupernatantProcedureModel(i32),
+    SupernatantProcedure(::rosetta_uuid::Uuid),
     Taxon(i32),
     TeamMember((i32, i32)),
     TeamProject((i32, i32)),
@@ -92,6 +94,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Address(_) => crate::codegen::tables::table_names::TableName::Address,
             TablePrimaryKey::AliquotingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureModel
+            }
+            TablePrimaryKey::AliquotingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::AliquotingProcedure
             }
             TablePrimaryKey::BallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillMachineModel
@@ -175,14 +180,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Material(_) => {
                 crate::codegen::tables::table_names::TableName::Material
             }
-            TablePrimaryKey::MixCountableProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MixCountableProcedureModel
-            }
-            TablePrimaryKey::MixSolidProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MixSolidProcedureModel
-            }
-            TablePrimaryKey::MountTipProcedureModel(_) => {
-                crate::codegen::tables::table_names::TableName::MountTipProcedureModel
+            TablePrimaryKey::MixingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::MixingProcedureModel
             }
             TablePrimaryKey::NextProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::NextProcedureModel
@@ -208,6 +207,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
+            TablePrimaryKey::PhoneModel(_) => {
+                crate::codegen::tables::table_names::TableName::PhoneModel
+            }
             TablePrimaryKey::PhotographProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedureModel
             }
@@ -216,6 +218,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::PipetteTipModel(_) => {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
+            }
+            TablePrimaryKey::PlacingProcedureModel(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedureModel
             }
             TablePrimaryKey::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
@@ -266,6 +271,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SupernatantProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedureModel
+            }
+            TablePrimaryKey::SupernatantProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedure
             }
             TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             TablePrimaryKey::TeamMember(_) => {

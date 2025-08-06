@@ -2,7 +2,7 @@
 
 use core_structures::{Address as PortalAddress, City as PortalCity, Country as PortalCountry};
 use diesel::PgConnection;
-use web_common_traits::database::{Insertable, UncheckedInsertableVariant};
+use web_common_traits::database::Insertable;
 
 use crate::codegen::Address as DirectusAddress;
 
@@ -21,7 +21,7 @@ pub(crate) fn get_address(
             PortalCity::new()
                 .name(directus_address.city.clone())?
                 .iso(country.iso)?
-                .unchecked_insert(portal_conn)?
+                .insert(0, portal_conn)?
         }
     };
 
@@ -47,6 +47,6 @@ pub(crate) fn get_address(
                     ));
                 }
             })?
-            .unchecked_insert(portal_conn)?)
+            .insert(0, portal_conn)?)
     }
 }

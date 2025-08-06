@@ -1,16 +1,28 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableContainerExtensionAttributes {
+    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+}
+impl core::fmt::Display for InsertableContainerExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::Trackable(e) => write!(f, "Trackable.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableContainerAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+    Extension(InsertableContainerExtensionAttributes),
+    Id,
     ContainerModelId,
 }
 impl core::fmt::Display for InsertableContainerAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableContainerAttributes::Id(id) => write!(f, "{}", id),
-            InsertableContainerAttributes::ContainerModelId => {
-                write!(f, "container_model_id")
-            }
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::Id => write!(f, "id"),
+            Self::ContainerModelId => write!(f, "container_model_id"),
         }
     }
 }
@@ -21,8 +33,8 @@ impl core::fmt::Display for InsertableContainerAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainer {
-    id: ::rosetta_uuid::Uuid,
-    container_model_id: ::rosetta_uuid::Uuid,
+    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) container_model_id: ::rosetta_uuid::Uuid,
 }
 impl InsertableContainer {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -90,29 +102,69 @@ impl InsertableContainer {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableContainerBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+pub struct InsertableContainerBuilder<
+    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+> {
     pub(crate) container_model_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) id: Trackable,
 }
-impl InsertableContainerBuilder {
-    pub fn container_model_id<P>(
+impl<Trackable> web_common_traits::database::ExtendableBuilder
+for InsertableContainerBuilder<Trackable>
+where
+    Trackable: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+    >,
+{
+    type Attributes = InsertableContainerAttributes;
+    fn extend_builder(
         mut self,
-        container_model_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let container_model_id = container_model_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableContainerAttributes::ContainerModelId)
-            },
-        )?;
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = self
+            .id
+            .extend_builder(other.id)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                ))
+            })?;
+        if let Some(container_model_id) = other.container_model_id {
+            self = self.container_model(container_model_id)?;
+        }
+        Ok(self)
+    }
+}
+impl<Trackable> web_common_traits::prelude::SetPrimaryKey for InsertableContainerBuilder<Trackable>
+where
+    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
+        self
+    }
+}
+impl<Trackable>
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<Trackable>
+{
+    /// Sets the value of the `containers.container_model_id` column from table
+    /// `containers`.
+    pub fn container_model(
+        mut self,
+        container_model_id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
         self.container_model_id = Some(container_model_id);
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.id` column from table `containers`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -121,10 +173,22 @@ impl InsertableContainerBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id =
-            self.id.id(id).map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        self.id = self.id.id(id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.name` column from table `containers`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -133,12 +197,23 @@ impl InsertableContainerBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        self.id = self.id.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.description` column from table
+    /// `containers`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -147,56 +222,87 @@ impl InsertableContainerBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        self.id = self.id.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn photograph_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.photograph_id` column from table
+    /// `containers`.
+    pub fn photograph(
         mut self,
-        photograph_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
+        self.id = self.id.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn parent_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `containers`.
+    pub fn parent(
         mut self,
-        parent_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .parent_id(parent_id)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
+        self.id = self.id.parent(parent_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_by` column from table
+    /// `containers`.
+    pub fn created_by(
         mut self,
-        created_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
+        self.id = self.id.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_at` column from table
+    /// `containers`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -206,26 +312,44 @@ impl InsertableContainerBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        self.id = self.id.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.updated_by` column from table
+    /// `containers`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
+        self.id = self.id.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.updated_at` column from table
+    /// `containers`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -235,44 +359,40 @@ impl InsertableContainerBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?;
+        self.id = self.id.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
 }
-impl InsertableContainerBuilder {
-    pub(crate) fn try_insert<C>(
+impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableContainerBuilder<Trackable>
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::containers::Container,
+            Error = web_common_traits::database::InsertError<InsertableContainerAttributes>,
+        >,
+    Trackable: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type Attributes = InsertableContainerAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.container_model_id.is_some()
+    }
+    fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        InsertableContainer,
-        web_common_traits::database::InsertError<InsertableContainerAttributes>,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-            >,
-        >,
-    {
-        use diesel::associations::Identifiable;
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let container_model_id = self.container_model_id.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableContainerAttributes::ContainerModelId,
-            ),
-        )?;
-        let id = self
-            .id
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableContainerAttributes::Id))?
-            .id();
-        Ok(InsertableContainer { id, container_model_id })
+        let insertable: crate::codegen::structs_codegen::tables::containers::Container =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

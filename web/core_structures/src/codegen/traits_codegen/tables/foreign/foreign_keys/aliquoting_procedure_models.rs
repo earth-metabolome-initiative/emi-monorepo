@@ -1,17 +1,23 @@
-#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingProcedureModelForeignKeys {
     pub procedure_model: Option<
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
-    pub source: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    pub aliquoted_from: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub destination: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    pub aliquoted_into: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
     pub aliquoted_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+    >,
+    pub pipette_tip: Option<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    >,
+    pub aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey: Option<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -33,32 +39,53 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.source,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.aliquoted_from,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                        self.destination,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.aliquoted_into,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
                         self.aliquoted_with,
                     ),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
+                        self.pipette_tip,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                        self.aliquoted_with,
+                        self.pipette_tip,
+                    )),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_model.is_some() && foreign_keys.source.is_some()
-            && foreign_keys.destination.is_some()
+        foreign_keys.procedure_model.is_some() && foreign_keys.aliquoted_from.is_some()
+            && foreign_keys.aliquoted_into.is_some()
             && foreign_keys.aliquoted_with.is_some()
+            && foreign_keys.pipette_tip.is_some()
+            && foreign_keys
+                .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey
+                .is_some()
     }
     fn update(
         &self,
@@ -69,44 +96,70 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.source == procedure_model_trackables.id {
-                    foreign_keys.source = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-                if self.aliquoted_with == procedure_model_trackables.id {
-                    foreign_keys.aliquoted_with = Some(
-                        procedure_model_trackables.clone(),
+                if self.aliquoted_with == compatibility_rules.left_trackable_id
+                    && self.pipette_tip == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys
+                        .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey = Some(
+                        compatibility_rules,
                     );
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.source == procedure_model_trackables.id {
-                    foreign_keys.source = None;
+                if self.aliquoted_with == compatibility_rules.left_trackable_id
+                    && self.pipette_tip == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys
+                        .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey = None;
                     updated = true;
                 }
-                if self.destination == procedure_model_trackables.id {
-                    foreign_keys.destination = None;
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteModel(pipette_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.aliquoted_with == pipette_models.id {
+                    foreign_keys.aliquoted_with = Some(pipette_models);
                     updated = true;
                 }
-                if self.aliquoted_with == procedure_model_trackables.id {
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteModel(pipette_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.aliquoted_with == pipette_models.id {
                     foreign_keys.aliquoted_with = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.pipette_tip == pipette_tip_models.id {
+                    foreign_keys.pipette_tip = Some(pipette_tip_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.pipette_tip == pipette_tip_models.id {
+                    foreign_keys.pipette_tip = None;
                     updated = true;
                 }
             }
@@ -127,6 +180,38 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             ) => {
                 if self.procedure_model_id == procedure_models.id {
                     foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.aliquoted_from == volumetric_container_models.id {
+                    foreign_keys.aliquoted_from = Some(volumetric_container_models);
+                    updated = true;
+                }
+                if self.aliquoted_into == volumetric_container_models.id {
+                    foreign_keys.aliquoted_into = Some(volumetric_container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.aliquoted_from == volumetric_container_models.id {
+                    foreign_keys.aliquoted_from = None;
+                    updated = true;
+                }
+                if self.aliquoted_into == volumetric_container_models.id {
+                    foreign_keys.aliquoted_into = None;
                     updated = true;
                 }
             }

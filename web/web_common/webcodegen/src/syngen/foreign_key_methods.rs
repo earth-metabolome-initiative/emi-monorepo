@@ -26,7 +26,7 @@ impl Table {
         let mut foreign_key_methods = TokenStream::new();
 
         for foreign_key_constraint in self.foreign_keys(conn)? {
-            if foreign_key_constraint.is_same_as_constraint(conn)? {
+            if foreign_key_constraint.is_same_as_constraint(conn)?.is_some() {
                 continue;
             }
 
@@ -36,10 +36,7 @@ impl Table {
 
             let columns = foreign_key_constraint.columns(conn)?;
 
-            let method_ident: Ident = Ident::new(
-                &foreign_key_constraint.getter_name(conn)?,
-                proc_macro2::Span::call_site(),
-            );
+            let method_ident: Ident = foreign_key_constraint.constraint_ident(conn)?;
 
             let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 

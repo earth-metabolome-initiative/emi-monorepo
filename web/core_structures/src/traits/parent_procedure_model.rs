@@ -83,8 +83,8 @@ where
     {
         use diesel::Identifiable;
         let parent_procedure_model = crate::ParentProcedureModel::new()
-            .parent_procedure_model_id(*self.id())?
-            .child_procedure_model_id(*child_procedure.id())?
+            .parent_procedure_model(*self.id())?
+            .child_procedure_model(*child_procedure.id())?
             .snoozable(options.snoozable)?
             .copiable(options.copiable)?
             .repeatable(options.repeatable)?
@@ -107,9 +107,9 @@ where
                     ProcedureModelTrackable::new()
                         .name(child_trackable.name)
                         .unwrap()
-                        .procedure_model_id(*self.id())
+                        .procedure_model(*self.id())
                         .unwrap()
-                        .trackable_id(child_trackable.trackable_id)
+                        .trackable(child_trackable.trackable_id)
                         .unwrap()
                         .created_by(user.id)
                         .unwrap()
@@ -118,17 +118,17 @@ where
                 };
 
                 SharedProcedureModelTrackable::new()
-                    .parent_id(parent_trackable.id)
+                    .parent(parent_trackable.id)
                     .unwrap()
-                    .child_id(child_trackable.id)
+                    .child(child_trackable.id)
                     .unwrap()
-                    .parent_trackable_id(parent_trackable.trackable_id)
+                    .parent_trackable(parent_trackable.trackable_id)
                     .unwrap()
-                    .child_trackable_id(child_trackable.trackable_id)
+                    .child_trackable(child_trackable.trackable_id)
                     .unwrap()
-                    .parent_procedure_model_id(parent_trackable.procedure_model_id)
+                    .parent_procedure_model(parent_trackable.procedure_model_id)
                     .unwrap()
-                    .child_procedure_model_id(child_trackable.procedure_model_id)
+                    .child_procedure_model(child_trackable.procedure_model_id)
                     .unwrap()
                     .created_by(user.id)
                     .unwrap()

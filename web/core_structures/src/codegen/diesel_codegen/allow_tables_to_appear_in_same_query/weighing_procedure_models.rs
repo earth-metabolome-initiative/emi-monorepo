@@ -8,6 +8,11 @@ diesel::allow_tables_to_appear_in_same_query!(
 );
 use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
 diesel::allow_tables_to_appear_in_same_query!(weighing_procedure_models, procedure_models);
+use crate::codegen::diesel_codegen::tables::volumetric_container_models::volumetric_container_models;
+diesel::allow_tables_to_appear_in_same_query!(
+    weighing_procedure_models,
+    volumetric_container_models
+);
 use crate::codegen::diesel_codegen::tables::weighing_instrument_models::weighing_instrument_models;
 diesel::allow_tables_to_appear_in_same_query!(
     weighing_procedure_models,

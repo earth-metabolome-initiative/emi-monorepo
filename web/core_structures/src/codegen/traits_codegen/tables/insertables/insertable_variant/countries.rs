@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::countries::Country,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::countries::Country;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCountry;
@@ -23,17 +24,41 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCountry = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let iso = self
+            .iso
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes::Iso,
+                ),
+            )?;
+        let name = self
+            .name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes::Name,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            iso,
+            name,
+        })
     }
 }

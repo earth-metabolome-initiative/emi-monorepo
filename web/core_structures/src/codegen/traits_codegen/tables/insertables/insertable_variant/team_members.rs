@@ -29,6 +29,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::teams::Team,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::team_members::TeamMember;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember;
@@ -45,7 +46,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.team(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -57,5 +58,29 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let team_id = self
+            .team_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttributes::TeamId,
+                ),
+            )?;
+        let member_id = self
+            .member_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttributes::MemberId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            team_id,
+            member_id,
+        })
     }
 }

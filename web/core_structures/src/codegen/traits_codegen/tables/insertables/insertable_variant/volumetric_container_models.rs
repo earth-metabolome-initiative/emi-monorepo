@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    ContainerModel,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
+    ContainerModel,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,13 +17,10 @@ where
         C,
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder: web_common_traits::database::InsertableVariant<
+    C: diesel::connection::LoadConnection,
+    ContainerModel: web_common_traits::database::TryInsertGeneric<
         C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
-        >,
+        PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel;
@@ -43,5 +43,32 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let liters = self
+            .liters
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes::Liters,
+                ),
+            )?;
+        let id = self
+            .id
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelExtensionAttributes::ContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes::Id,
+                    ),
+                ))
+            })?;
+        Ok(Self::InsertableVariant {
+            id,
+            liters,
+        })
     }
 }

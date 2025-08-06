@@ -15,8 +15,6 @@ pub mod session_operation;
 pub mod prelude {
     pub use common_traits::prelude::*;
 
-    #[cfg(feature = "postgres")]
-    pub use crate::database::UncheckedInsertableVariant;
     pub use crate::{
         attributes::*,
         database::{

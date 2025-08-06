@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::instrument_states::InstrumentState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentState;
@@ -23,17 +24,57 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentState = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let name = self
+            .name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttributes::Name,
+                ),
+            )?;
+        let description = self
+            .description
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttributes::Description,
+                ),
+            )?;
+        let icon = self
+            .icon
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttributes::Icon,
+                ),
+            )?;
+        let color_id = self
+            .color_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttributes::ColorId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            name,
+            description,
+            icon,
+            color_id,
+        })
     }
 }

@@ -10,26 +10,11 @@ graph [
         ];
 node [shape=box, style=rounded, fontname="Helvetica"];
 edge [fontname="Helvetica"];
-subgraph cluster_freezing_procedure_models {
-  C0 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_with"];
-  C1 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_with"];
-  C2 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_model_id"];
-  label="freezing_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
 subgraph cluster_trackable_procedure_models {
   C6 [color="blue", fillcolor="#ffffff", label="trackable_procedure_models\nid"];
   C7 [color="blue", fillcolor="#ffffff", label="trackable_procedure_models\nprocedure_model_id"];
   C8 [color="blue", fillcolor="#ffffff", label="trackable_procedure_models\ntrackable_id"];
   label="trackable_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_specialized_weighing_procedure_models {
-  C4 [color="blue", fillcolor="#ffffff", label="specialized_weighing_procedure_models\nprocedure_model_id"];
-  C5 [color="blue", fillcolor="#ffffff", label="specialized_weighing_procedure_models\nspecialized_weighed_with"];
-  label="specialized_weighing_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -40,6 +25,21 @@ subgraph cluster_weighing_procedure_models {
   C14 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nreweighed_with"];
   C15 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nweighed_with"];
   label="weighing_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_specialized_weighing_procedure_models {
+  C4 [color="blue", fillcolor="#ffffff", label="specialized_weighing_procedure_models\nprocedure_model_id"];
+  C5 [color="blue", fillcolor="#ffffff", label="specialized_weighing_procedure_models\nspecialized_weighed_with"];
+  label="specialized_weighing_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_freezing_procedure_models {
+  C0 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_with"];
+  C1 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_with"];
+  C2 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_model_id"];
+  label="freezing_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }

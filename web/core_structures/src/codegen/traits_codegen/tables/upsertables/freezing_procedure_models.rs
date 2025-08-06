@@ -17,7 +17,16 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(seconds.ne(excluded(seconds)).or(frozen_with.ne(excluded(frozen_with))))
+            .filter(
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(seconds.ne(excluded(seconds)))
+                    .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
+                    .or(frozen_container_id.ne(excluded(frozen_container_id)))
+                    .or(procedure_frozen_container_id.ne(excluded(procedure_frozen_container_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -41,7 +50,16 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(procedure_model_id)
             .do_update()
             .set(self)
-            .filter(seconds.ne(excluded(seconds)).or(frozen_with.ne(excluded(frozen_with))))
+            .filter(
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(seconds.ne(excluded(seconds)))
+                    .or(frozen_with.ne(excluded(frozen_with)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with)))
+                    .or(frozen_container_id.ne(excluded(frozen_container_id)))
+                    .or(procedure_frozen_container_id.ne(excluded(procedure_frozen_container_id))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

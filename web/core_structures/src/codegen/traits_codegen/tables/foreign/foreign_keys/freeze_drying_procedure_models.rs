@@ -2,10 +2,17 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDryingProcedureModelForeignKeys {
     pub procedure_model: Option<
-        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
-    pub freeze_dried_with:
-        Option<crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel>,
+    pub freeze_dried_with: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
+    pub freeze_dried_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey: Option<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel {
@@ -18,7 +25,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
                         self.procedure_model_id,
                     ),
                 ),
@@ -26,15 +33,36 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDrierModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
                         self.freeze_dried_with,
                     ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.freeze_dried_container_id,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                        self.freeze_dried_with,
+                        self.freeze_dried_container_id,
+                    )),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
             && foreign_keys.freeze_dried_with.is_some()
+            && foreign_keys.freeze_dried_container.is_some()
+            && foreign_keys
+                .freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey
+                .is_some()
     }
     fn update(
         &self,
@@ -45,48 +73,102 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::FreezeDrierModel(freeze_drier_models),
+                crate::codegen::tables::row::Row::BallMillMachineModel(
+                    ball_mill_machine_models,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.freeze_dried_with == freeze_drier_models.id {
-                    foreign_keys.freeze_dried_with = Some(freeze_drier_models);
+                if self.freeze_dried_with == ball_mill_machine_models.id {
+                    foreign_keys.freeze_dried_with = Some(ball_mill_machine_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::FreezeDrierModel(freeze_drier_models),
+                crate::codegen::tables::row::Row::BallMillMachineModel(
+                    ball_mill_machine_models,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.freeze_dried_with == freeze_drier_models.id {
+                if self.freeze_dried_with == ball_mill_machine_models.id {
                     foreign_keys.freeze_dried_with = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(
-                    storage_procedure_models,
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.freeze_dried_with == compatibility_rules.left_trackable_id
+                    && self.freeze_dried_container_id
+                        == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys
+                        .freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey = Some(
+                        compatibility_rules,
+                    );
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.freeze_dried_with == compatibility_rules.left_trackable_id
+                    && self.freeze_dried_container_id
+                        == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys
+                        .freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = Some(procedure_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
                 ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id
-                {
-                    foreign_keys.procedure_model = Some(storage_procedure_models);
+                if self.freeze_dried_container_id == volumetric_container_models.id {
+                    foreign_keys.freeze_dried_container = Some(
+                        volumetric_container_models,
+                    );
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(
-                    storage_procedure_models,
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id
-                {
-                    foreign_keys.procedure_model = None;
+                if self.freeze_dried_container_id == volumetric_container_models.id {
+                    foreign_keys.freeze_dried_container = None;
                     updated = true;
                 }
             }

@@ -17,10 +17,26 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
             .do_update()
             .set(self)
             .filter(
-                pascal
-                    .ne(excluded(pascal))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
+                    .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
-                    .or(freeze_dried_with.ne(excluded(freeze_dried_with))),
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(
+                        procedure_freeze_dried_with
+                            .ne(excluded(procedure_freeze_dried_with)),
+                    )
+                    .or(
+                        freeze_dried_container_id.ne(excluded(freeze_dried_container_id)),
+                    )
+                    .or(
+                        procedure_freeze_dried_container_id
+                            .ne(excluded(procedure_freeze_dried_container_id)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -45,10 +61,26 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
             .do_update()
             .set(self)
             .filter(
-                pascal
-                    .ne(excluded(pascal))
+                kelvin
+                    .ne(excluded(kelvin))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
+                    .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
-                    .or(freeze_dried_with.ne(excluded(freeze_dried_with))),
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(
+                        procedure_freeze_dried_with
+                            .ne(excluded(procedure_freeze_dried_with)),
+                    )
+                    .or(
+                        freeze_dried_container_id.ne(excluded(freeze_dried_container_id)),
+                    )
+                    .or(
+                        procedure_freeze_dried_container_id
+                            .ne(excluded(procedure_freeze_dried_container_id)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

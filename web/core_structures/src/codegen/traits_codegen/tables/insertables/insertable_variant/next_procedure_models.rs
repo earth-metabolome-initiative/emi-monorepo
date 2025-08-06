@@ -14,6 +14,21 @@ where
         C,
         crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
     >,
+    crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
+    >,
     crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -29,6 +44,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModel;
@@ -45,7 +61,7 @@ where
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModel = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -64,10 +80,76 @@ where
                     .into(),
             );
         }
+        if !insertable_struct
+            .next_procedure_models_parent_id_current_id_fkey(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct
+            .next_procedure_models_parent_id_successor_id_fkey(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let parent_id = self
+            .parent_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::ParentId,
+                ),
+            )?;
+        let current_id = self
+            .current_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CurrentId,
+                ),
+            )?;
+        let successor_id = self
+            .successor_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::SuccessorId,
+                ),
+            )?;
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CreatedAt,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            parent_id,
+            current_id,
+            successor_id,
+            created_by,
+            created_at,
+        })
     }
 }

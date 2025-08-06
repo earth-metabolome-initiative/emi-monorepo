@@ -7,8 +7,8 @@ pub enum InsertableCountryAttributes {
 impl core::fmt::Display for InsertableCountryAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCountryAttributes::Iso => write!(f, "iso"),
-            InsertableCountryAttributes::Name => write!(f, "name"),
+            Self::Iso => write!(f, "iso"),
+            Self::Name => write!(f, "name"),
         }
     }
 }
@@ -19,17 +19,39 @@ impl core::fmt::Display for InsertableCountryAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCountry {
-    iso: ::iso_codes::CountryCode,
-    name: String,
+    pub(crate) iso: ::iso_codes::CountryCode,
+    pub(crate) name: String,
 }
 impl InsertableCountry {}
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCountryBuilder {
     pub(crate) iso: Option<::iso_codes::CountryCode>,
     pub(crate) name: Option<String>,
 }
-impl InsertableCountryBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableCountryBuilder {
+    type Attributes = InsertableCountryAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(iso) = other.iso {
+            self = self.iso(iso)?;
+        }
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableCountryBuilder {
+    type PrimaryKey = ::iso_codes::CountryCode;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder {
+    /// Sets the value of the `countries.iso` column from table `countries`.
     pub fn iso<P>(
         mut self,
         iso: P,
@@ -45,6 +67,9 @@ impl InsertableCountryBuilder {
         self.iso = Some(iso);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder {
+    /// Sets the value of the `countries.name` column from table `countries`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -60,16 +85,28 @@ impl InsertableCountryBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableCountryBuilder> for InsertableCountry {
-    type Error = common_traits::prelude::BuilderError<InsertableCountryAttributes>;
-    fn try_from(builder: InsertableCountryBuilder) -> Result<InsertableCountry, Self::Error> {
-        Ok(Self {
-            iso: builder.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCountryAttributes::Iso,
-            ))?,
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCountryAttributes::Name,
-            ))?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableCountryBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::countries::Country,
+            Error = web_common_traits::database::InsertError<InsertableCountryAttributes>,
+        >,
+{
+    type Attributes = InsertableCountryAttributes;
+    fn is_complete(&self) -> bool {
+        self.iso.is_some() && self.name.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::countries::Country =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

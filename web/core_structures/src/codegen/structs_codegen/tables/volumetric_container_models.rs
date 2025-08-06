@@ -21,7 +21,7 @@ impl web_common_traits::prelude::TableName for VolumetricContainerModel {
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     > for VolumetricContainerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -29,7 +29,7 @@ where
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
     > for VolumetricContainerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,

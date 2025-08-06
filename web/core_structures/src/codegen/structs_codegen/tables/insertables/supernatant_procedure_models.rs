@@ -1,36 +1,54 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSupernatantProcedureModelAttributes {
-    ProcedureModelId(
+pub enum InsertableSupernatantProcedureModelExtensionAttributes {
+    ProcedureModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
+}
+impl core::fmt::Display for InsertableSupernatantProcedureModelExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::ProcedureModel(e) => write!(f, "ProcedureModel.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableSupernatantProcedureModelAttributes {
+    Extension(InsertableSupernatantProcedureModelExtensionAttributes),
+    ProcedureModelId,
     Liters,
-    StratifiedSource(
+    StratifiedSource,
+    ProcedureStratifiedSource(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    SupernatantDestination(
+    SupernatantDestination,
+    ProcedureSupernatantDestination(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    TransferredWith(
+    TransferredWith,
+    ProcedureTransferredWith(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+    ),
+    PipetteTip,
+    ProcedurePipetteTip(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
 impl core::fmt::Display for InsertableSupernatantProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableSupernatantProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
-                write!(f, "{}", procedure_model_id)
-            }
-            InsertableSupernatantProcedureModelAttributes::Liters => write!(f, "liters"),
-            InsertableSupernatantProcedureModelAttributes::StratifiedSource(stratified_source) => {
-                write!(f, "{}", stratified_source)
-            }
-            InsertableSupernatantProcedureModelAttributes::SupernatantDestination(
-                supernatant_destination,
-            ) => write!(f, "{}", supernatant_destination),
-            InsertableSupernatantProcedureModelAttributes::TransferredWith(transferred_with) => {
-                write!(f, "{}", transferred_with)
-            }
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::Liters => write!(f, "liters"),
+            Self::StratifiedSource => write!(f, "stratified_source"),
+            Self::ProcedureStratifiedSource(e) => write!(f, "{e}"),
+            Self::SupernatantDestination => write!(f, "supernatant_destination"),
+            Self::ProcedureSupernatantDestination(e) => write!(f, "{e}"),
+            Self::TransferredWith => write!(f, "transferred_with"),
+            Self::ProcedureTransferredWith(e) => write!(f, "{e}"),
+            Self::PipetteTip => write!(f, "pipette_tip"),
+            Self::ProcedurePipetteTip(e) => write!(f, "{e}"),
         }
     }
 }
@@ -43,11 +61,16 @@ impl core::fmt::Display for InsertableSupernatantProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSupernatantProcedureModel {
-    procedure_model_id: i32,
-    liters: f32,
-    stratified_source: i32,
-    supernatant_destination: i32,
-    transferred_with: i32,
+    pub(crate) procedure_model_id: i32,
+    pub(crate) liters: f32,
+    pub(crate) stratified_source: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_stratified_source: i32,
+    pub(crate) supernatant_destination: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_supernatant_destination: i32,
+    pub(crate) transferred_with: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_transferred_with: i32,
+    pub(crate) pipette_tip: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_pipette_tip: i32,
 }
 impl InsertableSupernatantProcedureModel {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -86,6 +109,38 @@ impl InsertableSupernatantProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.stratified_source,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
         diesel::result::Error,
     >
@@ -109,7 +164,7 @@ impl InsertableSupernatantProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.stratified_source,
+                self.procedure_stratified_source,
             ),
             conn,
         )
@@ -118,35 +173,35 @@ impl InsertableSupernatantProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
                 self.supernatant_destination,
             ),
             conn,
         )
     }
-    pub fn transferred_with<C: diesel::connection::LoadConnection>(
+    pub fn procedure_supernatant_destination<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -173,22 +228,255 @@ impl InsertableSupernatantProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_supernatant_destination,
+            ),
+            conn,
+        )
+    }
+    pub fn transferred_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::table(),
                 self.transferred_with,
             ),
             conn,
         )
     }
+    pub fn procedure_transferred_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_transferred_with,
+            ),
+            conn,
+        )
+    }
+    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
+                ),
+                self.pipette_tip,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
+                self.procedure_pipette_tip,
+            ),
+            conn,
+        )
+    }
+    pub fn supernatant_procedure_models_transferred_with_pipette_tip_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule::table(),
+                (self.transferred_with, self.pipette_tip),
+            ),
+            conn,
+        )
+    }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableSupernatantProcedureModelBuilder {
-    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+pub struct InsertableSupernatantProcedureModelBuilder<
+    ProcedureModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
     pub(crate) liters: Option<f32>,
-    pub(crate) stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) stratified_source: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) supernatant_destination: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) transferred_with: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) pipette_tip: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) procedure_model: ProcedureModel,
 }
-impl InsertableSupernatantProcedureModelBuilder {
+impl<ProcedureModel> web_common_traits::database::ExtendableBuilder
+for InsertableSupernatantProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    >,
+{
+    type Attributes = InsertableSupernatantProcedureModelAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure_model = self
+            .procedure_model
+            .extend_builder(other.procedure_model)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                ))
+            })?;
+        if let Some(liters) = other.liters {
+            self = self.liters(liters)?;
+        }
+        if let Some(stratified_source) = other.stratified_source {
+            self = self.stratified_source(stratified_source)?;
+        }
+        self = self.procedure_stratified_source(other.procedure_stratified_source)?;
+        if let Some(supernatant_destination) = other.supernatant_destination {
+            self = self.supernatant_destination(supernatant_destination)?;
+        }
+        self = self
+            .procedure_supernatant_destination(other.procedure_supernatant_destination)?;
+        if let Some(transferred_with) = other.transferred_with {
+            self = self.transferred_with(transferred_with)?;
+        }
+        self = self.procedure_transferred_with(other.procedure_transferred_with)?;
+        if let Some(pipette_tip) = other.pipette_tip {
+            self = self.pipette_tip(pipette_tip)?;
+        }
+        self = self.procedure_pipette_tip(other.procedure_pipette_tip)?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableSupernatantProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.procedure_model = self.procedure_model.set_primary_key(primary_key);
+        self
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `supernatant_procedure_models.liters` column from
+    /// table `supernatant_procedure_models`.
     pub fn liters<P>(
         mut self,
         liters: P,
@@ -208,69 +496,227 @@ impl InsertableSupernatantProcedureModelBuilder {
         self.liters = Some(liters);
         Ok(self)
     }
-    pub fn transferred_with(
-        mut self,
-        transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        if transferred_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableSupernatantProcedureModelAttributes::TransferredWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.transferred_with = transferred_with;
-        Ok(self)
-    }
-    pub fn supernatant_destination(
-        mut self,
-        supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        if supernatant_destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableSupernatantProcedureModelAttributes::SupernatantDestination(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.supernatant_destination = supernatant_destination;
-        Ok(self)
-    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `supernatant_procedure_models.stratified_source`
+    /// column from table `supernatant_procedure_models`.
     pub fn stratified_source(
         mut self,
-        stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        stratified_source: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
     > {
-        if stratified_source.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableSupernatantProcedureModelAttributes::StratifiedSource(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.stratified_source = stratified_source;
+        self.stratified_source = Some(stratified_source);
         Ok(self)
     }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_stratified_source` column from
+    /// table `supernatant_procedure_models`.
+    pub fn procedure_stratified_source(
+        mut self,
+        procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_stratified_source = self
+            .procedure_stratified_source
+            .extend_builder(procedure_stratified_source)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureStratifiedSource(
+                        attribute,
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `supernatant_procedure_models.supernatant_destination` column from table
+    /// `supernatant_procedure_models`.
+    pub fn supernatant_destination(
+        mut self,
+        supernatant_destination: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.supernatant_destination = Some(supernatant_destination);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_supernatant_destination` column
+    /// from table `supernatant_procedure_models`.
+    pub fn procedure_supernatant_destination(
+        mut self,
+        procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_supernatant_destination = self
+            .procedure_supernatant_destination
+            .extend_builder(procedure_supernatant_destination)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination(
+                        attribute,
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `supernatant_procedure_models.transferred_with`
+    /// column from table `supernatant_procedure_models`.
+    pub fn transferred_with(
+        mut self,
+        transferred_with: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.transferred_with = Some(transferred_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_transferred_with` column from
+    /// table `supernatant_procedure_models`.
+    pub fn procedure_transferred_with(
+        mut self,
+        procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_transferred_with = self
+            .procedure_transferred_with
+            .extend_builder(procedure_transferred_with)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureTransferredWith(
+                        attribute,
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `supernatant_procedure_models.pipette_tip` column
+    /// from table `supernatant_procedure_models`.
+    pub fn pipette_tip(
+        mut self,
+        pipette_tip: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.pipette_tip = Some(pipette_tip);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_pipette_tip` column from table
+    /// `supernatant_procedure_models`.
+    pub fn procedure_pipette_tip(
+        mut self,
+        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_pipette_tip =
+            self.procedure_pipette_tip.extend_builder(procedure_pipette_tip).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `supernatant_procedure_models`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -282,11 +728,25 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
         })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `supernatant_procedure_models`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -298,12 +758,25 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.description(description).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `supernatant_procedure_models`.
     pub fn deprecated<P>(
         mut self,
         deprecated: P,
@@ -315,30 +788,51 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn photograph_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `supernatant_procedure_models`.
+    pub fn photograph(
         mut self,
-        photograph_id: P,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `supernatant_procedure_models`.
     pub fn icon<P>(
         mut self,
         icon: P,
@@ -350,28 +844,52 @@ impl InsertableSupernatantProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
-            err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
         })?;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `supernatant_procedure_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.created_by(created_by).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `supernatant_procedure_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -384,29 +902,51 @@ impl InsertableSupernatantProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.created_at(created_at).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `supernatant_procedure_models`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
+        updated_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `supernatant_procedure_models`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -419,97 +959,57 @@ impl InsertableSupernatantProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
         Ok(self)
     }
 }
-impl InsertableSupernatantProcedureModelBuilder {
-    pub(crate) fn try_insert<C>(
+impl<ProcedureModel, C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableSupernatantProcedureModelBuilder<ProcedureModel>
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+        Error = web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
+    >,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
+{
+    type Attributes = InsertableSupernatantProcedureModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.procedure_model.is_complete() && self.liters.is_some()
+            && self.stratified_source.is_some()
+            && self.procedure_stratified_source.is_complete()
+            && self.supernatant_destination.is_some()
+            && self.procedure_supernatant_destination.is_complete()
+            && self.transferred_with.is_some()
+            && self.procedure_transferred_with.is_complete()
+            && self.pipette_tip.is_some() && self.procedure_pipette_tip.is_complete()
+    }
+    fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
-        InsertableSupernatantProcedureModel,
-        web_common_traits::database::InsertError<
-            InsertableSupernatantProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-            >,
-        >,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-            >,
-        >,
-    {
-        use diesel::associations::Identifiable;
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let liters = self.liters.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-            InsertableSupernatantProcedureModelAttributes::Liters,
-        ))?;
-        let procedure_model_id = self
-            .procedure_model_id
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::ProcedureModelId)
-            })?
-            .id();
-        let transferred_with = self
-            .transferred_with
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::TransferredWith)
-            })?
-            .id();
-        let supernatant_destination = self
-            .supernatant_destination
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableSupernatantProcedureModelAttributes::SupernatantDestination,
-                )
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableSupernatantProcedureModelAttributes::SupernatantDestination,
-                )
-            })?
-            .id();
-        let stratified_source = self
-            .stratified_source
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::StratifiedSource)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableSupernatantProcedureModelAttributes::StratifiedSource)
-            })?
-            .id();
-        Ok(InsertableSupernatantProcedureModel {
-            procedure_model_id,
-            liters,
-            stratified_source,
-            supernatant_destination,
-            transferred_with,
-        })
+        let insertable: crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

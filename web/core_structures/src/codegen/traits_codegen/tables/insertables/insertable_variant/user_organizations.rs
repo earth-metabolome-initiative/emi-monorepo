@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganization;
@@ -23,17 +24,41 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganization = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let user_id = self
+            .user_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttributes::UserId,
+                ),
+            )?;
+        let organization_id = self
+            .organization_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttributes::OrganizationId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            user_id,
+            organization_id,
+        })
     }
 }

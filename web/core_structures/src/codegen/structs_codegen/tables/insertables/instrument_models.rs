@@ -1,12 +1,35 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableInstrumentModelExtensionAttributes {
+    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+}
+impl core::fmt::Display for InsertableInstrumentModelExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::Trackable(e) => write!(f, "Trackable.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableInstrumentModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+    Extension(InsertableInstrumentModelExtensionAttributes),
+    Id,
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
+    for InsertableInstrumentModelAttributes
+{
+    fn from(
+        trackables: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+    ) -> Self {
+        Self::Extension(InsertableInstrumentModelExtensionAttributes::Trackable(trackables))
+    }
 }
 impl core::fmt::Display for InsertableInstrumentModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableInstrumentModelAttributes::Id(id) => write!(f, "{}", id),
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::Id => write!(f, "id"),
         }
     }
 }
@@ -19,7 +42,7 @@ impl core::fmt::Display for InsertableInstrumentModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableInstrumentModel {
-    id: ::rosetta_uuid::Uuid,
+    pub(crate) id: ::rosetta_uuid::Uuid,
 }
 impl InsertableInstrumentModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -55,12 +78,54 @@ impl InsertableInstrumentModel {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableInstrumentModelBuilder {
-    pub(crate) id: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+pub struct InsertableInstrumentModelBuilder<
+    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+> {
+    pub(crate) id: Trackable,
 }
-impl InsertableInstrumentModelBuilder {
+impl<Trackable> web_common_traits::database::ExtendableBuilder
+for InsertableInstrumentModelBuilder<Trackable>
+where
+    Trackable: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+    >,
+{
+    type Attributes = InsertableInstrumentModelAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = self
+            .id
+            .extend_builder(other.id)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableInstrumentModelAttributes::Extension(
+                    InsertableInstrumentModelExtensionAttributes::Trackable(attribute),
+                ))
+            })?;
+        Ok(self)
+    }
+}
+impl<Trackable> web_common_traits::prelude::SetPrimaryKey
+    for InsertableInstrumentModelBuilder<Trackable>
+where
+    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
+        self
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.id` column from table
+    /// `instrument_models`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -69,12 +134,17 @@ impl InsertableInstrumentModelBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .id(id)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.name` column from table
+    /// `instrument_models`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -83,12 +153,17 @@ impl InsertableInstrumentModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.description` column from table
+    /// `instrument_models`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -97,56 +172,66 @@ impl InsertableInstrumentModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn photograph_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.photograph_id` column from table
+    /// `instrument_models`.
+    pub fn photograph(
         mut self,
-        photograph_id: P,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn parent_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `instrument_models`.
+    pub fn parent(
         mut self,
-        parent_id: P,
+        parent_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .parent_id(parent_id)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_by` column from table
+    /// `instrument_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_at` column from table
+    /// `instrument_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -156,26 +241,33 @@ impl InsertableInstrumentModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.updated_by` column from table
+    /// `instrument_models`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
+        updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.updated_at` column from table
+    /// `instrument_models`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -185,39 +277,34 @@ impl InsertableInstrumentModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?;
+        self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
-impl InsertableInstrumentModelBuilder {
-    pub(crate) fn try_insert<C>(
+impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableInstrumentModelBuilder<Trackable>
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+            Error = web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>,
+        >,
+    Trackable: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type Attributes = InsertableInstrumentModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
+    }
+    fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        InsertableInstrumentModel,
-        web_common_traits::database::InsertError<InsertableInstrumentModelAttributes>,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-            >,
-        >,
-    {
-        use diesel::associations::Identifiable;
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let id = self
-            .id
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableInstrumentModelAttributes::Id))?
-            .id();
-        Ok(InsertableInstrumentModel { id })
+        let insertable: crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

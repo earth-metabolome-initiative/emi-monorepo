@@ -7,14 +7,8 @@ pub struct CappingProcedureModelForeignKeys {
     pub container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub procedure_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
     pub capped_with: Option<
         crate::codegen::structs_codegen::tables::trackables::Trackable,
-    >,
-    pub procedure_capped_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
     pub capping_procedure_models_container_id_capped_with_fkey: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
@@ -40,18 +34,8 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.procedure_container_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(
                 self.capped_with,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModelTrackable(
-                self.procedure_capped_with,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -64,9 +48,7 @@ impl web_common_traits::prelude::HasForeignKeys
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some()
             && foreign_keys.container.is_some()
-            && foreign_keys.procedure_container.is_some()
             && foreign_keys.capped_with.is_some()
-            && foreign_keys.procedure_capped_with.is_some()
             && foreign_keys.capping_procedure_models_container_id_capped_with_fkey.is_some()
     }
     fn update(
@@ -99,38 +81,6 @@ impl web_common_traits::prelude::HasForeignKeys
                     && self.capped_with == compatibility_rules.right_trackable_id
                 {
                     foreign_keys.capping_procedure_models_container_id_capped_with_fkey = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_container_id == procedure_model_trackables.id {
-                    foreign_keys.procedure_container = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-                if self.procedure_capped_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_capped_with = Some(procedure_model_trackables.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureModelTrackable(
-                    procedure_model_trackables,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_container_id == procedure_model_trackables.id {
-                    foreign_keys.procedure_container = None;
-                    updated = true;
-                }
-                if self.procedure_capped_with == procedure_model_trackables.id {
-                    foreign_keys.procedure_capped_with = None;
                     updated = true;
                 }
             }

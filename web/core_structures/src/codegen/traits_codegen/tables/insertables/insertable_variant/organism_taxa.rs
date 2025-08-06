@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxon;
@@ -23,17 +24,57 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxon = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::CreatedAt,
+                ),
+            )?;
+        let organism_id = self
+            .organism_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::OrganismId,
+                ),
+            )?;
+        let taxon_id = self
+            .taxon_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::TaxonId,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            created_by,
+            created_at,
+            organism_id,
+            taxon_id,
+        })
     }
 }

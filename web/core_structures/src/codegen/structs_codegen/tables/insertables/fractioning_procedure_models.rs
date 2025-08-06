@@ -1,46 +1,48 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFractioningProcedureModelAttributes {
-    ProcedureModelId(
+pub enum InsertableFractioningProcedureModelExtensionAttributes {
+    ProcedureModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
+}
+impl core::fmt::Display for InsertableFractioningProcedureModelExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::ProcedureModel(e) => write!(f, "ProcedureModel.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableFractioningProcedureModelAttributes {
+    Extension(InsertableFractioningProcedureModelExtensionAttributes),
+    ProcedureModelId,
     Kilograms,
     TolerancePercentage,
     WeighedWith,
     ProcedureWeighedWith(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    Source(
+    ProcedureFragmentSource(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
-    Destination(
+    FragmentPlacedInto,
+    ProcedureFragmentPlacedInto(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
 impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableFractioningProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
-                write!(f, "{}", procedure_model_id)
-            }
-            InsertableFractioningProcedureModelAttributes::Kilograms => {
-                write!(f, "kilograms")
-            }
-            InsertableFractioningProcedureModelAttributes::TolerancePercentage => {
-                write!(f, "tolerance_percentage")
-            }
-            InsertableFractioningProcedureModelAttributes::WeighedWith => {
-                write!(f, "weighed_with")
-            }
-            InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(
-                procedure_weighed_with,
-            ) => write!(f, "{}", procedure_weighed_with),
-            InsertableFractioningProcedureModelAttributes::Source(source) => {
-                write!(f, "{}", source)
-            }
-            InsertableFractioningProcedureModelAttributes::Destination(destination) => {
-                write!(f, "{}", destination)
-            }
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::Kilograms => write!(f, "kilograms"),
+            Self::TolerancePercentage => write!(f, "tolerance_percentage"),
+            Self::WeighedWith => write!(f, "weighed_with"),
+            Self::ProcedureWeighedWith(e) => write!(f, "{e}"),
+            Self::ProcedureFragmentSource(e) => write!(f, "{e}"),
+            Self::FragmentPlacedInto => write!(f, "fragment_placed_into"),
+            Self::ProcedureFragmentPlacedInto(e) => write!(f, "{e}"),
         }
     }
 }
@@ -53,13 +55,14 @@ impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFractioningProcedureModel {
-    procedure_model_id: i32,
-    kilograms: f32,
-    tolerance_percentage: f32,
-    weighed_with: ::rosetta_uuid::Uuid,
-    procedure_weighed_with: i32,
-    source: i32,
-    destination: i32,
+    pub(crate) procedure_model_id: i32,
+    pub(crate) kilograms: f32,
+    pub(crate) tolerance_percentage: f32,
+    pub(crate) weighed_with: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_weighed_with: i32,
+    pub(crate) procedure_fragment_source: i32,
+    pub(crate) fragment_placed_into: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_fragment_placed_into: i32,
 }
 impl InsertableFractioningProcedureModel {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -158,7 +161,7 @@ impl InsertableFractioningProcedureModel {
             conn,
         )
     }
-    pub fn source<C: diesel::connection::LoadConnection>(
+    pub fn procedure_fragment_source<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -185,12 +188,44 @@ impl InsertableFractioningProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.source,
+                self.procedure_fragment_source,
             ),
             conn,
         )
     }
-    pub fn destination<C: diesel::connection::LoadConnection>(
+    pub fn fragment_placed_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.fragment_placed_into,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_fragment_placed_into<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -217,24 +252,347 @@ impl InsertableFractioningProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.destination,
+                self.procedure_fragment_placed_into,
             ),
             conn,
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableFractioningProcedureModelBuilder {
-    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+pub struct InsertableFractioningProcedureModelBuilder<
+    ProcedureModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
     pub(crate) kilograms: Option<f32>,
     pub(crate) tolerance_percentage: Option<f32>,
     pub(crate) weighed_with: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    pub(crate) destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) procedure_fragment_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) fragment_placed_into: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_fragment_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) procedure_model: ProcedureModel,
 }
-impl InsertableFractioningProcedureModelBuilder {
+impl<ProcedureModel> web_common_traits::database::ExtendableBuilder
+for InsertableFractioningProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    >,
+{
+    type Attributes = InsertableFractioningProcedureModelAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure_model = self
+            .procedure_model
+            .extend_builder(other.procedure_model)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                ))
+            })?;
+        if let Some(kilograms) = other.kilograms {
+            self = self.kilograms(kilograms)?;
+        }
+        if let Some(tolerance_percentage) = other.tolerance_percentage {
+            self = self.tolerance_percentage(tolerance_percentage)?;
+        }
+        if let Some(weighed_with) = other.weighed_with {
+            self = self.weighed_with(weighed_with)?;
+        }
+        self = self.procedure_weighed_with(other.procedure_weighed_with)?;
+        self = self.procedure_fragment_source(other.procedure_fragment_source)?;
+        if let Some(fragment_placed_into) = other.fragment_placed_into {
+            self = self.fragment_placed_into(fragment_placed_into)?;
+        }
+        self = self
+            .procedure_fragment_placed_into(other.procedure_fragment_placed_into)?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableFractioningProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.procedure_model = self.procedure_model.set_primary_key(primary_key);
+        self
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `fractioning_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `fractioning_procedure_models`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `fractioning_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `fractioning_procedure_models`.
+    pub fn photograph(
+        mut self,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `fractioning_procedure_models`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `fractioning_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `fractioning_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `fractioning_procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `fractioning_procedure_models`.
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFractioningProcedureModelAttributes::Extension(
+                    InsertableFractioningProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `fractioning_procedure_models.kilograms` column
+    /// from table `fractioning_procedure_models`.
     pub fn kilograms<P>(
         mut self,
         kilograms: P,
@@ -255,6 +613,15 @@ impl InsertableFractioningProcedureModelBuilder {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `fractioning_procedure_models.tolerance_percentage` column from table
+    /// `fractioning_procedure_models`.
     pub fn tolerance_percentage<P>(
         mut self,
         tolerance_percentage: P,
@@ -288,370 +655,185 @@ impl InsertableFractioningProcedureModelBuilder {
         self.tolerance_percentage = Some(tolerance_percentage);
         Ok(self)
     }
-    pub fn weighed_with<P>(
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `fractioning_procedure_models.weighed_with` column
+    /// from table `fractioning_procedure_models`.
+    pub fn weighed_with(
         mut self,
-        weighed_with: P,
+        weighed_with: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let weighed_with = weighed_with.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableFractioningProcedureModelAttributes::WeighedWith)
-            },
-        )?;
+    > {
         self.weighed_with = Some(weighed_with);
-        self.procedure_weighed_with =
-            self.procedure_weighed_with.trackable_id(weighed_with).map_err(|err| {
-                err.into_field_name(
-                    InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
-                )
-            })?;
         Ok(self)
     }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `fractioning_procedure_models.procedure_weighed_with` column from table
+    /// `fractioning_procedure_models`.
     pub fn procedure_weighed_with(
         mut self,
         procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    > {
-        if procedure_weighed_with.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) =
-            (self.weighed_with, procedure_weighed_with.trackable_id)
-        {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_weighed_with.trackable_id {
-            self.weighed_with = Some(foreign);
-        } else if let Some(local) = self.weighed_with {
-            self.procedure_weighed_with =
-                self.procedure_weighed_with.trackable_id(local).map_err(|err| {
-                    err.into_field_name(
-                        InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
-                    )
-                })?;
-        }
-        self.procedure_weighed_with = procedure_weighed_with;
-        Ok(self)
-    }
-    pub fn source(
-        mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    > {
-        if source.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableFractioningProcedureModelAttributes::Source(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.source = source;
-        Ok(self)
-    }
-    pub fn destination(
-        mut self,
-        destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    > {
-        if destination.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableFractioningProcedureModelAttributes::Destination(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        self.destination = destination;
-        Ok(self)
-    }
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
-            err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-        })?;
-        Ok(self)
-    }
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.description(description).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn photograph_id<P>(
-        mut self,
-        photograph_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn icon<P>(
-        mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
-            err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-        })?;
-        Ok(self)
-    }
-    pub fn created_by<P>(
-        mut self,
-        created_by: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.created_by(created_by).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.created_at(created_at).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn updated_by<P>(
-        mut self,
-        updated_by: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?;
-        Ok(self)
-    }
-}
-impl InsertableFractioningProcedureModelBuilder {
-    pub(crate) fn try_insert<C>(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<
-        InsertableFractioningProcedureModel,
         web_common_traits::database::InsertError<
             InsertableFractioningProcedureModelAttributes,
         >,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-            >,
-        >,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-            >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
         >,
     {
-        use diesel::associations::Identifiable;
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_weighed_with =
+            self.procedure_weighed_with.extend_builder(procedure_weighed_with).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `fractioning_procedure_models.procedure_fragment_source` column from
+    /// table `fractioning_procedure_models`.
+    pub fn procedure_fragment_source(
+        mut self,
+        procedure_fragment_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableFractioningProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_fragment_source = self
+            .procedure_fragment_source
+            .extend_builder(procedure_fragment_source)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableFractioningProcedureModelAttributes::ProcedureFragmentSource(
+                        attribute,
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `fractioning_procedure_models.fragment_placed_into` column from table
+    /// `fractioning_procedure_models`.
+    pub fn fragment_placed_into(
+        mut self,
+        fragment_placed_into: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFractioningProcedureModelAttributes>,
+    > {
+        self.fragment_placed_into = Some(fragment_placed_into);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `fractioning_procedure_models.procedure_fragment_placed_into` column
+    /// from table `fractioning_procedure_models`.
+    pub fn procedure_fragment_placed_into(
+        mut self,
+        procedure_fragment_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableFractioningProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_fragment_placed_into = self
+            .procedure_fragment_placed_into
+            .extend_builder(procedure_fragment_placed_into)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableFractioningProcedureModelAttributes::ProcedureFragmentPlacedInto(
+                        attribute,
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel, C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableFractioningProcedureModelBuilder<ProcedureModel>
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
+        Error = web_common_traits::database::InsertError<
+            InsertableFractioningProcedureModelAttributes,
+        >,
+    >,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
+{
+    type Attributes = InsertableFractioningProcedureModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.procedure_model.is_complete() && self.kilograms.is_some()
+            && self.tolerance_percentage.is_some() && self.weighed_with.is_some()
+            && self.procedure_weighed_with.is_complete()
+            && self.procedure_fragment_source.is_complete()
+            && self.fragment_placed_into.is_some()
+            && self.procedure_fragment_placed_into.is_complete()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let kilograms =
-            self.kilograms.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFractioningProcedureModelAttributes::Kilograms,
-            ))?;
-        let tolerance_percentage = self.tolerance_percentage.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFractioningProcedureModelAttributes::TolerancePercentage,
-            ),
-        )?;
-        let weighed_with =
-            self.weighed_with.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableFractioningProcedureModelAttributes::WeighedWith,
-            ))?;
-        let procedure_model_id = self
-            .procedure_model_id
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::ProcedureModelId)
-            })?
-            .id();
-        let procedure_weighed_with = self
-            .procedure_weighed_with
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
-                )
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
-                )
-            })?
-            .id();
-        let source = self
-            .source
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Source)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Source)
-            })?
-            .id();
-        let destination = self
-            .destination
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableFractioningProcedureModelAttributes::Destination)
-            })?
-            .id();
-        Ok(InsertableFractioningProcedureModel {
-            procedure_model_id,
-            kilograms,
-            tolerance_percentage,
-            weighed_with,
-            procedure_weighed_with,
-            source,
-            destination,
-        })
+        let insertable: crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

@@ -5,14 +5,16 @@ pub enum InsertableRoleAttributes {
     Description,
     Icon,
     ColorId,
+    Id,
 }
 impl core::fmt::Display for InsertableRoleAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableRoleAttributes::Name => write!(f, "name"),
-            InsertableRoleAttributes::Description => write!(f, "description"),
-            InsertableRoleAttributes::Icon => write!(f, "icon"),
-            InsertableRoleAttributes::ColorId => write!(f, "color_id"),
+            Self::Name => write!(f, "name"),
+            Self::Description => write!(f, "description"),
+            Self::Icon => write!(f, "icon"),
+            Self::ColorId => write!(f, "color_id"),
+            Self::Id => write!(f, "id"),
         }
     }
 }
@@ -23,10 +25,10 @@ impl core::fmt::Display for InsertableRoleAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRole {
-    name: String,
-    description: String,
-    icon: String,
-    color_id: i16,
+    pub(crate) name: String,
+    pub(crate) description: String,
+    pub(crate) icon: String,
+    pub(crate) color_id: i16,
 }
 impl InsertableRole {
     pub fn color<C: diesel::connection::LoadConnection>(
@@ -62,7 +64,7 @@ impl InsertableRole {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRoleBuilder {
     pub(crate) name: Option<String>,
@@ -70,7 +72,35 @@ pub struct InsertableRoleBuilder {
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
-impl InsertableRoleBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableRoleBuilder {
+    type Attributes = InsertableRoleAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(description) = other.description {
+            self = self.description(description)?;
+        }
+        if let Some(icon) = other.icon {
+            self = self.icon(icon)?;
+        }
+        if let Some(color_id) = other.color_id {
+            self = self.color(color_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableRoleBuilder {
+    type PrimaryKey = i16;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
+    /// Sets the value of the `roles.name` column from table `roles`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -85,6 +115,9 @@ impl InsertableRoleBuilder {
         self.name = Some(name);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
+    /// Sets the value of the `roles.description` column from table `roles`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -100,6 +133,9 @@ impl InsertableRoleBuilder {
         self.description = Some(description);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
+    /// Sets the value of the `roles.icon` column from table `roles`.
     pub fn icon<P>(
         mut self,
         icon: P,
@@ -114,41 +150,42 @@ impl InsertableRoleBuilder {
         self.icon = Some(icon);
         Ok(self)
     }
-    pub fn color_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
+    /// Sets the value of the `roles.color_id` column from table `roles`.
+    pub fn color(
         mut self,
-        color_id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
-    where
-        P: TryInto<i16>,
-        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let color_id = color_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
-            Into::into(err).rename_field(InsertableRoleAttributes::ColorId)
-        })?;
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>> {
         self.color_id = Some(color_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableRoleBuilder> for InsertableRole {
-    type Error = common_traits::prelude::BuilderError<InsertableRoleAttributes>;
-    fn try_from(builder: InsertableRoleBuilder) -> Result<InsertableRole, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableRoleAttributes::Name,
-            ))?,
-            description: builder.description.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableRoleAttributes::Description,
-                ),
-            )?,
-            icon: builder.icon.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableRoleAttributes::Icon,
-            ))?,
-            color_id: builder.color_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableRoleAttributes::ColorId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRoleBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::roles::Role,
+            Error = web_common_traits::database::InsertError<InsertableRoleAttributes>,
+        >,
+{
+    type Attributes = InsertableRoleAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::roles::Role =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

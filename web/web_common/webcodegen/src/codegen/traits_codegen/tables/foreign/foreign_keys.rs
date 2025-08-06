@@ -29,7 +29,7 @@ impl Codegen<'_> {
             .map(|foreign_key_constraint| {
                 let columns = foreign_key_constraint.columns(conn)?;
                 let foreign_columns = foreign_key_constraint.foreign_columns(conn)?;
-                let getter_ident = foreign_key_constraint.getter_ident(conn)?;
+                let constraint_ident = foreign_key_constraint.constraint_ident(conn)?;
 
                 let if_statement = columns.iter().zip(foreign_columns.iter()).map(|(column, foreign_column)|{
                     let column_ident = column.snake_case_ident()?;
@@ -53,7 +53,7 @@ impl Codegen<'_> {
 
                 Ok(quote::quote! {
                     if #(#if_statement)&&* {
-                        foreign_keys.#getter_ident = #assignment_right_term;
+                        foreign_keys.#constraint_ident = #assignment_right_term;
                         updated = true;
                     }
                 })
@@ -121,11 +121,11 @@ impl Codegen<'_> {
                 .iter()
                 .zip(foreign_tables.iter())
                 .map(|(foreign_key, foreign_table)| {
-                    let getter_ident = foreign_key.getter_ident(conn)?;
+                    let constraint_ident = foreign_key.constraint_ident(conn)?;
                     let foreign_table_struct_type = foreign_table.import_struct_path()?;
 
                     Ok(quote::quote! {
-                        pub #getter_ident: Option<#foreign_table_struct_type>
+                        pub #constraint_ident: Option<#foreign_table_struct_type>
                     })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -157,18 +157,18 @@ impl Codegen<'_> {
                             },
                         )?;
 
-                    let getter_ident = foreign_key.getter_ident(conn)?;
+                    let constraint_ident = foreign_key.constraint_ident(conn)?;
                     if columns.iter().any(Column::is_nullable) {
                         Ok((
                             quote::quote! {
-                                foreign_keys.#getter_ident.is_some() || #attributes
+                                foreign_keys.#constraint_ident.is_some() || #attributes
                             },
                             true,
                         ))
                     } else {
                         Ok((
                             quote::quote! {
-                                foreign_keys.#getter_ident.is_some()
+                                foreign_keys.#constraint_ident.is_some()
                             },
                             false,
                         ))

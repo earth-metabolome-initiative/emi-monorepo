@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::addresses::Address,
     >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::addresses::Address;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAddress;
@@ -23,17 +24,65 @@ where
     type UserId = i32;
     fn insert(
         self,
-        _user_id: Self::UserId,
+        user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableAddress = self
-            .try_into()?;
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let city_id = self
+            .city_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes::CityId,
+                ),
+            )?;
+        let street_name = self
+            .street_name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes::StreetName,
+                ),
+            )?;
+        let street_number = self
+            .street_number
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes::StreetNumber,
+                ),
+            )?;
+        let postal_code = self
+            .postal_code
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes::PostalCode,
+                ),
+            )?;
+        let geolocation = self
+            .geolocation
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes::Geolocation,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            city_id,
+            street_name,
+            street_number,
+            postal_code,
+            geolocation,
+        })
     }
 }

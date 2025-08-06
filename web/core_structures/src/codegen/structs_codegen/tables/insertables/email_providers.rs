@@ -7,10 +7,8 @@ pub enum InsertableEmailProviderAttributes {
 impl core::fmt::Display for InsertableEmailProviderAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableEmailProviderAttributes::EmailId => write!(f, "email_id"),
-            InsertableEmailProviderAttributes::LoginProviderId => {
-                write!(f, "login_provider_id")
-            }
+            Self::EmailId => write!(f, "email_id"),
+            Self::LoginProviderId => write!(f, "login_provider_id"),
         }
     }
 }
@@ -23,8 +21,8 @@ impl core::fmt::Display for InsertableEmailProviderAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableEmailProvider {
-    email_id: i32,
-    login_provider_id: i16,
+    pub(crate) email_id: i32,
+    pub(crate) login_provider_id: i16,
 }
 impl InsertableEmailProvider {
     pub fn email<C: diesel::connection::LoadConnection>(
@@ -92,59 +90,79 @@ impl InsertableEmailProvider {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableEmailProviderBuilder {
     pub(crate) email_id: Option<i32>,
     pub(crate) login_provider_id: Option<i16>,
 }
-impl InsertableEmailProviderBuilder {
-    pub fn email_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableEmailProviderBuilder {
+    type Attributes = InsertableEmailProviderAttributes;
+    fn extend_builder(
         mut self,
-        email_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(email_id) = other.email_id {
+            self = self.email(email_id)?;
+        }
+        if let Some(login_provider_id) = other.login_provider_id {
+            self = self.login_provider(login_provider_id)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableEmailProviderBuilder {
+    type PrimaryKey = (i32, i16);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder {
+    /// Sets the value of the `email_providers.email_id` column from table
+    /// `email_providers`.
+    pub fn email(
+        mut self,
+        email_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let email_id = email_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableEmailProviderAttributes::EmailId)
-        })?;
         self.email_id = Some(email_id);
         Ok(self)
     }
-    pub fn login_provider_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder {
+    /// Sets the value of the `email_providers.login_provider_id` column from
+    /// table `email_providers`.
+    pub fn login_provider(
         mut self,
-        login_provider_id: P,
+        login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
-    where
-        P: TryInto<i16>,
-        <P as TryInto<i16>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let login_provider_id =
-            login_provider_id.try_into().map_err(|err: <P as TryInto<i16>>::Error| {
-                Into::into(err).rename_field(InsertableEmailProviderAttributes::LoginProviderId)
-            })?;
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }
 }
-impl TryFrom<InsertableEmailProviderBuilder> for InsertableEmailProvider {
-    type Error = common_traits::prelude::BuilderError<InsertableEmailProviderAttributes>;
-    fn try_from(
-        builder: InsertableEmailProviderBuilder,
-    ) -> Result<InsertableEmailProvider, Self::Error> {
-        Ok(Self {
-            email_id: builder.email_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableEmailProviderAttributes::EmailId,
-                ),
-            )?,
-            login_provider_id: builder.login_provider_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableEmailProviderAttributes::LoginProviderId,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableEmailProviderBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
+            Error = web_common_traits::database::InsertError<InsertableEmailProviderAttributes>,
+        >,
+{
+    type Attributes = InsertableEmailProviderAttributes;
+    fn is_complete(&self) -> bool {
+        self.email_id.is_some() && self.login_provider_id.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::email_providers::EmailProvider =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

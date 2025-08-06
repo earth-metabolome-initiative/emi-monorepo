@@ -5,6 +5,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedure_models)
             }
+            super::Row::AliquotingProcedure(aliquoting_procedures) => {
+                crate::codegen::tables::rows::Rows::from(aliquoting_procedures)
+            }
             super::Row::BallMillMachineModel(ball_mill_machine_models) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_machine_models)
             }
@@ -83,14 +86,8 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(login_providers)
             }
             super::Row::Material(materials) => crate::codegen::tables::rows::Rows::from(materials),
-            super::Row::MixCountableProcedureModel(mix_countable_procedure_models) => {
-                crate::codegen::tables::rows::Rows::from(mix_countable_procedure_models)
-            }
-            super::Row::MixSolidProcedureModel(mix_solid_procedure_models) => {
-                crate::codegen::tables::rows::Rows::from(mix_solid_procedure_models)
-            }
-            super::Row::MountTipProcedureModel(mount_tip_procedure_models) => {
-                crate::codegen::tables::rows::Rows::from(mount_tip_procedure_models)
+            super::Row::MixingProcedureModel(mixing_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(mixing_procedure_models)
             }
             super::Row::NextProcedureModel(next_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(next_procedure_models)
@@ -114,6 +111,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PermanenceCategory(permanence_categories) => {
                 crate::codegen::tables::rows::Rows::from(permanence_categories)
             }
+            super::Row::PhoneModel(phone_models) => {
+                crate::codegen::tables::rows::Rows::from(phone_models)
+            }
             super::Row::PhotographProcedureModel(photograph_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(photograph_procedure_models)
             }
@@ -122,6 +122,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::PipetteTipModel(pipette_tip_models) => {
                 crate::codegen::tables::rows::Rows::from(pipette_tip_models)
+            }
+            super::Row::PlacingProcedureModel(placing_procedure_models) => {
+                crate::codegen::tables::rows::Rows::from(placing_procedure_models)
             }
             super::Row::PositioningDeviceModel(positioning_device_models) => {
                 crate::codegen::tables::rows::Rows::from(positioning_device_models)
@@ -170,6 +173,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::SupernatantProcedureModel(supernatant_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(supernatant_procedure_models)
+            }
+            super::Row::SupernatantProcedure(supernatant_procedures) => {
+                crate::codegen::tables::rows::Rows::from(supernatant_procedures)
             }
             super::Row::Taxon(taxa) => crate::codegen::tables::rows::Rows::from(taxa),
             super::Row::TeamMember(team_members) => {

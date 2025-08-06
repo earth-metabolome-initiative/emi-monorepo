@@ -2,7 +2,7 @@
 
 use core_structures::{User, UserEmail};
 use diesel::PgConnection;
-use web_common_traits::database::{Insertable, InsertableVariant, UncheckedInsertableVariant};
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
 
@@ -46,7 +46,7 @@ pub fn get_user(
         )?
         .created_at(imputed_created_at)?
         .updated_at(last_access)?
-        .unchecked_insert(portal_conn)?;
+        .insert(0, portal_conn)?;
 
     let _new_email = UserEmail::new()
         .created_by(new_user.id)?

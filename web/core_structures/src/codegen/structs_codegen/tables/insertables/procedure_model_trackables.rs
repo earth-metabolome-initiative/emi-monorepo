@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcedureModelTrackableAttributes {
+    Id,
     Name,
     ProcedureModelId,
     TrackableId,
@@ -12,25 +13,14 @@ pub enum InsertableProcedureModelTrackableAttributes {
 impl core::fmt::Display for InsertableProcedureModelTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableProcedureModelTrackableAttributes::Name => write!(f, "name"),
-            InsertableProcedureModelTrackableAttributes::ProcedureModelId => {
-                write!(f, "procedure_model_id")
-            }
-            InsertableProcedureModelTrackableAttributes::TrackableId => {
-                write!(f, "trackable_id")
-            }
-            InsertableProcedureModelTrackableAttributes::CreatedBy => {
-                write!(f, "created_by")
-            }
-            InsertableProcedureModelTrackableAttributes::CreatedAt => {
-                write!(f, "created_at")
-            }
-            InsertableProcedureModelTrackableAttributes::UpdatedBy => {
-                write!(f, "updated_by")
-            }
-            InsertableProcedureModelTrackableAttributes::UpdatedAt => {
-                write!(f, "updated_at")
-            }
+            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "name"),
+            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::TrackableId => write!(f, "trackable_id"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::UpdatedBy => write!(f, "updated_by"),
+            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -43,13 +33,13 @@ impl core::fmt::Display for InsertableProcedureModelTrackableAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureModelTrackable {
-    name: String,
-    procedure_model_id: i32,
-    trackable_id: ::rosetta_uuid::Uuid,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) name: String,
+    pub(crate) procedure_model_id: i32,
+    pub(crate) trackable_id: ::rosetta_uuid::Uuid,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) updated_by: i32,
+    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureModelTrackable {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -205,7 +195,47 @@ impl Default for InsertableProcedureModelTrackableBuilder {
         }
     }
 }
-impl InsertableProcedureModelTrackableBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableProcedureModelTrackableBuilder {
+    type Attributes = InsertableProcedureModelTrackableAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(procedure_model_id) = other.procedure_model_id {
+            self = self.procedure_model(procedure_model_id)?;
+        }
+        if let Some(trackable_id) = other.trackable_id {
+            self = self.trackable(trackable_id)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(updated_by) = other.updated_by {
+            self = self.updated_by(updated_by)?;
+        }
+        if let Some(updated_at) = other.updated_at {
+            self = self.updated_at(updated_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureModelTrackableBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.name` column from
+    /// table `procedure_model_trackables`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -225,63 +255,61 @@ impl InsertableProcedureModelTrackableBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn procedure_model_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.procedure_model_id`
+    /// column from table `procedure_model_trackables`.
+    pub fn procedure_model(
         mut self,
-        procedure_model_id: P,
+        procedure_model_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let procedure_model_id =
-            procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableProcedureModelTrackableAttributes::ProcedureModelId)
-            })?;
+    > {
         self.procedure_model_id = Some(procedure_model_id);
         Ok(self)
     }
-    pub fn trackable_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.trackable_id` column
+    /// from table `procedure_model_trackables`.
+    pub fn trackable(
         mut self,
-        trackable_id: P,
+        trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let trackable_id = trackable_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableProcedureModelTrackableAttributes::TrackableId)
-            },
-        )?;
+    > {
         self.trackable_id = Some(trackable_id);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.created_by` column
+    /// from table `procedure_model_trackables`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelTrackableAttributes::CreatedBy)
-        })?;
+    > {
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.created_at` column
+    /// from table `procedure_model_trackables`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -310,23 +338,28 @@ impl InsertableProcedureModelTrackableBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.updated_by` column
+    /// from table `procedure_model_trackables`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
+        updated_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelTrackableAttributes::UpdatedBy)
-        })?;
+    > {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.updated_at` column
+    /// from table `procedure_model_trackables`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -356,45 +389,37 @@ impl InsertableProcedureModelTrackableBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableProcedureModelTrackableBuilder> for InsertableProcedureModelTrackable {
-    type Error = common_traits::prelude::BuilderError<InsertableProcedureModelTrackableAttributes>;
-    fn try_from(
-        builder: InsertableProcedureModelTrackableBuilder,
-    ) -> Result<InsertableProcedureModelTrackable, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableProcedureModelTrackableAttributes::Name,
-            ))?,
-            procedure_model_id: builder.procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                ),
-            )?,
-            trackable_id: builder.trackable_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::TrackableId,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: builder.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: builder.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableProcedureModelTrackableAttributes::UpdatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableProcedureModelTrackableBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+        Error = web_common_traits::database::InsertError<
+            InsertableProcedureModelTrackableAttributes,
+        >,
+    >,
+{
+    type Attributes = InsertableProcedureModelTrackableAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.procedure_model_id.is_some()
+            && self.trackable_id.is_some() && self.created_by.is_some()
+            && self.created_at.is_some() && self.updated_by.is_some()
+            && self.updated_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

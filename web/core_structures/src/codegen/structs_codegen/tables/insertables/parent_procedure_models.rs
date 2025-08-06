@@ -13,24 +13,14 @@ pub enum InsertableParentProcedureModelAttributes {
 impl core::fmt::Display for InsertableParentProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableParentProcedureModelAttributes::ParentProcedureModelId => {
-                write!(f, "parent_procedure_model_id")
-            }
-            InsertableParentProcedureModelAttributes::ChildProcedureModelId => {
-                write!(f, "child_procedure_model_id")
-            }
-            InsertableParentProcedureModelAttributes::Snoozable => write!(f, "snoozable"),
-            InsertableParentProcedureModelAttributes::Copiable => write!(f, "copiable"),
-            InsertableParentProcedureModelAttributes::Repeatable => {
-                write!(f, "repeatable")
-            }
-            InsertableParentProcedureModelAttributes::Skippable => write!(f, "skippable"),
-            InsertableParentProcedureModelAttributes::CreatedBy => {
-                write!(f, "created_by")
-            }
-            InsertableParentProcedureModelAttributes::CreatedAt => {
-                write!(f, "created_at")
-            }
+            Self::ParentProcedureModelId => write!(f, "parent_procedure_model_id"),
+            Self::ChildProcedureModelId => write!(f, "child_procedure_model_id"),
+            Self::Snoozable => write!(f, "snoozable"),
+            Self::Copiable => write!(f, "copiable"),
+            Self::Repeatable => write!(f, "repeatable"),
+            Self::Skippable => write!(f, "skippable"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
         }
     }
 }
@@ -43,14 +33,14 @@ impl core::fmt::Display for InsertableParentProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableParentProcedureModel {
-    parent_procedure_model_id: i32,
-    child_procedure_model_id: i32,
-    snoozable: bool,
-    copiable: bool,
-    repeatable: bool,
-    skippable: bool,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) parent_procedure_model_id: i32,
+    pub(crate) child_procedure_model_id: i32,
+    pub(crate) snoozable: bool,
+    pub(crate) copiable: bool,
+    pub(crate) repeatable: bool,
+    pub(crate) skippable: bool,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableParentProcedureModel {
     pub fn parent_procedure_model<C: diesel::connection::LoadConnection>(
@@ -176,69 +166,77 @@ impl Default for InsertableParentProcedureModelBuilder {
         }
     }
 }
-impl InsertableParentProcedureModelBuilder {
-    pub fn parent_procedure_model_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableParentProcedureModelBuilder {
+    type Attributes = InsertableParentProcedureModelAttributes;
+    fn extend_builder(
         mut self,
-        parent_procedure_model_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(parent_procedure_model_id) = other.parent_procedure_model_id {
+            self = self.parent_procedure_model(parent_procedure_model_id)?;
+        }
+        if let Some(child_procedure_model_id) = other.child_procedure_model_id {
+            self = self.child_procedure_model(child_procedure_model_id)?;
+        }
+        if let Some(snoozable) = other.snoozable {
+            self = self.snoozable(snoozable)?;
+        }
+        if let Some(copiable) = other.copiable {
+            self = self.copiable(copiable)?;
+        }
+        if let Some(repeatable) = other.repeatable {
+            self = self.repeatable(repeatable)?;
+        }
+        if let Some(skippable) = other.skippable {
+            self = self.skippable(skippable)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableParentProcedureModelBuilder {
+    type PrimaryKey = (i32, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the
+    /// `parent_procedure_models.parent_procedure_model_id` column from table
+    /// `parent_procedure_models`.
+    pub fn parent_procedure_model(
+        mut self,
+        parent_procedure_model_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_procedure_model_id =
-            parent_procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableParentProcedureModelAttributes::ParentProcedureModelId)
-            })?;
-        if let Some(child_procedure_model_id) = self.child_procedure_model_id {
-            pgrx_validation::must_be_distinct_i32(
-                parent_procedure_model_id,
-                child_procedure_model_id,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableParentProcedureModelAttributes::ParentProcedureModelId,
-                    InsertableParentProcedureModelAttributes::ChildProcedureModelId,
-                )
-            })?;
-        }
+    > {
         self.parent_procedure_model_id = Some(parent_procedure_model_id);
         Ok(self)
     }
-    pub fn child_procedure_model_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.child_procedure_model_id`
+    /// column from table `parent_procedure_models`.
+    pub fn child_procedure_model(
         mut self,
-        child_procedure_model_id: P,
+        child_procedure_model_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let child_procedure_model_id =
-            child_procedure_model_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableParentProcedureModelAttributes::ChildProcedureModelId)
-            })?;
-        if let Some(parent_procedure_model_id) = self.parent_procedure_model_id {
-            pgrx_validation::must_be_distinct_i32(
-                parent_procedure_model_id,
-                child_procedure_model_id,
-            )
-            .map_err(|e| {
-                e.rename_fields(
-                    InsertableParentProcedureModelAttributes::ParentProcedureModelId,
-                    InsertableParentProcedureModelAttributes::ChildProcedureModelId,
-                )
-            })?;
-        }
+    > {
         self.child_procedure_model_id = Some(child_procedure_model_id);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.snoozable` column from
+    /// table `parent_procedure_models`.
     pub fn snoozable<P>(
         mut self,
         snoozable: P,
@@ -256,6 +254,10 @@ impl InsertableParentProcedureModelBuilder {
         self.snoozable = Some(snoozable);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.copiable` column from
+    /// table `parent_procedure_models`.
     pub fn copiable<P>(
         mut self,
         copiable: P,
@@ -273,6 +275,10 @@ impl InsertableParentProcedureModelBuilder {
         self.copiable = Some(copiable);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.repeatable` column from
+    /// table `parent_procedure_models`.
     pub fn repeatable<P>(
         mut self,
         repeatable: P,
@@ -290,6 +296,10 @@ impl InsertableParentProcedureModelBuilder {
         self.repeatable = Some(repeatable);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.skippable` column from
+    /// table `parent_procedure_models`.
     pub fn skippable<P>(
         mut self,
         skippable: P,
@@ -307,23 +317,24 @@ impl InsertableParentProcedureModelBuilder {
         self.skippable = Some(skippable);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.created_by` column from
+    /// table `parent_procedure_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableParentProcedureModelAttributes::CreatedBy)
-        })?;
+    > {
         self.created_by = Some(created_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the `parent_procedure_models.created_at` column from
+    /// table `parent_procedure_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -345,52 +356,38 @@ impl InsertableParentProcedureModelBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableParentProcedureModelBuilder> for InsertableParentProcedureModel {
-    type Error = common_traits::prelude::BuilderError<InsertableParentProcedureModelAttributes>;
-    fn try_from(
-        builder: InsertableParentProcedureModelBuilder,
-    ) -> Result<InsertableParentProcedureModel, Self::Error> {
-        Ok(Self {
-            parent_procedure_model_id: builder.parent_procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::ParentProcedureModelId,
-                ),
-            )?,
-            child_procedure_model_id: builder.child_procedure_model_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::ChildProcedureModelId,
-                ),
-            )?,
-            snoozable: builder.snoozable.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::Snoozable,
-                ),
-            )?,
-            copiable: builder.copiable.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::Copiable,
-                ),
-            )?,
-            repeatable: builder.repeatable.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::Repeatable,
-                ),
-            )?,
-            skippable: builder.skippable.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::Skippable,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableParentProcedureModelAttributes::CreatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableParentProcedureModelBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
+        Error = web_common_traits::database::InsertError<
+            InsertableParentProcedureModelAttributes,
+        >,
+    >,
+{
+    type Attributes = InsertableParentProcedureModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.parent_procedure_model_id.is_some()
+            && self.child_procedure_model_id.is_some() && self.snoozable.is_some()
+            && self.copiable.is_some() && self.repeatable.is_some()
+            && self.skippable.is_some() && self.created_by.is_some()
+            && self.created_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

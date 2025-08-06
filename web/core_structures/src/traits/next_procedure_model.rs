@@ -47,9 +47,9 @@ where
         // Then, we create a new NextProcedureModel entry linking the parent
         // procedure to the new child procedure.
         let next_procedure = NextProcedureModel::new()
-            .parent_id(*self.id())?
-            .current_id(*current_procedure.id())?
-            .successor_id(*successor_procedure.id())?
+            .parent(*self.id())?
+            .current(*current_procedure.id())?
+            .successor(*successor_procedure.id())?
             .created_by(user.id)?
             .insert(user.id, conn)?;
 

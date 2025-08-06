@@ -10,11 +10,11 @@ pub enum InsertableSpatialRefSyAttributes {
 impl core::fmt::Display for InsertableSpatialRefSyAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableSpatialRefSyAttributes::Srid => write!(f, "srid"),
-            InsertableSpatialRefSyAttributes::AuthName => write!(f, "auth_name"),
-            InsertableSpatialRefSyAttributes::AuthSrid => write!(f, "auth_srid"),
-            InsertableSpatialRefSyAttributes::Srtext => write!(f, "srtext"),
-            InsertableSpatialRefSyAttributes::Proj4text => write!(f, "proj4text"),
+            Self::Srid => write!(f, "srid"),
+            Self::AuthName => write!(f, "auth_name"),
+            Self::AuthSrid => write!(f, "auth_srid"),
+            Self::Srtext => write!(f, "srtext"),
+            Self::Proj4text => write!(f, "proj4text"),
         }
     }
 }
@@ -27,14 +27,14 @@ impl core::fmt::Display for InsertableSpatialRefSyAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpatialRefSy {
-    srid: i32,
-    auth_name: Option<String>,
-    auth_srid: Option<i32>,
-    srtext: Option<String>,
-    proj4text: Option<String>,
+    pub(crate) srid: i32,
+    pub(crate) auth_name: Option<String>,
+    pub(crate) auth_srid: Option<i32>,
+    pub(crate) srtext: Option<String>,
+    pub(crate) proj4text: Option<String>,
 }
 impl InsertableSpatialRefSy {}
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srid: Option<i32>,
@@ -43,7 +43,39 @@ pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srtext: Option<String>,
     pub(crate) proj4text: Option<String>,
 }
-impl InsertableSpatialRefSyBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableSpatialRefSyBuilder {
+    type Attributes = InsertableSpatialRefSyAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(srid) = other.srid {
+            self = self.srid(srid)?;
+        }
+        if let Some(auth_name) = other.auth_name {
+            self = self.auth_name(Some(auth_name))?;
+        }
+        if let Some(auth_srid) = other.auth_srid {
+            self = self.auth_srid(Some(auth_srid))?;
+        }
+        if let Some(srtext) = other.srtext {
+            self = self.srtext(Some(srtext))?;
+        }
+        if let Some(proj4text) = other.proj4text {
+            self = self.proj4text(Some(proj4text))?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableSpatialRefSyBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.srid` column from table
+    /// `spatial_ref_sys`.
     pub fn srid<P>(
         mut self,
         srid: P,
@@ -58,6 +90,10 @@ impl InsertableSpatialRefSyBuilder {
         self.srid = Some(srid);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.auth_name` column from table
+    /// `spatial_ref_sys`.
     pub fn auth_name<P>(
         mut self,
         auth_name: P,
@@ -73,6 +109,10 @@ impl InsertableSpatialRefSyBuilder {
         self.auth_name = auth_name;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.auth_srid` column from table
+    /// `spatial_ref_sys`.
     pub fn auth_srid<P>(
         mut self,
         auth_srid: P,
@@ -88,6 +128,10 @@ impl InsertableSpatialRefSyBuilder {
         self.auth_srid = auth_srid;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.srtext` column from table
+    /// `spatial_ref_sys`.
     pub fn srtext<P>(
         mut self,
         srtext: P,
@@ -102,6 +146,10 @@ impl InsertableSpatialRefSyBuilder {
         self.srtext = srtext;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.proj4text` column from table
+    /// `spatial_ref_sys`.
     pub fn proj4text<P>(
         mut self,
         proj4text: P,
@@ -118,19 +166,28 @@ impl InsertableSpatialRefSyBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableSpatialRefSyBuilder> for InsertableSpatialRefSy {
-    type Error = common_traits::prelude::BuilderError<InsertableSpatialRefSyAttributes>;
-    fn try_from(
-        builder: InsertableSpatialRefSyBuilder,
-    ) -> Result<InsertableSpatialRefSy, Self::Error> {
-        Ok(Self {
-            srid: builder.srid.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableSpatialRefSyAttributes::Srid,
-            ))?,
-            auth_name: builder.auth_name,
-            auth_srid: builder.auth_srid,
-            srtext: builder.srtext,
-            proj4text: builder.proj4text,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableSpatialRefSyBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
+            Error = web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>,
+        >,
+{
+    type Attributes = InsertableSpatialRefSyAttributes;
+    fn is_complete(&self) -> bool {
+        self.srid.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

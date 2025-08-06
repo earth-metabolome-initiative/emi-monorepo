@@ -44,8 +44,8 @@ where
         use diesel::Identifiable;
         crate::ProcedureModelTrackable::new()
             .name(name)?
-            .procedure_model_id(*self.id())?
-            .trackable_id(*trackable.id())?
+            .procedure_model(*self.id())?
+            .trackable(*trackable.id())?
             .created_by(user.id)?
             .insert(user.id, conn)
     }

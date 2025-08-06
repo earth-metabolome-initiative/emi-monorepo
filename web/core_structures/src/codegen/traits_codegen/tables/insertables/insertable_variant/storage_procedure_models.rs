@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    ProcedureModel,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+    ProcedureModel,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,66 +17,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
     >,
-    crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel;
@@ -89,47 +38,94 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_model(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct.parent_container(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct
-            .procedure_parent_container(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct.child_container(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct.procedure_child_container(conn)?.can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::TryInsertGeneric;
+        let kelvin = self
+            .kelvin
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::Kelvin,
+                ),
+            )?;
+        let kelvin_tolerance_percentage = self
+            .kelvin_tolerance_percentage
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
+                ),
+            )?;
+        let parent_container_id = self
+            .parent_container_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ParentContainerId,
+                ),
+            )?;
+        let child_container_id = self
+            .child_container_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ChildContainerId,
+                ),
+            )?;
+        let procedure_model_id = self
+            .procedure_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes::Id,
+                    ),
+                ))
+            })?;
+        let procedure_parent_container_id = self
+            .procedure_parent_container_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
+                )
+            })?;
+        let procedure_child_container_id = self
+            .procedure_child_container_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
+                )
+            })?;
+        Ok(Self::InsertableVariant {
+            procedure_model_id,
+            kelvin,
+            kelvin_tolerance_percentage,
+            parent_container_id,
+            procedure_parent_container_id,
+            child_container_id,
+            procedure_child_container_id,
+        })
     }
 }

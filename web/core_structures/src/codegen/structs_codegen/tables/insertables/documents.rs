@@ -11,12 +11,12 @@ pub enum InsertableDocumentAttributes {
 impl core::fmt::Display for InsertableDocumentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableDocumentAttributes::Id => write!(f, "id"),
-            InsertableDocumentAttributes::MimeType => write!(f, "mime_type"),
-            InsertableDocumentAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableDocumentAttributes::CreatedAt => write!(f, "created_at"),
-            InsertableDocumentAttributes::UpdatedBy => write!(f, "updated_by"),
-            InsertableDocumentAttributes::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "id"),
+            Self::MimeType => write!(f, "mime_type"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
+            Self::UpdatedBy => write!(f, "updated_by"),
+            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -27,12 +27,12 @@ impl core::fmt::Display for InsertableDocumentAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDocument {
-    id: ::rosetta_uuid::Uuid,
-    mime_type: ::media_types::MediaType,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
-    updated_by: i32,
-    updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) mime_type: ::media_types::MediaType,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) updated_by: i32,
+    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableDocument {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -122,7 +122,41 @@ impl Default for InsertableDocumentBuilder {
         }
     }
 }
-impl InsertableDocumentBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableDocumentBuilder {
+    type Attributes = InsertableDocumentAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(id) = other.id {
+            self = self.id(id)?;
+        }
+        if let Some(mime_type) = other.mime_type {
+            self = self.mime_type(mime_type)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        if let Some(updated_by) = other.updated_by {
+            self = self.updated_by(updated_by)?;
+        }
+        if let Some(updated_at) = other.updated_at {
+            self = self.updated_at(updated_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableDocumentBuilder {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.id` column from table `documents`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -137,6 +171,10 @@ impl InsertableDocumentBuilder {
         self.id = Some(id);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.mime_type` column from table
+    /// `documents`.
     pub fn mime_type<P>(
         mut self,
         mime_type: P,
@@ -153,21 +191,22 @@ impl InsertableDocumentBuilder {
         self.mime_type = Some(mime_type);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.created_by` column from table
+    /// `documents`.
+    pub fn created_by(
         mut self,
-        created_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableDocumentAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableDocumentAttributes::CreatedBy)
-        })?;
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableDocumentAttributes>> {
         self.created_by = Some(created_by);
         self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.created_at` column from table
+    /// `documents`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -193,20 +232,21 @@ impl InsertableDocumentBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.updated_by` column from table
+    /// `documents`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableDocumentAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let updated_by = updated_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableDocumentAttributes::UpdatedBy)
-        })?;
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableDocumentAttributes>> {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder {
+    /// Sets the value of the `documents.updated_at` column from table
+    /// `documents`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -233,38 +273,33 @@ impl InsertableDocumentBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableDocumentBuilder> for InsertableDocument {
-    type Error = common_traits::prelude::BuilderError<InsertableDocumentAttributes>;
-    fn try_from(builder: InsertableDocumentBuilder) -> Result<InsertableDocument, Self::Error> {
-        Ok(Self {
-            id: builder.id.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableDocumentAttributes::Id,
-            ))?,
-            mime_type: builder.mime_type.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentAttributes::MimeType,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentAttributes::CreatedAt,
-                ),
-            )?,
-            updated_by: builder.updated_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentAttributes::UpdatedBy,
-                ),
-            )?,
-            updated_at: builder.updated_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableDocumentAttributes::UpdatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableDocumentBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::documents::Document,
+            Error = web_common_traits::database::InsertError<InsertableDocumentAttributes>,
+        >,
+{
+    type Attributes = InsertableDocumentAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.mime_type.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::documents::Document =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

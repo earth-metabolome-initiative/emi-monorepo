@@ -28,12 +28,12 @@ CREATE TABLE
 		id UUID PRIMARY KEY REFERENCES trackables (id) ON DELETE CASCADE
 	);
 
--- CREATE TABLE
--- 	IF NOT EXISTS phone_models (
--- 		id UUID PRIMARY KEY,
--- 		FOREIGN KEY (id) REFERENCES camera_models (id) ON DELETE CASCADE,
--- 		FOREIGN KEY (id) REFERENCES positioning_device_models (id) ON DELETE CASCADE
--- 	);
+CREATE TABLE
+	IF NOT EXISTS phone_models (
+		id UUID PRIMARY KEY,
+		FOREIGN KEY (id) REFERENCES camera_models (id) ON DELETE CASCADE,
+		FOREIGN KEY (id) REFERENCES positioning_device_models (id) ON DELETE CASCADE
+	);
 
 CREATE TABLE
 	IF NOT EXISTS freezer_models (

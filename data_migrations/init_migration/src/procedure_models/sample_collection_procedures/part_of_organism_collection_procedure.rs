@@ -41,7 +41,7 @@ pub(crate) fn init_part_of_organism_collection(
     let cct_builder = ProcedureModelTrackable::new()
         .name(SAMPLE_CCT)
         .unwrap()
-        .trackable_id(cct.id)
+        .trackable(cct.id)
         .unwrap()
         .created_by(user.id)
         .unwrap();
@@ -52,7 +52,7 @@ pub(crate) fn init_part_of_organism_collection(
     let coffee_filter_wrapper_builder = ProcedureModelTrackable::new()
         .name("Coffee filter wrapper")
         .unwrap()
-        .trackable_id(coffee_filter_wrapper.id)
+        .trackable(coffee_filter_wrapper.id)
         .unwrap()
         .created_by(user.id)
         .unwrap();
@@ -62,7 +62,7 @@ pub(crate) fn init_part_of_organism_collection(
     let sample_builder = ProcedureModelTrackable::new()
         .name("Sample")
         .unwrap()
-        .trackable_id(sample.id)
+        .trackable(sample.id)
         .unwrap()
         .created_by(user.id)
         .unwrap();
@@ -129,7 +129,7 @@ pub(crate) fn init_part_of_organism_collection(
         .unwrap()
         .procedure_packaged_with(coffee_filter_wrapper_builder.clone())
         .unwrap()
-        .procedure_sample_id(sample_builder)
+        .procedure_sample(sample_builder)
         .unwrap()
         .insert(user.id, conn)
         .unwrap();
@@ -142,9 +142,9 @@ pub(crate) fn init_part_of_organism_collection(
             "Place the wrapped sample in a conical centrifugal tube for storage and transport.",
         )
         .unwrap()
-        .procedure_parent_container_id(cct_builder.clone())
+        .procedure_parent_container(cct_builder.clone())
         .unwrap()
-        .procedure_child_container_id(coffee_filter_wrapper_builder)
+        .procedure_child_container(coffee_filter_wrapper_builder)
         .unwrap()
         .created_by(user.id)
         .unwrap()
@@ -159,17 +159,17 @@ pub(crate) fn init_part_of_organism_collection(
             "Place the conical centrifugal tube with the sample in a storage box for long-term storage.",
         )
         .unwrap()
-        .procedure_parent_container_id(
+        .procedure_parent_container(
             ProcedureModelTrackable::new()
             .name(CONICAL_TUBE_BOX)
             .unwrap()
-            .trackable_id(ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap().id)
+            .trackable(ContainerModel::from_name(POLYSTYRENE_BOX, conn).unwrap().unwrap().id)
             .unwrap()
             .created_by(user.id)
             .unwrap()
         )
         .unwrap()
-        .procedure_child_container_id(cct_builder)
+        .procedure_child_container(cct_builder)
         .unwrap()
         .created_by(user.id)
         .unwrap()

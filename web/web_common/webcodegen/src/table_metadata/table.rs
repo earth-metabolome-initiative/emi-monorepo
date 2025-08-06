@@ -333,6 +333,17 @@ pub struct Table {
 }
 
 impl Table {
+    /// Returns whether the provided column is from the current table.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The column to check.
+    pub fn has_column(&self, column: &Column) -> bool {
+        self.table_name == column.table_name
+            && self.table_schema == column.table_schema
+            && self.table_catalog == column.table_catalog
+    }
+
     #[must_use]
     /// Returns whether the table is a view.
     pub fn is_view(&self) -> bool {
@@ -579,14 +590,20 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign keys cannot be loaded from the database.
-    pub fn parent_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        let mut columns = Vec::new();
-        for column in self.columns(conn)? {
-            if column.is_foreign_key_on_delete_cascade(conn) {
-                columns.push(column);
+    pub fn parent_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        let mut parent_keys = Vec::new();
+        for foreign_key in self.foreign_keys(conn)? {
+            if foreign_key.is_on_delete_cascade(conn)?
+                && foreign_key.is_foreign_primary_key(conn)?
+                && !foreign_key.is_self_referential(conn)?
+            {
+                parent_keys.push(foreign_key);
             }
         }
-        Ok(columns)
+        Ok(parent_keys)
     }
 
     /// Returns the parent tables of the table.
@@ -604,12 +621,10 @@ impl Table {
     /// * If the parent tables cannot be loaded from the database.
     pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
-        for column in self.parent_keys(conn)? {
-            for foreign_key in column.foreign_keys(conn)? {
-                if let Some(foreign_table) = foreign_key.foreign_table(conn)? {
-                    if !tables.contains(&foreign_table) {
-                        tables.push(foreign_table);
-                    }
+        for foreign_key in self.parent_keys(conn)? {
+            if let Some(foreign_table) = foreign_key.foreign_table(conn)? {
+                if !tables.contains(&foreign_table) {
+                    tables.push(foreign_table);
                 }
             }
         }
@@ -733,17 +748,32 @@ impl Table {
     ///
     /// # Arguments
     ///
+    /// * `include_ancestors` - Whether to include ancestor tables in the
+    ///   search.
     /// * `conn` - The database connection.
     ///
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    pub fn has_created_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn has_created_by_column(
+        &self,
+        include_ancestors: bool,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn)? {
             if column.is_created_by(conn)? {
                 return Ok(true);
             }
         }
+
+        if include_ancestors {
+            for table in self.extension_tables(conn)? {
+                if table.has_created_by_column(true, conn)? {
+                    return Ok(true);
+                }
+            }
+        }
+
         Ok(false)
     }
 
@@ -751,17 +781,32 @@ impl Table {
     ///
     /// # Arguments
     ///
+    /// * `include_ancestors` - Whether to include ancestor tables in the
+    ///   search.
     /// * `conn` - The database connection.
     ///
     /// # Errors
     ///
     /// * Returns an error if the provided database connection is invalid.
-    pub fn has_updated_by_column(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn has_updated_by_column(
+        &self,
+        include_ancestors: bool,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn)? {
             if column.is_updated_by(conn)? {
                 return Ok(true);
             }
         }
+
+        if include_ancestors {
+            for table in self.extension_tables(conn)? {
+                if table.has_updated_by_column(true, conn)? {
+                    return Ok(true);
+                }
+            }
+        }
+
         Ok(false)
     }
 
@@ -803,6 +848,28 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<PgIndex>, diesel::result::Error> {
         same_as_indices(self, conn)
+    }
+
+    /// Returns the same as foreign keys for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
+    pub fn same_as_foreign_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(KeyColumnUsage, PgIndex)>, WebCodeGenError> {
+        let mut same_as_foreign_keys = Vec::new();
+        for foreign_key in self.foreign_keys(conn)? {
+            if let Some(index) = foreign_key.is_same_as_constraint(conn)? {
+                same_as_foreign_keys.push((foreign_key, index));
+            }
+        }
+        Ok(same_as_foreign_keys)
     }
 
     /// Returns all tables in the database.
@@ -1095,14 +1162,34 @@ impl Table {
     /// * If the database connection is invalid.
     pub fn is_extended(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         for child_table in self.children_tables(conn)? {
-            if child_table.extension_table(conn)?.as_ref() == Some(self) {
+            if child_table.extension_tables(conn)?.contains(self) {
                 return Ok(true);
             }
         }
         Ok(false)
     }
 
-    /// Returns the immediate table this table extends, if any.
+    /// Returns the KeyColumnUsage linking to extension tables, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the table cannot be loaded from the database.
+    pub fn extension_foreign_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .filter(|foreign_key| foreign_key.is_extension(conn).unwrap_or(false))
+            .collect())
+    }
+
+    /// Returns the immediate tables this table extends, if any.
     ///
     /// # Arguments
     ///
@@ -1117,38 +1204,12 @@ impl Table {
     /// A table is considered an extension table if it has a primary key
     /// composed of a single column which is also a foreign key to another
     /// table. This does apply to composite primary keys.
-    pub fn extension_table(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Option<Table>, WebCodeGenError> {
-        let primary_key_columns = self.primary_key_columns(conn)?;
-
-        if primary_key_columns.iter().any(Column::is_always_automatically_generated) {
-            return Ok(None);
-        }
-
-        let mut extended_table = None;
-        for foreign_key in self.foreign_keys(conn)? {
-            if foreign_key.is_foreign_primary_key(conn)?
-                && foreign_key.columns(conn)? == primary_key_columns
-            {
-                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
-                if extended_table.is_some() && extended_table.as_ref() != Some(&foreign_table) {
-                    unimplemented!(
-                        "Multiple extension tables in table `{}.{}` are not supported yet: found `{}.{}` and `{}.{}`",
-                        self.table_schema,
-                        self.table_name,
-                        extended_table.as_ref().unwrap().table_schema,
-                        extended_table.as_ref().unwrap().table_name,
-                        &foreign_table.table_schema,
-                        &foreign_table.table_name,
-                    );
-                }
-                extended_table = Some(foreign_table);
-            }
-        }
-
-        Ok(extended_table)
+    pub fn extension_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+        Ok(self
+            .extension_foreign_keys(conn)?
+            .into_iter()
+            .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok().flatten())
+            .collect())
     }
 
     /// Returns the tables this table extends, if any.
@@ -1166,16 +1227,21 @@ impl Table {
     /// A table is considered an extension table if it has a primary key
     /// composed of a single column which is also a foreign key to another
     /// table. This does apply to composite primary keys.
-    pub fn extension_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+    pub fn ancestral_extension_tables(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
-        if let Some(extension_table) = self.extension_table(conn)? {
-            for table in extension_table.extension_tables(conn)? {
+        for extended_table in self.extension_tables(conn)? {
+            for table in extended_table.ancestral_extension_tables(conn)? {
                 if !tables.contains(&table) {
                     tables.push(table);
                 }
             }
-            tables.push(extension_table);
+            tables.push(extended_table);
         }
+        tables.sort_unstable();
+        tables.dedup();
         Ok(tables)
     }
 
@@ -1450,10 +1516,10 @@ impl Table {
         other: &Self,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        let mut self_extension_tables = self.extension_tables(conn)?;
+        let mut self_extension_tables = self.ancestral_extension_tables(conn)?;
         self_extension_tables.push(self.clone());
         self_extension_tables.sort_unstable();
-        let mut other_extension_tables = other.extension_tables(conn)?;
+        let mut other_extension_tables = other.ancestral_extension_tables(conn)?;
         other_extension_tables.push(other.clone());
         other_extension_tables.sort_unstable();
 

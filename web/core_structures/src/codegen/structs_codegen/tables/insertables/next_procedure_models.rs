@@ -10,13 +10,11 @@ pub enum InsertableNextProcedureModelAttributes {
 impl core::fmt::Display for InsertableNextProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableNextProcedureModelAttributes::ParentId => write!(f, "parent_id"),
-            InsertableNextProcedureModelAttributes::CurrentId => write!(f, "current_id"),
-            InsertableNextProcedureModelAttributes::SuccessorId => {
-                write!(f, "successor_id")
-            }
-            InsertableNextProcedureModelAttributes::CreatedBy => write!(f, "created_by"),
-            InsertableNextProcedureModelAttributes::CreatedAt => write!(f, "created_at"),
+            Self::ParentId => write!(f, "parent_id"),
+            Self::CurrentId => write!(f, "current_id"),
+            Self::SuccessorId => write!(f, "successor_id"),
+            Self::CreatedBy => write!(f, "created_by"),
+            Self::CreatedAt => write!(f, "created_at"),
         }
     }
 }
@@ -29,11 +27,11 @@ impl core::fmt::Display for InsertableNextProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableNextProcedureModel {
-    parent_id: i32,
-    current_id: i32,
-    successor_id: i32,
-    created_by: i32,
-    created_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) parent_id: i32,
+    pub(crate) current_id: i32,
+    pub(crate) successor_id: i32,
+    pub(crate) created_by: i32,
+    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableNextProcedureModel {
     pub fn parent<C: diesel::connection::LoadConnection>(
@@ -253,91 +251,95 @@ impl Default for InsertableNextProcedureModelBuilder {
         }
     }
 }
-impl InsertableNextProcedureModelBuilder {
-    pub fn parent_id<P>(
+impl web_common_traits::database::ExtendableBuilder for InsertableNextProcedureModelBuilder {
+    type Attributes = InsertableNextProcedureModelAttributes;
+    fn extend_builder(
         mut self,
-        parent_id: P,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(parent_id) = other.parent_id {
+            self = self.parent(parent_id)?;
+        }
+        if let Some(current_id) = other.current_id {
+            self = self.current(current_id)?;
+        }
+        if let Some(successor_id) = other.successor_id {
+            self = self.successor(successor_id)?;
+        }
+        if let Some(created_by) = other.created_by {
+            self = self.created_by(created_by)?;
+        }
+        if let Some(created_at) = other.created_at {
+            self = self.created_at(created_at)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableNextProcedureModelBuilder {
+    type PrimaryKey = (i32, i32, i32);
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.parent_id` column from
+    /// table `next_procedure_models`.
+    pub fn parent(
+        mut self,
+        parent_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_id = parent_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableNextProcedureModelAttributes::ParentId)
-        })?;
+    > {
         self.parent_id = Some(parent_id);
         Ok(self)
     }
-    pub fn current_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.current_id` column from
+    /// table `next_procedure_models`.
+    pub fn current(
         mut self,
-        current_id: P,
+        current_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let current_id = current_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableNextProcedureModelAttributes::CurrentId)
-        })?;
-        if let Some(successor_id) = self.successor_id {
-            pgrx_validation::must_be_distinct_i32(current_id, successor_id).map_err(|e| {
-                e.rename_fields(
-                    InsertableNextProcedureModelAttributes::CurrentId,
-                    InsertableNextProcedureModelAttributes::SuccessorId,
-                )
-            })?;
-        }
+    > {
         self.current_id = Some(current_id);
         Ok(self)
     }
-    pub fn successor_id<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.successor_id` column from
+    /// table `next_procedure_models`.
+    pub fn successor(
         mut self,
-        successor_id: P,
+        successor_id: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let successor_id = successor_id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableNextProcedureModelAttributes::SuccessorId)
-        })?;
-        if let Some(current_id) = self.current_id {
-            pgrx_validation::must_be_distinct_i32(current_id, successor_id).map_err(|e| {
-                e.rename_fields(
-                    InsertableNextProcedureModelAttributes::CurrentId,
-                    InsertableNextProcedureModelAttributes::SuccessorId,
-                )
-            })?;
-        }
+    > {
         self.successor_id = Some(successor_id);
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.created_by` column from
+    /// table `next_procedure_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let created_by = created_by.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableNextProcedureModelAttributes::CreatedBy)
-        })?;
+    > {
         self.created_by = Some(created_by);
         Ok(self)
     }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.created_at` column from
+    /// table `next_procedure_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -359,37 +361,36 @@ impl InsertableNextProcedureModelBuilder {
         Ok(self)
     }
 }
-impl TryFrom<InsertableNextProcedureModelBuilder> for InsertableNextProcedureModel {
-    type Error = common_traits::prelude::BuilderError<InsertableNextProcedureModelAttributes>;
-    fn try_from(
-        builder: InsertableNextProcedureModelBuilder,
-    ) -> Result<InsertableNextProcedureModel, Self::Error> {
-        Ok(Self {
-            parent_id: builder.parent_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNextProcedureModelAttributes::ParentId,
-                ),
-            )?,
-            current_id: builder.current_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNextProcedureModelAttributes::CurrentId,
-                ),
-            )?,
-            successor_id: builder.successor_id.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNextProcedureModelAttributes::SuccessorId,
-                ),
-            )?,
-            created_by: builder.created_by.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNextProcedureModelAttributes::CreatedBy,
-                ),
-            )?,
-            created_at: builder.created_at.ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    InsertableNextProcedureModelAttributes::CreatedAt,
-                ),
-            )?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableNextProcedureModelBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
+        Error = web_common_traits::database::InsertError<
+            InsertableNextProcedureModelAttributes,
+        >,
+    >,
+{
+    type Attributes = InsertableNextProcedureModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.parent_id.is_some() && self.current_id.is_some()
+            && self.successor_id.is_some() && self.created_by.is_some()
+            && self.created_at.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

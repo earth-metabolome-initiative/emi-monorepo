@@ -9,6 +9,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::AliquotingProcedureModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::AliquotingProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::AliquotingProcedure)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::BallMillMachineModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::BallMillMachineModel)
@@ -147,19 +152,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Material(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Material).collect::<Vec<_>>()
             }
-            super::Rows::MixCountableProcedureModel(rows) => {
+            super::Rows::MixingProcedureModel(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::MixCountableProcedureModel)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::MixSolidProcedureModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::MixSolidProcedureModel)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::MountTipProcedureModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::MountTipProcedureModel)
+                    .map(crate::codegen::tables::row::Row::MixingProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::NextProcedureModel(rows) => {
@@ -200,6 +195,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::PermanenceCategory)
                     .collect::<Vec<_>>()
             }
+            super::Rows::PhoneModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PhoneModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PhotographProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PhotographProcedureModel)
@@ -213,6 +213,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::PipetteTipModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PipetteTipModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PlacingProcedureModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PlacingProcedureModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::PositioningDeviceModel(rows) => {
@@ -301,6 +306,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::SupernatantProcedureModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SupernatantProcedureModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::SupernatantProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SupernatantProcedure)
                     .collect::<Vec<_>>()
             }
             super::Rows::Taxon(rows) => {

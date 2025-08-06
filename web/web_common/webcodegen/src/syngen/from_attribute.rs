@@ -88,7 +88,7 @@ impl crate::Table {
             from_methods.push((vec![self.clone()], columns, false, None));
         }
 
-        for extension_table in self.extension_tables(conn)? {
+        for extension_table in self.ancestral_extension_tables(conn)? {
             let extension_table_ident = extension_table.snake_case_ident()?;
             let extension_primary_key = extension_table.primary_key_columns(conn)?.pop().unwrap();
             let primary_key_ident = primary_key_columns[0].snake_case_ident()?;

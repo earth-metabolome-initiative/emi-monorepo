@@ -2,10 +2,16 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BallMillProcedureModelForeignKeys {
     pub procedure_model: Option<
-        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub milled_with: Option<
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
+    pub milled_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub ball_mill_procedure_models_milled_with_milled_container_id_fkey: Option<
+        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -18,7 +24,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
                 self.procedure_model_id,
             ),
         ));
@@ -27,9 +33,25 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.milled_with,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                self.milled_container_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                self.milled_with,
+                self.milled_container_id,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_model.is_some() && foreign_keys.milled_with.is_some()
+        foreign_keys.procedure_model.is_some()
+            && foreign_keys.milled_with.is_some()
+            && foreign_keys.milled_container.is_some()
+            && foreign_keys
+                .ball_mill_procedure_models_milled_with_milled_container_id_fkey
+                .is_some()
     }
     fn update(
         &self,
@@ -60,22 +82,72 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(storage_procedure_models),
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id {
-                    foreign_keys.procedure_model = Some(storage_procedure_models);
+                if self.milled_with == compatibility_rules.left_trackable_id
+                    && self.milled_container_id == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.ball_mill_procedure_models_milled_with_milled_container_id_fkey =
+                        Some(compatibility_rules);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(storage_procedure_models),
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id {
+                if self.milled_with == compatibility_rules.left_trackable_id
+                    && self.milled_container_id == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.ball_mill_procedure_models_milled_with_milled_container_id_fkey =
+                        None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = Some(procedure_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_model_id == procedure_models.id {
                     foreign_keys.procedure_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.milled_container_id == volumetric_container_models.id {
+                    foreign_keys.milled_container = Some(volumetric_container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::VolumetricContainerModel(
+                    volumetric_container_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.milled_container_id == volumetric_container_models.id {
+                    foreign_keys.milled_container = None;
                     updated = true;
                 }
             }

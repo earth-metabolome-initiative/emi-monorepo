@@ -4,42 +4,51 @@ mod aliquoting_procedure_models;
 pub use aliquoting_procedure_models::{
     InsertableAliquotingProcedureModel, InsertableAliquotingProcedureModelAttributes,
     InsertableAliquotingProcedureModelBuilder,
+    InsertableAliquotingProcedureModelExtensionAttributes,
+};
+mod aliquoting_procedures;
+pub use aliquoting_procedures::{
+    InsertableAliquotingProcedure, InsertableAliquotingProcedureAttributes,
+    InsertableAliquotingProcedureBuilder, InsertableAliquotingProcedureExtensionAttributes,
 };
 mod ball_mill_machine_models;
 pub use ball_mill_machine_models::{
     InsertableBallMillMachineModel, InsertableBallMillMachineModelAttributes,
-    InsertableBallMillMachineModelBuilder,
+    InsertableBallMillMachineModelBuilder, InsertableBallMillMachineModelExtensionAttributes,
 };
 mod ball_mill_procedure_models;
 pub use ball_mill_procedure_models::{
     InsertableBallMillProcedureModel, InsertableBallMillProcedureModelAttributes,
-    InsertableBallMillProcedureModelBuilder,
+    InsertableBallMillProcedureModelBuilder, InsertableBallMillProcedureModelExtensionAttributes,
 };
 mod binary_question_procedure_models;
 pub use binary_question_procedure_models::{
     InsertableBinaryQuestionProcedureModel, InsertableBinaryQuestionProcedureModelAttributes,
     InsertableBinaryQuestionProcedureModelBuilder,
+    InsertableBinaryQuestionProcedureModelExtensionAttributes,
 };
 mod brands;
 pub use brands::{InsertableBrand, InsertableBrandAttributes, InsertableBrandBuilder};
 mod camera_models;
 pub use camera_models::{
     InsertableCameraModel, InsertableCameraModelAttributes, InsertableCameraModelBuilder,
+    InsertableCameraModelExtensionAttributes,
 };
 mod capping_procedure_models;
 pub use capping_procedure_models::{
     InsertableCappingProcedureModel, InsertableCappingProcedureModelAttributes,
-    InsertableCappingProcedureModelBuilder,
+    InsertableCappingProcedureModelBuilder, InsertableCappingProcedureModelExtensionAttributes,
 };
 mod centrifuge_models;
 pub use centrifuge_models::{
     InsertableCentrifugeModel, InsertableCentrifugeModelAttributes,
-    InsertableCentrifugeModelBuilder,
+    InsertableCentrifugeModelBuilder, InsertableCentrifugeModelExtensionAttributes,
 };
 mod centrifuge_procedure_models;
 pub use centrifuge_procedure_models::{
     InsertableCentrifugeProcedureModel, InsertableCentrifugeProcedureModelAttributes,
     InsertableCentrifugeProcedureModelBuilder,
+    InsertableCentrifugeProcedureModelExtensionAttributes,
 };
 mod cities;
 pub use cities::{InsertableCity, InsertableCityAttributes, InsertableCityBuilder};
@@ -48,17 +57,17 @@ pub use colors::{InsertableColor, InsertableColorAttributes, InsertableColorBuil
 mod commercial_product_lots;
 pub use commercial_product_lots::{
     InsertableCommercialProductLot, InsertableCommercialProductLotAttributes,
-    InsertableCommercialProductLotBuilder,
+    InsertableCommercialProductLotBuilder, InsertableCommercialProductLotExtensionAttributes,
 };
 mod commercial_products;
 pub use commercial_products::{
     InsertableCommercialProduct, InsertableCommercialProductAttributes,
-    InsertableCommercialProductBuilder,
+    InsertableCommercialProductBuilder, InsertableCommercialProductExtensionAttributes,
 };
 mod commercial_reagents;
 pub use commercial_reagents::{
     InsertableCommercialReagent, InsertableCommercialReagentAttributes,
-    InsertableCommercialReagentBuilder,
+    InsertableCommercialReagentBuilder, InsertableCommercialReagentExtensionAttributes,
 };
 mod compatibility_rules;
 pub use compatibility_rules::{
@@ -68,17 +77,19 @@ pub use compatibility_rules::{
 mod container_models;
 pub use container_models::{
     InsertableContainerModel, InsertableContainerModelAttributes, InsertableContainerModelBuilder,
+    InsertableContainerModelExtensionAttributes,
 };
 mod containers;
 pub use containers::{
     InsertableContainer, InsertableContainerAttributes, InsertableContainerBuilder,
+    InsertableContainerExtensionAttributes,
 };
 mod countries;
 pub use countries::{InsertableCountry, InsertableCountryAttributes, InsertableCountryBuilder};
 mod disposal_procedure_models;
 pub use disposal_procedure_models::{
     InsertableDisposalProcedureModel, InsertableDisposalProcedureModelAttributes,
-    InsertableDisposalProcedureModelBuilder,
+    InsertableDisposalProcedureModelBuilder, InsertableDisposalProcedureModelExtensionAttributes,
 };
 mod documents;
 pub use documents::{InsertableDocument, InsertableDocumentAttributes, InsertableDocumentBuilder};
@@ -90,35 +101,39 @@ mod fractioning_procedure_models;
 pub use fractioning_procedure_models::{
     InsertableFractioningProcedureModel, InsertableFractioningProcedureModelAttributes,
     InsertableFractioningProcedureModelBuilder,
+    InsertableFractioningProcedureModelExtensionAttributes,
 };
 mod freeze_drier_models;
 pub use freeze_drier_models::{
     InsertableFreezeDrierModel, InsertableFreezeDrierModelAttributes,
-    InsertableFreezeDrierModelBuilder,
+    InsertableFreezeDrierModelBuilder, InsertableFreezeDrierModelExtensionAttributes,
 };
 mod freeze_drying_procedure_models;
 pub use freeze_drying_procedure_models::{
     InsertableFreezeDryingProcedureModel, InsertableFreezeDryingProcedureModelAttributes,
     InsertableFreezeDryingProcedureModelBuilder,
+    InsertableFreezeDryingProcedureModelExtensionAttributes,
 };
 mod freezer_models;
 pub use freezer_models::{
     InsertableFreezerModel, InsertableFreezerModelAttributes, InsertableFreezerModelBuilder,
+    InsertableFreezerModelExtensionAttributes,
 };
 mod freezing_procedure_models;
 pub use freezing_procedure_models::{
     InsertableFreezingProcedureModel, InsertableFreezingProcedureModelAttributes,
-    InsertableFreezingProcedureModelBuilder,
+    InsertableFreezingProcedureModelBuilder, InsertableFreezingProcedureModelExtensionAttributes,
 };
 mod geolocation_procedure_models;
 pub use geolocation_procedure_models::{
     InsertableGeolocationProcedureModel, InsertableGeolocationProcedureModelAttributes,
     InsertableGeolocationProcedureModelBuilder,
+    InsertableGeolocationProcedureModelExtensionAttributes,
 };
 mod instrument_models;
 pub use instrument_models::{
     InsertableInstrumentModel, InsertableInstrumentModelAttributes,
-    InsertableInstrumentModelBuilder,
+    InsertableInstrumentModelBuilder, InsertableInstrumentModelExtensionAttributes,
 };
 mod instrument_states;
 pub use instrument_states::{
@@ -131,20 +146,10 @@ pub use login_providers::{
 };
 mod materials;
 pub use materials::{InsertableMaterial, InsertableMaterialAttributes, InsertableMaterialBuilder};
-mod mix_countable_procedure_models;
-pub use mix_countable_procedure_models::{
-    InsertableMixCountableProcedureModel, InsertableMixCountableProcedureModelAttributes,
-    InsertableMixCountableProcedureModelBuilder,
-};
-mod mix_solid_procedure_models;
-pub use mix_solid_procedure_models::{
-    InsertableMixSolidProcedureModel, InsertableMixSolidProcedureModelAttributes,
-    InsertableMixSolidProcedureModelBuilder,
-};
-mod mount_tip_procedure_models;
-pub use mount_tip_procedure_models::{
-    InsertableMountTipProcedureModel, InsertableMountTipProcedureModelAttributes,
-    InsertableMountTipProcedureModelBuilder,
+mod mixing_procedure_models;
+pub use mixing_procedure_models::{
+    InsertableMixingProcedureModel, InsertableMixingProcedureModelAttributes,
+    InsertableMixingProcedureModelBuilder, InsertableMixingProcedureModelExtensionAttributes,
 };
 mod next_procedure_models;
 pub use next_procedure_models::{
@@ -161,7 +166,10 @@ pub use organism_taxa::{
     InsertableOrganismTaxon, InsertableOrganismTaxonAttributes, InsertableOrganismTaxonBuilder,
 };
 mod organisms;
-pub use organisms::{InsertableOrganism, InsertableOrganismAttributes, InsertableOrganismBuilder};
+pub use organisms::{
+    InsertableOrganism, InsertableOrganismAttributes, InsertableOrganismBuilder,
+    InsertableOrganismExtensionAttributes,
+};
 mod organizations;
 pub use organizations::{
     InsertableOrganization, InsertableOrganizationAttributes, InsertableOrganizationBuilder,
@@ -169,7 +177,7 @@ pub use organizations::{
 mod packaging_procedure_models;
 pub use packaging_procedure_models::{
     InsertablePackagingProcedureModel, InsertablePackagingProcedureModelAttributes,
-    InsertablePackagingProcedureModelBuilder,
+    InsertablePackagingProcedureModelBuilder, InsertablePackagingProcedureModelExtensionAttributes,
 };
 mod parent_procedure_models;
 pub use parent_procedure_models::{
@@ -181,29 +189,41 @@ pub use permanence_categories::{
     InsertablePermanenceCategory, InsertablePermanenceCategoryAttributes,
     InsertablePermanenceCategoryBuilder,
 };
+mod phone_models;
+pub use phone_models::{
+    InsertablePhoneModel, InsertablePhoneModelAttributes, InsertablePhoneModelBuilder,
+    InsertablePhoneModelExtensionAttributes,
+};
 mod photograph_procedure_models;
 pub use photograph_procedure_models::{
     InsertablePhotographProcedureModel, InsertablePhotographProcedureModelAttributes,
     InsertablePhotographProcedureModelBuilder,
+    InsertablePhotographProcedureModelExtensionAttributes,
 };
 mod pipette_models;
 pub use pipette_models::{
     InsertablePipetteModel, InsertablePipetteModelAttributes, InsertablePipetteModelBuilder,
+    InsertablePipetteModelExtensionAttributes,
 };
 mod pipette_tip_models;
 pub use pipette_tip_models::{
     InsertablePipetteTipModel, InsertablePipetteTipModelAttributes,
-    InsertablePipetteTipModelBuilder,
+    InsertablePipetteTipModelBuilder, InsertablePipetteTipModelExtensionAttributes,
+};
+mod placing_procedure_models;
+pub use placing_procedure_models::{
+    InsertablePlacingProcedureModel, InsertablePlacingProcedureModelAttributes,
+    InsertablePlacingProcedureModelBuilder, InsertablePlacingProcedureModelExtensionAttributes,
 };
 mod positioning_device_models;
 pub use positioning_device_models::{
     InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttributes,
-    InsertablePositioningDeviceModelBuilder,
+    InsertablePositioningDeviceModelBuilder, InsertablePositioningDeviceModelExtensionAttributes,
 };
 mod pouring_procedure_models;
 pub use pouring_procedure_models::{
     InsertablePouringProcedureModel, InsertablePouringProcedureModelAttributes,
-    InsertablePouringProcedureModelBuilder,
+    InsertablePouringProcedureModelBuilder, InsertablePouringProcedureModelExtensionAttributes,
 };
 mod procedure_model_trackables;
 pub use procedure_model_trackables::{
@@ -226,6 +246,7 @@ pub use procedures::{
 mod processables;
 pub use processables::{
     InsertableProcessable, InsertableProcessableAttributes, InsertableProcessableBuilder,
+    InsertableProcessableExtensionAttributes,
 };
 mod project_states;
 pub use project_states::{
@@ -236,7 +257,10 @@ pub use projects::{InsertableProject, InsertableProjectAttributes, InsertablePro
 mod ranks;
 pub use ranks::{InsertableRank, InsertableRankAttributes, InsertableRankBuilder};
 mod reagents;
-pub use reagents::{InsertableReagent, InsertableReagentAttributes, InsertableReagentBuilder};
+pub use reagents::{
+    InsertableReagent, InsertableReagentAttributes, InsertableReagentBuilder,
+    InsertableReagentExtensionAttributes,
+};
 mod roles;
 pub use roles::{InsertableRole, InsertableRoleAttributes, InsertableRoleBuilder};
 mod rooms;
@@ -264,12 +288,18 @@ pub use spectra_collections::{
 mod storage_procedure_models;
 pub use storage_procedure_models::{
     InsertableStorageProcedureModel, InsertableStorageProcedureModelAttributes,
-    InsertableStorageProcedureModelBuilder,
+    InsertableStorageProcedureModelBuilder, InsertableStorageProcedureModelExtensionAttributes,
 };
 mod supernatant_procedure_models;
 pub use supernatant_procedure_models::{
     InsertableSupernatantProcedureModel, InsertableSupernatantProcedureModelAttributes,
     InsertableSupernatantProcedureModelBuilder,
+    InsertableSupernatantProcedureModelExtensionAttributes,
+};
+mod supernatant_procedures;
+pub use supernatant_procedures::{
+    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttributes,
+    InsertableSupernatantProcedureBuilder, InsertableSupernatantProcedureExtensionAttributes,
 };
 mod taxa;
 pub use taxa::{InsertableTaxon, InsertableTaxonAttributes, InsertableTaxonBuilder};
@@ -317,24 +347,25 @@ mod volumetric_container_models;
 pub use volumetric_container_models::{
     InsertableVolumetricContainerModel, InsertableVolumetricContainerModelAttributes,
     InsertableVolumetricContainerModelBuilder,
+    InsertableVolumetricContainerModelExtensionAttributes,
 };
 mod volumetric_processables;
 pub use volumetric_processables::{
     InsertableVolumetricProcessable, InsertableVolumetricProcessableAttributes,
-    InsertableVolumetricProcessableBuilder,
+    InsertableVolumetricProcessableBuilder, InsertableVolumetricProcessableExtensionAttributes,
 };
 mod weighing_instrument_models;
 pub use weighing_instrument_models::{
     InsertableWeighingInstrumentModel, InsertableWeighingInstrumentModelAttributes,
-    InsertableWeighingInstrumentModelBuilder,
+    InsertableWeighingInstrumentModelBuilder, InsertableWeighingInstrumentModelExtensionAttributes,
 };
 mod weighing_procedure_models;
 pub use weighing_procedure_models::{
     InsertableWeighingProcedureModel, InsertableWeighingProcedureModelAttributes,
-    InsertableWeighingProcedureModelBuilder,
+    InsertableWeighingProcedureModelBuilder, InsertableWeighingProcedureModelExtensionAttributes,
 };
 mod weighing_procedures;
 pub use weighing_procedures::{
     InsertableWeighingProcedure, InsertableWeighingProcedureAttributes,
-    InsertableWeighingProcedureBuilder,
+    InsertableWeighingProcedureBuilder, InsertableWeighingProcedureExtensionAttributes,
 };

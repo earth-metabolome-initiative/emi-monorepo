@@ -14,21 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::projects::Project,
     >,
-    crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::projects::Project,
-    >,
+    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::projects::Project;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProject;
@@ -43,21 +29,119 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProject = self
-            .try_into()?;
-        if let Some(parent) = insertable_struct.parent_project(conn)? {
-            if !parent.can_update(user_id, conn)? {
-                return Err(
-                    generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                        .into(),
-                );
-            }
-        }
+            .try_insert(user_id, conn)?;
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        _user_id: i32,
+        _conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let id = self
+            .id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::Id,
+                ),
+            )?;
+        let name = self
+            .name
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::Name,
+                ),
+            )?;
+        let description = self
+            .description
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::Description,
+                ),
+            )?;
+        let state_id = self
+            .state_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::StateId,
+                ),
+            )?;
+        let icon = self
+            .icon
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::Icon,
+                ),
+            )?;
+        let color_id = self
+            .color_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::ColorId,
+                ),
+            )?;
+        let created_by = self
+            .created_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::CreatedBy,
+                ),
+            )?;
+        let created_at = self
+            .created_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::CreatedAt,
+                ),
+            )?;
+        let updated_by = self
+            .updated_by
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::UpdatedBy,
+                ),
+            )?;
+        let updated_at = self
+            .updated_at
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::UpdatedAt,
+                ),
+            )?;
+        let expected_end_date = self
+            .expected_end_date
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::ExpectedEndDate,
+                ),
+            )?;
+        let end_date = self
+            .end_date
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttributes::EndDate,
+                ),
+            )?;
+        Ok(Self::InsertableVariant {
+            id,
+            name,
+            description,
+            state_id,
+            icon,
+            color_id,
+            parent_project_id: self.parent_project_id,
+            budget: self.budget,
+            expenses: self.expenses,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at,
+            expected_end_date,
+            end_date,
+        })
     }
 }

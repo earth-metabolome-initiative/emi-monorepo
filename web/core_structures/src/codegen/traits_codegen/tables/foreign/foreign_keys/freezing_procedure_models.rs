@@ -1,10 +1,13 @@
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezingProcedureModelForeignKeys {
-    pub procedure_model: Option<
-        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
-    >,
+    pub procedure_model:
+        Option<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
     pub frozen_with: Option<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
+    pub frozen_container:
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
+    pub freezing_procedure_models_frozen_with_frozen_container_id_fkey:
+        Option<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel
@@ -16,7 +19,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureModel(
                 self.procedure_model_id,
             ),
         ));
@@ -25,9 +28,23 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.frozen_with,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+                self.frozen_container_id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CompatibilityRule((
+                self.frozen_with,
+                self.frozen_container_id,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_model.is_some() && foreign_keys.frozen_with.is_some()
+        foreign_keys.procedure_model.is_some()
+            && foreign_keys.frozen_with.is_some()
+            && foreign_keys.frozen_container.is_some()
+            && foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey.is_some()
     }
     fn update(
         &self,
@@ -37,6 +54,52 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.frozen_with == compatibility_rules.left_trackable_id
+                    && self.frozen_container_id == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey =
+                        Some(compatibility_rules);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.frozen_with == compatibility_rules.left_trackable_id
+                    && self.frozen_container_id == compatibility_rules.right_trackable_id
+                {
+                    foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey =
+                        None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.frozen_container_id == container_models.id {
+                    foreign_keys.frozen_container = Some(container_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ContainerModel(container_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.frozen_container_id == container_models.id {
+                    foreign_keys.frozen_container = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::FreezerModel(freezer_models),
                 web_common_traits::crud::CRUD::Read
@@ -58,21 +121,21 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(storage_procedure_models),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id {
-                    foreign_keys.procedure_model = Some(storage_procedure_models);
+                if self.procedure_model_id == procedure_models.id {
+                    foreign_keys.procedure_model = Some(procedure_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::StorageProcedureModel(storage_procedure_models),
+                crate::codegen::tables::row::Row::ProcedureModel(procedure_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_model_id == storage_procedure_models.procedure_model_id {
+                if self.procedure_model_id == procedure_models.id {
                     foreign_keys.procedure_model = None;
                     updated = true;
                 }

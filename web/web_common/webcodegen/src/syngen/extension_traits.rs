@@ -24,7 +24,7 @@ impl crate::Table {
         let table_ident = self.struct_ident()?;
         let primary_key_type = self.primary_key_type(conn)?;
 
-        let mut extension_traits = self.extension_tables(conn)?
+        let mut extension_traits = self.ancestral_extension_tables(conn)?
             .iter()
             .map(|extended_table| {
                 let extended_table_path = extended_table.import_struct_path()?;

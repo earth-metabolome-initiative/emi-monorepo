@@ -29,7 +29,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, crate::errors::WebCodeGenError> {
-        if self.has_updated_by_column(conn)? && self.has_created_by_column(conn)? {
+        if self.has_updated_by_column(false, conn)? && self.has_created_by_column(false, conn)? {
             return Ok(true);
         }
         if !self.has_parents(conn)? {
@@ -123,31 +123,18 @@ impl Codegen<'_> {
             let mut parent_check_trait_requirements = HashMap::new();
 
             for parent_key in table.parent_keys(conn)? {
-                let mut parent_tables = Vec::new();
-
-                for foreign_key in parent_key.foreign_keys(conn)? {
-                    if foreign_key.columns(conn)?.len() > 1 {
-                        continue;
-                    }
-                    parent_tables
-                        .push(foreign_key.foreign_table(conn)?.expect("Parent table not found"));
-                }
-
-                if parent_tables.len() > 1 {
-                    unimplemented!("This is a new case!")
-                }
-
-                let parent_table = parent_tables.pop().expect("Parent table not found");
+                let parent_table =
+                    parent_key.foreign_table(conn)?.expect("Parent table should exist");
 
                 if !parent_table.allows_updatable(conn)? {
                     continue;
                 }
 
-                let method_ident = parent_key.getter_ident()?;
+                let method_ident = parent_key.constraint_ident(conn)?;
                 let parent_table_ident = parent_table.snake_case_ident()?;
                 let parent_table_path = parent_table.import_struct_path()?;
 
-                let recursive_call = if parent_key.is_nullable() {
+                let recursive_call = if parent_key.is_nullable(conn)? {
                     quote::quote! {#parent_table_ident.can_update(user_id, conn)}
                 } else {
                     quote::quote! {
@@ -185,7 +172,7 @@ impl Codegen<'_> {
                     }
                 }
 
-                parent_check.extend(if parent_key.is_nullable() {
+                parent_check.extend(if parent_key.is_nullable(conn)? {
                     quote::quote! {
                         if let Some(#parent_table_ident) = self.#method_ident(conn)? {
                             if !#recursive_call? {
@@ -229,7 +216,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let created_by_check = if table.has_created_by_column(conn)? {
+            let created_by_check = if table.has_created_by_column(false, conn)? {
                 quote::quote! {
                     // If the user is the creator of the record, they can update it
                     if user_id == self.created_by {
@@ -240,7 +227,7 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let updated_by_check = if table.has_updated_by_column(conn)? {
+            let updated_by_check = if table.has_updated_by_column(false, conn)? {
                 quote::quote! {
                     // If the user is the last updator of the record, they can update it
                     if user_id == self.updated_by {

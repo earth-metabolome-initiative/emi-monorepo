@@ -1,9 +1,22 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureModelAttributes {
-    ProcedureModelId(
+pub enum InsertableStorageProcedureModelExtensionAttributes {
+    ProcedureModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
     ),
+}
+impl core::fmt::Display for InsertableStorageProcedureModelExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::ProcedureModel(e) => write!(f, "ProcedureModel.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableStorageProcedureModelAttributes {
+    Extension(InsertableStorageProcedureModelExtensionAttributes),
+    ProcedureModelId,
     Kelvin,
     KelvinTolerancePercentage,
     ParentContainerId,
@@ -18,25 +31,14 @@ pub enum InsertableStorageProcedureModelAttributes {
 impl core::fmt::Display for InsertableStorageProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableStorageProcedureModelAttributes::ProcedureModelId(procedure_model_id) => {
-                write!(f, "{}", procedure_model_id)
-            }
-            InsertableStorageProcedureModelAttributes::Kelvin => write!(f, "kelvin"),
-            InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage => {
-                write!(f, "kelvin_tolerance_percentage")
-            }
-            InsertableStorageProcedureModelAttributes::ParentContainerId => {
-                write!(f, "parent_container_id")
-            }
-            InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
-                procedure_parent_container_id,
-            ) => write!(f, "{}", procedure_parent_container_id),
-            InsertableStorageProcedureModelAttributes::ChildContainerId => {
-                write!(f, "child_container_id")
-            }
-            InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(
-                procedure_child_container_id,
-            ) => write!(f, "{}", procedure_child_container_id),
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::Kelvin => write!(f, "kelvin"),
+            Self::KelvinTolerancePercentage => write!(f, "kelvin_tolerance_percentage"),
+            Self::ParentContainerId => write!(f, "parent_container_id"),
+            Self::ProcedureParentContainerId(e) => write!(f, "{e}"),
+            Self::ChildContainerId => write!(f, "child_container_id"),
+            Self::ProcedureChildContainerId(e) => write!(f, "{e}"),
         }
     }
 }
@@ -49,13 +51,13 @@ impl core::fmt::Display for InsertableStorageProcedureModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStorageProcedureModel {
-    procedure_model_id: i32,
-    kelvin: f32,
-    kelvin_tolerance_percentage: f32,
-    parent_container_id: ::rosetta_uuid::Uuid,
-    procedure_parent_container_id: i32,
-    child_container_id: ::rosetta_uuid::Uuid,
-    procedure_child_container_id: i32,
+    pub(crate) procedure_model_id: i32,
+    pub(crate) kelvin: f32,
+    pub(crate) kelvin_tolerance_percentage: f32,
+    pub(crate) parent_container_id: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_parent_container_id: i32,
+    pub(crate) child_container_id: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_child_container_id: i32,
 }
 impl InsertableStorageProcedureModel {
     pub fn procedure_model<C: diesel::connection::LoadConnection>(
@@ -94,29 +96,29 @@ impl InsertableStorageProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
+            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
                 self.parent_container_id,
             ),
             conn,
@@ -158,29 +160,29 @@ impl InsertableStorageProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
+            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
                 self.child_container_id,
             ),
             conn,
@@ -255,19 +257,25 @@ impl InsertableStorageProcedureModel {
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableStorageProcedureModelBuilder {
-    pub(crate) procedure_model_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+pub struct InsertableStorageProcedureModelBuilder<
+    ProcedureModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
     pub(crate) kelvin: Option<f32>,
     pub(crate) kelvin_tolerance_percentage: Option<f32>,
     pub(crate) parent_container_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_parent_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     pub(crate) child_container_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_child_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    pub(crate) procedure_model: ProcedureModel,
 }
-impl Default for InsertableStorageProcedureModelBuilder {
+impl<ProcedureModel> Default for InsertableStorageProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: Default,
+{
     fn default() -> Self {
         Self {
-            procedure_model_id: Default::default(),
+            procedure_model: Default::default(),
             kelvin: Default::default(),
             kelvin_tolerance_percentage: Some(5f32),
             parent_container_id: Default::default(),
@@ -277,7 +285,63 @@ impl Default for InsertableStorageProcedureModelBuilder {
         }
     }
 }
-impl InsertableStorageProcedureModelBuilder {
+impl<ProcedureModel> web_common_traits::database::ExtendableBuilder
+for InsertableStorageProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
+    >,
+{
+    type Attributes = InsertableStorageProcedureModelAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure_model = self
+            .procedure_model
+            .extend_builder(other.procedure_model)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                ))
+            })?;
+        if let Some(kelvin) = other.kelvin {
+            self = self.kelvin(kelvin)?;
+        }
+        if let Some(kelvin_tolerance_percentage) = other.kelvin_tolerance_percentage {
+            self = self.kelvin_tolerance_percentage(kelvin_tolerance_percentage)?;
+        }
+        if let Some(parent_container_id) = other.parent_container_id {
+            self = self.parent_container(parent_container_id)?;
+        }
+        self = self.procedure_parent_container(other.procedure_parent_container_id)?;
+        if let Some(child_container_id) = other.child_container_id {
+            self = self.child_container(child_container_id)?;
+        }
+        self = self.procedure_child_container(other.procedure_child_container_id)?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableStorageProcedureModelBuilder<ProcedureModel>
+where
+    ProcedureModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.procedure_model = self.procedure_model.set_primary_key(primary_key);
+        self
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `storage_procedure_models.kelvin` column from
+    /// table `storage_procedure_models`.
     pub fn kelvin<P>(
         mut self,
         kelvin: P,
@@ -297,6 +361,15 @@ impl InsertableStorageProcedureModelBuilder {
         self.kelvin = Some(kelvin);
         Ok(self)
     }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `storage_procedure_models.kelvin_tolerance_percentage` column from table
+    /// `storage_procedure_models`.
     pub fn kelvin_tolerance_percentage<P>(
         mut self,
         kelvin_tolerance_percentage: P,
@@ -329,150 +402,118 @@ impl InsertableStorageProcedureModelBuilder {
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    pub fn parent_container_id<P>(
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `storage_procedure_models.parent_container_id`
+    /// column from table `storage_procedure_models`.
+    pub fn parent_container(
         mut self,
-        parent_container_id: P,
+        parent_container_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_container_id = parent_container_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableStorageProcedureModelAttributes::ParentContainerId)
-            },
-        )?;
+    > {
         self.parent_container_id = Some(parent_container_id);
-        self.procedure_parent_container_id = self
-            .procedure_parent_container_id
-            .trackable_id(parent_container_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
-                )
-            })?;
         Ok(self)
     }
-    pub fn child_container_id<P>(
-        mut self,
-        child_container_id: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
     >
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let child_container_id = child_container_id.try_into().map_err(
-            |err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableStorageProcedureModelAttributes::ChildContainerId)
-            },
-        )?;
-        self.child_container_id = Some(child_container_id);
-        self.procedure_child_container_id =
-            self.procedure_child_container_id.trackable_id(child_container_id).map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
-                )
-            })?;
-        Ok(self)
-    }
-    pub fn procedure_parent_container_id(
+{
+    /// Sets the value of the
+    /// `storage_procedure_models.procedure_parent_container_id` column from
+    /// table `storage_procedure_models`.
+    pub fn procedure_parent_container(
         mut self,
         procedure_parent_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    > {
-        if procedure_parent_container_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) =
-            (self.parent_container_id, procedure_parent_container_id.trackable_id)
-        {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_parent_container_id.trackable_id {
-            self.parent_container_id = Some(foreign);
-        } else if let Some(local) = self.parent_container_id {
-            self.procedure_parent_container_id =
-                self.procedure_parent_container_id.trackable_id(local).map_err(|err| {
-                    err.into_field_name(
-                        InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
-                    )
-                })?;
-        }
-        self.procedure_parent_container_id = procedure_parent_container_id;
+        web_common_traits::database::InsertError<
+            InsertableStorageProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_parent_container_id = self
+            .procedure_parent_container_id
+            .extend_builder(procedure_parent_container_id)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(attribute)
+                })
+            })?;
         Ok(self)
     }
-    pub fn procedure_child_container_id(
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `storage_procedure_models.child_container_id`
+    /// column from table `storage_procedure_models`.
+    pub fn child_container(
         mut self,
-        procedure_child_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        child_container_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
     > {
-        if procedure_child_container_id.procedure_model_id.is_some() {
-            return Err(
-                web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::ProcedureModelId,
-                        ),
-                    ),
-                ),
-            );
-        }
-        if let (Some(local), Some(foreign)) =
-            (self.child_container_id, procedure_child_container_id.trackable_id)
-        {
-            if local != foreign {
-                return Err(
-                    web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
-                            ),
-                        ),
-                    ),
-                );
-            }
-        } else if let Some(foreign) = procedure_child_container_id.trackable_id {
-            self.child_container_id = Some(foreign);
-        } else if let Some(local) = self.child_container_id {
-            self.procedure_child_container_id =
-                self.procedure_child_container_id.trackable_id(local).map_err(|err| {
-                    err.into_field_name(
-                        InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
-                    )
-                })?;
-        }
-        self.procedure_child_container_id = procedure_child_container_id;
+        self.child_container_id = Some(child_container_id);
         Ok(self)
     }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `storage_procedure_models.procedure_child_container_id` column from
+    /// table `storage_procedure_models`.
+    pub fn procedure_child_container(
+        mut self,
+        procedure_child_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableStorageProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_child_container_id = self
+            .procedure_child_container_id
+            .extend_builder(procedure_child_container_id)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `storage_procedure_models`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -484,11 +525,23 @@ impl InsertableStorageProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id = self.procedure_model_id.name(name).map_err(|err| {
-            err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
         })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `storage_procedure_models`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -500,12 +553,23 @@ impl InsertableStorageProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.description(description).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `storage_procedure_models`.
     pub fn deprecated<P>(
         mut self,
         deprecated: P,
@@ -517,30 +581,47 @@ impl InsertableStorageProcedureModelBuilder {
         P: TryInto<bool>,
         <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.deprecated(deprecated).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn photograph_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `storage_procedure_models`.
+    pub fn photograph(
         mut self,
-        photograph_id: P,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.photograph_id(photograph_id).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `storage_procedure_models`.
     pub fn icon<P>(
         mut self,
         icon: P,
@@ -552,28 +633,48 @@ impl InsertableStorageProcedureModelBuilder {
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id = self.procedure_model_id.icon(icon).map_err(|err| {
-            err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
         })?;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `storage_procedure_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.created_by(created_by).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `storage_procedure_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -586,29 +687,47 @@ impl InsertableStorageProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.created_at(created_at).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `storage_procedure_models`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
+        updated_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_by(updated_by).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `storage_procedure_models`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -621,107 +740,53 @@ impl InsertableStorageProcedureModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model_id =
-            self.procedure_model_id.updated_at(updated_at).map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?;
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
 }
-impl InsertableStorageProcedureModelBuilder {
-    pub(crate) fn try_insert<C>(
+impl<ProcedureModel, C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableStorageProcedureModelBuilder<ProcedureModel>
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+        Error = web_common_traits::database::InsertError<
+            InsertableStorageProcedureModelAttributes,
+        >,
+    >,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
+{
+    type Attributes = InsertableStorageProcedureModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.procedure_model.is_complete() && self.kelvin.is_some()
+            && self.kelvin_tolerance_percentage.is_some()
+            && self.parent_container_id.is_some()
+            && self.procedure_parent_container_id.is_complete()
+            && self.child_container_id.is_some()
+            && self.procedure_child_container_id.is_complete()
+    }
+    fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
-        InsertableStorageProcedureModel,
-        web_common_traits::database::InsertError<
-            InsertableStorageProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelAttributes,
-            >,
-        >,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-            >,
-        >,
-    {
-        use diesel::associations::Identifiable;
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let kelvin = self.kelvin.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-            InsertableStorageProcedureModelAttributes::Kelvin,
-        ))?;
-        let kelvin_tolerance_percentage = self.kelvin_tolerance_percentage.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
-            ),
-        )?;
-        let parent_container_id = self.parent_container_id.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableStorageProcedureModelAttributes::ParentContainerId,
-            ),
-        )?;
-        let child_container_id = self.child_container_id.ok_or(
-            common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableStorageProcedureModelAttributes::ChildContainerId,
-            ),
-        )?;
-        let procedure_model_id = self
-            .procedure_model_id
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(InsertableStorageProcedureModelAttributes::ProcedureModelId)
-            })?
-            .id();
-        let procedure_parent_container_id = self
-            .procedure_parent_container_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
-                )
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureParentContainerId,
-                )
-            })?
-            .id();
-        let procedure_child_container_id = self
-            .procedure_child_container_id
-            .procedure_model_id(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
-                )
-            })?
-            .insert(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    InsertableStorageProcedureModelAttributes::ProcedureChildContainerId,
-                )
-            })?
-            .id();
-        Ok(InsertableStorageProcedureModel {
-            procedure_model_id,
-            kelvin,
-            kelvin_tolerance_percentage,
-            parent_container_id,
-            procedure_parent_container_id,
-            child_container_id,
-            procedure_child_container_id,
-        })
+        let insertable: crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

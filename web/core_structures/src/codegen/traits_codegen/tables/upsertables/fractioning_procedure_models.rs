@@ -22,8 +22,14 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
                     .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with.ne(excluded(weighed_with)))
                     .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
-                    .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination))),
+                    .or(
+                        procedure_fragment_source.ne(excluded(procedure_fragment_source)),
+                    )
+                    .or(fragment_placed_into.ne(excluded(fragment_placed_into)))
+                    .or(
+                        procedure_fragment_placed_into
+                            .ne(excluded(procedure_fragment_placed_into)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -53,8 +59,14 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_models::Fract
                     .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with.ne(excluded(weighed_with)))
                     .or(procedure_weighed_with.ne(excluded(procedure_weighed_with)))
-                    .or(source.ne(excluded(source)))
-                    .or(destination.ne(excluded(destination))),
+                    .or(
+                        procedure_fragment_source.ne(excluded(procedure_fragment_source)),
+                    )
+                    .or(fragment_placed_into.ne(excluded(fragment_placed_into)))
+                    .or(
+                        procedure_fragment_placed_into
+                            .ne(excluded(procedure_fragment_placed_into)),
+                    ),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

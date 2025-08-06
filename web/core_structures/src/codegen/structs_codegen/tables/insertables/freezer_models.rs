@@ -1,12 +1,39 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableFreezerModelExtensionAttributes {
+    InstrumentModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
+    ),
+}
+impl core::fmt::Display for InsertableFreezerModelExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::InstrumentModel(e) => write!(f, "InstrumentModel.{e}"),
+        }
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableFreezerModelAttributes {
-    Id(crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes),
+    Extension(InsertableFreezerModelExtensionAttributes),
+    Id,
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes>
+    for InsertableFreezerModelAttributes
+{
+    fn from(
+        instrument_models: crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
+    ) -> Self {
+        Self::Extension(InsertableFreezerModelExtensionAttributes::InstrumentModel(
+            instrument_models,
+        ))
+    }
 }
 impl core::fmt::Display for InsertableFreezerModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableFreezerModelAttributes::Id(id) => write!(f, "{}", id),
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::Id => write!(f, "id"),
         }
     }
 }
@@ -19,7 +46,7 @@ impl core::fmt::Display for InsertableFreezerModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFreezerModel {
-    id: ::rosetta_uuid::Uuid,
+    pub(crate) id: ::rosetta_uuid::Uuid,
 }
 impl InsertableFreezerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -56,13 +83,59 @@ impl InsertableFreezerModel {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableFreezerModelBuilder {
-    pub(crate) id:
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder,
+pub struct InsertableFreezerModelBuilder<
+    InstrumentModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+> {
+    pub(crate) id: InstrumentModel,
 }
-impl InsertableFreezerModelBuilder {
+impl<InstrumentModel> web_common_traits::database::ExtendableBuilder
+for InsertableFreezerModelBuilder<InstrumentModel>
+where
+    InstrumentModel: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
+    >,
+{
+    type Attributes = InsertableFreezerModelAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = self
+            .id
+            .extend_builder(other.id)
+            .map_err(|err| {
+                err.into_field_name(|attribute| InsertableFreezerModelAttributes::Extension(
+                    InsertableFreezerModelExtensionAttributes::InstrumentModel(attribute),
+                ))
+            })?;
+        Ok(self)
+    }
+}
+impl<InstrumentModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableFreezerModelBuilder<InstrumentModel>
+where
+    InstrumentModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
+        self
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.id` column from table
+    /// `freezer_models`.
     pub fn id<P>(
         mut self,
         id: P,
@@ -71,12 +144,19 @@ impl InsertableFreezerModelBuilder {
         P: TryInto<::rosetta_uuid::Uuid>,
         <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .id(id)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.name` column from table
+    /// `freezer_models`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -85,12 +165,19 @@ impl InsertableFreezerModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .name(name)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.description` column from table
+    /// `freezer_models`.
     pub fn description<P>(
         mut self,
         description: P,
@@ -99,56 +186,74 @@ impl InsertableFreezerModelBuilder {
         P: TryInto<Option<String>>,
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .description(description)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn photograph_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.photograph_id` column from table
+    /// `freezer_models`.
+    pub fn photograph(
         mut self,
-        photograph_id: P,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableFreezerModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .photograph_id(photograph_id)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn parent_id<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `freezer_models`.
+    pub fn parent(
         mut self,
-        parent_id: P,
+        parent_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableFreezerModelAttributes>>
-    where
-        P: TryInto<Option<::rosetta_uuid::Uuid>>,
-        <P as TryInto<Option<::rosetta_uuid::Uuid>>>::Error:
-            Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .parent_id(parent_id)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn created_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.created_by` column from table
+    /// `freezer_models`.
+    pub fn created_by(
         mut self,
-        created_by: P,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableFreezerModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_by(created_by)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.created_at` column from table
+    /// `freezer_models`.
     pub fn created_at<P>(
         mut self,
         created_at: P,
@@ -158,26 +263,37 @@ impl InsertableFreezerModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .created_at(created_at)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
-    pub fn updated_by<P>(
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.updated_by` column from table
+    /// `freezer_models`.
+    pub fn updated_by(
         mut self,
-        updated_by: P,
+        updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableFreezerModelAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_by(updated_by)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.updated_at` column from table
+    /// `freezer_models`.
     pub fn updated_at<P>(
         mut self,
         updated_at: P,
@@ -187,39 +303,35 @@ impl InsertableFreezerModelBuilder {
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.id = self
-            .id
-            .updated_at(updated_at)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?;
+        self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
-impl InsertableFreezerModelBuilder {
-    pub(crate) fn try_insert<C>(
+impl<InstrumentModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableFreezerModelBuilder<InstrumentModel>
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+            Error = web_common_traits::database::InsertError<InsertableFreezerModelAttributes>,
+        >,
+    InstrumentModel:
+        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type Attributes = InsertableFreezerModelAttributes;
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
+    }
+    fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        InsertableFreezerModel,
-        web_common_traits::database::InsertError<InsertableFreezerModelAttributes>,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
-            Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
-            >,
-        >,
-    {
-        use diesel::associations::Identifiable;
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let id = self
-            .id
-            .insert(user_id, conn)
-            .map_err(|err| err.into_field_name(InsertableFreezerModelAttributes::Id))?
-            .id();
-        Ok(InsertableFreezerModel { id })
+        let insertable: crate::codegen::structs_codegen::tables::freezer_models::FreezerModel =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }

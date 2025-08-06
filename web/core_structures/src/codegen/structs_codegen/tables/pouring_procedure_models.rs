@@ -16,7 +16,8 @@ pub struct PouringProcedureModel {
     pub procedure_model_id: i32,
     pub measured_with: i32,
     pub source: i32,
-    pub destination: i32,
+    pub poured_into: ::rosetta_uuid::Uuid,
+    pub procedure_poured_into: i32,
     pub liters: f32,
 }
 impl web_common_traits::prelude::TableName for PouringProcedureModel {
@@ -133,7 +134,39 @@ impl PouringProcedureModel {
             conn,
         )
     }
-    pub fn destination<C: diesel::connection::LoadConnection>(
+    pub fn poured_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.poured_into,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_poured_into<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -160,7 +193,7 @@ impl PouringProcedureModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable::table(),
-                self.destination,
+                self.procedure_poured_into,
             ),
             conn,
         )
@@ -192,15 +225,28 @@ impl PouringProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_destination(
-        destination: &i32,
+    pub fn from_poured_into(
+        poured_into: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
         Self::table()
-            .filter(pouring_procedure_models::destination.eq(destination))
+            .filter(pouring_procedure_models::poured_into.eq(poured_into))
+            .order_by(pouring_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_poured_into(
+        procedure_poured_into: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        Self::table()
+            .filter(pouring_procedure_models::procedure_poured_into.eq(procedure_poured_into))
             .order_by(pouring_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)
     }
@@ -245,8 +291,8 @@ impl PouringProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_destination_and_procedure_model_id(
-        destination: &i32,
+    pub fn from_procedure_poured_into_and_procedure_model_id(
+        procedure_poured_into: &i32,
         procedure_model_id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -257,9 +303,29 @@ impl PouringProcedureModel {
         use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
         Self::table()
             .filter(
-                pouring_procedure_models::destination
-                    .eq(destination)
+                pouring_procedure_models::procedure_poured_into
+                    .eq(procedure_poured_into)
                     .and(pouring_procedure_models::procedure_model_id.eq(procedure_model_id)),
+            )
+            .order_by(pouring_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_poured_into_and_poured_into(
+        procedure_poured_into: &i32,
+        poured_into: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::pouring_procedure_models::pouring_procedure_models;
+        Self::table()
+            .filter(
+                pouring_procedure_models::procedure_poured_into
+                    .eq(procedure_poured_into)
+                    .and(pouring_procedure_models::poured_into.eq(poured_into)),
             )
             .order_by(pouring_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)

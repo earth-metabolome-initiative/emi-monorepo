@@ -23,7 +23,7 @@ pub(crate) fn init_tools(user: &User, conn: &mut PgConnection) {
         .unwrap()
         .description(Some("Metal beads 3mm used in laboratory procedures".to_owned()))
         .unwrap()
-        .parent_id(Some(metal_beads.id))
+        .parent(Some(metal_beads.id))
         .unwrap()
         .created_by(user.id)
         .unwrap()

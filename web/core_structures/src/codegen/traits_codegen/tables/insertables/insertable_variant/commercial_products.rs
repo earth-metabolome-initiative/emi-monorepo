@@ -1,7 +1,10 @@
 impl<
     C: diesel::connection::LoadConnection,
+    Trackable,
 > web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
+    Trackable,
+>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -14,13 +17,10 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder: web_common_traits::database::InsertableVariant<
+    C: diesel::connection::LoadConnection,
+    Trackable: web_common_traits::database::TryInsertGeneric<
         C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::trackables::Trackable,
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-        >,
+        PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct;
@@ -43,5 +43,33 @@ where
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
+    }
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, Self::Error> {
+        let brand_id = self
+            .brand_id
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::BrandId,
+                ),
+            )?;
+        let id = self
+            .id
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductExtensionAttributes::Trackable(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                    ),
+                ))
+            })?;
+        Ok(Self::InsertableVariant {
+            id,
+            deprecation_date: self.deprecation_date,
+            brand_id,
+        })
     }
 }

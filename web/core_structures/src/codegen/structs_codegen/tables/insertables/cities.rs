@@ -1,14 +1,16 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCityAttributes {
+    Id,
     Name,
     Iso,
 }
 impl core::fmt::Display for InsertableCityAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            InsertableCityAttributes::Name => write!(f, "name"),
-            InsertableCityAttributes::Iso => write!(f, "iso"),
+            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "name"),
+            Self::Iso => write!(f, "iso"),
         }
     }
 }
@@ -19,8 +21,8 @@ impl core::fmt::Display for InsertableCityAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCity {
-    name: String,
-    iso: ::iso_codes::CountryCode,
+    pub(crate) name: String,
+    pub(crate) iso: ::iso_codes::CountryCode,
 }
 impl InsertableCity {
     pub fn iso<C: diesel::connection::LoadConnection>(
@@ -56,13 +58,35 @@ impl InsertableCity {
         )
     }
 }
-#[derive(Default, Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
     pub(crate) iso: Option<::iso_codes::CountryCode>,
 }
-impl InsertableCityBuilder {
+impl web_common_traits::database::ExtendableBuilder for InsertableCityBuilder {
+    type Attributes = InsertableCityAttributes;
+    fn extend_builder(
+        mut self,
+        other: Self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let Some(name) = other.name {
+            self = self.name(name)?;
+        }
+        if let Some(iso) = other.iso {
+            self = self.iso(iso)?;
+        }
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableCityBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
+    /// Sets the value of the `cities.name` column from table `cities`.
     pub fn name<P>(
         mut self,
         name: P,
@@ -77,32 +101,39 @@ impl InsertableCityBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    pub fn iso<P>(
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
+    /// Sets the value of the `cities.iso` column from table `cities`.
+    pub fn iso(
         mut self,
-        iso: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>>
-    where
-        P: TryInto<::iso_codes::CountryCode>,
-        <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let iso =
-            iso.try_into().map_err(|err: <P as TryInto<::iso_codes::CountryCode>>::Error| {
-                Into::into(err).rename_field(InsertableCityAttributes::Iso)
-            })?;
+        iso: ::iso_codes::CountryCode,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>> {
         self.iso = Some(iso);
         Ok(self)
     }
 }
-impl TryFrom<InsertableCityBuilder> for InsertableCity {
-    type Error = common_traits::prelude::BuilderError<InsertableCityAttributes>;
-    fn try_from(builder: InsertableCityBuilder) -> Result<InsertableCity, Self::Error> {
-        Ok(Self {
-            name: builder.name.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCityAttributes::Name,
-            ))?,
-            iso: builder.iso.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                InsertableCityAttributes::Iso,
-            ))?,
-        })
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableCityBuilder
+where
+    Self: web_common_traits::database::InsertableVariant<
+            C,
+            UserId = i32,
+            Row = crate::codegen::structs_codegen::tables::cities::City,
+            Error = web_common_traits::database::InsertError<InsertableCityAttributes>,
+        >,
+{
+    type Attributes = InsertableCityAttributes;
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.iso.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::cities::City =
+            self.insert(user_id, conn)?;
+        Ok(insertable.id())
     }
 }
