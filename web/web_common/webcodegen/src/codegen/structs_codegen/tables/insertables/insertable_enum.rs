@@ -138,11 +138,9 @@ impl Table {
 
         for extension_table in extension_tables {
             let struct_ident = extension_table.struct_ident()?;
-            let struct_name = extension_table.struct_name()?;
-            let pattern = format!("{struct_name}.{{e}}");
             let extension_table_enum_ty = extension_table.insertable_enum_ty()?;
             display_insertable_extension_enum_variants.push(quote::quote! {
-                Self::#struct_ident(e) => write!(f, #pattern)
+                Self::#struct_ident(e) => write!(f, "{e}")
             });
             insertable_extension_enum_variants.push(quote::quote! {
                 #struct_ident(#extension_table_enum_ty)

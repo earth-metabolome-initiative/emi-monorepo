@@ -6,7 +6,7 @@ pub enum InsertableSupernatantProcedureExtensionAttributes {
 impl core::fmt::Display for InsertableSupernatantProcedureExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure(e) => write!(f, "Procedure.{e}"),
+            Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }

@@ -204,26 +204,6 @@ impl PackagingProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample_id_and_procedure_model_id(
-        procedure_sample_id: &i32,
-        procedure_model_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
-        Self::table()
-            .filter(
-                packaging_procedure_models::procedure_sample_id
-                    .eq(procedure_sample_id)
-                    .and(packaging_procedure_models::procedure_model_id.eq(procedure_model_id)),
-            )
-            .order_by(packaging_procedure_models::procedure_model_id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_procedure_packaged_with_and_procedure_model_id(
         procedure_packaged_with: &i32,
         procedure_model_id: &i32,
@@ -259,6 +239,26 @@ impl PackagingProcedureModel {
                 packaging_procedure_models::procedure_packaged_with
                     .eq(procedure_packaged_with)
                     .and(packaging_procedure_models::packaged_with.eq(packaged_with)),
+            )
+            .order_by(packaging_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_id_and_procedure_model_id(
+        procedure_sample_id: &i32,
+        procedure_model_id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedure_models::packaging_procedure_models;
+        Self::table()
+            .filter(
+                packaging_procedure_models::procedure_sample_id
+                    .eq(procedure_sample_id)
+                    .and(packaging_procedure_models::procedure_model_id.eq(procedure_model_id)),
             )
             .order_by(packaging_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)

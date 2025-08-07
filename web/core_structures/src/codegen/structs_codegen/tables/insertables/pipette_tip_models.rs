@@ -6,7 +6,7 @@ pub enum InsertablePipetteTipModelExtensionAttributes {
 impl core::fmt::Display for InsertablePipetteTipModelExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Trackable(e) => write!(f, "Trackable.{e}"),
+            Self::Trackable(e) => write!(f, "{e}"),
         }
     }
 }
@@ -210,6 +210,22 @@ impl
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `pipette_tip_models`.
+    pub fn parent(
+        mut self,
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePipetteTipModelAttributes>>
+    {
+        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }

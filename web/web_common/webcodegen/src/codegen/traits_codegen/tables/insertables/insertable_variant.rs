@@ -351,6 +351,10 @@ impl Codegen<'_> {
             }
         }
 
+        let mut grouped_same_as_columns = grouped_same_as_columns.into_iter().collect::<Vec<_>>();
+
+        grouped_same_as_columns.sort_unstable();
+
         // Now we iterate over the grouped same-as columns and generate
         // the completion code for each foreign table.
         for (local_column, same_as_columns) in grouped_same_as_columns {

@@ -8,7 +8,7 @@ pub enum InsertableVolumetricProcessableExtensionAttributes {
 impl core::fmt::Display for InsertableVolumetricProcessableExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Processable(e) => write!(f, "Processable.{e}"),
+            Self::Processable(e) => write!(f, "{e}"),
         }
     }
 }
@@ -274,6 +274,26 @@ impl
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `volumetric_processables`.
+    pub fn parent(
+        mut self,
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    > {
+        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }

@@ -136,6 +136,26 @@ impl VolumetricContainerModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_parent_id(
+        parent_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, volumetric_container_models::volumetric_container_models,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
+            .filter(trackables::parent_id.eq(parent_id))
+            .order_by(volumetric_container_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,

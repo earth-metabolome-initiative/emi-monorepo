@@ -76,18 +76,18 @@ where
                     ),
                 ))
             })?;
-        let source = self
-            .source
+        let measured_with = self
+            .measured_with
             .procedure_model(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::MeasuredWith,
                 )
             })?
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::MeasuredWith,
                 )
             })?;
         let procedure_poured_into = self
@@ -104,18 +104,18 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::ProcedurePouredInto,
                 )
             })?;
-        let measured_with = self
-            .measured_with
+        let source = self
+            .source
             .procedure_model(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::MeasuredWith,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
                 )
             })?
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::MeasuredWith,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
                 )
             })?;
         Ok(Self::InsertableVariant {

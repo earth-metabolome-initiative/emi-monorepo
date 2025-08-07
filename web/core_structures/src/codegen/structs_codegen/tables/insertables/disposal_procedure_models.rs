@@ -8,7 +8,7 @@ pub enum InsertableDisposalProcedureModelExtensionAttributes {
 impl core::fmt::Display for InsertableDisposalProcedureModelExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureModel(e) => write!(f, "ProcedureModel.{e}"),
+            Self::ProcedureModel(e) => write!(f, "{e}"),
         }
     }
 }

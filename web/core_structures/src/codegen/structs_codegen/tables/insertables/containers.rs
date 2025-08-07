@@ -6,7 +6,7 @@ pub enum InsertableContainerExtensionAttributes {
 impl core::fmt::Display for InsertableContainerExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Trackable(e) => write!(f, "Trackable.{e}"),
+            Self::Trackable(e) => write!(f, "{e}"),
         }
     }
 }
@@ -271,6 +271,27 @@ impl
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableContainerAttributes::Extension(
+                    InsertableContainerExtensionAttributes::Trackable(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `containers`.
+    pub fn parent(
+        mut self,
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableContainerAttributes>> {
+        self.id = self.id.parent(parent_id).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableContainerAttributes::Extension(
                     InsertableContainerExtensionAttributes::Trackable(attribute),

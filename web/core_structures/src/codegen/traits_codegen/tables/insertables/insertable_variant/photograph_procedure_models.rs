@@ -91,20 +91,6 @@ where
                     ),
                 ))
             })?;
-        let trackable_id = self
-            .trackable_id
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureModelAttributes::TrackableId,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureModelAttributes::TrackableId,
-                )
-            })?;
         let procedure_photographed_with = self
             .procedure_photographed_with
             .procedure_model(procedure_model_id)
@@ -117,6 +103,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureModelAttributes::ProcedurePhotographedWith,
+                )
+            })?;
+        let trackable_id = self
+            .trackable_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureModelAttributes::TrackableId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureModelAttributes::TrackableId,
                 )
             })?;
         Ok(Self::InsertableVariant {

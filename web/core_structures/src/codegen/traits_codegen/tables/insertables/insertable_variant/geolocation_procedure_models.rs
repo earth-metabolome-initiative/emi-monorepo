@@ -91,20 +91,6 @@ where
                     ),
                 ))
             })?;
-        let trackable_id = self
-            .trackable_id
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::TrackableId,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::TrackableId,
-                )
-            })?;
         let procedure_geolocated_with = self
             .procedure_geolocated_with
             .procedure_model(procedure_model_id)
@@ -117,6 +103,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::ProcedureGeolocatedWith,
+                )
+            })?;
+        let trackable_id = self
+            .trackable_id
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::TrackableId,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::TrackableId,
                 )
             })?;
         Ok(Self::InsertableVariant {

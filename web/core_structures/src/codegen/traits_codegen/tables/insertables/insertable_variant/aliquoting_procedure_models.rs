@@ -140,6 +140,20 @@ where
                     ),
                 ))
             })?;
+        let procedure_aliquoted_from = self
+            .procedure_aliquoted_from
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
+                )
+            })?;
         let procedure_aliquoted_into = self
             .procedure_aliquoted_into
             .procedure_model(procedure_model_id)
@@ -152,20 +166,6 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedInto,
-                )
-            })?;
-        let procedure_pipette_tip = self
-            .procedure_pipette_tip
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip,
                 )
             })?;
         let procedure_aliquoted_with = self
@@ -182,18 +182,18 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith,
                 )
             })?;
-        let procedure_aliquoted_from = self
-            .procedure_aliquoted_from
+        let procedure_pipette_tip = self
+            .procedure_pipette_tip
             .procedure_model(procedure_model_id)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip,
                 )
             })?
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip,
                 )
             })?;
         Ok(Self::InsertableVariant {

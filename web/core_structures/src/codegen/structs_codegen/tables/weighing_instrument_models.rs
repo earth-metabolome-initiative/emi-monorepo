@@ -130,6 +130,26 @@ impl WeighingInstrumentModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_parent_id(
+        parent_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            trackables::trackables, weighing_instrument_models::weighing_instrument_models,
+        };
+        Self::table()
+            .inner_join(trackables::table.on(weighing_instrument_models::id.eq(trackables::id)))
+            .filter(trackables::parent_id.eq(parent_id))
+            .order_by(weighing_instrument_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,

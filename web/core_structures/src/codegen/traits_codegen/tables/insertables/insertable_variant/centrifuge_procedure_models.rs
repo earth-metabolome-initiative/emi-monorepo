@@ -126,20 +126,6 @@ where
                     ),
                 ))
             })?;
-        let procedure_centrifuged_with = self
-            .procedure_centrifuged_with
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
-                )
-            })?;
         let procedure_centrifuged_container_id = self
             .procedure_centrifuged_container_id
             .procedure_model(procedure_model_id)
@@ -152,6 +138,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId,
+                )
+            })?;
+        let procedure_centrifuged_with = self
+            .procedure_centrifuged_with
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith,
                 )
             })?;
         Ok(Self::InsertableVariant {

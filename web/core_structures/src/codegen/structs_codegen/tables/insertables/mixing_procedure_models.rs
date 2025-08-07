@@ -8,7 +8,7 @@ pub enum InsertableMixingProcedureModelExtensionAttributes {
 impl core::fmt::Display for InsertableMixingProcedureModelExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureModel(e) => write!(f, "ProcedureModel.{e}"),
+            Self::ProcedureModel(e) => write!(f, "{e}"),
         }
     }
 }

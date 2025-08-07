@@ -126,20 +126,6 @@ where
                     ),
                 ))
             })?;
-        let procedure_freeze_dried_with = self
-            .procedure_freeze_dried_with
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
-                )
-            })?;
         let procedure_freeze_dried_container_id = self
             .procedure_freeze_dried_container_id
             .procedure_model(procedure_model_id)
@@ -152,6 +138,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedContainerId,
+                )
+            })?;
+        let procedure_freeze_dried_with = self
+            .procedure_freeze_dried_with
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith,
                 )
             })?;
         Ok(Self::InsertableVariant {

@@ -207,6 +207,26 @@ impl GeolocationProcedureModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_geolocated_with_and_geolocated_with(
+        procedure_geolocated_with: &i32,
+        geolocated_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::geolocation_procedure_models::geolocation_procedure_models;
+        Self::table()
+            .filter(
+                geolocation_procedure_models::procedure_geolocated_with
+                    .eq(procedure_geolocated_with)
+                    .and(geolocation_procedure_models::geolocated_with.eq(geolocated_with)),
+            )
+            .order_by(geolocation_procedure_models::procedure_model_id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_geolocated_with_and_procedure_model_id(
         procedure_geolocated_with: &i32,
         procedure_model_id: &i32,
@@ -242,26 +262,6 @@ impl GeolocationProcedureModel {
                 geolocation_procedure_models::trackable_id
                     .eq(trackable_id)
                     .and(geolocation_procedure_models::procedure_model_id.eq(procedure_model_id)),
-            )
-            .order_by(geolocation_procedure_models::procedure_model_id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_geolocated_with_and_geolocated_with(
-        procedure_geolocated_with: &i32,
-        geolocated_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedure_models::geolocation_procedure_models;
-        Self::table()
-            .filter(
-                geolocation_procedure_models::procedure_geolocated_with
-                    .eq(procedure_geolocated_with)
-                    .and(geolocation_procedure_models::geolocated_with.eq(geolocated_with)),
             )
             .order_by(geolocation_procedure_models::procedure_model_id.asc())
             .load::<Self>(conn)

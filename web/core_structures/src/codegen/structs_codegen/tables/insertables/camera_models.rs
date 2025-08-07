@@ -8,7 +8,7 @@ pub enum InsertableCameraModelExtensionAttributes {
 impl core::fmt::Display for InsertableCameraModelExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::InstrumentModel(e) => write!(f, "InstrumentModel.{e}"),
+            Self::InstrumentModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -227,6 +227,24 @@ impl
         <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `camera_models`.
+    pub fn parent(
+        mut self,
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
+    {
+        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }

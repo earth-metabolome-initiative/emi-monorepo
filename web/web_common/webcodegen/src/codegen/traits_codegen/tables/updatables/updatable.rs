@@ -241,8 +241,11 @@ impl Codegen<'_> {
             let where_clause = if parent_check_trait_requirements.is_empty() {
                 TokenStream::new()
             } else {
+                let mut constraints =
+                    parent_check_trait_requirements.into_iter().collect::<Vec<_>>();
+                constraints.sort_unstable_by_key(|(ident, _)| ident.to_string());
                 let constraints =
-                    parent_check_trait_requirements.values().cloned().collect::<Vec<_>>();
+                    constraints.into_iter().map(|(_, constraint)| constraint).collect::<Vec<_>>();
 
                 quote::quote! { where #(#constraints),* }
             };

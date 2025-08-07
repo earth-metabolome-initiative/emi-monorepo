@@ -5,6 +5,7 @@ pub enum InsertableTrackableAttributes {
     Name,
     Description,
     PhotographId,
+    ParentId,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -17,6 +18,7 @@ impl core::fmt::Display for InsertableTrackableAttributes {
             Self::Name => write!(f, "name"),
             Self::Description => write!(f, "description"),
             Self::PhotographId => write!(f, "photograph_id"),
+            Self::ParentId => write!(f, "parent_id"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
             Self::UpdatedBy => write!(f, "updated_by"),
@@ -35,6 +37,7 @@ pub struct InsertableTrackable {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) photograph_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) parent_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
@@ -72,6 +75,42 @@ impl InsertableTrackable {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::documents::Document::table(),
                 photograph_id,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn parent<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_id) = self.parent_id else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                parent_id,
             ),
             conn,
         )
@@ -149,6 +188,7 @@ pub struct InsertableTrackableBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) photograph_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) parent_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
@@ -161,6 +201,7 @@ impl Default for InsertableTrackableBuilder {
             name: Default::default(),
             description: Default::default(),
             photograph_id: Default::default(),
+            parent_id: Default::default(),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
@@ -185,6 +226,9 @@ impl web_common_traits::database::ExtendableBuilder for InsertableTrackableBuild
         }
         if let Some(photograph_id) = other.photograph_id {
             self = self.photograph(Some(photograph_id))?;
+        }
+        if let Some(parent_id) = other.parent_id {
+            self = self.parent(Some(parent_id))?;
         }
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
@@ -296,6 +340,14 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
         let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
             Into::into(err).rename_field(InsertableTrackableAttributes::Id)
         })?;
+        if let Some(parent_id) = self.parent_id {
+            pgrx_validation::must_be_distinct_uuid(id, parent_id).map_err(|e| {
+                e.rename_fields(
+                    InsertableTrackableAttributes::Id,
+                    InsertableTrackableAttributes::ParentId,
+                )
+            })?;
+        }
         self.id = Some(id);
         Ok(self)
     }
@@ -322,6 +374,17 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
             })?;
         }
         self.name = name;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
+    /// Sets the value of the `trackables.parent_id` column from table
+    /// `trackables`.
+    pub fn parent(
+        mut self,
+        parent_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>> {
+        self.parent_id = parent_id;
         Ok(self)
     }
 }

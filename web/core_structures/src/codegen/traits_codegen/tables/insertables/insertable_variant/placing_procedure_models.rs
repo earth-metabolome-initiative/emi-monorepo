@@ -76,20 +76,6 @@ where
                     ),
                 ))
             })?;
-        let source = self
-            .source
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::Source,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::Source,
-                )
-            })?;
         let procedure_placed_into = self
             .procedure_placed_into
             .procedure_model(procedure_model_id)
@@ -102,6 +88,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::ProcedurePlacedInto,
+                )
+            })?;
+        let source = self
+            .source
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::Source,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::Source,
                 )
             })?;
         Ok(Self::InsertableVariant {
