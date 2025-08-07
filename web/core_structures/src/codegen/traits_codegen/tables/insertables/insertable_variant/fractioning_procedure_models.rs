@@ -17,6 +17,13 @@ where
         C,
         crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        PrimaryKey = i32,
+    >,
     crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -31,13 +38,6 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
-    >,
-    C: diesel::connection::LoadConnection,
-    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel;

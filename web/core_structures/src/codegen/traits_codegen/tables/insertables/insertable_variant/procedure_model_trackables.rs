@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
+    C: diesel::connection::LoadConnection,
     crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -44,7 +45,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::trackables::Trackable,
     >,
-    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackable;

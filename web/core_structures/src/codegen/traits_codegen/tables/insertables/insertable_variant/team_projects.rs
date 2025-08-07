@@ -14,6 +14,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::team_projects::TeamProject,
     >,
+    C: diesel::connection::LoadConnection,
     crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -44,7 +45,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::teams::Team,
     >,
-    C: diesel::connection::LoadConnection,
 {
     type Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject;

@@ -17,6 +17,8 @@ where
         C,
         crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -32,8 +34,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
     >,
-    C: diesel::connection::LoadConnection,
-    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Row = crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModel;

@@ -17,6 +17,8 @@ where
         C,
         crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -32,8 +34,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
     >,
-    C: diesel::connection::LoadConnection,
-    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,

@@ -17,6 +17,13 @@ where
         C,
         crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        PrimaryKey = i32,
+    >,
     crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -46,13 +53,6 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-    >,
-    C: diesel::connection::LoadConnection,
-    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel;

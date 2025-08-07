@@ -17,6 +17,8 @@ where
         C,
         crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
     >,
+    C: diesel::connection::LoadConnection,
+    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -32,8 +34,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     >,
-    C: diesel::connection::LoadConnection,
-    ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,

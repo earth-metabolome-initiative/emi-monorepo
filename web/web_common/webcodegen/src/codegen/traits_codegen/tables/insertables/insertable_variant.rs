@@ -534,6 +534,7 @@ impl Codegen<'_> {
                 self.generate_insertable_builder_try_insert_implementation(table, conn)?;
 
             additional_where_clause.extend(try_insert_additional_where_clause);
+            additional_where_clause.sort_unstable_by(|a, b| a.to_string().cmp(&b.to_string()));
 
             let extension_tables = table.extension_tables(conn)?;
             let generics = extension_tables
