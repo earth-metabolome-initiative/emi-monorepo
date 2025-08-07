@@ -154,25 +154,109 @@ where
         self
     }
 }
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `disposal_procedure_models.disposed_id` column
+    /// from table `disposal_procedure_models`.
+    pub fn disposed(
+        mut self,
+        disposed_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableDisposalProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.disposed_id = self.disposed_id.extend_builder(disposed_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableDisposalProcedureModelAttributes::DisposedId(attribute)
+            })
+        })?;
+        Ok(self)
+    }
+}
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
+    /// Sets the value of the `procedure_models.created_at` column from table
     /// `disposal_procedure_models`.
-    pub fn name<P>(
+    pub fn created_at<P>(
         mut self,
-        name: P,
+        created_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableDisposalProcedureModelAttributes::Extension(
+                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `disposal_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableDisposalProcedureModelAttributes::Extension(
+                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `disposal_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableDisposalProcedureModelAttributes::Extension(
                     InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -215,20 +299,48 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// Sets the value of the `procedure_models.icon` column from table
     /// `disposal_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn icon<P>(
         mut self,
-        deprecated: P,
+        icon: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableDisposalProcedureModelAttributes::Extension(
+                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `disposal_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableDisposalProcedureModelAttributes::Extension(
                     InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -267,64 +379,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the `procedure_models.updated_at` column from table
     /// `disposal_procedure_models`.
-    pub fn icon<P>(
+    pub fn updated_at<P>(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableDisposalProcedureModelAttributes::Extension(
-                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `disposal_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableDisposalProcedureModelAttributes::Extension(
-                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `disposal_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
@@ -334,7 +393,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableDisposalProcedureModelAttributes::Extension(
                     InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -363,65 +422,6 @@ impl
                 InsertableDisposalProcedureModelAttributes::Extension(
                     InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
                 )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `disposal_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableDisposalProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableDisposalProcedureModelAttributes::Extension(
-                    InsertableDisposalProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `disposal_procedure_models.disposed_id` column
-    /// from table `disposal_procedure_models`.
-    pub fn disposed(
-        mut self,
-        disposed_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableDisposalProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.disposed_id = self.disposed_id.extend_builder(disposed_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableDisposalProcedureModelAttributes::DisposedId(attribute)
             })
         })?;
         Ok(self)

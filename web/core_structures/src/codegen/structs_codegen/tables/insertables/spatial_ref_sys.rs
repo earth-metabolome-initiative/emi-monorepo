@@ -74,24 +74,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSpatialRefSyBuilder
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.srid` column from table
-    /// `spatial_ref_sys`.
-    pub fn srid<P>(
-        mut self,
-        srid: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let srid = srid.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srid)
-        })?;
-        self.srid = Some(srid);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.auth_name` column from table
     /// `spatial_ref_sys`.
     pub fn auth_name<P>(
@@ -130,24 +112,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.srtext` column from table
-    /// `spatial_ref_sys`.
-    pub fn srtext<P>(
-        mut self,
-        srtext: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let srtext = srtext.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
-            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
-        })?;
-        self.srtext = srtext;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.proj4text` column from table
     /// `spatial_ref_sys`.
     pub fn proj4text<P>(
@@ -163,6 +127,42 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
                 Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Proj4text)
             })?;
         self.proj4text = proj4text;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.srid` column from table
+    /// `spatial_ref_sys`.
+    pub fn srid<P>(
+        mut self,
+        srid: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
+    where
+        P: TryInto<i32>,
+        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let srid = srid.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srid)
+        })?;
+        self.srid = Some(srid);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
+    /// Sets the value of the `spatial_ref_sys.srtext` column from table
+    /// `spatial_ref_sys`.
+    pub fn srtext<P>(
+        mut self,
+        srtext: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let srtext = srtext.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
+        })?;
+        self.srtext = srtext;
         Ok(self)
     }
 }

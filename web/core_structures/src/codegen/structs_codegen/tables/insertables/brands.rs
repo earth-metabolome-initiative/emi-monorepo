@@ -150,36 +150,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.name` column from table `brands`.
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableBrandAttributes::Name)
-        })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableBrandAttributes::Name))?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.created_by` column from table `brands`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
     /// Sets the value of the `brands.created_at` column from table `brands`.
     pub fn created_at<P>(
         mut self,
@@ -208,12 +178,32 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilde
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.updated_by` column from table `brands`.
-    pub fn updated_by(
+    /// Sets the value of the `brands.created_by` column from table `brands`.
+    pub fn created_by(
         mut self,
-        updated_by: i32,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
-        self.updated_by = Some(updated_by);
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.name` column from table `brands`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableBrandAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableBrandAttributes::Name))?;
+        self.name = Some(name);
         Ok(self)
     }
 }
@@ -242,6 +232,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilde
             })?;
         }
         self.updated_at = Some(updated_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.updated_by` column from table `brands`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
 }

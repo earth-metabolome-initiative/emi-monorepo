@@ -234,6 +234,57 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureModelTrack
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
 {
+    /// Sets the value of the `procedure_model_trackables.created_at` column
+    /// from table `procedure_model_trackables`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelTrackableAttributes::CreatedAt)
+            },
+        )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableProcedureModelTrackableAttributes::CreatedAt,
+                    InsertableProcedureModelTrackableAttributes::UpdatedAt,
+                )
+            })?;
+        }
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.created_by` column
+    /// from table `procedure_model_trackables`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
+    > {
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
     /// Sets the value of the `procedure_model_trackables.name` column from
     /// table `procedure_model_trackables`.
     pub fn name<P>(
@@ -291,73 +342,6 @@ impl
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
 {
-    /// Sets the value of the `procedure_model_trackables.created_by` column
-    /// from table `procedure_model_trackables`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    > {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
-{
-    /// Sets the value of the `procedure_model_trackables.created_at` column
-    /// from table `procedure_model_trackables`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProcedureModelTrackableAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableProcedureModelTrackableAttributes::CreatedAt,
-                    InsertableProcedureModelTrackableAttributes::UpdatedAt,
-                )
-            })?;
-        }
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
-{
-    /// Sets the value of the `procedure_model_trackables.updated_by` column
-    /// from table `procedure_model_trackables`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
-    > {
-        self.updated_by = Some(updated_by);
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
-{
     /// Sets the value of the `procedure_model_trackables.updated_at` column
     /// from table `procedure_model_trackables`.
     pub fn updated_at<P>(
@@ -386,6 +370,22 @@ impl
             })?;
         }
         self.updated_at = Some(updated_at);
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder
+{
+    /// Sets the value of the `procedure_model_trackables.updated_by` column
+    /// from table `procedure_model_trackables`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureModelTrackableAttributes>,
+    > {
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
 }

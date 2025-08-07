@@ -470,6 +470,267 @@ where
         self
     }
 }
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `supernatant_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `supernatant_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `supernatant_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `supernatant_procedure_models`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `supernatant_procedure_models`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `supernatant_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `supernatant_procedure_models`.
+    pub fn photograph(
+        mut self,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `supernatant_procedure_models`.
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `supernatant_procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureModelAttributes::Extension(
+                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
 impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
         ProcedureModel,
@@ -494,169 +755,6 @@ impl<ProcedureModel>
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| e.rename_field(InsertableSupernatantProcedureModelAttributes::Liters))?;
         self.liters = Some(liters);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `supernatant_procedure_models.stratified_source`
-    /// column from table `supernatant_procedure_models`.
-    pub fn stratified_source(
-        mut self,
-        stratified_source: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        self.stratified_source = Some(stratified_source);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `supernatant_procedure_models.procedure_stratified_source` column from
-    /// table `supernatant_procedure_models`.
-    pub fn procedure_stratified_source(
-        mut self,
-        procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableSupernatantProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_stratified_source = self
-            .procedure_stratified_source
-            .extend_builder(procedure_stratified_source)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableSupernatantProcedureModelAttributes::ProcedureStratifiedSource(
-                        attribute,
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `supernatant_procedure_models.supernatant_destination` column from table
-    /// `supernatant_procedure_models`.
-    pub fn supernatant_destination(
-        mut self,
-        supernatant_destination: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        self.supernatant_destination = Some(supernatant_destination);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `supernatant_procedure_models.procedure_supernatant_destination` column
-    /// from table `supernatant_procedure_models`.
-    pub fn procedure_supernatant_destination(
-        mut self,
-        procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableSupernatantProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_supernatant_destination = self
-            .procedure_supernatant_destination
-            .extend_builder(procedure_supernatant_destination)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination(
-                        attribute,
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `supernatant_procedure_models.transferred_with`
-    /// column from table `supernatant_procedure_models`.
-    pub fn transferred_with(
-        mut self,
-        transferred_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    > {
-        self.transferred_with = Some(transferred_with);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `supernatant_procedure_models.procedure_transferred_with` column from
-    /// table `supernatant_procedure_models`.
-    pub fn procedure_transferred_with(
-        mut self,
-        procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableSupernatantProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_transferred_with = self
-            .procedure_transferred_with
-            .extend_builder(procedure_transferred_with)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableSupernatantProcedureModelAttributes::ProcedureTransferredWith(
-                        attribute,
-                    )
-                })
-            })?;
         Ok(self)
     }
 }
@@ -710,264 +808,166 @@ impl<ProcedureModel>
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `supernatant_procedure_models`.
-    pub fn name<P>(
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_stratified_source` column from
+    /// table `supernatant_procedure_models`.
+    pub fn procedure_stratified_source(
         mut self,
-        name: P,
+        procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_stratified_source = self
+            .procedure_stratified_source
+            .extend_builder(procedure_stratified_source)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureStratifiedSource(
                         attribute,
-                    ),
-                )
-            })
-        })?;
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.description` column from table
-    /// `supernatant_procedure_models`.
-    pub fn description<P>(
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_supernatant_destination` column
+    /// from table `supernatant_procedure_models`.
+    pub fn procedure_supernatant_destination(
         mut self,
-        description: P,
+        procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
     {
-        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_supernatant_destination = self
+            .procedure_supernatant_destination
+            .extend_builder(procedure_supernatant_destination)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination(
                         attribute,
-                    ),
-                )
-            })
-        })?;
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
-    /// `supernatant_procedure_models`.
-    pub fn deprecated<P>(
+    /// Sets the value of the
+    /// `supernatant_procedure_models.procedure_transferred_with` column from
+    /// table `supernatant_procedure_models`.
+    pub fn procedure_transferred_with(
         mut self,
-        deprecated: P,
+        procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableSupernatantProcedureModelAttributes,
+        >,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_transferred_with = self
+            .procedure_transferred_with
+            .extend_builder(procedure_transferred_with)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureModelAttributes::ProcedureTransferredWith(
                         attribute,
-                    ),
-                )
-            })
-        })?;
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.photograph_id` column from table
-    /// `supernatant_procedure_models`.
-    pub fn photograph(
+    /// Sets the value of the `supernatant_procedure_models.stratified_source`
+    /// column from table `supernatant_procedure_models`.
+    pub fn stratified_source(
         mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
+        stratified_source: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
+        self.stratified_source = Some(stratified_source);
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the
+    /// `supernatant_procedure_models.supernatant_destination` column from table
     /// `supernatant_procedure_models`.
-    pub fn icon<P>(
+    pub fn supernatant_destination(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `supernatant_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
+        supernatant_destination: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
+        self.supernatant_destination = Some(supernatant_destination);
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `supernatant_procedure_models`.
-    pub fn created_at<P>(
+    /// Sets the value of the `supernatant_procedure_models.transferred_with`
+    /// column from table `supernatant_procedure_models`.
+    pub fn transferred_with(
         mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_by` column from table
-    /// `supernatant_procedure_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
+        transferred_with: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `supernatant_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureModelAttributes::Extension(
-                    InsertableSupernatantProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
+        self.transferred_with = Some(transferred_with);
         Ok(self)
     }
 }

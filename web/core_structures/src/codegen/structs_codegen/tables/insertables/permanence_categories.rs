@@ -102,23 +102,16 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertablePermanenceCategoryB
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.name` column from table
+    /// Sets the value of the `permanence_categories.color_id` column from table
     /// `permanence_categories`.
-    pub fn name<P>(
+    pub fn color(
         mut self,
-        name: P,
+        color_id: i16,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertablePermanenceCategoryAttributes::Name)
-        })?;
-        self.name = Some(name);
+    > {
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -166,16 +159,23 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceC
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.color_id` column from table
+    /// Sets the value of the `permanence_categories.name` column from table
     /// `permanence_categories`.
-    pub fn color(
+    pub fn name<P>(
         mut self,
-        color_id: i16,
+        name: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    > {
-        self.color_id = Some(color_id);
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertablePermanenceCategoryAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

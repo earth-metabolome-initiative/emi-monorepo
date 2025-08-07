@@ -72,6 +72,7 @@ mod team_projects;
 mod team_states;
 mod teams;
 mod temporary_user;
+mod trackable_ancestors;
 mod trackable_locations;
 mod trackables;
 mod units;

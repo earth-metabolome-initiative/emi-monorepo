@@ -146,6 +146,8 @@ pub mod teams;
 pub use teams::Team;
 pub mod temporary_user;
 pub use temporary_user::TemporaryUser;
+pub mod trackable_ancestors;
+pub use trackable_ancestors::TrackableAncestor;
 pub mod trackable_locations;
 pub use trackable_locations::TrackableLocation;
 pub mod trackables;

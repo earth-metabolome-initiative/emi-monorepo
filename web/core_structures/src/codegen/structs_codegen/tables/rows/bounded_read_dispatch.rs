@@ -222,6 +222,9 @@ where
     crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -851,6 +854,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::TemporaryUser => {
                 crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::TrackableAncestor => {
+                crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor::bounded_read(
                         offset,
                         limit,
                         conn,

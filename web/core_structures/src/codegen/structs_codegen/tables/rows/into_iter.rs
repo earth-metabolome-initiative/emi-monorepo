@@ -339,6 +339,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::TemporaryUser)
                     .collect::<Vec<_>>()
             }
+            super::Rows::TrackableAncestor(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::TrackableAncestor)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::TrackableLocation(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::TrackableLocation)

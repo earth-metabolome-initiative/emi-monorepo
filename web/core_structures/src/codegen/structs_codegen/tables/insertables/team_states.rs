@@ -100,20 +100,13 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamStateBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateBuilder {
-    /// Sets the value of the `team_states.name` column from table
+    /// Sets the value of the `team_states.color_id` column from table
     /// `team_states`.
-    pub fn name<P>(
+    pub fn color(
         mut self,
-        name: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableTeamStateAttributes::Name)
-        })?;
-        self.name = Some(name);
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>> {
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -155,13 +148,20 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateBu
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateBuilder {
-    /// Sets the value of the `team_states.color_id` column from table
+    /// Sets the value of the `team_states.name` column from table
     /// `team_states`.
-    pub fn color(
+    pub fn name<P>(
         mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>> {
-        self.color_id = Some(color_id);
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamStateAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableTeamStateAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

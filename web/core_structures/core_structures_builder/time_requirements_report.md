@@ -10,15 +10,15 @@ The slowest task was `Code generation` which took a minute (100.00% of all time)
 ## Time Report for Code generation
 
 The total time spent on all tasks was a minute.
-The slowest task was `Generate Structs` which took a minute (81.94% of all time).
+The slowest task was `Generate Structs` which took a minute (82.43% of all time).
 
 | name                             | time       | percentage | comment |
 |----------------------------------|------------|------------|---------|
 | Retrieving tables                | now        | 0.00%      |         |
 | Creating column same-as network  | now        | 0.00%      |         |
-| Creating table extension network | 12 seconds | 16.67%     |         |
+| Creating table extension network | 12 seconds | 16.22%     |         |
 | Generating Diesel code           | now        | 0.00%      |         |
-| Generate Structs                 | a minute   | 81.94%     |         |
+| Generate Structs                 | a minute   | 82.43%     |         |
 | Generate Web Common Traits       | now        | 0.00%      |         |
 
 ### Time Report for Generating Diesel code

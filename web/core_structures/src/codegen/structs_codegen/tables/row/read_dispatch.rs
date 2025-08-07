@@ -222,6 +222,9 @@ where
     crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation: web_common_traits::database::Read<
         C,
     >,
@@ -925,6 +928,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::TrackableAncestor(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor::read(
                             primary_key,
                             conn,
                         )?

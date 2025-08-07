@@ -17,7 +17,7 @@ pub use tables::{
     ProjectState, Rank, Reagent, Role, Room, SampleState, SharedProcedureModelTrackable,
     SpatialRefSy, SpectraCollection, Spectrum, StorageProcedureModel, SupernatantProcedure,
     SupernatantProcedureModel, Taxon, Team, TeamMember, TeamProject, TeamState, TemporaryUser,
-    Trackable, TrackableLocation, Unit, User, UserEmail, UserOrganization,
+    Trackable, TrackableAncestor, TrackableLocation, Unit, User, UserEmail, UserOrganization,
     VolumetricContainerModel, VolumetricProcessable, WeighingInstrumentModel, WeighingProcedure,
     WeighingProcedureModel,
 };

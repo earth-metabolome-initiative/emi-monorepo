@@ -75,6 +75,7 @@ pub enum TablePrimaryKey {
     TeamState(i16),
     Team(i32),
     TemporaryUser(i32),
+    TrackableAncestor((::rosetta_uuid::Uuid, ::rosetta_uuid::Uuid)),
     TrackableLocation(::rosetta_uuid::Uuid),
     Trackable(::rosetta_uuid::Uuid),
     Unit(i16),
@@ -288,6 +289,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Team(_) => crate::codegen::tables::table_names::TableName::Team,
             TablePrimaryKey::TemporaryUser(_) => {
                 crate::codegen::tables::table_names::TableName::TemporaryUser
+            }
+            TablePrimaryKey::TrackableAncestor(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableAncestor
             }
             TablePrimaryKey::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation

@@ -102,20 +102,14 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSampleStateBuilder 
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder {
-    /// Sets the value of the `sample_states.name` column from table
+    /// Sets the value of the `sample_states.color_id` column from table
     /// `sample_states`.
-    pub fn name<P>(
+    pub fn color(
         mut self,
-        name: P,
+        color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSampleStateAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableSampleStateAttributes::Name)
-        })?;
-        self.name = Some(name);
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -157,14 +151,20 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleState
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder {
-    /// Sets the value of the `sample_states.color_id` column from table
+    /// Sets the value of the `sample_states.name` column from table
     /// `sample_states`.
-    pub fn color(
+    pub fn name<P>(
         mut self,
-        color_id: i16,
+        name: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSampleStateAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.color_id = Some(color_id);
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableSampleStateAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

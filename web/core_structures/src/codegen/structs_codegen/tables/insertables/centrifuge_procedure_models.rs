@@ -358,6 +358,43 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
+    /// Sets the value of the
+    /// `centrifuge_procedure_models.centrifuged_container_id` column from table
+    /// `centrifuge_procedure_models`.
+    pub fn centrifuged_container(
+        mut self,
+        centrifuged_container_id: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    > {
+        self.centrifuged_container_id = Some(centrifuged_container_id);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `centrifuge_procedure_models.centrifuged_with`
+    /// column from table `centrifuge_procedure_models`.
+    pub fn centrifuged_with(
+        mut self,
+        centrifuged_with: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    > {
+        self.centrifuged_with = Some(centrifuged_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
     /// Sets the value of the `centrifuge_procedure_models.kelvin` column from
     /// table `centrifuge_procedure_models`.
     pub fn kelvin<P>(
@@ -428,30 +465,70 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `centrifuge_procedure_models.seconds` column from
-    /// table `centrifuge_procedure_models`.
-    pub fn seconds<P>(
+    /// Sets the value of the
+    /// `centrifuge_procedure_models.procedure_centrifuged_container_id` column
+    /// from table `centrifuge_procedure_models`.
+    pub fn procedure_centrifuged_container(
         mut self,
-        seconds: P,
+        procedure_centrifuged_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableCentrifugeProcedureModelAttributes,
+        >,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
     {
-        let seconds = seconds.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds)
-        })?;
-        pgrx_validation::must_be_greater_than_f32(seconds, 30f32)
-            .map_err(|e| e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds))
-            .and_then(|_| {
-                pgrx_validation::must_be_smaller_than_f32(seconds, 1800f32).map_err(|e| {
-                    e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds)
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_centrifuged_container_id = self
+            .procedure_centrifuged_container_id
+            .extend_builder(procedure_centrifuged_container_id)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId(
+                        attribute,
+                    )
                 })
             })?;
-        self.seconds = Some(seconds);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `centrifuge_procedure_models.procedure_centrifuged_with` column from
+    /// table `centrifuge_procedure_models`.
+    pub fn procedure_centrifuged_with(
+        mut self,
+        procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableCentrifugeProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_centrifuged_with = self
+            .procedure_centrifuged_with
+            .extend_builder(procedure_centrifuged_with)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
+                        attribute,
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -500,107 +577,30 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `centrifuge_procedure_models.centrifuged_with`
-    /// column from table `centrifuge_procedure_models`.
-    pub fn centrifuged_with(
-        mut self,
-        centrifuged_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    > {
-        self.centrifuged_with = Some(centrifuged_with);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `centrifuge_procedure_models.procedure_centrifuged_with` column from
+    /// Sets the value of the `centrifuge_procedure_models.seconds` column from
     /// table `centrifuge_procedure_models`.
-    pub fn procedure_centrifuged_with(
+    pub fn seconds<P>(
         mut self,
-        procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableCentrifugeProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_centrifuged_with = self
-            .procedure_centrifuged_with
-            .extend_builder(procedure_centrifuged_with)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
-                        attribute,
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `centrifuge_procedure_models.centrifuged_container_id` column from table
-    /// `centrifuge_procedure_models`.
-    pub fn centrifuged_container(
-        mut self,
-        centrifuged_container_id: ::rosetta_uuid::Uuid,
+        seconds: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    > {
-        self.centrifuged_container_id = Some(centrifuged_container_id);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `centrifuge_procedure_models.procedure_centrifuged_container_id` column
-    /// from table `centrifuge_procedure_models`.
-    pub fn procedure_centrifuged_container(
-        mut self,
-        procedure_centrifuged_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableCentrifugeProcedureModelAttributes,
-        >,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_centrifuged_container_id = self
-            .procedure_centrifuged_container_id
-            .extend_builder(procedure_centrifuged_container_id)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId(
-                        attribute,
-                    )
+        let seconds = seconds.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds)
+        })?;
+        pgrx_validation::must_be_greater_than_f32(seconds, 30f32)
+            .map_err(|e| e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds))
+            .and_then(|_| {
+                pgrx_validation::must_be_smaller_than_f32(seconds, 1800f32).map_err(|e| {
+                    e.rename_field(InsertableCentrifugeProcedureModelAttributes::Seconds)
                 })
             })?;
+        self.seconds = Some(seconds);
         Ok(self)
     }
 }
@@ -609,20 +609,78 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
+    /// Sets the value of the `procedure_models.created_at` column from table
     /// `centrifuge_procedure_models`.
-    pub fn name<P>(
+    pub fn created_at<P>(
         mut self,
-        name: P,
+        created_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCentrifugeProcedureModelAttributes::Extension(
+                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `centrifuge_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCentrifugeProcedureModelAttributes::Extension(
+                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `centrifuge_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCentrifugeProcedureModelAttributes::Extension(
                     InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
@@ -669,20 +727,50 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// Sets the value of the `procedure_models.icon` column from table
     /// `centrifuge_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn icon<P>(
         mut self,
-        deprecated: P,
+        icon: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCentrifugeProcedureModelAttributes::Extension(
+                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `centrifuge_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCentrifugeProcedureModelAttributes::Extension(
                     InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
@@ -725,68 +813,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the `procedure_models.updated_at` column from table
     /// `centrifuge_procedure_models`.
-    pub fn icon<P>(
+    pub fn updated_at<P>(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCentrifugeProcedureModelAttributes::Extension(
-                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `centrifuge_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCentrifugeProcedureModelAttributes::Extension(
-                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `centrifuge_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
@@ -796,7 +827,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCentrifugeProcedureModelAttributes::Extension(
                     InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
@@ -823,37 +854,6 @@ impl
         web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
     > {
         self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCentrifugeProcedureModelAttributes::Extension(
-                    InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `centrifuge_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCentrifugeProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCentrifugeProcedureModelAttributes::Extension(
                     InsertableCentrifugeProcedureModelExtensionAttributes::ProcedureModel(

@@ -140,20 +140,6 @@ where
                     ),
                 ))
             })?;
-        let procedure_pipette_tip = self
-            .procedure_pipette_tip
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip,
-                )
-            })?;
         let procedure_stratified_source = self
             .procedure_stratified_source
             .procedure_model(procedure_model_id)
@@ -180,6 +166,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination,
+                )
+            })?;
+        let procedure_pipette_tip = self
+            .procedure_pipette_tip
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip,
                 )
             })?;
         let procedure_transferred_with = self

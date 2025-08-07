@@ -126,20 +126,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith,
                 )
             })?;
-        let procedure_fragment_source = self
-            .procedure_fragment_source
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentSource,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentSource,
-                )
-            })?;
         let procedure_fragment_placed_into = self
             .procedure_fragment_placed_into
             .procedure_model(procedure_model_id)
@@ -152,6 +138,20 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentPlacedInto,
+                )
+            })?;
+        let procedure_fragment_source = self
+            .procedure_fragment_source
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentSource,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentSource,
                 )
             })?;
         Ok(Self::InsertableVariant {

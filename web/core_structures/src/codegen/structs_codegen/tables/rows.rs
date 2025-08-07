@@ -76,6 +76,7 @@ mod team_projects;
 mod team_states;
 mod teams;
 mod temporary_user;
+mod trackable_ancestors;
 mod trackable_locations;
 mod trackables;
 mod units;
@@ -335,6 +336,11 @@ pub enum Rows {
     Team(Vec<crate::codegen::structs_codegen::tables::teams::Team>),
     TemporaryUser(
         Vec<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>,
+    ),
+    TrackableAncestor(
+        Vec<
+            crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
+        >,
     ),
     TrackableLocation(
         Vec<
@@ -902,6 +908,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::TrackableAncestor(trackable_ancestors) => {
+                trackable_ancestors
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::TrackableLocation(trackable_locations) => {
                 trackable_locations
                     .iter()
@@ -1110,6 +1123,7 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::TeamState(team_states) => team_states.primary_keys(),
             Rows::Team(teams) => teams.primary_keys(),
             Rows::TemporaryUser(temporary_user) => temporary_user.primary_keys(),
+            Rows::TrackableAncestor(trackable_ancestors) => trackable_ancestors.primary_keys(),
             Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
             Rows::Trackable(trackables) => trackables.primary_keys(),
             Rows::Unit(units) => units.primary_keys(),

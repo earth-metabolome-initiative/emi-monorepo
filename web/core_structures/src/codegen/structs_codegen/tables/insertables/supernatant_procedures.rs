@@ -449,6 +449,35 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
     >
 {
+    /// Sets the value of the `procedures.created_at` column from table
+    /// `supernatant_procedures`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure = self.procedure.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureAttributes::Extension(
+                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
     /// Sets the value of the `procedures.created_by` column from table
     /// `supernatant_procedures`.
     pub fn created_by(
@@ -474,11 +503,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
     >
 {
-    /// Sets the value of the `procedures.created_at` column from table
+    /// Sets the value of the `procedures.updated_at` column from table
     /// `supernatant_procedures`.
-    pub fn created_at<P>(
+    pub fn updated_at<P>(
         mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
@@ -488,7 +517,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure = self.procedure.created_at(created_at).map_err(|e| {
+        self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableSupernatantProcedureAttributes::Extension(
                     InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
@@ -522,32 +551,21 @@ impl
         Ok(self)
     }
 }
-impl
+impl<Procedure>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+        Procedure,
     >
 {
-    /// Sets the value of the `procedures.updated_at` column from table
-    /// `supernatant_procedures`.
-    pub fn updated_at<P>(
+    /// Sets the value of the `supernatant_procedures.pipette_tip` column from
+    /// table `supernatant_procedures`.
+    pub fn pipette_tip(
         mut self,
-        updated_at: P,
+        pipette_tip: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureAttributes::Extension(
-                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
+    > {
+        self.pipette_tip = Some(pipette_tip);
         Ok(self)
     }
 }
@@ -620,24 +638,6 @@ impl<Procedure>
         web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
     > {
         self.transferred_with = Some(transferred_with);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `supernatant_procedures.pipette_tip` column from
-    /// table `supernatant_procedures`.
-    pub fn pipette_tip(
-        mut self,
-        pipette_tip: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    > {
-        self.pipette_tip = Some(pipette_tip);
         Ok(self)
     }
 }

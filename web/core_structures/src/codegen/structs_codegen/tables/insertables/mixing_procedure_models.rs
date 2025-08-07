@@ -317,25 +317,234 @@ where
         self
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `mixing_procedure_models`.
-    pub fn name<P>(
+    /// Sets the value of the `mixing_procedure_models.kilograms` column from
+    /// table `mixing_procedure_models`.
+    pub fn kilograms<P>(
         mut self,
-        name: P,
+        kilograms: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableMixingProcedureModelAttributes::Kilograms)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(kilograms)
+            .map_err(|e| e.rename_field(InsertableMixingProcedureModelAttributes::Kilograms))?;
+        self.kilograms = Some(kilograms);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `mixing_procedure_models.measured_with` column
+    /// from table `mixing_procedure_models`.
+    pub fn measured_with(
+        mut self,
+        measured_with: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    > {
+        self.measured_with = Some(measured_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `mixing_procedure_models.mixed_with` column from
+    /// table `mixing_procedure_models`.
+    pub fn mixed_with(
+        mut self,
+        mixed_with: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    > {
+        self.mixed_with = Some(mixed_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `mixing_procedure_models.procedure_measured_with`
+    /// column from table `mixing_procedure_models`.
+    pub fn procedure_measured_with(
+        mut self,
+        procedure_measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableMixingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_measured_with =
+            self.procedure_measured_with.extend_builder(procedure_measured_with).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableMixingProcedureModelAttributes::ProcedureMeasuredWith(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `mixing_procedure_models.procedure_mixed_into`
+    /// column from table `mixing_procedure_models`.
+    pub fn procedure_mixed_into(
+        mut self,
+        procedure_mixed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableMixingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_mixed_into =
+            self.procedure_mixed_into.extend_builder(procedure_mixed_into).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableMixingProcedureModelAttributes::ProcedureMixedInto(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `mixing_procedure_models.source` column from table
+    /// `mixing_procedure_models`.
+    pub fn source(
+        mut self,
+        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableMixingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.source = self.source.extend_builder(source).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableMixingProcedureModelAttributes::Source(attribute)
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `mixing_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableMixingProcedureModelAttributes::Extension(
+                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `mixing_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableMixingProcedureModelAttributes::Extension(
+                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `mixing_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableMixingProcedureModelAttributes::Extension(
                     InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -378,20 +587,48 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// Sets the value of the `procedure_models.icon` column from table
     /// `mixing_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn icon<P>(
         mut self,
-        deprecated: P,
+        icon: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableMixingProcedureModelAttributes::Extension(
+                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `mixing_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableMixingProcedureModelAttributes::Extension(
                     InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -430,64 +667,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the `procedure_models.updated_at` column from table
     /// `mixing_procedure_models`.
-    pub fn icon<P>(
+    pub fn updated_at<P>(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableMixingProcedureModelAttributes::Extension(
-                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `mixing_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableMixingProcedureModelAttributes::Extension(
-                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `mixing_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
@@ -497,7 +681,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableMixingProcedureModelAttributes::Extension(
                     InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -528,190 +712,6 @@ impl
                 )
             })
         })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `mixing_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableMixingProcedureModelAttributes::Extension(
-                    InsertableMixingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.measured_with` column
-    /// from table `mixing_procedure_models`.
-    pub fn measured_with(
-        mut self,
-        measured_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    > {
-        self.measured_with = Some(measured_with);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.procedure_measured_with`
-    /// column from table `mixing_procedure_models`.
-    pub fn procedure_measured_with(
-        mut self,
-        procedure_measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableMixingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_measured_with =
-            self.procedure_measured_with.extend_builder(procedure_measured_with).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableMixingProcedureModelAttributes::ProcedureMeasuredWith(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.source` column from table
-    /// `mixing_procedure_models`.
-    pub fn source(
-        mut self,
-        source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableMixingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.source = self.source.extend_builder(source).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableMixingProcedureModelAttributes::Source(attribute)
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.mixed_with` column from
-    /// table `mixing_procedure_models`.
-    pub fn mixed_with(
-        mut self,
-        mixed_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    > {
-        self.mixed_with = Some(mixed_with);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.procedure_mixed_into`
-    /// column from table `mixing_procedure_models`.
-    pub fn procedure_mixed_into(
-        mut self,
-        procedure_mixed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableMixingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_mixed_into =
-            self.procedure_mixed_into.extend_builder(procedure_mixed_into).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableMixingProcedureModelAttributes::ProcedureMixedInto(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `mixing_procedure_models.kilograms` column from
-    /// table `mixing_procedure_models`.
-    pub fn kilograms<P>(
-        mut self,
-        kilograms: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableMixingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableMixingProcedureModelAttributes::Kilograms)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(kilograms)
-            .map_err(|e| e.rename_field(InsertableMixingProcedureModelAttributes::Kilograms))?;
-        self.kilograms = Some(kilograms);
         Ok(self)
     }
 }

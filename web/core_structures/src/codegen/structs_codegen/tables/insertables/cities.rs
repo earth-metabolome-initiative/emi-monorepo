@@ -86,6 +86,16 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableCityBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
+    /// Sets the value of the `cities.iso` column from table `cities`.
+    pub fn iso(
+        mut self,
+        iso: ::iso_codes::CountryCode,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>> {
+        self.iso = Some(iso);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
     /// Sets the value of the `cities.name` column from table `cities`.
     pub fn name<P>(
         mut self,
@@ -99,16 +109,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder
             Into::into(err).rename_field(InsertableCityAttributes::Name)
         })?;
         self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
-    /// Sets the value of the `cities.iso` column from table `cities`.
-    pub fn iso(
-        mut self,
-        iso: ::iso_codes::CountryCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>> {
-        self.iso = Some(iso);
         Ok(self)
     }
 }

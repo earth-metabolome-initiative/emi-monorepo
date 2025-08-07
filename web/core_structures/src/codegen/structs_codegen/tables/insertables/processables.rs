@@ -153,6 +153,62 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
+    /// Sets the value of the `trackables.created_at` column from table
+    /// `processables`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_by` column from table
+    /// `processables`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    {
+        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.description` column from table
+    /// `processables`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
     /// Sets the value of the `trackables.id` column from table `processables`.
     pub fn id<P>(
         mut self,
@@ -190,25 +246,6 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
-    /// Sets the value of the `trackables.description` column from table
-    /// `processables`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
-    where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
     /// Sets the value of the `trackables.photograph_id` column from table
     /// `processables`.
     pub fn photograph(
@@ -217,75 +254,6 @@ impl
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     {
         self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `processables`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
-    {
-        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `processables`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
-    {
-        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `processables`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `processables`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
-    {
-        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -306,6 +274,22 @@ impl
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.updated_by` column from table
+    /// `processables`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    {
+        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }

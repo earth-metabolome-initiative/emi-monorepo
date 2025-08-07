@@ -100,19 +100,12 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRoleBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.name` column from table `roles`.
-    pub fn name<P>(
+    /// Sets the value of the `roles.color_id` column from table `roles`.
+    pub fn color(
         mut self,
-        name: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRoleAttributes::Name)
-        })?;
-        self.name = Some(name);
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>> {
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -152,12 +145,19 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.color_id` column from table `roles`.
-    pub fn color(
+    /// Sets the value of the `roles.name` column from table `roles`.
+    pub fn name<P>(
         mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>> {
-        self.color_id = Some(color_id);
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableRoleAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

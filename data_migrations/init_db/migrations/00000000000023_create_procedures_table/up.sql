@@ -30,8 +30,9 @@ CREATE TABLE IF NOT EXISTS procedure_trackables (
 	FOREIGN KEY (
 		procedure_model_trackable_id,
 		ancestor_trackable_id
-	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE
-	-- TODO: add a check using the trackables closure table to ensure that the `trackable_id` is a descendant of the `ancestor_trackable_id`.
+	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
+	-- We check that the trackable is indeed a descendant of the ancestor trackable defined in the procedure model trackable.
+	FOREIGN KEY (trackable_id, ancestor_trackable_id) REFERENCES trackable_ancestors(trackable_id, ancestor_id) ON DELETE CASCADE
 );
 --------------------------------------------
 -- HERE BEGIN THE SPECIALIZED STEP TABLES --

@@ -77,6 +77,34 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
+    /// Sets the value of the `users.created_at` column from table `users`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableUserAttributes::CreatedAt)
+            },
+        )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableUserAttributes::CreatedAt,
+                    InsertableUserAttributes::UpdatedAt,
+                )
+            })?;
+        }
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
     /// Sets the value of the `users.first_name` column from table `users`.
     pub fn first_name<P>(
         mut self,
@@ -111,34 +139,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
         pgrx_validation::must_be_paragraph(last_name.as_ref())
             .map_err(|e| e.rename_field(InsertableUserAttributes::LastName))?;
         self.last_name = Some(last_name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder {
-    /// Sets the value of the `users.created_at` column from table `users`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableUserAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableUserAttributes::CreatedAt,
-                    InsertableUserAttributes::UpdatedAt,
-                )
-            })?;
-        }
-        self.created_at = Some(created_at);
         Ok(self)
     }
 }

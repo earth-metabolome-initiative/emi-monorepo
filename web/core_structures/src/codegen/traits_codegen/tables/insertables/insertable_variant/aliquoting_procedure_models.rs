@@ -17,21 +17,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
     >,
-    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-    >,
     crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -46,6 +31,21 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -140,34 +140,6 @@ where
                     ),
                 ))
             })?;
-        let procedure_aliquoted_with = self
-            .procedure_aliquoted_with
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith,
-                )
-            })?;
-        let procedure_aliquoted_from = self
-            .procedure_aliquoted_from
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
-                )
-            })?;
         let procedure_aliquoted_into = self
             .procedure_aliquoted_into
             .procedure_model(procedure_model_id)
@@ -194,6 +166,34 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip,
+                )
+            })?;
+        let procedure_aliquoted_with = self
+            .procedure_aliquoted_with
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith,
+                )
+            })?;
+        let procedure_aliquoted_from = self
+            .procedure_aliquoted_from
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom,
                 )
             })?;
         Ok(Self::InsertableVariant {

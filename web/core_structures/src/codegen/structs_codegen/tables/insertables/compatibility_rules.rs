@@ -182,6 +182,39 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableCompatibilityRuleBu
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.created_at` column from table
+    /// `compatibility_rules`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableCompatibilityRuleAttributes::CreatedAt)
+            },
+        )?;
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
+    /// Sets the value of the `compatibility_rules.created_by` column from table
+    /// `compatibility_rules`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
+    {
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
     /// Sets the value of the `compatibility_rules.left_trackable_id` column
     /// from table `compatibility_rules`.
     pub fn left_trackable(
@@ -190,18 +223,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibili
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
     {
         self.left_trackable_id = Some(left_trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
-    /// Sets the value of the `compatibility_rules.right_trackable_id` column
-    /// from table `compatibility_rules`.
-    pub fn right_trackable(
-        mut self,
-        right_trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
-    {
-        self.right_trackable_id = Some(right_trackable_id);
         Ok(self)
     }
 }
@@ -228,35 +249,14 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibili
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
-    /// Sets the value of the `compatibility_rules.created_by` column from table
-    /// `compatibility_rules`.
-    pub fn created_by(
+    /// Sets the value of the `compatibility_rules.right_trackable_id` column
+    /// from table `compatibility_rules`.
+    pub fn right_trackable(
         mut self,
-        created_by: i32,
+        right_trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
     {
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableCompatibilityRuleBuilder {
-    /// Sets the value of the `compatibility_rules.created_at` column from table
-    /// `compatibility_rules`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCompatibilityRuleAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableCompatibilityRuleAttributes::CreatedAt)
-            },
-        )?;
-        self.created_at = Some(created_at);
+        self.right_trackable_id = Some(right_trackable_id);
         Ok(self)
     }
 }

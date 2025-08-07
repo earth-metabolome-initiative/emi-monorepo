@@ -83,38 +83,22 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableOrganizationBuilder
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
-    /// Sets the value of the `organizations.name` column from table
+    /// Sets the value of the `organizations.alpha_two_code` column from table
     /// `organizations`.
-    pub fn name<P>(
+    pub fn alpha_two_code<P>(
         mut self,
-        name: P,
+        alpha_two_code: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::iso_codes::CountryCode>,
+        <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableOrganizationAttributes::Name)
-        })?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
-    /// Sets the value of the `organizations.url` column from table
-    /// `organizations`.
-    pub fn url<P>(
-        mut self,
-        url: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let url = url.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableOrganizationAttributes::Url)
-        })?;
-        self.url = Some(url);
+        let alpha_two_code = alpha_two_code.try_into().map_err(
+            |err: <P as TryInto<::iso_codes::CountryCode>>::Error| {
+                Into::into(err).rename_field(InsertableOrganizationAttributes::AlphaTwoCode)
+            },
+        )?;
+        self.alpha_two_code = Some(alpha_two_code);
         Ok(self)
     }
 }
@@ -137,22 +121,38 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizatio
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
-    /// Sets the value of the `organizations.alpha_two_code` column from table
+    /// Sets the value of the `organizations.domain` column from table
     /// `organizations`.
-    pub fn alpha_two_code<P>(
+    pub fn domain<P>(
         mut self,
-        alpha_two_code: P,
+        domain: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
-        P: TryInto<::iso_codes::CountryCode>,
-        <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let alpha_two_code = alpha_two_code.try_into().map_err(
-            |err: <P as TryInto<::iso_codes::CountryCode>>::Error| {
-                Into::into(err).rename_field(InsertableOrganizationAttributes::AlphaTwoCode)
-            },
-        )?;
-        self.alpha_two_code = Some(alpha_two_code);
+        let domain = domain.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Domain)
+        })?;
+        self.domain = Some(domain);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
+    /// Sets the value of the `organizations.name` column from table
+    /// `organizations`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }
@@ -176,20 +176,20 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizatio
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder {
-    /// Sets the value of the `organizations.domain` column from table
+    /// Sets the value of the `organizations.url` column from table
     /// `organizations`.
-    pub fn domain<P>(
+    pub fn url<P>(
         mut self,
-        domain: P,
+        url: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganizationAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let domain = domain.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableOrganizationAttributes::Domain)
+        let url = url.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableOrganizationAttributes::Url)
         })?;
-        self.domain = Some(domain);
+        self.url = Some(url);
         Ok(self)
     }
 }

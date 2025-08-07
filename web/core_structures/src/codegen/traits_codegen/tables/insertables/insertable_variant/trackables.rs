@@ -82,7 +82,6 @@ where
             name: self.name,
             description: self.description,
             photograph_id: self.photograph_id,
-            parent_id: self.parent_id,
             created_by,
             created_at,
             updated_by,

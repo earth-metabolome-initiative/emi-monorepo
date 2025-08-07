@@ -302,101 +302,6 @@ where
         self
     }
 }
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `weighing_procedures.procedure_model_id` column
-    /// from table `weighing_procedures`.
-    pub fn procedure_model(
-        mut self,
-        procedure_model_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
-    {
-        self.procedure_model_id = Some(procedure_model_id);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `weighing_procedures.weighted_with` column from
-    /// table `weighing_procedures`.
-    pub fn weighted_with(
-        mut self,
-        weighted_with: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
-    {
-        self.weighted_with = Some(weighted_with);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `weighing_procedures.weighted_container_id` column
-    /// from table `weighing_procedures`.
-    pub fn weighted_container(
-        mut self,
-        weighted_container_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
-    {
-        self.weighted_container_id = Some(weighted_container_id);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `weighing_procedures.kilograms` column from table
-    /// `weighing_procedures`.
-    pub fn kilograms<P>(
-        mut self,
-        kilograms: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableWeighingProcedureAttributes::Kilograms)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(kilograms)
-            .map_err(|e| e.rename_field(InsertableWeighingProcedureAttributes::Kilograms))?;
-        self.kilograms = Some(kilograms);
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_by` column from table
-    /// `weighing_procedures`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
-    {
-        self.procedure = self.procedure.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureAttributes::Extension(
-                    InsertableWeighingProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -428,20 +333,21 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
     >
 {
-    /// Sets the value of the `procedures.updated_by` column from table
+    /// Sets the value of the `procedures.created_by` column from table
     /// `weighing_procedures`.
-    pub fn updated_by(
+    pub fn created_by(
         mut self,
-        updated_by: i32,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
     {
-        self.procedure = self.procedure.updated_by(updated_by).map_err(|e| {
+        self.procedure = self.procedure.created_by(created_by).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableWeighingProcedureAttributes::Extension(
                     InsertableWeighingProcedureExtensionAttributes::Procedure(attribute),
                 )
             })
         })?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
 }
@@ -468,6 +374,100 @@ impl
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.updated_by` column from table
+    /// `weighing_procedures`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    {
+        self.procedure = self.procedure.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureAttributes::Extension(
+                    InsertableWeighingProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl<Procedure>
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        Procedure,
+    >
+{
+    /// Sets the value of the `weighing_procedures.kilograms` column from table
+    /// `weighing_procedures`.
+    pub fn kilograms<P>(
+        mut self,
+        kilograms: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableWeighingProcedureAttributes::Kilograms)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(kilograms)
+            .map_err(|e| e.rename_field(InsertableWeighingProcedureAttributes::Kilograms))?;
+        self.kilograms = Some(kilograms);
+        Ok(self)
+    }
+}
+impl<Procedure>
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        Procedure,
+    >
+{
+    /// Sets the value of the `weighing_procedures.procedure_model_id` column
+    /// from table `weighing_procedures`.
+    pub fn procedure_model(
+        mut self,
+        procedure_model_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    {
+        self.procedure_model_id = Some(procedure_model_id);
+        Ok(self)
+    }
+}
+impl<Procedure>
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        Procedure,
+    >
+{
+    /// Sets the value of the `weighing_procedures.weighted_container_id` column
+    /// from table `weighing_procedures`.
+    pub fn weighted_container(
+        mut self,
+        weighted_container_id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    {
+        self.weighted_container_id = Some(weighted_container_id);
+        Ok(self)
+    }
+}
+impl<Procedure>
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        Procedure,
+    >
+{
+    /// Sets the value of the `weighing_procedures.weighted_with` column from
+    /// table `weighing_procedures`.
+    pub fn weighted_with(
+        mut self,
+        weighted_with: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableWeighingProcedureAttributes>>
+    {
+        self.weighted_with = Some(weighted_with);
         Ok(self)
     }
 }

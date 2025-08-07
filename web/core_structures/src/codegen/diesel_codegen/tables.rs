@@ -72,6 +72,7 @@ pub mod team_projects;
 pub mod team_states;
 pub mod teams;
 pub mod temporary_user;
+pub mod trackable_ancestors;
 pub mod trackable_locations;
 pub mod trackables;
 pub mod units;

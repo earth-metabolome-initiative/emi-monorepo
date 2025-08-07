@@ -134,14 +134,16 @@ impl Codegen<'_> {
             // We re-export all of the setter methods associated with the extended
             // table, if any.
             let mut covered = HashMap::new();
-            let extension_columns = self.table_extension_network().unwrap().ancestors_columns(
+            let extension_columns_map = self.table_extension_network().unwrap().ancestors_columns(
                 table,
                 &mut covered,
                 conn,
             )?;
+            let mut extension_columns: Vec<&Column> =
+                extension_columns_map.values().flatten().collect::<Vec<&Column>>();
+            extension_columns.sort_unstable();
             let insertable_builder_methods = extension_columns
-                .values()
-                .flatten()
+                .into_iter()
                 .map(|column| self.generate_setter_method(table, column, conn))
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 

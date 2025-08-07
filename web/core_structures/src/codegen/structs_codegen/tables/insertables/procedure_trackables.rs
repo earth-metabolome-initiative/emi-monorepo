@@ -267,6 +267,40 @@ impl InsertableProcedureTrackable {
             conn,
         )
     }
+    pub fn procedure_trackables_trackable_id_ancestor_trackable_id_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor::table(),
+                (self.trackable_id, self.ancestor_trackable_id),
+            ),
+            conn,
+        )
+    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -334,6 +368,72 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureTrackableB
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
+    /// Sets the value of the `procedure_trackables.ancestor_trackable_id`
+    /// column from table `procedure_trackables`.
+    pub fn ancestor_trackable(
+        mut self,
+        ancestor_trackable_id: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
+    > {
+        self.ancestor_trackable_id = Some(ancestor_trackable_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
+    /// Sets the value of the `procedure_trackables.created_at` column from
+    /// table `procedure_trackables`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureTrackableAttributes::CreatedAt)
+            },
+        )?;
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
+    /// Sets the value of the `procedure_trackables.created_by` column from
+    /// table `procedure_trackables`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
+    > {
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
+    /// Sets the value of the `procedure_trackables.parent_trackable_id` column
+    /// from table `procedure_trackables`.
+    pub fn parent_trackable(
+        mut self,
+        parent_trackable_id: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
+    > {
+        self.parent_trackable_id = Some(parent_trackable_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
     /// Sets the value of the `procedure_trackables.procedure_id` column from
     /// table `procedure_trackables`.
     pub fn procedure(
@@ -362,20 +462,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTr
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
-    /// Sets the value of the `procedure_trackables.trackable_id` column from
-    /// table `procedure_trackables`.
-    pub fn trackable(
-        mut self,
-        trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
-    > {
-        self.trackable_id = Some(trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
     /// Sets the value of the
     /// `procedure_trackables.procedure_model_trackable_id` column from table
     /// `procedure_trackables`.
@@ -391,68 +477,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTr
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
-    /// Sets the value of the `procedure_trackables.ancestor_trackable_id`
-    /// column from table `procedure_trackables`.
-    pub fn ancestor_trackable(
-        mut self,
-        ancestor_trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
-    > {
-        self.ancestor_trackable_id = Some(ancestor_trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
-    /// Sets the value of the `procedure_trackables.parent_trackable_id` column
-    /// from table `procedure_trackables`.
-    pub fn parent_trackable(
-        mut self,
-        parent_trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
-    > {
-        self.parent_trackable_id = Some(parent_trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
-    /// Sets the value of the `procedure_trackables.created_by` column from
+    /// Sets the value of the `procedure_trackables.trackable_id` column from
     /// table `procedure_trackables`.
-    pub fn created_by(
+    pub fn trackable(
         mut self,
-        created_by: i32,
+        trackable_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
     > {
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTrackableBuilder {
-    /// Sets the value of the `procedure_trackables.created_at` column from
-    /// table `procedure_trackables`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableProcedureTrackableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProcedureTrackableAttributes::CreatedAt)
-            },
-        )?;
-        self.created_at = Some(created_at);
+        self.trackable_id = Some(trackable_id);
         Ok(self)
     }
 }

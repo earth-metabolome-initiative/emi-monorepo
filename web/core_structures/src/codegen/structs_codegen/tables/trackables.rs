@@ -15,7 +15,6 @@ pub struct Trackable {
     pub name: Option<String>,
     pub description: Option<String>,
     pub photograph_id: Option<::rosetta_uuid::Uuid>,
-    pub parent_id: Option<::rosetta_uuid::Uuid>,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -27,30 +26,6 @@ impl web_common_traits::prelude::TableName for Trackable {
 impl web_common_traits::prelude::ExtensionTable<Self> for Trackable where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
-}
-impl<C> web_common_traits::prelude::Ancestor<C> for Trackable
-where
-    Self: web_common_traits::prelude::TableName + Sized,
-    C: diesel::connection::LoadConnection,
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
-        + diesel::sql_types::HasSqlType<::rosetta_uuid::diesel_impls::Uuid>
-        + 'static,
-    web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
-            diesel::sql_types::Untyped,
-            <C as diesel::Connection>::Backend,
-        >,
-    for<'a> &'a Self: diesel::Identifiable,
-    for<'a> <&'a Self as diesel::Identifiable>::Id:
-        diesel::serialize::ToSql<::rosetta_uuid::diesel_impls::Uuid, C::Backend>,
-{
-    const PARENT_ID: &'static str = "parent_id";
-    const ID: &'static str = "id";
-    type SqlType = ::rosetta_uuid::diesel_impls::Uuid;
-}
-impl web_common_traits::prelude::Descendant<Trackable> for Trackable {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
-        self.parent_id.as_ref()
-    }
 }
 impl diesel::Identifiable for Trackable {
     type Id = ::rosetta_uuid::Uuid;
@@ -90,42 +65,6 @@ impl Trackable {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::documents::Document::table(),
                 photograph_id,
-            ),
-            conn,
-        )
-        .map(Some)
-    }
-    pub fn parent<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(parent_id) = self.parent_id else {
-            return Ok(None);
-        };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                parent_id,
             ),
             conn,
         )
@@ -234,19 +173,6 @@ impl Trackable {
         use crate::codegen::diesel_codegen::tables::trackables::trackables;
         Self::table()
             .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(trackables::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::trackables::trackables;
-        Self::table()
-            .filter(trackables::parent_id.eq(parent_id))
             .order_by(trackables::id.asc())
             .load::<Self>(conn)
     }

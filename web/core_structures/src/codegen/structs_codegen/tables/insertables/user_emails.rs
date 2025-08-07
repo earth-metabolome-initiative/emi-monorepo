@@ -110,37 +110,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserEmailBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.email` column from table
-    /// `user_emails`.
-    pub fn email<P>(
-        mut self,
-        email: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let email = email.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableUserEmailAttributes::Email)
-        })?;
-        pgrx_validation::must_be_email(email.as_ref())
-            .map_err(|e| e.rename_field(InsertableUserEmailAttributes::Email))?;
-        self.email = Some(email);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.created_by` column from table
-    /// `user_emails`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>> {
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
     /// Sets the value of the `user_emails.created_at` column from table
     /// `user_emails`.
     pub fn created_at<P>(
@@ -158,6 +127,37 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBu
             },
         )?;
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
+    /// Sets the value of the `user_emails.created_by` column from table
+    /// `user_emails`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>> {
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
+    /// Sets the value of the `user_emails.email` column from table
+    /// `user_emails`.
+    pub fn email<P>(
+        mut self,
+        email: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let email = email.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUserEmailAttributes::Email)
+        })?;
+        pgrx_validation::must_be_email(email.as_ref())
+            .map_err(|e| e.rename_field(InsertableUserEmailAttributes::Email))?;
+        self.email = Some(email);
         Ok(self)
     }
 }

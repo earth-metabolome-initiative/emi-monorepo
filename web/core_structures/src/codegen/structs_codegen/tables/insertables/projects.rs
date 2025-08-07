@@ -328,6 +328,180 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProjectBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.budget` column from table `projects`.
+    pub fn budget<P>(
+        mut self,
+        budget: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<Option<f64>>,
+        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let budget = budget.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Budget)
+        })?;
+        self.budget = budget;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.color_id` column from table `projects`.
+    pub fn color(
+        mut self,
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
+        self.color_id = Some(color_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.created_at` column from table
+    /// `projects`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::CreatedAt)
+            },
+        )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    InsertableProjectAttributes::CreatedAt,
+                    InsertableProjectAttributes::UpdatedAt,
+                )
+            })?;
+        }
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.created_by` column from table
+    /// `projects`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.description` column from table
+    /// `projects`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::Description)
+            })?;
+        if let Some(name) = self.name.as_ref() {
+            pgrx_validation::must_be_distinct(name, description.as_ref()).map_err(|e| {
+                e.rename_fields(
+                    InsertableProjectAttributes::Name,
+                    InsertableProjectAttributes::Description,
+                )
+            })?;
+        }
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| e.rename_field(InsertableProjectAttributes::Description))?;
+        self.description = Some(description);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.end_date` column from table `projects`.
+    pub fn end_date<P>(
+        mut self,
+        end_date: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let end_date = end_date.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::EndDate)
+            },
+        )?;
+        self.end_date = Some(end_date);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.expected_end_date` column from table
+    /// `projects`.
+    pub fn expected_end_date<P>(
+        mut self,
+        expected_end_date: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let expected_end_date = expected_end_date.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProjectAttributes::ExpectedEndDate)
+            },
+        )?;
+        self.expected_end_date = Some(expected_end_date);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.expenses` column from table `projects`.
+    pub fn expenses<P>(
+        mut self,
+        expenses: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<Option<f64>>,
+        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let expenses = expenses.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Expenses)
+        })?;
+        self.expenses = expenses;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
+    /// Sets the value of the `projects.icon` column from table `projects`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProjectAttributes::Icon)
+        })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
+            .map_err(|e| e.rename_field(InsertableProjectAttributes::Icon))?;
+        self.icon = Some(icon);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
     /// Sets the value of the `projects.id` column from table `projects`.
     pub fn id<P>(
         mut self,
@@ -380,74 +554,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuil
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.description` column from table
-    /// `projects`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableProjectAttributes::Description)
-            })?;
-        if let Some(name) = self.name.as_ref() {
-            pgrx_validation::must_be_distinct(name, description.as_ref()).map_err(|e| {
-                e.rename_fields(
-                    InsertableProjectAttributes::Name,
-                    InsertableProjectAttributes::Description,
-                )
-            })?;
-        }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| e.rename_field(InsertableProjectAttributes::Description))?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.state_id` column from table `projects`.
-    pub fn state(
-        mut self,
-        state_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
-        self.state_id = Some(state_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.icon` column from table `projects`.
-    pub fn icon<P>(
-        mut self,
-        icon: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableProjectAttributes::Icon)
-        })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| e.rename_field(InsertableProjectAttributes::Icon))?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.color_id` column from table `projects`.
-    pub fn color(
-        mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
-        self.color_id = Some(color_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
     /// Sets the value of the `projects.parent_project_id` column from table
     /// `projects`.
     pub fn parent_project(
@@ -459,88 +565,12 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuil
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.budget` column from table `projects`.
-    pub fn budget<P>(
+    /// Sets the value of the `projects.state_id` column from table `projects`.
+    pub fn state(
         mut self,
-        budget: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<Option<f64>>,
-        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let budget = budget.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
-            Into::into(err).rename_field(InsertableProjectAttributes::Budget)
-        })?;
-        self.budget = budget;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.expenses` column from table `projects`.
-    pub fn expenses<P>(
-        mut self,
-        expenses: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<Option<f64>>,
-        <P as TryInto<Option<f64>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let expenses = expenses.try_into().map_err(|err: <P as TryInto<Option<f64>>>::Error| {
-            Into::into(err).rename_field(InsertableProjectAttributes::Expenses)
-        })?;
-        self.expenses = expenses;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.created_by` column from table
-    /// `projects`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
+        state_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.created_at` column from table
-    /// `projects`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProjectAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableProjectAttributes::CreatedAt,
-                    InsertableProjectAttributes::UpdatedAt,
-                )
-            })?;
-        }
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.updated_by` column from table
-    /// `projects`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
-        self.updated_by = Some(updated_by);
+        self.state_id = Some(state_id);
         Ok(self)
     }
 }
@@ -574,43 +604,13 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuil
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.expected_end_date` column from table
+    /// Sets the value of the `projects.updated_by` column from table
     /// `projects`.
-    pub fn expected_end_date<P>(
+    pub fn updated_by(
         mut self,
-        expected_end_date: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let expected_end_date = expected_end_date.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProjectAttributes::ExpectedEndDate)
-            },
-        )?;
-        self.expected_end_date = Some(expected_end_date);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder {
-    /// Sets the value of the `projects.end_date` column from table `projects`.
-    pub fn end_date<P>(
-        mut self,
-        end_date: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>>
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let end_date = end_date.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProjectAttributes::EndDate)
-            },
-        )?;
-        self.end_date = Some(end_date);
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProjectAttributes>> {
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
 }

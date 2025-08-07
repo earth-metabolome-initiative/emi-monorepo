@@ -256,6 +256,40 @@ impl ProcedureTrackable {
             conn,
         )
     }
+    pub fn procedure_trackables_trackable_id_ancestor_trackable_id_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor::table(),
+                (self.trackable_id, self.ancestor_trackable_id),
+            ),
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_id(
         procedure_id: &::rosetta_uuid::Uuid,
@@ -447,6 +481,29 @@ impl ProcedureTrackable {
             .filter(
                 procedure_trackables::procedure_model_trackable_id
                     .eq(procedure_model_trackable_id)
+                    .and(procedure_trackables::ancestor_trackable_id.eq(ancestor_trackable_id)),
+            )
+            .order_by((
+                procedure_trackables::procedure_id.asc(),
+                procedure_trackables::trackable_id.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_trackable_id_and_ancestor_trackable_id(
+        trackable_id: &::rosetta_uuid::Uuid,
+        ancestor_trackable_id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedure_trackables::procedure_trackables;
+        Self::table()
+            .filter(
+                procedure_trackables::trackable_id
+                    .eq(trackable_id)
                     .and(procedure_trackables::ancestor_trackable_id.eq(ancestor_trackable_id)),
             )
             .order_by((

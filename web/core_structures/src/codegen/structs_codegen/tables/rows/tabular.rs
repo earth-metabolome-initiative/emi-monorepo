@@ -186,6 +186,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::TemporaryUser(_) => {
                 crate::codegen::tables::table_names::TableName::TemporaryUser
             }
+            super::Rows::TrackableAncestor(_) => {
+                crate::codegen::tables::table_names::TableName::TrackableAncestor
+            }
             super::Rows::TrackableLocation(_) => {
                 crate::codegen::tables::table_names::TableName::TrackableLocation
             }

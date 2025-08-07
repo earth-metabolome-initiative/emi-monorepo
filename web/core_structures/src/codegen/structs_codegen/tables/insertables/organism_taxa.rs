@@ -174,18 +174,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableOrganismTaxonBuilde
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
-    /// Sets the value of the `organism_taxa.created_by` column from table
-    /// `organism_taxa`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>>
-    {
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
     /// Sets the value of the `organism_taxa.created_at` column from table
     /// `organism_taxa`.
     pub fn created_at<P>(
@@ -203,6 +191,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTax
             },
         )?;
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder {
+    /// Sets the value of the `organism_taxa.created_by` column from table
+    /// `organism_taxa`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>>
+    {
+        self.created_by = Some(created_by);
         Ok(self)
     }
 }

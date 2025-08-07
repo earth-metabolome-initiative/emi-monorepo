@@ -118,18 +118,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserOrganizationBui
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
-    /// Sets the value of the `user_organizations.user_id` column from table
-    /// `user_organizations`.
-    pub fn user(
-        mut self,
-        user_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
-    {
-        self.user_id = Some(user_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
     /// Sets the value of the `user_organizations.organization_id` column from
     /// table `user_organizations`.
     pub fn organization(
@@ -138,6 +126,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganiz
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
     {
         self.organization_id = Some(organization_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
+    /// Sets the value of the `user_organizations.user_id` column from table
+    /// `user_organizations`.
+    pub fn user(
+        mut self,
+        user_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
+    {
+        self.user_id = Some(user_id);
         Ok(self)
     }
 }

@@ -60,19 +60,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableColorBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder {
-    /// Sets the value of the `colors.name` column from table `colors`.
-    pub fn name<P>(
+    /// Sets the value of the `colors.description` column from table `colors`.
+    pub fn description<P>(
         mut self,
-        name: P,
+        description: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableColorAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableColorAttributes::Name)
-        })?;
-        self.name = Some(name);
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableColorAttributes::Description)
+            })?;
+        self.description = Some(description);
         Ok(self)
     }
 }
@@ -96,20 +97,19 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilde
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder {
-    /// Sets the value of the `colors.description` column from table `colors`.
-    pub fn description<P>(
+    /// Sets the value of the `colors.name` column from table `colors`.
+    pub fn name<P>(
         mut self,
-        description: P,
+        name: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableColorAttributes>>
     where
         P: TryInto<String>,
         <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableColorAttributes::Description)
-            })?;
-        self.description = Some(description);
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableColorAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

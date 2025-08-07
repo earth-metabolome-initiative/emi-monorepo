@@ -214,100 +214,12 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRoomBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.name` column from table `rooms`.
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRoomAttributes::Name)
-        })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableRoomAttributes::Name))?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.description` column from table `rooms`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Description)
-            })?;
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| e.rename_field(InsertableRoomAttributes::Description))?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.qrcode` column from table `rooms`.
-    pub fn qrcode<P>(
-        mut self,
-        qrcode: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let qrcode =
-            qrcode.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Qrcode)
-            })?;
-        self.qrcode = Some(qrcode);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.addresses_id` column from table `rooms`.
     pub fn addresses(
         mut self,
         addresses_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
         self.addresses_id = Some(addresses_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.geolocation` column from table `rooms`.
-    pub fn geolocation<P>(
-        mut self,
-        geolocation: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Geolocation)
-            },
-        )?;
-        self.geolocation = Some(geolocation);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.created_by` column from table `rooms`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
         Ok(self)
     }
 }
@@ -340,12 +252,90 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.updated_by` column from table `rooms`.
-    pub fn updated_by(
+    /// Sets the value of the `rooms.created_by` column from table `rooms`.
+    pub fn created_by(
         mut self,
-        updated_by: i32,
+        created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
-        self.updated_by = Some(updated_by);
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.description` column from table `rooms`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let description =
+            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableRoomAttributes::Description)
+            })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| e.rename_field(InsertableRoomAttributes::Description))?;
+        self.description = Some(description);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.geolocation` column from table `rooms`.
+    pub fn geolocation<P>(
+        mut self,
+        geolocation: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
+    where
+        P: TryInto<postgis_diesel::types::Point>,
+        <P as TryInto<postgis_diesel::types::Point>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let geolocation = geolocation.try_into().map_err(
+            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+                Into::into(err).rename_field(InsertableRoomAttributes::Geolocation)
+            },
+        )?;
+        self.geolocation = Some(geolocation);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.name` column from table `rooms`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableRoomAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableRoomAttributes::Name))?;
+        self.name = Some(name);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.qrcode` column from table `rooms`.
+    pub fn qrcode<P>(
+        mut self,
+        qrcode: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let qrcode =
+            qrcode.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+                Into::into(err).rename_field(InsertableRoomAttributes::Qrcode)
+            })?;
+        self.qrcode = Some(qrcode);
         Ok(self)
     }
 }
@@ -374,6 +364,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
             })?;
         }
         self.updated_at = Some(updated_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.updated_by` column from table `rooms`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
 }

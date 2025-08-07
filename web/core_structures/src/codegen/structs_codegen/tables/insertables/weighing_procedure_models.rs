@@ -271,21 +271,280 @@ where
         self
     }
 }
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `weighing_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `weighing_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `weighing_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `weighing_procedure_models`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `weighing_procedure_models`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `weighing_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `weighing_procedure_models`.
+    pub fn photograph(
+        mut self,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `weighing_procedure_models`.
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `weighing_procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableWeighingProcedureModelAttributes::Extension(
+                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
 impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
         ProcedureModel,
     >
 {
-    /// Sets the value of the `weighing_procedure_models.weighed_with` column
-    /// from table `weighing_procedure_models`.
-    pub fn weighed_with(
+    /// Sets the value of the
+    /// `weighing_procedure_models.procedure_sample_container` column from table
+    /// `weighing_procedure_models`.
+    pub fn procedure_sample_container(
         mut self,
-        weighed_with: ::rosetta_uuid::Uuid,
+        procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    > {
-        self.weighed_with = Some(weighed_with);
+        web_common_traits::database::InsertError<
+            InsertableWeighingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_sample_container = self
+            .procedure_sample_container
+            .extend_builder(procedure_sample_container)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(attribute)
+                })
+            })?;
         Ok(self)
     }
 }
@@ -343,275 +602,16 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the
-    /// `weighing_procedure_models.procedure_sample_container` column from table
-    /// `weighing_procedure_models`.
-    pub fn procedure_sample_container(
+    /// Sets the value of the `weighing_procedure_models.weighed_with` column
+    /// from table `weighing_procedure_models`.
+    pub fn weighed_with(
         mut self,
-        procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableWeighingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_sample_container = self
-            .procedure_sample_container
-            .extend_builder(procedure_sample_container)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `weighing_procedure_models`.
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.description` column from table
-    /// `weighing_procedure_models`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.deprecated` column from table
-    /// `weighing_procedure_models`.
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.photograph_id` column from table
-    /// `weighing_procedure_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
+        weighed_with: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.icon` column from table
-    /// `weighing_procedure_models`.
-    pub fn icon<P>(
-        mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `weighing_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `weighing_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_by` column from table
-    /// `weighing_procedure_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `weighing_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableWeighingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableWeighingProcedureModelAttributes::Extension(
-                    InsertableWeighingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
+        self.weighed_with = Some(weighed_with);
         Ok(self)
     }
 }

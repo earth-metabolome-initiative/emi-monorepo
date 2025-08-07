@@ -220,30 +220,62 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureModelBuild
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.name` column from table
+    /// Sets the value of the `procedure_models.created_at` column from table
     /// `procedure_models`.
-    pub fn name<P>(
+    pub fn created_at<P>(
         mut self,
-        name: P,
+        created_at: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelAttributes::Name)
-        })?;
-        if let Some(description) = self.description.as_ref() {
-            pgrx_validation::must_be_distinct(name.as_ref(), description).map_err(|e| {
+        let created_at = created_at.try_into().map_err(
+            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureModelAttributes::CreatedAt)
+            },
+        )?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
                 e.rename_fields(
-                    InsertableProcedureModelAttributes::Name,
-                    InsertableProcedureModelAttributes::Description,
+                    InsertableProcedureModelAttributes::CreatedAt,
+                    InsertableProcedureModelAttributes::UpdatedAt,
                 )
             })?;
         }
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Name))?;
-        self.name = Some(name);
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
+    {
+        self.created_by = Some(created_by);
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let deprecated = deprecated.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Deprecated)
+        })?;
+        self.deprecated = Some(deprecated);
         Ok(self)
     }
 }
@@ -277,36 +309,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureMo
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.deprecated` column from table
-    /// `procedure_models`.
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let deprecated = deprecated.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableProcedureModelAttributes::Deprecated)
-        })?;
-        self.deprecated = Some(deprecated);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.photograph_id` column from table
-    /// `procedure_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
-    {
-        self.photograph_id = photograph_id;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
     /// Sets the value of the `procedure_models.icon` column from table
     /// `procedure_models`.
     pub fn icon<P>(
@@ -327,56 +329,42 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureMo
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.created_by` column from table
+    /// Sets the value of the `procedure_models.name` column from table
     /// `procedure_models`.
-    pub fn created_by(
+    pub fn name<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
-    {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        name: P,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableProcedureModelAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableProcedureModelAttributes::Name)
+        })?;
+        if let Some(description) = self.description.as_ref() {
+            pgrx_validation::must_be_distinct(name.as_ref(), description).map_err(|e| {
                 e.rename_fields(
-                    InsertableProcedureModelAttributes::CreatedAt,
-                    InsertableProcedureModelAttributes::UpdatedAt,
+                    InsertableProcedureModelAttributes::Name,
+                    InsertableProcedureModelAttributes::Description,
                 )
             })?;
         }
-        self.created_at = Some(created_at);
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| e.rename_field(InsertableProcedureModelAttributes::Name))?;
+        self.name = Some(name);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
-    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// Sets the value of the `procedure_models.photograph_id` column from table
     /// `procedure_models`.
-    pub fn updated_by(
+    pub fn photograph(
         mut self,
-        updated_by: i32,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
     {
-        self.updated_by = Some(updated_by);
+        self.photograph_id = photograph_id;
         Ok(self)
     }
 }
@@ -406,6 +394,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureMo
             })?;
         }
         self.updated_at = Some(updated_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder {
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureModelAttributes>>
+    {
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
 }

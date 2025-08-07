@@ -154,13 +154,32 @@ where
         self
     }
 }
+impl<
+    ProcedureModel,
+> crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
+    ProcedureModel,
+> {
+    ///Sets the value of the `binary_question_procedure_models.trackable_id` column from table `binary_question_procedure_models`.
+    pub fn trackable(
+        mut self,
+        trackable_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableBinaryQuestionProcedureModelAttributes,
+        >,
+    > {
+        self.trackable_id = Some(trackable_id);
+        Ok(self)
+    }
+}
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
-    ///Sets the value of the `procedure_models.name` column from table `binary_question_procedure_models`.
-    pub fn name<P>(
+    ///Sets the value of the `procedure_models.created_at` column from table `binary_question_procedure_models`.
+    pub fn created_at<P>(
         mut self,
-        name: P,
+        created_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -168,12 +187,73 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
         >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<
+            ::rosetta_timestamp::TimestampUTC,
+        >>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
-            .name(name)
+            .created_at(created_at)
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
+                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
+    ///Sets the value of the `procedure_models.created_by` column from table `binary_question_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableBinaryQuestionProcedureModelAttributes,
+        >,
+    > {
+        self.procedure_model = self
+            .procedure_model
+            .created_by(created_by)
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
+                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    ))
+            })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
+    ///Sets the value of the `procedure_models.deprecated` column from table `binary_question_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableBinaryQuestionProcedureModelAttributes,
+        >,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self
+            .procedure_model
+            .deprecated(deprecated)
             .map_err(|e| {
                 e
                     .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
@@ -219,64 +299,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
-    ///Sets the value of the `procedure_models.deprecated` column from table `binary_question_procedure_models`.
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableBinaryQuestionProcedureModelAttributes,
-        >,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self
-            .procedure_model
-            .deprecated(deprecated)
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
-                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
-                            attribute,
-                        ),
-                    ))
-            })?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-> {
-    ///Sets the value of the `procedure_models.photograph_id` column from table `binary_question_procedure_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableBinaryQuestionProcedureModelAttributes,
-        >,
-    > {
-        self.procedure_model = self
-            .procedure_model
-            .photograph(photograph_id)
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
-                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
-                            attribute,
-                        ),
-                    ))
-            })?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-> {
     ///Sets the value of the `procedure_models.icon` column from table `binary_question_procedure_models`.
     pub fn icon<P>(
         mut self,
@@ -308,38 +330,10 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
-    ///Sets the value of the `procedure_models.created_by` column from table `binary_question_procedure_models`.
-    pub fn created_by(
+    ///Sets the value of the `procedure_models.name` column from table `binary_question_procedure_models`.
+    pub fn name<P>(
         mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableBinaryQuestionProcedureModelAttributes,
-        >,
-    > {
-        self.procedure_model = self
-            .procedure_model
-            .created_by(created_by)
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
-                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
-                            attribute,
-                        ),
-                    ))
-            })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-> {
-    ///Sets the value of the `procedure_models.created_at` column from table `binary_question_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        name: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -347,14 +341,12 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
         >,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<
-            ::rosetta_timestamp::TimestampUTC,
-        >>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
-            .created_at(created_at)
+            .name(name)
             .map_err(|e| {
                 e
                     .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
@@ -369,10 +361,10 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
-    ///Sets the value of the `procedure_models.updated_by` column from table `binary_question_procedure_models`.
-    pub fn updated_by(
+    ///Sets the value of the `procedure_models.photograph_id` column from table `binary_question_procedure_models`.
+    pub fn photograph(
         mut self,
-        updated_by: i32,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -381,7 +373,7 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
     > {
         self.procedure_model = self
             .procedure_model
-            .updated_by(updated_by)
+            .photograph(photograph_id)
             .map_err(|e| {
                 e
                     .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
@@ -426,22 +418,30 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuest
         Ok(self)
     }
 }
-impl<
-    ProcedureModel,
-> crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
-    ProcedureModel,
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBinaryQuestionProcedureModelBuilder<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
-    ///Sets the value of the `binary_question_procedure_models.trackable_id` column from table `binary_question_procedure_models`.
-    pub fn trackable(
+    ///Sets the value of the `procedure_models.updated_by` column from table `binary_question_procedure_models`.
+    pub fn updated_by(
         mut self,
-        trackable_id: i32,
+        updated_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
             InsertableBinaryQuestionProcedureModelAttributes,
         >,
     > {
-        self.trackable_id = Some(trackable_id);
+        self.procedure_model = self
+            .procedure_model
+            .updated_by(updated_by)
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| InsertableBinaryQuestionProcedureModelAttributes::Extension(
+                        InsertableBinaryQuestionProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    ))
+            })?;
         Ok(self)
     }
 }

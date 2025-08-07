@@ -75,6 +75,7 @@ impl super::Rows {
             super::Rows::TeamState(rows) => rows.len(),
             super::Rows::Team(rows) => rows.len(),
             super::Rows::TemporaryUser(rows) => rows.len(),
+            super::Rows::TrackableAncestor(rows) => rows.len(),
             super::Rows::TrackableLocation(rows) => rows.len(),
             super::Rows::Trackable(rows) => rows.len(),
             super::Rows::Unit(rows) => rows.len(),

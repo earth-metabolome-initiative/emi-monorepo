@@ -191,6 +191,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::TemporaryUser(temporary_user) => {
                 crate::codegen::tables::rows::Rows::from(temporary_user)
             }
+            super::Row::TrackableAncestor(trackable_ancestors) => {
+                crate::codegen::tables::rows::Rows::from(trackable_ancestors)
+            }
             super::Row::TrackableLocation(trackable_locations) => {
                 crate::codegen::tables::rows::Rows::from(trackable_locations)
             }

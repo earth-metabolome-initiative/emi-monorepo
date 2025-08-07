@@ -202,36 +202,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTrackableLocationBu
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
-    /// Sets the value of the `trackable_locations.id` column from table
-    /// `trackable_locations`.
-    pub fn id<P>(
-        mut self,
-        id: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
-    where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
-            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
-    /// Sets the value of the `trackable_locations.trackable_id` column from
-    /// table `trackable_locations`.
-    pub fn trackable(
-        mut self,
-        trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
-    {
-        self.trackable_id = Some(trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
     /// Sets the value of the `trackable_locations.container_id` column from
     /// table `trackable_locations`.
     pub fn container(
@@ -240,45 +210,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     {
         self.container_id = container_id;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
-    /// Sets the value of the `trackable_locations.geolocation` column from
-    /// table `trackable_locations`.
-    pub fn geolocation<P>(
-        mut self,
-        geolocation: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
-    where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
-                Into::into(err).rename_field(InsertableTrackableLocationAttributes::Geolocation)
-            },
-        )?;
-        self.geolocation = Some(geolocation);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
-    /// Sets the value of the `trackable_locations.inferred` column from table
-    /// `trackable_locations`.
-    pub fn inferred<P>(
-        mut self,
-        inferred: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let inferred = inferred.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Inferred)
-        })?;
-        self.inferred = Some(inferred);
         Ok(self)
     }
 }
@@ -312,6 +243,75 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     {
         self.created_by = Some(created_by);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
+    /// Sets the value of the `trackable_locations.geolocation` column from
+    /// table `trackable_locations`.
+    pub fn geolocation<P>(
+        mut self,
+        geolocation: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
+    where
+        P: TryInto<postgis_diesel::types::Point>,
+        <P as TryInto<postgis_diesel::types::Point>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let geolocation = geolocation.try_into().map_err(
+            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableLocationAttributes::Geolocation)
+            },
+        )?;
+        self.geolocation = Some(geolocation);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
+    /// Sets the value of the `trackable_locations.id` column from table
+    /// `trackable_locations`.
+    pub fn id<P>(
+        mut self,
+        id: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
+    where
+        P: TryInto<::rosetta_uuid::Uuid>,
+        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Id)
+        })?;
+        self.id = Some(id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
+    /// Sets the value of the `trackable_locations.inferred` column from table
+    /// `trackable_locations`.
+    pub fn inferred<P>(
+        mut self,
+        inferred: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let inferred = inferred.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableLocationAttributes::Inferred)
+        })?;
+        self.inferred = Some(inferred);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
+    /// Sets the value of the `trackable_locations.trackable_id` column from
+    /// table `trackable_locations`.
+    pub fn trackable(
+        mut self,
+        trackable_id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
+    {
+        self.trackable_id = Some(trackable_id);
         Ok(self)
     }
 }

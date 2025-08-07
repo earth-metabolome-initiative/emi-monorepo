@@ -76,6 +76,20 @@ where
                     ),
                 ))
             })?;
+        let source = self
+            .source
+            .procedure_model(procedure_model_id)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
+                )
+            })?
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
+                )
+            })?;
         let procedure_poured_into = self
             .procedure_poured_into
             .procedure_model(procedure_model_id)
@@ -102,20 +116,6 @@ where
             .map_err(|err| {
                 err.into_field_name(
                     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::MeasuredWith,
-                )
-            })?;
-        let source = self
-            .source
-            .procedure_model(procedure_model_id)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
-                )
-            })?
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::Source,
                 )
             })?;
         Ok(Self::InsertableVariant {

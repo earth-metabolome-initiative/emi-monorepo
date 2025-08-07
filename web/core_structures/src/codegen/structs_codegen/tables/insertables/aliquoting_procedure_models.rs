@@ -469,25 +469,316 @@ where
         self
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn name<P>(
+    /// Sets the value of the `aliquoting_procedure_models.aliquoted_from`
+    /// column from table `aliquoting_procedure_models`.
+    pub fn aliquoted_from(
         mut self,
-        name: P,
+        aliquoted_from: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        self.aliquoted_from = Some(aliquoted_from);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `aliquoting_procedure_models.aliquoted_into`
+    /// column from table `aliquoting_procedure_models`.
+    pub fn aliquoted_into(
+        mut self,
+        aliquoted_into: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        self.aliquoted_into = Some(aliquoted_into);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `aliquoting_procedure_models.aliquoted_with`
+    /// column from table `aliquoting_procedure_models`.
+    pub fn aliquoted_with(
+        mut self,
+        aliquoted_with: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        self.aliquoted_with = Some(aliquoted_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `aliquoting_procedure_models.liters` column from
+    /// table `aliquoting_procedure_models`.
+    pub fn liters<P>(
+        mut self,
+        liters: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableAliquotingProcedureModelAttributes::Liters)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(liters)
+            .map_err(|e| e.rename_field(InsertableAliquotingProcedureModelAttributes::Liters))?;
+        self.liters = Some(liters);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `aliquoting_procedure_models.pipette_tip` column
+    /// from table `aliquoting_procedure_models`.
+    pub fn pipette_tip(
+        mut self,
+        pipette_tip: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        self.pipette_tip = Some(pipette_tip);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `aliquoting_procedure_models.procedure_aliquoted_from` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn procedure_aliquoted_from(
+        mut self,
+        procedure_aliquoted_from: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableAliquotingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_aliquoted_from = self
+            .procedure_aliquoted_from
+            .extend_builder(procedure_aliquoted_from)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `aliquoting_procedure_models.procedure_aliquoted_into` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn procedure_aliquoted_into(
+        mut self,
+        procedure_aliquoted_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableAliquotingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_aliquoted_into = self
+            .procedure_aliquoted_into
+            .extend_builder(procedure_aliquoted_into)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedInto(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `aliquoting_procedure_models.procedure_aliquoted_with` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn procedure_aliquoted_with(
+        mut self,
+        procedure_aliquoted_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableAliquotingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_aliquoted_with = self
+            .procedure_aliquoted_with
+            .extend_builder(procedure_aliquoted_with)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the
+    /// `aliquoting_procedure_models.procedure_pipette_tip` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn procedure_pipette_tip(
+        mut self,
+        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableAliquotingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_pipette_tip =
+            self.procedure_pipette_tip.extend_builder(procedure_pipette_tip).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableAliquotingProcedureModelAttributes::Extension(
+                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableAliquotingProcedureModelAttributes::Extension(
+                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableAliquotingProcedureModelAttributes::Extension(
                     InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
@@ -534,20 +825,50 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// Sets the value of the `procedure_models.icon` column from table
     /// `aliquoting_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn icon<P>(
         mut self,
-        deprecated: P,
+        icon: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableAliquotingProcedureModelAttributes::Extension(
+                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
+                        attribute,
+                    ),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `aliquoting_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableAliquotingProcedureModelAttributes::Extension(
                     InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
@@ -590,68 +911,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the `procedure_models.updated_at` column from table
     /// `aliquoting_procedure_models`.
-    pub fn icon<P>(
+    pub fn updated_at<P>(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureModelAttributes::Extension(
-                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureModelAttributes::Extension(
-                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
@@ -661,7 +925,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableAliquotingProcedureModelAttributes::Extension(
                     InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
@@ -696,270 +960,6 @@ impl
                 )
             })
         })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureModelAttributes::Extension(
-                    InsertableAliquotingProcedureModelExtensionAttributes::ProcedureModel(
-                        attribute,
-                    ),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `aliquoting_procedure_models.liters` column from
-    /// table `aliquoting_procedure_models`.
-    pub fn liters<P>(
-        mut self,
-        liters: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableAliquotingProcedureModelAttributes::Liters)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(liters)
-            .map_err(|e| e.rename_field(InsertableAliquotingProcedureModelAttributes::Liters))?;
-        self.liters = Some(liters);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `aliquoting_procedure_models.aliquoted_from`
-    /// column from table `aliquoting_procedure_models`.
-    pub fn aliquoted_from(
-        mut self,
-        aliquoted_from: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        self.aliquoted_from = Some(aliquoted_from);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `aliquoting_procedure_models.procedure_aliquoted_from` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn procedure_aliquoted_from(
-        mut self,
-        procedure_aliquoted_from: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableAliquotingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_aliquoted_from = self
-            .procedure_aliquoted_from
-            .extend_builder(procedure_aliquoted_from)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `aliquoting_procedure_models.aliquoted_into`
-    /// column from table `aliquoting_procedure_models`.
-    pub fn aliquoted_into(
-        mut self,
-        aliquoted_into: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        self.aliquoted_into = Some(aliquoted_into);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `aliquoting_procedure_models.procedure_aliquoted_into` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn procedure_aliquoted_into(
-        mut self,
-        procedure_aliquoted_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableAliquotingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_aliquoted_into = self
-            .procedure_aliquoted_into
-            .extend_builder(procedure_aliquoted_into)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedInto(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `aliquoting_procedure_models.aliquoted_with`
-    /// column from table `aliquoting_procedure_models`.
-    pub fn aliquoted_with(
-        mut self,
-        aliquoted_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        self.aliquoted_with = Some(aliquoted_with);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `aliquoting_procedure_models.procedure_aliquoted_with` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn procedure_aliquoted_with(
-        mut self,
-        procedure_aliquoted_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableAliquotingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_aliquoted_with = self
-            .procedure_aliquoted_with
-            .extend_builder(procedure_aliquoted_with)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `aliquoting_procedure_models.pipette_tip` column
-    /// from table `aliquoting_procedure_models`.
-    pub fn pipette_tip(
-        mut self,
-        pipette_tip: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureModelAttributes>,
-    > {
-        self.pipette_tip = Some(pipette_tip);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the
-    /// `aliquoting_procedure_models.procedure_pipette_tip` column from table
-    /// `aliquoting_procedure_models`.
-    pub fn procedure_pipette_tip(
-        mut self,
-        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableAliquotingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_pipette_tip =
-            self.procedure_pipette_tip.extend_builder(procedure_pipette_tip).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip(attribute)
-                })
-            })?;
         Ok(self)
     }
 }

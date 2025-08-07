@@ -321,6 +321,11 @@ mod temporary_user;
 pub use temporary_user::{
     InsertableTemporaryUser, InsertableTemporaryUserAttributes, InsertableTemporaryUserBuilder,
 };
+mod trackable_ancestors;
+pub use trackable_ancestors::{
+    InsertableTrackableAncestor, InsertableTrackableAncestorAttributes,
+    InsertableTrackableAncestorBuilder,
+};
 mod trackable_locations;
 pub use trackable_locations::{
     InsertableTrackableLocation, InsertableTrackableLocationAttributes,

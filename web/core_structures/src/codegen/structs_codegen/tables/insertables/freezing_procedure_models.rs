@@ -343,246 +343,39 @@ where
         self
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `freezing_procedure_models`.
-    pub fn name<P>(
+    /// Sets the value of the `freezing_procedure_models.frozen_container_id`
+    /// column from table `freezing_procedure_models`.
+    pub fn frozen_container(
         mut self,
-        name: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.description` column from table
-    /// `freezing_procedure_models`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.deprecated` column from table
-    /// `freezing_procedure_models`.
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.photograph_id` column from table
-    /// `freezing_procedure_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
+        frozen_container_id: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
+        self.frozen_container_id = Some(frozen_container_id);
         Ok(self)
     }
 }
-impl
+impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+        ProcedureModel,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
-    /// `freezing_procedure_models`.
-    pub fn icon<P>(
+    /// Sets the value of the `freezing_procedure_models.frozen_with` column
+    /// from table `freezing_procedure_models`.
+    pub fn frozen_with(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `freezing_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
+        frozen_with: ::rosetta_uuid::Uuid,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
     > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `freezing_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_by` column from table
-    /// `freezing_procedure_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `freezing_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableFreezingProcedureModelAttributes::Extension(
-                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
+        self.frozen_with = Some(frozen_with);
         Ok(self)
     }
 }
@@ -661,50 +454,34 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `freezing_procedure_models.seconds` column from
+    /// Sets the value of the
+    /// `freezing_procedure_models.procedure_frozen_container_id` column from
     /// table `freezing_procedure_models`.
-    pub fn seconds<P>(
+    pub fn procedure_frozen_container(
         mut self,
-        seconds: P,
+        procedure_frozen_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+        web_common_traits::database::InsertError<
+            InsertableFreezingProcedureModelAttributes,
+        >,
     >
     where
-        P: TryInto<Option<f32>>,
-        <P as TryInto<Option<f32>>>::Error: Into<validation_errors::SingleFieldError>,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
     {
-        let seconds = seconds.try_into().map_err(|err: <P as TryInto<Option<f32>>>::Error| {
-            Into::into(err).rename_field(InsertableFreezingProcedureModelAttributes::Seconds)
-        })?;
-        if let Some(seconds) = seconds {
-            pgrx_validation::must_be_strictly_positive_f32(seconds)
-                .map_err(|e| e.rename_field(InsertableFreezingProcedureModelAttributes::Seconds))
-                .and_then(|_| {
-                    pgrx_validation::must_be_strictly_greater_than_f32(seconds, 1800f32).map_err(
-                        |e| e.rename_field(InsertableFreezingProcedureModelAttributes::Seconds),
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_frozen_container_id = self
+            .procedure_frozen_container_id
+            .extend_builder(procedure_frozen_container_id)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableFreezingProcedureModelAttributes::ProcedureFrozenContainerId(
+                        attribute,
                     )
-                })?;
-        }
-        self.seconds = seconds;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `freezing_procedure_models.frozen_with` column
-    /// from table `freezing_procedure_models`.
-    pub fn frozen_with(
-        mut self,
-        frozen_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
-    > {
-        self.frozen_with = Some(frozen_with);
+                })
+            })?;
         Ok(self)
     }
 }
@@ -744,52 +521,275 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `freezing_procedure_models.frozen_container_id`
-    /// column from table `freezing_procedure_models`.
-    pub fn frozen_container(
+    /// Sets the value of the `freezing_procedure_models.seconds` column from
+    /// table `freezing_procedure_models`.
+    pub fn seconds<P>(
         mut self,
-        frozen_container_id: ::rosetta_uuid::Uuid,
+        seconds: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<Option<f32>>,
+        <P as TryInto<Option<f32>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let seconds = seconds.try_into().map_err(|err: <P as TryInto<Option<f32>>>::Error| {
+            Into::into(err).rename_field(InsertableFreezingProcedureModelAttributes::Seconds)
+        })?;
+        if let Some(seconds) = seconds {
+            pgrx_validation::must_be_strictly_positive_f32(seconds)
+                .map_err(|e| e.rename_field(InsertableFreezingProcedureModelAttributes::Seconds))
+                .and_then(|_| {
+                    pgrx_validation::must_be_strictly_greater_than_f32(seconds, 1800f32).map_err(
+                        |e| e.rename_field(InsertableFreezingProcedureModelAttributes::Seconds),
+                    )
+                })?;
+        }
+        self.seconds = seconds;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `freezing_procedure_models`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `freezing_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
     > {
-        self.frozen_container_id = Some(frozen_container_id);
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
         Ok(self)
     }
 }
-impl<ProcedureModel>
+impl
     crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
-        ProcedureModel,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the
-    /// `freezing_procedure_models.procedure_frozen_container_id` column from
-    /// table `freezing_procedure_models`.
-    pub fn procedure_frozen_container(
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `freezing_procedure_models`.
+    pub fn deprecated<P>(
         mut self,
-        procedure_frozen_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        deprecated: P,
     ) -> Result<
         Self,
-        web_common_traits::database::InsertError<
-            InsertableFreezingProcedureModelAttributes,
-        >,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
     >
     where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_frozen_container_id = self
-            .procedure_frozen_container_id
-            .extend_builder(procedure_frozen_container_id)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableFreezingProcedureModelAttributes::ProcedureFrozenContainerId(
-                        attribute,
-                    )
-                })
-            })?;
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `freezing_procedure_models`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `freezing_procedure_models`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `freezing_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `freezing_procedure_models`.
+    pub fn photograph(
+        mut self,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `freezing_procedure_models`.
+    pub fn updated_at<P>(
+        mut self,
+        updated_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `freezing_procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableFreezingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableFreezingProcedureModelAttributes::Extension(
+                    InsertableFreezingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
 }

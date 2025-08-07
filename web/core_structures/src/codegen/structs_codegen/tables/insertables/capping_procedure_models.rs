@@ -310,55 +310,6 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `capping_procedure_models.container_id` column
-    /// from table `capping_procedure_models`.
-    pub fn container(
-        mut self,
-        container_id: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
-    > {
-        self.container_id = Some(container_id);
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
-    /// Sets the value of the `capping_procedure_models.procedure_container_id`
-    /// column from table `capping_procedure_models`.
-    pub fn procedure_container(
-        mut self,
-        procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableCappingProcedureModelAttributes,
-        >,
-    >
-    where
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
-        >,
-    {
-        use web_common_traits::database::ExtendableBuilder;
-        self.procedure_container_id =
-            self.procedure_container_id.extend_builder(procedure_container_id).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableCappingProcedureModelAttributes::ProcedureContainerId(attribute)
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<ProcedureModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
-        ProcedureModel,
-    >
-{
     /// Sets the value of the `capping_procedure_models.capped_with` column from
     /// table `capping_procedure_models`.
     pub fn capped_with(
@@ -369,6 +320,24 @@ impl<ProcedureModel>
         web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
     > {
         self.capped_with = Some(capped_with);
+        Ok(self)
+    }
+}
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `capping_procedure_models.container_id` column
+    /// from table `capping_procedure_models`.
+    pub fn container(
+        mut self,
+        container_id: ::rosetta_uuid::Uuid,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
+    > {
+        self.container_id = Some(container_id);
         Ok(self)
     }
 }
@@ -403,25 +372,110 @@ impl<ProcedureModel>
         Ok(self)
     }
 }
+impl<ProcedureModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
+        ProcedureModel,
+    >
+{
+    /// Sets the value of the `capping_procedure_models.procedure_container_id`
+    /// column from table `capping_procedure_models`.
+    pub fn procedure_container(
+        mut self,
+        procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableCappingProcedureModelAttributes,
+        >,
+    >
+    where
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::ExtendableBuilder<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
+        >,
+    {
+        use web_common_traits::database::ExtendableBuilder;
+        self.procedure_container_id =
+            self.procedure_container_id.extend_builder(procedure_container_id).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableCappingProcedureModelAttributes::ProcedureContainerId(attribute)
+                })
+            })?;
+        Ok(self)
+    }
+}
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.name` column from table
+    /// Sets the value of the `procedure_models.created_at` column from table
     /// `capping_procedure_models`.
-    pub fn name<P>(
+    pub fn created_at<P>(
         mut self,
-        name: P,
+        created_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCappingProcedureModelAttributes::Extension(
+                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `capping_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCappingProcedureModelAttributes::Extension(
+                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `capping_procedure_models`.
+    pub fn deprecated<P>(
+        mut self,
+        deprecated: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<bool>,
+        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCappingProcedureModelAttributes::Extension(
                     InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -464,20 +518,48 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// Sets the value of the `procedure_models.icon` column from table
     /// `capping_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn icon<P>(
         mut self,
-        deprecated: P,
+        icon: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableCappingProcedureModelAttributes::Extension(
+                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `capping_procedure_models`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
+    >
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCappingProcedureModelAttributes::Extension(
                     InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -516,64 +598,11 @@ impl
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
     >
 {
-    /// Sets the value of the `procedure_models.icon` column from table
+    /// Sets the value of the `procedure_models.updated_at` column from table
     /// `capping_procedure_models`.
-    pub fn icon<P>(
+    pub fn updated_at<P>(
         mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCappingProcedureModelAttributes::Extension(
-                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `capping_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCappingProcedureModelAttributes::Extension(
-                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `capping_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
+        updated_at: P,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
@@ -583,7 +612,7 @@ impl
         <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCappingProcedureModelAttributes::Extension(
                     InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
@@ -608,35 +637,6 @@ impl
         web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
     > {
         self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCappingProcedureModelAttributes::Extension(
-                    InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `capping_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableCappingProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
             e.into_field_name(|attribute| {
                 InsertableCappingProcedureModelAttributes::Extension(
                     InsertableCappingProcedureModelExtensionAttributes::ProcedureModel(attribute),

@@ -282,62 +282,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableNextProcedureModelB
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
-    /// Sets the value of the `next_procedure_models.parent_id` column from
-    /// table `next_procedure_models`.
-    pub fn parent(
-        mut self,
-        parent_id: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    > {
-        self.parent_id = Some(parent_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
-    /// Sets the value of the `next_procedure_models.current_id` column from
-    /// table `next_procedure_models`.
-    pub fn current(
-        mut self,
-        current_id: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    > {
-        self.current_id = Some(current_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
-    /// Sets the value of the `next_procedure_models.successor_id` column from
-    /// table `next_procedure_models`.
-    pub fn successor(
-        mut self,
-        successor_id: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    > {
-        self.successor_id = Some(successor_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
-    /// Sets the value of the `next_procedure_models.created_by` column from
-    /// table `next_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
-    > {
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
     /// Sets the value of the `next_procedure_models.created_at` column from
     /// table `next_procedure_models`.
     pub fn created_at<P>(
@@ -358,6 +302,62 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedu
             },
         )?;
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.created_by` column from
+    /// table `next_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
+    > {
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.current_id` column from
+    /// table `next_procedure_models`.
+    pub fn current(
+        mut self,
+        current_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
+    > {
+        self.current_id = Some(current_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.parent_id` column from
+    /// table `next_procedure_models`.
+    pub fn parent(
+        mut self,
+        parent_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
+    > {
+        self.parent_id = Some(parent_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.successor_id` column from
+    /// table `next_procedure_models`.
+    pub fn successor(
+        mut self,
+        successor_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
+    > {
+        self.successor_id = Some(successor_id);
         Ok(self)
     }
 }

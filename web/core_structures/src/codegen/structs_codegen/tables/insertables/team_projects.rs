@@ -118,18 +118,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamProjectBuilder 
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
-    /// Sets the value of the `team_projects.team_id` column from table
-    /// `team_projects`.
-    pub fn team(
-        mut self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
-    {
-        self.team_id = Some(team_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
     /// Sets the value of the `team_projects.project_id` column from table
     /// `team_projects`.
     pub fn project(
@@ -138,6 +126,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
     {
         self.project_id = Some(project_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
+    /// Sets the value of the `team_projects.team_id` column from table
+    /// `team_projects`.
+    pub fn team(
+        mut self,
+        team_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
+    {
+        self.team_id = Some(team_id);
         Ok(self)
     }
 }

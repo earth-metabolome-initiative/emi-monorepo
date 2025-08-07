@@ -135,33 +135,6 @@ where
         self
     }
 }
-impl<Processable>
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        Processable,
-    >
-{
-    /// Sets the value of the `volumetric_processables.liters` column from table
-    /// `volumetric_processables`.
-    pub fn liters<P>(
-        mut self,
-        liters: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableVolumetricProcessableAttributes::Liters)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(liters)
-            .map_err(|e| e.rename_field(InsertableVolumetricProcessableAttributes::Liters))?;
-        self.liters = Some(liters);
-        Ok(self)
-    }
-}
 impl<Trackable>
     crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
         crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
@@ -183,6 +156,76 @@ impl<Trackable>
         <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.kilograms(kilograms).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.created_at` column from table
+    /// `volumetric_processables`.
+    pub fn created_at<P>(
+        mut self,
+        created_at: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.created_by` column from table
+    /// `volumetric_processables`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    > {
+        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.description` column from table
+    /// `volumetric_processables`.
+    pub fn description<P>(
+        mut self,
+        description: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<Option<String>>,
+        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -241,30 +284,6 @@ impl
         >,
     >
 {
-    /// Sets the value of the `trackables.description` column from table
-    /// `volumetric_processables`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    >
-    where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
     /// Sets the value of the `trackables.photograph_id` column from table
     /// `volumetric_processables`.
     pub fn photograph(
@@ -275,92 +294,6 @@ impl
         web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
     > {
         self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `volumetric_processables`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    > {
-        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `volumetric_processables`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    > {
-        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `volumetric_processables`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `volumetric_processables`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
-    > {
-        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -386,6 +319,53 @@ impl
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+        >,
+    >
+{
+    /// Sets the value of the `trackables.updated_by` column from table
+    /// `volumetric_processables`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    > {
+        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl<Processable>
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricProcessableBuilder<
+        Processable,
+    >
+{
+    /// Sets the value of the `volumetric_processables.liters` column from table
+    /// `volumetric_processables`.
+    pub fn liters<P>(
+        mut self,
+        liters: P,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableVolumetricProcessableAttributes>,
+    >
+    where
+        P: TryInto<f32>,
+        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let liters = liters.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableVolumetricProcessableAttributes::Liters)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(liters)
+            .map_err(|e| e.rename_field(InsertableVolumetricProcessableAttributes::Liters))?;
+        self.liters = Some(liters);
         Ok(self)
     }
 }

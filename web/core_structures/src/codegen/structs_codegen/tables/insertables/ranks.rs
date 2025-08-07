@@ -53,23 +53,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRankBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder {
-    /// Sets the value of the `ranks.name` column from table `ranks`.
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRankAttributes::Name)
-        })?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder {
     /// Sets the value of the `ranks.description` column from table `ranks`.
     pub fn description<P>(
         mut self,
@@ -84,6 +67,23 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder
                 Into::into(err).rename_field(InsertableRankAttributes::Description)
             })?;
         self.description = Some(description);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder {
+    /// Sets the value of the `ranks.name` column from table `ranks`.
+    pub fn name<P>(
+        mut self,
+        name: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableRankAttributes::Name)
+        })?;
+        self.name = Some(name);
         Ok(self)
     }
 }

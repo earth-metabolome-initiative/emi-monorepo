@@ -117,6 +117,46 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
+    /// Sets the value of the `addresses.geolocation` column from table
+    /// `addresses`.
+    pub fn geolocation<P>(
+        mut self,
+        geolocation: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
+    where
+        P: TryInto<postgis_diesel::types::Point>,
+        <P as TryInto<postgis_diesel::types::Point>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let geolocation = geolocation.try_into().map_err(
+            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::Geolocation)
+            },
+        )?;
+        self.geolocation = Some(geolocation);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
+    /// Sets the value of the `addresses.postal_code` column from table
+    /// `addresses`.
+    pub fn postal_code<P>(
+        mut self,
+        postal_code: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let postal_code =
+            postal_code.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableAddressAttributes::PostalCode)
+            })?;
+        self.postal_code = Some(postal_code);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
     /// Sets the value of the `addresses.street_name` column from table
     /// `addresses`.
     pub fn street_name<P>(
@@ -151,46 +191,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
                 Into::into(err).rename_field(InsertableAddressAttributes::StreetNumber)
             })?;
         self.street_number = Some(street_number);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.postal_code` column from table
-    /// `addresses`.
-    pub fn postal_code<P>(
-        mut self,
-        postal_code: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let postal_code =
-            postal_code.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::PostalCode)
-            })?;
-        self.postal_code = Some(postal_code);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.geolocation` column from table
-    /// `addresses`.
-    pub fn geolocation<P>(
-        mut self,
-        geolocation: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::Geolocation)
-            },
-        )?;
-        self.geolocation = Some(geolocation);
         Ok(self)
     }
 }

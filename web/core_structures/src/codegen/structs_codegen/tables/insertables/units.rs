@@ -100,6 +100,33 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUnitBuilder {
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
+    /// Sets the value of the `units.color_id` column from table `units`.
+    pub fn color(
+        mut self,
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>> {
+        self.color_id = Some(color_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
+    /// Sets the value of the `units.icon` column from table `units`.
+    pub fn icon<P>(
+        mut self,
+        icon: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>>
+    where
+        P: TryInto<String>,
+        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableUnitAttributes::Icon)
+        })?;
+        self.icon = Some(icon);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
     /// Sets the value of the `units.name` column from table `units`.
     pub fn name<P>(
         mut self,
@@ -130,33 +157,6 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
             Into::into(err).rename_field(InsertableUnitAttributes::Unit)
         })?;
         self.unit = Some(unit);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
-    /// Sets the value of the `units.icon` column from table `units`.
-    pub fn icon<P>(
-        mut self,
-        icon: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>>
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableUnitAttributes::Icon)
-        })?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
-    /// Sets the value of the `units.color_id` column from table `units`.
-    pub fn color(
-        mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>> {
-        self.color_id = Some(color_id);
         Ok(self)
     }
 }
