@@ -1174,6 +1174,21 @@ impl Column {
         }
     }
 
+    /// Returns whether the column is part of the table's primary key.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_part_of_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn)?;
+        let primary_key_columns = table.primary_key_columns(conn)?;
+        Ok(primary_key_columns.contains(self))
+    }
+
     /// Returns whether the column is part of an extension primary key
     /// constraint.
     ///

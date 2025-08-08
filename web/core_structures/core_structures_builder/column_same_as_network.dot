@@ -10,28 +10,60 @@ graph [
         ];
 node [shape=box, style=rounded, fontname="Helvetica"];
 edge [fontname="Helvetica"];
-subgraph cluster_disposal_procedure_models {
-  C80 [color="blue", fillcolor="#ffffff", label="disposal_procedure_models\ndisposed_id"];
-  C81 [color="blue", fillcolor="#ffffff", label="disposal_procedure_models\nprocedure_model_id"];
-  label="disposal_procedure_models";
+subgraph cluster_supernatant_procedure_models {
+  C315 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\npipette_tip"];
+  C316 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_model_id"];
+  C317 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_pipette_tip"];
+  C318 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_stratified_source"];
+  C319 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_supernatant_destination"];
+  C320 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_transferred_with"];
+  C321 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nstratified_source"];
+  C322 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nsupernatant_destination"];
+  C323 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\ntransferred_with"];
+  label="supernatant_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_photograph_procedure_models {
-  C186 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nphotographed_with"];
-  C187 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nprocedure_model_id"];
-  C188 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nprocedure_photographed_with"];
-  C189 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\ntrackable_id"];
-  label="photograph_procedure_models";
+subgraph cluster_supernatant_procedures {
+  C325 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_id"];
+  C326 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_model_id"];
+  label="supernatant_procedures";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_geolocation_procedure_models {
-  C117 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\ngeolocated_with"];
-  C118 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\nprocedure_geolocated_with"];
-  C119 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\nprocedure_model_id"];
-  C120 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\ntrackable_id"];
-  label="geolocation_procedure_models";
+subgraph cluster_freezing_procedure_models {
+  C109 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_container_id"];
+  C110 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_with"];
+  C113 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_container_id"];
+  C114 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_with"];
+  C115 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_model_id"];
+  label="freezing_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_placing_procedure_models {
+  C192 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nplaced_into"];
+  C193 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nprocedure_model_id"];
+  C194 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nprocedure_placed_into"];
+  C196 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nsource"];
+  label="placing_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_aliquoting_procedures {
+  C19 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_id"];
+  C20 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_model_id"];
+  label="aliquoting_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_ball_mill_procedure_models {
+  C25 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nmilled_container_id"];
+  C26 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nmilled_with"];
+  C27 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_milled_container_id"];
+  C28 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_milled_with"];
+  C29 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_model_id"];
+  label="ball_mill_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -46,10 +78,13 @@ subgraph cluster_mixing_procedure_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_supernatant_procedures {
-  C325 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_id"];
-  C326 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_model_id"];
-  label="supernatant_procedures";
+subgraph cluster_storage_procedure_models {
+  C307 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nchild_container_id"];
+  C310 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nparent_container_id"];
+  C311 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_child_container_id"];
+  C312 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_model_id"];
+  C313 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_parent_container_id"];
+  label="storage_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -64,48 +99,10 @@ subgraph cluster_fractioning_procedure_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_procedure_model_trackables {
-  C206 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\nid"];
-  C208 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\nprocedure_model_id"];
-  C209 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\ntrackable_id"];
-  label="procedure_model_trackables";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_packaging_procedure_models {
-  C168 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\npackaged_with"];
-  C169 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_model_id"];
-  C170 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_packaged_with"];
-  C171 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_sample_id"];
-  label="packaging_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_storage_procedure_models {
-  C307 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nchild_container_id"];
-  C310 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nparent_container_id"];
-  C311 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_child_container_id"];
-  C312 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_model_id"];
-  C313 [color="blue", fillcolor="#ffffff", label="storage_procedure_models\nprocedure_parent_container_id"];
-  label="storage_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_procedure_trackables {
-  C222 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nancestor_trackable_id"];
-  C226 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_id"];
-  C227 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_model_id"];
-  C228 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_model_trackable_id"];
-  label="procedure_trackables";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_placing_procedure_models {
-  C192 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nplaced_into"];
-  C193 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nprocedure_model_id"];
-  C194 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nprocedure_placed_into"];
-  C196 [color="blue", fillcolor="#ffffff", label="placing_procedure_models\nsource"];
-  label="placing_procedure_models";
+subgraph cluster_weighing_procedures {
+  C403 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_id"];
+  C404 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_model_id"];
+  label="weighing_procedures";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -119,51 +116,10 @@ subgraph cluster_pouring_procedure_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_weighing_procedure_models {
-  C397 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_model_id"];
-  C398 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_sample_container"];
-  C399 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_weighed_with"];
-  C400 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nsample_container_id"];
-  C401 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nweighed_with"];
-  label="weighing_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_aliquoting_procedures {
-  C19 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_id"];
-  C20 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_model_id"];
-  label="aliquoting_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_capping_procedure_models {
-  C40 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\ncapped_with"];
-  C41 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\ncontainer_id"];
-  C42 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_capped_with"];
-  C43 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_container_id"];
-  C44 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_model_id"];
-  label="capping_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
 subgraph cluster_procedures {
   C232 [color="blue", fillcolor="#ffffff", label="procedures\nid"];
   C233 [color="blue", fillcolor="#ffffff", label="procedures\nprocedure_model_id"];
   label="procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_supernatant_procedure_models {
-  C315 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\npipette_tip"];
-  C316 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_model_id"];
-  C317 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_pipette_tip"];
-  C318 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_stratified_source"];
-  C319 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_supernatant_destination"];
-  C320 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nprocedure_transferred_with"];
-  C321 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nstratified_source"];
-  C322 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\nsupernatant_destination"];
-  C323 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_models\ntransferred_with"];
-  label="supernatant_procedure_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -181,44 +137,6 @@ subgraph cluster_aliquoting_procedure_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_shared_procedure_model_trackables {
-  C285 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_id"];
-  C286 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_procedure_model_id"];
-  C287 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_trackable_id"];
-  C290 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_id"];
-  C291 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_procedure_model_id"];
-  C292 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_trackable_id"];
-  label="shared_procedure_model_trackables";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_freezing_procedure_models {
-  C109 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_container_id"];
-  C110 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nfrozen_with"];
-  C113 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_container_id"];
-  C114 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_frozen_with"];
-  C115 [color="blue", fillcolor="#ffffff", label="freezing_procedure_models\nprocedure_model_id"];
-  label="freezing_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_weighing_procedures {
-  C403 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_id"];
-  C404 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_model_id"];
-  label="weighing_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_ball_mill_procedure_models {
-  C25 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nmilled_container_id"];
-  C26 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nmilled_with"];
-  C27 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_milled_container_id"];
-  C28 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_milled_with"];
-  C29 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_models\nprocedure_model_id"];
-  label="ball_mill_procedure_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
 subgraph cluster_centrifuge_procedure_models {
   C46 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_models\ncentrifuged_container_id"];
   C47 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_models\ncentrifuged_with"];
@@ -229,6 +147,30 @@ subgraph cluster_centrifuge_procedure_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
+subgraph cluster_procedure_model_trackables {
+  C206 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\nid"];
+  C208 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\nprocedure_model_id"];
+  C209 [color="blue", fillcolor="#ffffff", label="procedure_model_trackables\ntrackable_id"];
+  label="procedure_model_trackables";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_disposal_procedure_models {
+  C80 [color="blue", fillcolor="#ffffff", label="disposal_procedure_models\ndisposed_id"];
+  C81 [color="blue", fillcolor="#ffffff", label="disposal_procedure_models\nprocedure_model_id"];
+  label="disposal_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_geolocation_procedure_models {
+  C117 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\ngeolocated_with"];
+  C118 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\nprocedure_geolocated_with"];
+  C119 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\nprocedure_model_id"];
+  C120 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_models\ntrackable_id"];
+  label="geolocation_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
 subgraph cluster_freeze_drying_procedure_models {
   C99 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_models\nfreeze_dried_container_id"];
   C100 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_models\nfreeze_dried_with"];
@@ -236,6 +178,64 @@ subgraph cluster_freeze_drying_procedure_models {
   C105 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_models\nprocedure_freeze_dried_with"];
   C106 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_models\nprocedure_model_id"];
   label="freeze_drying_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_packaging_procedure_models {
+  C168 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\npackaged_with"];
+  C169 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_model_id"];
+  C170 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_packaged_with"];
+  C171 [color="blue", fillcolor="#ffffff", label="packaging_procedure_models\nprocedure_sample_id"];
+  label="packaging_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_capping_procedure_models {
+  C40 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\ncapped_with"];
+  C41 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\ncontainer_id"];
+  C42 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_capped_with"];
+  C43 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_container_id"];
+  C44 [color="blue", fillcolor="#ffffff", label="capping_procedure_models\nprocedure_model_id"];
+  label="capping_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_procedure_trackables {
+  C222 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nancestor_trackable_id"];
+  C226 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_id"];
+  C227 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_model_id"];
+  C228 [color="blue", fillcolor="#ffffff", label="procedure_trackables\nprocedure_model_trackable_id"];
+  label="procedure_trackables";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_weighing_procedure_models {
+  C397 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_model_id"];
+  C398 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_sample_container"];
+  C399 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nprocedure_weighed_with"];
+  C400 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nsample_container_id"];
+  C401 [color="blue", fillcolor="#ffffff", label="weighing_procedure_models\nweighed_with"];
+  label="weighing_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_photograph_procedure_models {
+  C186 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nphotographed_with"];
+  C187 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nprocedure_model_id"];
+  C188 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\nprocedure_photographed_with"];
+  C189 [color="blue", fillcolor="#ffffff", label="photograph_procedure_models\ntrackable_id"];
+  label="photograph_procedure_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_shared_procedure_model_trackables {
+  C285 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_id"];
+  C286 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_procedure_model_id"];
+  C287 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nchild_trackable_id"];
+  C290 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_id"];
+  C291 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_procedure_model_id"];
+  C292 [color="blue", fillcolor="#ffffff", label="shared_procedure_model_trackables\nparent_trackable_id"];
+  label="shared_procedure_model_trackables";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }

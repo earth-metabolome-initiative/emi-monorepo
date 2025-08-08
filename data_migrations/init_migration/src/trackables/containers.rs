@@ -1,6 +1,6 @@
 //! Submodule to initialize the `reagents` in the database.
 
-use core_structures::{ContainerModel, User};
+use core_structures::{CompatibilityRule, ContainerModel, FreezerModel, User};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -9,6 +9,8 @@ pub(crate) use wet_lab_containers::{
     CONICAL_CENTRIFUGAL_TUBE_50ML, SAFELOCK_TUBE_2ML, VIAL_1_5ML, VIAL_1_5ML_CAP_SPLITTED,
     VIAL_1_5ML_SEALED_CAP, VIAL_INSERT_200UL,
 };
+
+use crate::trackables::instruments::FREEZER;
 
 pub const SHELF: &str = "Shelf";
 pub const BOTTLE: &str = "Bottle";
@@ -64,7 +66,7 @@ pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _polystyrene_box = ContainerModel::new()
+    let polystyrene_box = ContainerModel::new()
         .name(Some(POLYSTYRENE_BOX.to_owned()))
         .unwrap()
         .description(Some(

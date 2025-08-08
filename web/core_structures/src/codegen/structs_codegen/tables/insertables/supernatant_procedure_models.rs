@@ -786,7 +786,7 @@ impl<ProcedureModel>
     /// `supernatant_procedure_models`.
     pub fn procedure_pipette_tip(
         mut self,
-        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -799,6 +799,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.pipette_tip, procedure_pipette_tip.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_pipette_tip.trackable_id {
+            self.pipette_tip = Some(foreign);
+        } else if let Some(local) = self.pipette_tip {
+            procedure_pipette_tip = procedure_pipette_tip
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedurePipetteTip(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_pipette_tip =
             self.procedure_pipette_tip.extend_builder(procedure_pipette_tip).map_err(|e| {
                 e.into_field_name(|attribute| {
@@ -818,7 +844,7 @@ impl<ProcedureModel>
     /// table `supernatant_procedure_models`.
     pub fn procedure_stratified_source(
         mut self,
-        procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_stratified_source: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -831,6 +857,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.stratified_source, procedure_stratified_source.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureStratifiedSource(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_stratified_source.trackable_id {
+            self.stratified_source = Some(foreign);
+        } else if let Some(local) = self.stratified_source {
+            procedure_stratified_source = procedure_stratified_source
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureStratifiedSource(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_stratified_source = self
             .procedure_stratified_source
             .extend_builder(procedure_stratified_source)
@@ -854,7 +907,7 @@ impl<ProcedureModel>
     /// from table `supernatant_procedure_models`.
     pub fn procedure_supernatant_destination(
         mut self,
-        procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_supernatant_destination: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -867,6 +920,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.supernatant_destination, procedure_supernatant_destination.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_supernatant_destination.trackable_id {
+            self.supernatant_destination = Some(foreign);
+        } else if let Some(local) = self.supernatant_destination {
+            procedure_supernatant_destination = procedure_supernatant_destination
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureSupernatantDestination(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_supernatant_destination = self
             .procedure_supernatant_destination
             .extend_builder(procedure_supernatant_destination)
@@ -890,7 +970,7 @@ impl<ProcedureModel>
     /// table `supernatant_procedure_models`.
     pub fn procedure_transferred_with(
         mut self,
-        procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_transferred_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -903,6 +983,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.transferred_with, procedure_transferred_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureTransferredWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_transferred_with.trackable_id {
+            self.transferred_with = Some(foreign);
+        } else if let Some(local) = self.transferred_with {
+            procedure_transferred_with = procedure_transferred_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureModelAttributes::ProcedureTransferredWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_transferred_with = self
             .procedure_transferred_with
             .extend_builder(procedure_transferred_with)

@@ -382,7 +382,7 @@ impl<ProcedureModel>
     /// from table `fractioning_procedure_models`.
     pub fn procedure_fragment_placed_into(
         mut self,
-        procedure_fragment_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_fragment_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -395,6 +395,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.fragment_placed_into, procedure_fragment_placed_into.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentPlacedInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_fragment_placed_into.trackable_id {
+            self.fragment_placed_into = Some(foreign);
+        } else if let Some(local) = self.fragment_placed_into {
+            procedure_fragment_placed_into = procedure_fragment_placed_into
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureFragmentPlacedInto(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_fragment_placed_into = self
             .procedure_fragment_placed_into
             .extend_builder(procedure_fragment_placed_into)
@@ -454,7 +481,7 @@ impl<ProcedureModel>
     /// `fractioning_procedure_models`.
     pub fn procedure_weighed_with(
         mut self,
-        procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -467,6 +494,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.weighed_with, procedure_weighed_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_weighed_with.trackable_id {
+            self.weighed_with = Some(foreign);
+        } else if let Some(local) = self.weighed_with {
+            procedure_weighed_with = procedure_weighed_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureModelAttributes::ProcedureWeighedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_weighed_with =
             self.procedure_weighed_with.extend_builder(procedure_weighed_with).map_err(|e| {
                 e.into_field_name(|attribute| {

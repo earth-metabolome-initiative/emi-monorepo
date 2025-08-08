@@ -524,7 +524,7 @@ impl<ProcedureModel>
     /// `weighing_procedure_models`.
     pub fn procedure_sample_container(
         mut self,
-        procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_sample_container: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -537,6 +537,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.sample_container_id, procedure_sample_container.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_sample_container.trackable_id {
+            self.sample_container_id = Some(foreign);
+        } else if let Some(local) = self.sample_container_id {
+            procedure_sample_container = procedure_sample_container
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelAttributes::ProcedureSampleContainer(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_sample_container = self
             .procedure_sample_container
             .extend_builder(procedure_sample_container)
@@ -557,7 +584,7 @@ impl<ProcedureModel>
     /// column from table `weighing_procedure_models`.
     pub fn procedure_weighed_with(
         mut self,
-        procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_weighed_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -570,6 +597,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.weighed_with, procedure_weighed_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelAttributes::ProcedureWeighedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_weighed_with.trackable_id {
+            self.weighed_with = Some(foreign);
+        } else if let Some(local) = self.weighed_with {
+            procedure_weighed_with = procedure_weighed_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureModelAttributes::ProcedureWeighedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_weighed_with =
             self.procedure_weighed_with.extend_builder(procedure_weighed_with).map_err(|e| {
                 e.into_field_name(|attribute| {

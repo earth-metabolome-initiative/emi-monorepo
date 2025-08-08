@@ -1,14 +1,14 @@
 //! Submodule to initialize the `instruments` in the database.
 
 use core_structures::{
-    BallMillMachineModel, CameraModel, CentrifugeModel, FreezeDrierModel, FreezerModel,
-    PipetteModel, PositioningDeviceModel, Trackable, User, VolumetricContainerModel,
-    WeighingInstrumentModel, traits::CompatibleWith,
+    BallMillMachineModel, CameraModel, CentrifugeModel, CompatibilityRule, ContainerModel,
+    FreezeDrierModel, FreezerModel, PipetteModel, PositioningDeviceModel, Trackable, User,
+    VolumetricContainerModel, WeighingInstrumentModel, traits::CompatibleWith,
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::containers::SAFELOCK_TUBE_2ML;
+use crate::trackables::containers::{POLYSTYRENE_BOX, SAFELOCK_TUBE_2ML};
 pub mod ball_mill_instrument;
 pub mod centrifuge_instrument;
 pub mod pipette_1000;
@@ -41,12 +41,26 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) {
         .insert(user.id, conn)
         .unwrap();
 
-    let _freezer = FreezerModel::new()
+    let freezer = FreezerModel::new()
         .name(Some(FREEZER.to_owned()))
         .unwrap()
         .description(Some("-80°C Freezer".to_owned()))
         .unwrap()
         .parent(Some(instrument.id))
+        .unwrap()
+        .created_by(user.id)
+        .unwrap()
+        .insert(user.id, conn)
+        .unwrap();
+
+    let polystyrene_box = ContainerModel::from_name(POLYSTYRENE_BOX, conn)
+        .unwrap()
+        .expect("Polystyrene Box should exist");
+
+    let _rule = CompatibilityRule::new()
+        .left_trackable(freezer.id)
+        .unwrap()
+        .right_trackable(polystyrene_box.id)
         .unwrap()
         .created_by(user.id)
         .unwrap()

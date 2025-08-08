@@ -30,7 +30,7 @@ impl Codegen<'_> {
     /// 1. Columns that are part of the ancestors' of the current table's
     ///    attributes.
     /// 2. Columns that are part of other tables' that require partial builders.
-    pub(super) fn generate_same_as_assigments(
+    pub(super) fn generate_same_as_assignments(
         &self,
         table: &Table,
         current_column: &Column,
@@ -100,7 +100,9 @@ impl Codegen<'_> {
         //
 
         let current_column_ident = current_column.snake_case_ident()?;
+        let current_column_camel_case_ident = current_column.camel_case_ident()?;
         let mut assignments = Vec::new();
+        let attributes_enum = table.insertable_enum_ty()?;
 
         // We iterate over the columns of the current table and we identify whether
         // any of them has a same-as relationship with the current column.
@@ -191,32 +193,26 @@ impl Codegen<'_> {
             let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
             let current_column_table = current_column.table(conn)?;
 
-            // We determine the foreign keys from the current table to the current column,
-            // if any.
-            let current_column_foreign_keys = self
-                .table_extension_network()
-                .unwrap()
-                .extension_foreign_keys_path(table, current_column, conn);
-            let self_extension_path_ident = if let Some(path) = current_column_foreign_keys {
-                let mut full_path = TokenStream::new();
-                for key in path {
-                    let key_ident = key.constraint_ident(conn)?;
-                    full_path.extend(quote! { .#key_ident });
-                }
-                quote! {
-                    self.#full_path
-                }
-            } else {
-                quote! {
-                    self.#current_column_ident
-                }
-            };
+            let same_as_network = self.column_same_as_network().unwrap();
 
-            for (local_column, foreign_column) in self
-                .column_same_as_network()
-                .unwrap()
-                .inferred_same_as_columns(&table, &foreign_table, &current_column)
-            {
+            let mut same_as_columns =
+                same_as_network.inferred_same_as_columns(&table, &foreign_table, &current_column);
+            same_as_columns.extend(same_as_network.same_as_columns(
+                &table,
+                &foreign_table,
+                &current_column,
+                conn,
+            )?);
+
+            for (local_column, foreign_column) in same_as_columns {
+                // If the local column is a primary key that is automatically generated,
+                // we skip it as it is not settable.
+                if local_column.is_part_of_primary_key(conn)?
+                    || foreign_column.is_part_of_primary_key(conn)?
+                {
+                    continue;
+                }
+
                 let local_column_ident = local_column.snake_case_ident()?;
                 let foreign_column_ident = foreign_column.snake_case_ident()?;
                 let foreign_column_setter_ident = foreign_column.getter_ident()?;
@@ -254,9 +250,14 @@ impl Codegen<'_> {
                             );
                         }
                     } else if let Some(foreign) = #current_column_ident #maybe_associated_table_path.#foreign_column_ident {
-                        self.#local_column_ident = Some(foreign)?;
+                        self.#local_column_ident = Some(foreign);
                     } else if let Some(local) = self.#local_column_ident {
-                        #self_extension_path_ident #maybe_associated_table_path.#foreign_column_ident = #self_extension_path_ident #maybe_associated_table_path.#foreign_column_ident.#foreign_column_setter_ident(local)?;
+                        #current_column_ident = #current_column_ident .#foreign_column_setter_ident(local)
+                            .map_err(|e| {
+                                e.into_field_name(|attribute| {
+                                    #attributes_enum::#current_column_camel_case_ident(attribute)
+                                })
+                            })?;
                     }
                 });
             }

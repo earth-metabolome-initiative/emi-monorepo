@@ -578,7 +578,7 @@ impl<ProcedureModel>
     /// `aliquoting_procedure_models`.
     pub fn procedure_aliquoted_from(
         mut self,
-        procedure_aliquoted_from: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_aliquoted_from: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -591,6 +591,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.aliquoted_from, procedure_aliquoted_from.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_aliquoted_from.trackable_id {
+            self.aliquoted_from = Some(foreign);
+        } else if let Some(local) = self.aliquoted_from {
+            procedure_aliquoted_from = procedure_aliquoted_from
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedFrom(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_aliquoted_from = self
             .procedure_aliquoted_from
             .extend_builder(procedure_aliquoted_from)
@@ -612,7 +639,7 @@ impl<ProcedureModel>
     /// `aliquoting_procedure_models`.
     pub fn procedure_aliquoted_into(
         mut self,
-        procedure_aliquoted_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_aliquoted_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -625,6 +652,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.aliquoted_into, procedure_aliquoted_into.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_aliquoted_into.trackable_id {
+            self.aliquoted_into = Some(foreign);
+        } else if let Some(local) = self.aliquoted_into {
+            procedure_aliquoted_into = procedure_aliquoted_into
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedInto(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_aliquoted_into = self
             .procedure_aliquoted_into
             .extend_builder(procedure_aliquoted_into)
@@ -646,7 +700,7 @@ impl<ProcedureModel>
     /// `aliquoting_procedure_models`.
     pub fn procedure_aliquoted_with(
         mut self,
-        procedure_aliquoted_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_aliquoted_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -659,6 +713,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.aliquoted_with, procedure_aliquoted_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_aliquoted_with.trackable_id {
+            self.aliquoted_with = Some(foreign);
+        } else if let Some(local) = self.aliquoted_with {
+            procedure_aliquoted_with = procedure_aliquoted_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedureAliquotedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_aliquoted_with = self
             .procedure_aliquoted_with
             .extend_builder(procedure_aliquoted_with)
@@ -680,7 +761,7 @@ impl<ProcedureModel>
     /// `aliquoting_procedure_models`.
     pub fn procedure_pipette_tip(
         mut self,
-        procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_pipette_tip: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -693,6 +774,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.pipette_tip, procedure_pipette_tip.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_pipette_tip.trackable_id {
+            self.pipette_tip = Some(foreign);
+        } else if let Some(local) = self.pipette_tip {
+            procedure_pipette_tip = procedure_pipette_tip
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureModelAttributes::ProcedurePipetteTip(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_pipette_tip =
             self.procedure_pipette_tip.extend_builder(procedure_pipette_tip).map_err(|e| {
                 e.into_field_name(|attribute| {

@@ -245,8 +245,11 @@ impl Codegen<'_> {
             });
         };
 
-        let (same_as_assigments, mut necessary_columns) =
-            self.generate_same_as_assigments(table, column, conn)?;
+        let (same_as_assignments, mut necessary_columns) =
+            self.generate_same_as_assignments(table, column, conn)?;
+
+        let maybe_mut = if same_as_assignments.is_empty() { None } else { Some(quote! { mut }) };
+
         necessary_columns.push(column.clone());
 
         let maybe_where_constraints =
@@ -291,15 +294,15 @@ impl Codegen<'_> {
             impl #maybe_impl_left_generics #insertable_builder_ident {
                 #[doc = #documentation_message]
                 pub fn #getter_ident #maybe_method_generics (
-                    mut self, #column_snake_case_ident: #argument_type
+                    mut self, #maybe_mut #column_snake_case_ident: #argument_type
                 ) -> Result<Self, web_common_traits::database::InsertError<#insertable_enum>>
                 #maybe_where_constraints
                 {
                     #(#use_requirements)*
                     #(#column_preprocessing)*
                     #maybe_check_constraints
+                    #(#same_as_assignments)*
                     #column_assignment
-                    #(#same_as_assigments)*
                     #updated_by_exception
                     Ok(self)
                 }

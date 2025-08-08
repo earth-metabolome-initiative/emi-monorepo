@@ -285,8 +285,8 @@ where
     fn default() -> Self {
         Self {
             procedure_model: Default::default(),
-            kelvin: Default::default(),
-            kelvin_tolerance_percentage: Some(5f32),
+            kelvin: Some(293.15f32),
+            kelvin_tolerance_percentage: Some(1f32),
             seconds: Some(120f32),
             rotation_per_minute: Some(13000f32),
             centrifuged_with: Default::default(),
@@ -470,7 +470,7 @@ impl<ProcedureModel>
     /// from table `centrifuge_procedure_models`.
     pub fn procedure_centrifuged_container(
         mut self,
-        procedure_centrifuged_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_centrifuged_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -483,6 +483,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.centrifuged_container_id, procedure_centrifuged_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_centrifuged_container_id.trackable_id {
+            self.centrifuged_container_id = Some(foreign);
+        } else if let Some(local) = self.centrifuged_container_id {
+            procedure_centrifuged_container_id = procedure_centrifuged_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_centrifuged_container_id = self
             .procedure_centrifuged_container_id
             .extend_builder(procedure_centrifuged_container_id)
@@ -506,7 +533,7 @@ impl<ProcedureModel>
     /// table `centrifuge_procedure_models`.
     pub fn procedure_centrifuged_with(
         mut self,
-        procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_centrifuged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -519,6 +546,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.centrifuged_with, procedure_centrifuged_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_centrifuged_with.trackable_id {
+            self.centrifuged_with = Some(foreign);
+        } else if let Some(local) = self.centrifuged_with {
+            procedure_centrifuged_with = procedure_centrifuged_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureModelAttributes::ProcedureCentrifugedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_centrifuged_with = self
             .procedure_centrifuged_with
             .extend_builder(procedure_centrifuged_with)

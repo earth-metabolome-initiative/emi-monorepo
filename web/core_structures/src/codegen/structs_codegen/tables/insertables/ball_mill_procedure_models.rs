@@ -284,8 +284,8 @@ where
     fn default() -> Self {
         Self {
             procedure_model: Default::default(),
-            kelvin: Default::default(),
-            kelvin_tolerance_percentage: Some(5f32),
+            kelvin: Some(293.15f32),
+            kelvin_tolerance_percentage: Some(1f32),
             seconds: Some(150f32),
             hertz: Some(25f32),
             milled_with: Default::default(),
@@ -498,7 +498,7 @@ impl<ProcedureModel>
     /// table `ball_mill_procedure_models`.
     pub fn procedure_milled_container(
         mut self,
-        procedure_milled_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_milled_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -511,6 +511,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.milled_container_id, procedure_milled_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureModelAttributes::ProcedureMilledContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_milled_container_id.trackable_id {
+            self.milled_container_id = Some(foreign);
+        } else if let Some(local) = self.milled_container_id {
+            procedure_milled_container_id = procedure_milled_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureModelAttributes::ProcedureMilledContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_milled_container_id = self
             .procedure_milled_container_id
             .extend_builder(procedure_milled_container_id)
@@ -533,7 +560,7 @@ impl<ProcedureModel>
     /// column from table `ball_mill_procedure_models`.
     pub fn procedure_milled_with(
         mut self,
-        procedure_milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_milled_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -546,6 +573,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.milled_with, procedure_milled_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_milled_with.trackable_id {
+            self.milled_with = Some(foreign);
+        } else if let Some(local) = self.milled_with {
+            procedure_milled_with = procedure_milled_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureModelAttributes::ProcedureMilledWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_milled_with =
             self.procedure_milled_with.extend_builder(procedure_milled_with).map_err(|e| {
                 e.into_field_name(|attribute| {

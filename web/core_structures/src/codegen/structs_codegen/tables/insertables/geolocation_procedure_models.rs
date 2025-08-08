@@ -260,7 +260,7 @@ impl<ProcedureModel>
     /// table `geolocation_procedure_models`.
     pub fn procedure_geolocated_with(
         mut self,
-        procedure_geolocated_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_geolocated_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -273,6 +273,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.geolocated_with, procedure_geolocated_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::ProcedureGeolocatedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_geolocated_with.trackable_id {
+            self.geolocated_with = Some(foreign);
+        } else if let Some(local) = self.geolocated_with {
+            procedure_geolocated_with = procedure_geolocated_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureModelAttributes::ProcedureGeolocatedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_geolocated_with = self
             .procedure_geolocated_with
             .extend_builder(procedure_geolocated_with)

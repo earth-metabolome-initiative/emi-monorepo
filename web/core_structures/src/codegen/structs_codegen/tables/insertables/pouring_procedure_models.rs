@@ -362,7 +362,7 @@ impl<ProcedureModel>
     /// column from table `pouring_procedure_models`.
     pub fn procedure_poured_into(
         mut self,
-        procedure_poured_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_poured_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -375,6 +375,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.poured_into, procedure_poured_into.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::ProcedurePouredInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_poured_into.trackable_id {
+            self.poured_into = Some(foreign);
+        } else if let Some(local) = self.poured_into {
+            procedure_poured_into = procedure_poured_into
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureModelAttributes::ProcedurePouredInto(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_poured_into =
             self.procedure_poured_into.extend_builder(procedure_poured_into).map_err(|e| {
                 e.into_field_name(|attribute| {

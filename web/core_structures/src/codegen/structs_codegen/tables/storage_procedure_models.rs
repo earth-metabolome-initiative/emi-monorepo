@@ -199,9 +199,7 @@ impl StorageProcedureModel {
             conn,
         )
     }
-    pub fn storage_procedure_models_parent_container_id_child_contain_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn storage_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

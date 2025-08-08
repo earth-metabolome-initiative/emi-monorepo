@@ -200,9 +200,7 @@ impl FreezingProcedureModel {
             conn,
         )
     }
-    pub fn freezing_procedure_models_frozen_with_frozen_container_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn freezing_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

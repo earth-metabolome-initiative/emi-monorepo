@@ -223,9 +223,7 @@ impl InsertableFreezingProcedureModel {
             conn,
         )
     }
-    pub fn freezing_procedure_models_frozen_with_frozen_container_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn freezing_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -280,7 +278,7 @@ where
     fn default() -> Self {
         Self {
             procedure_model: Default::default(),
-            kelvin: Default::default(),
+            kelvin: Some(203.15f32),
             kelvin_tolerance_percentage: Some(5f32),
             seconds: Some(43200f32),
             frozen_with: Default::default(),
@@ -459,7 +457,7 @@ impl<ProcedureModel>
     /// table `freezing_procedure_models`.
     pub fn procedure_frozen_container(
         mut self,
-        procedure_frozen_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_frozen_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -472,6 +470,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.frozen_container_id, procedure_frozen_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelAttributes::ProcedureFrozenContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_frozen_container_id.trackable_id {
+            self.frozen_container_id = Some(foreign);
+        } else if let Some(local) = self.frozen_container_id {
+            procedure_frozen_container_id = procedure_frozen_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelAttributes::ProcedureFrozenContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_frozen_container_id = self
             .procedure_frozen_container_id
             .extend_builder(procedure_frozen_container_id)
@@ -494,7 +519,7 @@ impl<ProcedureModel>
     /// column from table `freezing_procedure_models`.
     pub fn procedure_frozen_with(
         mut self,
-        procedure_frozen_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_frozen_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -507,6 +532,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.frozen_with, procedure_frozen_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_frozen_with.trackable_id {
+            self.frozen_with = Some(foreign);
+        } else if let Some(local) = self.frozen_with {
+            procedure_frozen_with = procedure_frozen_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureModelAttributes::ProcedureFrozenWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_frozen_with =
             self.procedure_frozen_with.extend_builder(procedure_frozen_with).map_err(|e| {
                 e.into_field_name(|attribute| {

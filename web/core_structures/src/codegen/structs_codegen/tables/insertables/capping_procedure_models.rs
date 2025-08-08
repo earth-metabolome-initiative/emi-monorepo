@@ -350,7 +350,7 @@ impl<ProcedureModel>
     /// column from table `capping_procedure_models`.
     pub fn procedure_capped_with(
         mut self,
-        procedure_capped_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_capped_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -363,6 +363,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.capped_with, procedure_capped_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_capped_with.trackable_id {
+            self.capped_with = Some(foreign);
+        } else if let Some(local) = self.capped_with {
+            procedure_capped_with = procedure_capped_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelAttributes::ProcedureCappedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_capped_with =
             self.procedure_capped_with.extend_builder(procedure_capped_with).map_err(|e| {
                 e.into_field_name(|attribute| {
@@ -381,7 +407,7 @@ impl<ProcedureModel>
     /// column from table `capping_procedure_models`.
     pub fn procedure_container(
         mut self,
-        procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -394,6 +420,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.container_id, procedure_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelAttributes::ProcedureContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_container_id.trackable_id {
+            self.container_id = Some(foreign);
+        } else if let Some(local) = self.container_id {
+            procedure_container_id = procedure_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureModelAttributes::ProcedureContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_container_id =
             self.procedure_container_id.extend_builder(procedure_container_id).map_err(|e| {
                 e.into_field_name(|attribute| {

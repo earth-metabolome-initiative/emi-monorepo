@@ -525,7 +525,7 @@ impl<
     ///Sets the value of the `freeze_drying_procedure_models.procedure_freeze_dried_container_id` column from table `freeze_drying_procedure_models`.
     pub fn procedure_freeze_dried_container(
         mut self,
-        procedure_freeze_dried_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_freeze_dried_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -538,6 +538,34 @@ impl<
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (
+            self.freeze_dried_container_id,
+            procedure_freeze_dried_container_id.trackable_id,
+        ) {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_freeze_dried_container_id.trackable_id {
+            self.freeze_dried_container_id = Some(foreign);
+        } else if let Some(local) = self.freeze_dried_container_id {
+            procedure_freeze_dried_container_id = procedure_freeze_dried_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_freeze_dried_container_id = self
             .procedure_freeze_dried_container_id
             .extend_builder(procedure_freeze_dried_container_id)
@@ -558,7 +586,7 @@ impl<
     ///Sets the value of the `freeze_drying_procedure_models.procedure_freeze_dried_with` column from table `freeze_drying_procedure_models`.
     pub fn procedure_freeze_dried_with(
         mut self,
-        procedure_freeze_dried_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_freeze_dried_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -571,6 +599,38 @@ impl<
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (
+            self.freeze_dried_with,
+            procedure_freeze_dried_with.trackable_id,
+        ) {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_freeze_dried_with.trackable_id {
+            self.freeze_dried_with = Some(foreign);
+        } else if let Some(local) = self.freeze_dried_with {
+            procedure_freeze_dried_with = procedure_freeze_dried_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::ProcedureFreezeDriedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
+
+        println!("1) procedure_freeze_dried_with: {procedure_freeze_dried_with:?}");
+        println!("2) procedure_freeze_dried_with: {:?}", self.procedure_freeze_dried_with);
+
         self.procedure_freeze_dried_with = self
             .procedure_freeze_dried_with
             .extend_builder(procedure_freeze_dried_with)

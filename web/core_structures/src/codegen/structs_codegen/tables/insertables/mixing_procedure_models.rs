@@ -389,7 +389,7 @@ impl<ProcedureModel>
     /// column from table `mixing_procedure_models`.
     pub fn procedure_measured_with(
         mut self,
-        procedure_measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_measured_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -402,6 +402,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.measured_with, procedure_measured_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelAttributes::ProcedureMeasuredWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_measured_with.trackable_id {
+            self.measured_with = Some(foreign);
+        } else if let Some(local) = self.measured_with {
+            procedure_measured_with = procedure_measured_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelAttributes::ProcedureMeasuredWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_measured_with =
             self.procedure_measured_with.extend_builder(procedure_measured_with).map_err(|e| {
                 e.into_field_name(|attribute| {
@@ -420,7 +447,7 @@ impl<ProcedureModel>
     /// column from table `mixing_procedure_models`.
     pub fn procedure_mixed_into(
         mut self,
-        procedure_mixed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_mixed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -433,6 +460,31 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.mixed_with, procedure_mixed_into.trackable_id) {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelAttributes::ProcedureMixedInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_mixed_into.trackable_id {
+            self.mixed_with = Some(foreign);
+        } else if let Some(local) = self.mixed_with {
+            procedure_mixed_into = procedure_mixed_into
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableMixingProcedureModelAttributes::ProcedureMixedInto(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_mixed_into =
             self.procedure_mixed_into.extend_builder(procedure_mixed_into).map_err(|e| {
                 e.into_field_name(|attribute| {

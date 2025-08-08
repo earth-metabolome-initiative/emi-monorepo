@@ -300,9 +300,9 @@ CREATE TABLE IF NOT EXISTS disposal_procedure_models (
 CREATE TABLE IF NOT EXISTS storage_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
-	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
+	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
 		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
 	),
@@ -327,12 +327,12 @@ CREATE TABLE IF NOT EXISTS storage_procedure_models (
 	-- We check that the `child_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_child_container_id, child_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `parent_container_id` is indeed a container that can hold the `child_container_id`.
-	FOREIGN KEY (parent_container_id, child_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT storage_pm_compatibility_rule FOREIGN KEY (parent_container_id, child_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id)
 );
 CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
@@ -364,14 +364,14 @@ CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 		frozen_container_id
 	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `frozen_with` is indeed a container that can hold the `frozen_container_id`.
-	FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT freezing_pm_compatibility_rule FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
-	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
+	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
 		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
 	),
@@ -400,14 +400,14 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 	-- We check that the `procedure_centrifuged_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_centrifuged_container_id, centrifuged_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `centrifuged_with` is indeed a container that can hold the `centrifuged_with`.
-	FOREIGN KEY (centrifuged_with, centrifuged_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT centrifuge_pm_compatibility_rule FOREIGN KEY (centrifuged_with, centrifuged_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
-	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
+	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
 		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
 		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
 	),
@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	-- We check that the `milled_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_milled_container_id, milled_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `milled_with` is indeed a ball mill machine that can hold the `milled_container_id`.
-	FOREIGN KEY (milled_with, milled_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT ball_mill_pm_compatibility_rule FOREIGN KEY (milled_with, milled_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
@@ -472,7 +472,7 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	-- We check that the `freeze_dried_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_freeze_dried_container_id, freeze_dried_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `freeze_dried_container_id` is indeed a freeze drier that can hold the `freeze_dried_with`.
-	FOREIGN KEY (freeze_dried_with, freeze_dried_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT freeze_drying_pm_compatibility_rule FOREIGN KEY (freeze_dried_with, freeze_dried_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS geolocation_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),

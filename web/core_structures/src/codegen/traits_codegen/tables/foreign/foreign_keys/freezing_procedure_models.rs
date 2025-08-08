@@ -6,7 +6,7 @@ pub struct FreezingProcedureModelForeignKeys {
     pub frozen_with: Option<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
     pub frozen_container:
         Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
-    pub freezing_procedure_models_frozen_with_frozen_container_id_fkey:
+    pub freezing_pm_compatibility_rule:
         Option<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -44,7 +44,7 @@ impl web_common_traits::prelude::HasForeignKeys
         foreign_keys.procedure_model.is_some()
             && foreign_keys.frozen_with.is_some()
             && foreign_keys.frozen_container.is_some()
-            && foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey.is_some()
+            && foreign_keys.freezing_pm_compatibility_rule.is_some()
     }
     fn update(
         &self,
@@ -63,8 +63,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.frozen_with == compatibility_rules.left_trackable_id
                     && self.frozen_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey =
-                        Some(compatibility_rules);
+                    foreign_keys.freezing_pm_compatibility_rule = Some(compatibility_rules);
                     updated = true;
                 }
             }
@@ -75,8 +74,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.frozen_with == compatibility_rules.left_trackable_id
                     && self.frozen_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.freezing_procedure_models_frozen_with_frozen_container_id_fkey =
-                        None;
+                    foreign_keys.freezing_pm_compatibility_rule = None;
                     updated = true;
                 }
             }

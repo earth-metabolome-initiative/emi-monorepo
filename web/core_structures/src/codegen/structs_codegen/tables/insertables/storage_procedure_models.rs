@@ -220,9 +220,7 @@ impl InsertableStorageProcedureModel {
             conn,
         )
     }
-    pub fn storage_procedure_models_parent_container_id_child_contain_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn storage_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -276,8 +274,8 @@ where
     fn default() -> Self {
         Self {
             procedure_model: Default::default(),
-            kelvin: Default::default(),
-            kelvin_tolerance_percentage: Some(5f32),
+            kelvin: Some(293.15f32),
+            kelvin_tolerance_percentage: Some(1f32),
             parent_container_id: Default::default(),
             procedure_parent_container_id: Default::default(),
             child_container_id: Default::default(),
@@ -692,7 +690,7 @@ impl<ProcedureModel>
     /// table `storage_procedure_models`.
     pub fn procedure_child_container(
         mut self,
-        procedure_child_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_child_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -705,6 +703,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.child_container_id, procedure_child_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_child_container_id.trackable_id {
+            self.child_container_id = Some(foreign);
+        } else if let Some(local) = self.child_container_id {
+            procedure_child_container_id = procedure_child_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureChildContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_child_container_id = self
             .procedure_child_container_id
             .extend_builder(procedure_child_container_id)
@@ -726,7 +751,7 @@ impl<ProcedureModel>
     /// table `storage_procedure_models`.
     pub fn procedure_parent_container(
         mut self,
-        procedure_parent_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_parent_container_id: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -739,6 +764,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.parent_container_id, procedure_parent_container_id.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_parent_container_id.trackable_id {
+            self.parent_container_id = Some(foreign);
+        } else if let Some(local) = self.parent_container_id {
+            procedure_parent_container_id = procedure_parent_container_id
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_parent_container_id = self
             .procedure_parent_container_id
             .extend_builder(procedure_parent_container_id)

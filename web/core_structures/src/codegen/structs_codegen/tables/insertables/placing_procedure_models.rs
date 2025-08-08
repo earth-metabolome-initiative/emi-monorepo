@@ -266,7 +266,7 @@ impl<ProcedureModel>
     /// column from table `placing_procedure_models`.
     pub fn procedure_placed_into(
         mut self,
-        procedure_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_placed_into: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -279,6 +279,32 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) = (self.placed_into, procedure_placed_into.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::ProcedurePlacedInto(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_placed_into.trackable_id {
+            self.placed_into = Some(foreign);
+        } else if let Some(local) = self.placed_into {
+            procedure_placed_into = procedure_placed_into
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureModelAttributes::ProcedurePlacedInto(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_placed_into =
             self.procedure_placed_into.extend_builder(procedure_placed_into).map_err(|e| {
                 e.into_field_name(|attribute| {

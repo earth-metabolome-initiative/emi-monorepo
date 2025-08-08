@@ -263,6 +263,61 @@ impl ColumnSameAsNetwork {
         Ok(dot)
     }
 
+    /// Returns the same-as columns associated to the given column and
+    /// target table.
+    ///
+    /// # Arguments
+    ///
+    /// * `source_table`: The column for which to find same-as columns.
+    /// * `target_table`: The target table to which the same-as columns should
+    ///   belong.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if there is an issue with the database connection.
+    pub fn same_as_columns(
+        &self,
+        source_table: &Table,
+        target_table: &Table,
+        passing_through: &Column,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(&Column, &Column)>, WebCodeGenError> {
+        Ok(self
+            .same_as_graph
+            .sparse_coordinates()
+            .filter_map(move |(src_id, dst_id)| {
+                let src_column = self.same_as_graph.nodes_vocabulary().get(src_id)?;
+                let dst_column = self.same_as_graph.nodes_vocabulary().get(dst_id)?;
+
+                if src_column.table_name != source_table.table_name
+                    || src_column.table_schema != source_table.table_schema
+                    || dst_column.table_name != target_table.table_name
+                    || dst_column.table_schema != target_table.table_schema
+                {
+                    return None;
+                }
+
+                // We check if this source column appears in foreign keys with the
+                // provided passing through column, and has in the foreign columns
+                // the target table.
+                for foreign_key in src_column.foreign_keys(conn).ok()? {
+                    let local_columns = foreign_key.columns(conn).ok()?;
+                    if !local_columns.contains(passing_through) {
+                        continue;
+                    }
+                    let foreign_columns = foreign_key.foreign_columns(conn).ok()?;
+                    if !foreign_columns.contains(dst_column) {
+                        continue;
+                    }
+
+                    return Some((src_column, dst_column));
+                }
+
+                None
+            })
+            .collect())
+    }
+
     /// Returns the inferred same-as columns associated to the given column and
     /// target table.
     ///

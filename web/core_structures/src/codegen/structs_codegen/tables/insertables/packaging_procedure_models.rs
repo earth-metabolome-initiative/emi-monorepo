@@ -260,7 +260,7 @@ impl<ProcedureModel>
     /// `packaging_procedure_models`.
     pub fn procedure_packaged_with(
         mut self,
-        procedure_packaged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
+        mut procedure_packaged_with: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -273,6 +273,33 @@ impl<ProcedureModel>
         >,
     {
         use web_common_traits::database::ExtendableBuilder;
+        if let (Some(local), Some(foreign)) =
+            (self.packaged_with, procedure_packaged_with.trackable_id)
+        {
+            if local != foreign {
+                return Err(
+                    web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureModelAttributes::ProcedurePackagedWith(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::TrackableId,
+                            ),
+                        ),
+                    ),
+                );
+            }
+        } else if let Some(foreign) = procedure_packaged_with.trackable_id {
+            self.packaged_with = Some(foreign);
+        } else if let Some(local) = self.packaged_with {
+            procedure_packaged_with = procedure_packaged_with
+                .trackable(local)
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureModelAttributes::ProcedurePackagedWith(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
         self.procedure_packaged_with =
             self.procedure_packaged_with.extend_builder(procedure_packaged_with).map_err(|e| {
                 e.into_field_name(|attribute| {
