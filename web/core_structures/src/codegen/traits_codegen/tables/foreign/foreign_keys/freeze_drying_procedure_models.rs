@@ -5,7 +5,7 @@ pub struct FreezeDryingProcedureModelForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub freeze_dried_with: Option<
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
     >,
     pub freeze_dried_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
@@ -33,7 +33,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDrierModel(
                         self.freeze_dried_with,
                     ),
                 ),
@@ -71,30 +71,6 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::BallMillMachineModel(
-                    ball_mill_machine_models,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.freeze_dried_with == ball_mill_machine_models.id {
-                    foreign_keys.freeze_dried_with = Some(ball_mill_machine_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::BallMillMachineModel(
-                    ball_mill_machine_models,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.freeze_dried_with == ball_mill_machine_models.id {
-                    foreign_keys.freeze_dried_with = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::CompatibilityRule(compatibility_rules),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -119,6 +95,26 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                         == compatibility_rules.right_trackable_id
                 {
                     foreign_keys.freeze_drying_pm_compatibility_rule = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::FreezeDrierModel(freeze_drier_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.freeze_dried_with == freeze_drier_models.id {
+                    foreign_keys.freeze_dried_with = Some(freeze_drier_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::FreezeDrierModel(freeze_drier_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.freeze_dried_with == freeze_drier_models.id {
+                    foreign_keys.freeze_dried_with = None;
                     updated = true;
                 }
             }

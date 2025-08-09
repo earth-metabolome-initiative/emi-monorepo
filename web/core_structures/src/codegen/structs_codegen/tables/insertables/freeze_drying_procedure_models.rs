@@ -102,29 +102,29 @@ impl InsertableFreezeDryingProcedureModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+            crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::table(),
+                crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel::table(),
                 self.freeze_dried_with,
             ),
             conn,

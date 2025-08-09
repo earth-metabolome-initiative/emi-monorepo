@@ -19,21 +19,6 @@ where
     >,
     C: diesel::connection::LoadConnection,
     ProcedureModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
-    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
@@ -53,15 +38,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.freeze_dried_with(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
