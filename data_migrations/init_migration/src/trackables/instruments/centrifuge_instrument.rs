@@ -22,8 +22,8 @@ pub(crate) fn init_eppendorf_centrifuge(
     let brand = eppendorf(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(Some(device_name.to_owned()))?
-        .description(Some("Eppendorf centrifuge, used to precipitate solid material.".to_owned()))?
+        .name(device_name.to_owned())?
+        .description("Eppendorf centrifuge, used to precipitate solid material.".to_owned())?
         .created_by(user.id)?
         .parent(Some(centrifuge.id))?
         .brand(brand.id)?

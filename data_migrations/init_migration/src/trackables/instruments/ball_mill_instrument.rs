@@ -22,10 +22,10 @@ pub(crate) fn init_retsch_mm400(
     let brand = retsch(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(Some(device_name.to_owned()))?
-        .description(Some(
+        .name(device_name.to_owned())?
+        .description(
             "Retsch MM 400 Ball Mill, used to reduce solid material into powder.".to_owned(),
-        ))?
+        )?
         .created_by(user.id)?
         .parent(Some(ball_mill.id))?
         .brand(brand.id)?

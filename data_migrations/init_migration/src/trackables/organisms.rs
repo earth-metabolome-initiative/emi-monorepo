@@ -9,14 +9,14 @@ pub(crate) const SAMPLE: &str = "Sample";
 
 pub(crate) fn init_organisms(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     let _organisms = Trackable::new()
-        .name(Some(ORGANISM.to_owned()))?
-        .description(Some("Organisms used in laboratory procedures".to_owned()))?
+        .name(ORGANISM.to_owned())?
+        .description("Organisms used in laboratory procedures".to_owned())?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _sample = Trackable::new()
-        .name(Some(SAMPLE.to_owned()))?
-        .description(Some("Sample of an organism".to_owned()))?
+        .name(SAMPLE.to_owned())?
+        .description("Sample of an organism".to_owned())?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 

@@ -13,15 +13,15 @@ pub(super) fn init_safelock_tubes(
     conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
     let safelock_tube = ContainerModel::new()
-        .name(Some(SAFELOCK_TUBE.to_owned()))?
-        .description(Some("Safelock Tube, used to perform extractions".to_owned()))?
+        .name(SAFELOCK_TUBE.to_owned())?
+        .description("Safelock Tube, used to perform extractions".to_owned())?
         .parent(Some(wet_lab_container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _safelock_tube_2ml = VolumetricContainerModel::new()
-        .name(Some(SAFELOCK_TUBE_2ML.to_owned()))?
-        .description(Some("Safelock tube of 2ml, used for sample extraction.".to_owned()))?
+        .name(SAFELOCK_TUBE_2ML.to_owned())?
+        .description("Safelock tube of 2ml, used for sample extraction.".to_owned())?
         .parent(Some(safelock_tube.id))?
         .created_by(user.id)?
         .liters(0.002)?

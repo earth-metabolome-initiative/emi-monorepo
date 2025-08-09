@@ -25,8 +25,8 @@ pub(crate) fn init_gilson_pipette_200(
     let brand = gilson(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(Some(device_name.to_owned()))?
-        .description(Some("Gilson pipette 200, used to precipitate solid material.".to_owned()))?
+        .name(device_name.to_owned())?
+        .description("Gilson pipette 200, used to precipitate solid material.".to_owned())?
         .created_by(user.id)?
         .parent(Some(pipette.id))?
         .brand(brand.id)?
@@ -48,8 +48,8 @@ pub(crate) fn init_sarstedt_pipette_tip_200(
     let brand = sarstedt(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(Some(device_name.to_owned()))?
-        .description(Some("Tip for Gilson Pipette 200µl to manipulate liquids".to_owned()))?
+        .name(device_name.to_owned())?
+        .description("Tip for Gilson Pipette 200µl to manipulate liquids".to_owned())?
         .created_by(user.id)?
         .parent(Some(pipette_tip.id))?
         .brand(brand.id)?

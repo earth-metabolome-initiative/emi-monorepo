@@ -17,23 +17,23 @@ pub(super) fn init_conical_centrifugal_tubes(
     conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
     let conical_tube = ContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE.to_owned()))?
-        .description(Some("Conical tube, a common container for samples".to_owned()))?
+        .name(CONICAL_CENTRIFUGAL_TUBE.to_owned())?
+        .description("Conical tube, a common container for samples".to_owned())?
         .parent(Some(wet_lab_container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let conical_tube_50ml = VolumetricContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML.to_owned()))?
-        .description(Some("Conical tube of 50ml, used for sample collection.".to_owned()))?
+        .name(CONICAL_CENTRIFUGAL_TUBE_50ML.to_owned())?
+        .description("Conical tube of 50ml, used for sample collection.".to_owned())?
         .parent(Some(conical_tube.id))?
         .created_by(user.id)?
         .liters(0.05)?
         .insert(user.id, conn)?;
 
     let conical_tube_rack = ContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned()))?
-        .description(Some("Conical tube rack, a common container for conical tubes".to_owned()))?
+        .name(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned())?
+        .description("Conical tube rack, a common container for conical tubes".to_owned())?
         .parent(Some(container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;

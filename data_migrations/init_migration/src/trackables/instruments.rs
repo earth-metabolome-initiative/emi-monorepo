@@ -32,14 +32,14 @@ pub const CAMERA: &str = "Camera";
 
 pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     let instrument = core_structures::Trackable::new()
-        .name(Some("Instrument".to_owned()))?
-        .description(Some("Instruments used in laboratory procedures".to_owned()))?
+        .name("Instrument".to_owned())?
+        .description("Instruments used in laboratory procedures".to_owned())?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let freezer = FreezerModel::new()
-        .name(Some(FREEZER.to_owned()))?
-        .description(Some("-80°C Freezer".to_owned()))?
+        .name(FREEZER.to_owned())?
+        .description("-80°C Freezer".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
@@ -53,22 +53,22 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::
         .insert(user.id, conn)?;
 
     let _freeze_dryer = FreezeDrierModel::new()
-        .name(Some(FREEZE_DRYER.to_owned()))?
-        .description(Some("Freeze dryer".to_owned()))?
+        .name(FREEZE_DRYER.to_owned())?
+        .description("Freeze dryer".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _weighing_scale = WeighingInstrumentModel::new()
-        .name(Some(WEIGHING_SCALE.to_owned()))?
-        .description(Some("Weighing scale for weighing samples".to_owned()))?
+        .name(WEIGHING_SCALE.to_owned())?
+        .description("Weighing scale for weighing samples".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let ball_mill_machine = BallMillMachineModel::new()
-        .name(Some(BALL_MILL_MACHINE.to_owned()))?
-        .description(Some("Ball mill machine for grinding samples".to_owned()))?
+        .name(BALL_MILL_MACHINE.to_owned())?
+        .description("Ball mill machine for grinding samples".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
@@ -78,8 +78,8 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::
     ball_mill_machine.compatible_with(&safelock_2ml, user, conn)?;
 
     let safelock_centrifuge = CentrifugeModel::new()
-        .name(Some(SAFELOCK_CENTRIFUGE.to_owned()))?
-        .description(Some("Centrifuge for separating samples".to_owned()))?
+        .name(SAFELOCK_CENTRIFUGE.to_owned())?
+        .description("Centrifuge for separating samples".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
@@ -87,58 +87,58 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::
     safelock_centrifuge.compatible_with(&safelock_2ml, user, conn)?;
 
     let _geolocation_instrument = PositioningDeviceModel::new()
-        .name(Some(GEOLOCATION_INSTRUMENT.to_owned()))?
-        .description(Some("Geolocation instrument for tracking positions".to_owned()))?
+        .name(GEOLOCATION_INSTRUMENT.to_owned())?
+        .description("Geolocation instrument for tracking positions".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _camera_instrument = CameraModel::new()
-        .name(Some(CAMERA.to_owned()))?
-        .description(Some("Camera for capturing images".to_owned()))?
+        .name(CAMERA.to_owned())?
+        .description("Camera for capturing images".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let pipettes = Trackable::new()
-        .name(Some(PIPETTES.to_owned()))?
-        .description(Some("Pipettes for liquid handling".to_owned()))?
+        .name(PIPETTES.to_owned())?
+        .description("Pipettes for liquid handling".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let pipette_tips = Trackable::new()
-        .name(Some(PIPETTE_TIPS.to_owned()))?
-        .description(Some("Pipette tips for liquid handling".to_owned()))?
+        .name(PIPETTE_TIPS.to_owned())?
+        .description("Pipette tips for liquid handling".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _pipettes_1000 = VolumetricContainerModel::new()
-        .name(Some(PIPETTES_1000.to_owned()))?
-        .description(Some("Pipettes for liquid handling".to_owned()))?
+        .name(PIPETTES_1000.to_owned())?
+        .description("Pipettes for liquid handling".to_owned())?
         .parent(Some(pipettes.id))?
         .created_by(user.id)?
         .liters(0.001)?
         .insert(user.id, conn)?;
 
     let _pipette_tips_1000 = Trackable::new()
-        .name(Some(PIPETTE_TIPS_1000.to_owned()))?
-        .description(Some("Pipette tips for liquid handling".to_owned()))?
+        .name(PIPETTE_TIPS_1000.to_owned())?
+        .description("Pipette tips for liquid handling".to_owned())?
         .parent(Some(pipette_tips.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _pipettes_200 = PipetteModel::new()
-        .name(Some(PIPETTES_200.to_owned()))?
-        .description(Some("Pipettes for liquid handling".to_owned()))?
+        .name(PIPETTES_200.to_owned())?
+        .description("Pipettes for liquid handling".to_owned())?
         .parent(Some(pipettes.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _pipette_tips_200 = Trackable::new()
-        .name(Some(PIPETTE_TIPS_200.to_owned()))?
-        .description(Some("Pipette tips for liquid handling".to_owned()))?
+        .name(PIPETTE_TIPS_200.to_owned())?
+        .description("Pipette tips for liquid handling".to_owned())?
         .parent(Some(pipette_tips.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;

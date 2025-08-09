@@ -14,11 +14,11 @@ pub(super) fn init_wrappers(
     conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
     let coffee_filter_wrapper = ContainerModel::new()
-        .name(Some(COFFEE_FILTER_WRAPPER.to_owned()))?
-        .description(Some(
+        .name(COFFEE_FILTER_WRAPPER.to_owned())?
+        .description(
             "Coffee filters used to wrap sample in the field prior to storage in Falcon tubes"
                 .to_owned(),
-        ))?
+        )?
         .parent(Some(wet_lab_container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;

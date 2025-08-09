@@ -21,54 +21,52 @@ pub const POLYSTYRENE_BOX: &str = "Polystyrene Box";
 
 pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     let container = ContainerModel::new()
-        .name(Some("Container".to_owned()))?
-        .description(Some("Containers used in laboratory procedures".to_owned()))?
+        .name("Container".to_owned())?
+        .description("Containers used in laboratory procedures".to_owned())?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _bottle = ContainerModel::new()
-        .name(Some(BOTTLE.to_owned()))?
-        .description(Some("Bottle, a common container for liquids".to_owned()))?
+        .name(BOTTLE.to_owned())?
+        .description("Bottle, a common container for liquids".to_owned())?
         .parent(Some(container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let sample_container = ContainerModel::new()
-        .name(Some(SAMPLE_CONTAINER.to_owned()))?
-        .description(Some("Sample container, a common container for samples".to_owned()))?
+        .name(SAMPLE_CONTAINER.to_owned())?
+        .description("Sample container, a common container for samples".to_owned())?
         .parent(Some(container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let r#box = ContainerModel::new()
-        .name(Some(BOX.to_owned()))?
-        .description(Some("Box, a common container for samples".to_owned()))?
+        .name(BOX.to_owned())?
+        .description("Box, a common container for samples".to_owned())?
         .parent(Some(container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let polystyrene_box = ContainerModel::new()
-        .name(Some(POLYSTYRENE_BOX.to_owned()))?
-        .description(Some(
-            "Polystyrene box, a container typically used for liquid nitrogen".to_owned(),
-        ))?
+        .name(POLYSTYRENE_BOX.to_owned())?
+        .description("Polystyrene box, a container typically used for liquid nitrogen".to_owned())?
         .parent(Some(r#box.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _shelf = ContainerModel::new()
-        .name(Some(SHELF.to_owned()))?
-        .description(Some("Shelf, a common container for storing other containers".to_owned()))?
+        .name(SHELF.to_owned())?
+        .description("Shelf, a common container for storing other containers".to_owned())?
         .parent(Some(container.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _sprayer = ContainerModel::new()
-        .name(Some(SPRAYER.to_owned()))
+        .name(SPRAYER.to_owned())
         ?
-        .description(Some(
+        .description(
             "Sprayer, a container for liquids, usually Ethanol, used in laboratory or field procedures".to_owned(),
-        ))
+        )
         ?
         .parent(Some(container.id))
         ?

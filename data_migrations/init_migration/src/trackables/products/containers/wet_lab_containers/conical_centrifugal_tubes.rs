@@ -26,8 +26,8 @@ pub(crate) fn init_greiner_cct(
     let conical_tube_50ml = Trackable::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)?;
     let greiner = greiner_bio_one(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(conical_tube.to_owned()))?
-        .description(Some("Conical sample tube of 50ml, used for sample collection.".to_owned()))?
+        .name(conical_tube.to_owned())?
+        .description("Conical sample tube of 50ml, used for sample collection.".to_owned())?
         .created_by(user.id)?
         .brand(greiner.id)?
         .parent(Some(conical_tube_50ml.id))?
@@ -48,10 +48,10 @@ pub(crate) fn init_fisherbrand_cct_rack(
     let conical_tube_rack_50ml = Trackable::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK, conn)?;
     let fisherbrand = fisherbrand(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(conical_tube.to_owned()))?
-        .description(Some(
+        .name(conical_tube.to_owned())?
+        .description(
             "Rack for Conical sample tube of 50ml, used to store dried samples library.".to_owned(),
-        ))?
+        )?
         .created_by(user.id)?
         .brand(fisherbrand.id)?
         .parent(Some(conical_tube_rack_50ml.id))?

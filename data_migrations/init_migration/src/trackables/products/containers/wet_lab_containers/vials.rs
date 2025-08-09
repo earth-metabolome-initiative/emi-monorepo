@@ -25,11 +25,11 @@ pub(crate) fn init_macherey_nagel_vial(
     let vial_1_5ml = Trackable::from_name(VIAL_1_5ML, conn)?;
     let macherey_nagel = macherey_nagel(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(vial.to_owned()))?
-        .description(Some(
+        .name(vial.to_owned())?
+        .description(
             "Macherey Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis."
                 .to_owned(),
-        ))?
+        )?
         .created_by(user.id)?
         .brand(macherey_nagel.id)?
         .parent(Some(vial_1_5ml.id))?
@@ -54,8 +54,8 @@ pub(crate) fn init_fisherbrand_kryobox_vial_box(
     let vial_box_trackable = Trackable::from_name(VIAL_BOX, conn)?;
     let fisherbrand = fisherbrand(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(vial_box.to_owned()))?
-        .description(Some("Fisherbrand Kryobox Vial Box, used to store vials.".to_owned()))?
+        .name(vial_box.to_owned())?
+        .description("Fisherbrand Kryobox Vial Box, used to store vials.".to_owned())?
         .created_by(user.id)?
         .brand(fisherbrand.id)?
         .parent(Some(vial_box_trackable.id))?
@@ -75,12 +75,11 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
     let splitted_cap_trackable = Trackable::from_name(VIAL_1_5ML_CAP_SPLITTED, conn)?;
     let macherey_nagel = macherey_nagel(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(splitted_cap.to_owned()))
+        .name(splitted_cap.to_owned())
         ?
-        .description(Some("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.".to_owned()))
+        .description("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.".to_owned())
         ?
-        .created_by(user.id)
-        ?
+        .created_by(user.id)?
         .brand(macherey_nagel.id)
         ?
         .parent(Some(splitted_cap_trackable.id))
@@ -102,10 +101,10 @@ pub(crate) fn init_advion_interchim_sealed_cap(
     let sealed_cap_trackable = Trackable::from_name(VIAL_1_5ML_SEALED_CAP, conn)?;
     let advion_interchim = advion_interchim(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(sealed_cap.to_owned()))?
-        .description(Some(
+        .name(sealed_cap.to_owned())?
+        .description(
             "Avion Interchim Sealed Cap 1.5ml, used to seal Vial 1.5ml for storage.".to_owned(),
-        ))?
+        )?
         .created_by(user.id)?
         .brand(advion_interchim.id)?
         .parent(Some(sealed_cap_trackable.id))?
@@ -125,9 +124,9 @@ pub(crate) fn init_vici_schweiz_insert(
     let insert_trackable = Trackable::from_name(VIAL_INSERT_200UL, conn)?;
     let vici_schweiz = vici_schweiz(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(insert.to_owned()))
+        .name(insert.to_owned())
         ?
-        .description(Some("VICI Schweiz insert, used to decrease needed amount of extract for mass spectrometry analysis.".to_owned()))
+        .description("VICI Schweiz insert, used to decrease needed amount of extract for mass spectrometry analysis.".to_owned())
         ?
         .created_by(user.id)
         ?

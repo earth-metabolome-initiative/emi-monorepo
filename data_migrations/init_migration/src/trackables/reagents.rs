@@ -12,14 +12,14 @@ pub const LIQUID_NITROGEN: &str = "Liquid nitrogen";
 
 pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     let reagent_category = core_structures::Trackable::new()
-        .name(Some("Reagent".to_owned()))?
-        .description(Some("Common solvents used in laboratory procedures".to_owned()))?
+        .name("Reagent".to_owned())?
+        .description("Common solvents used in laboratory procedures".to_owned())?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     let _ethanol = Reagent::new()
-        .name(Some(ETHANOL_95.to_owned()))?
-        .description(Some("Absolute Ethanol, >= 95%, with 5% isopropanol".to_owned()))?
+        .name(ETHANOL_95.to_owned())?
+        .description("Absolute Ethanol, >= 95%, with 5% isopropanol".to_owned())?
         .parent(Some(reagent_category.id))?
         .purity(95.0)?
         .cas_code("64-17-5")?
@@ -28,8 +28,8 @@ pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .insert(user.id, conn)?;
 
     let _methanol = Reagent::new()
-        .name(Some(METHANOL_HPLC.to_owned()))?
-        .description(Some("Methanol, >= 99.8%, HPLC grade".to_owned()))?
+        .name(METHANOL_HPLC.to_owned())?
+        .description("Methanol, >= 99.8%, HPLC grade".to_owned())?
         .parent(Some(reagent_category.id))?
         .purity(99.8)?
         .cas_code("67-56-1")?
@@ -38,8 +38,8 @@ pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .insert(user.id, conn)?;
 
     let _formic_acid = Reagent::new()
-        .name(Some(FORMIC_ACID.to_owned()))?
-        .description(Some("Formic acid, 98+%, pure".to_owned()))?
+        .name(FORMIC_ACID.to_owned())?
+        .description("Formic acid, 98+%, pure".to_owned())?
         .parent(Some(reagent_category.id))?
         .purity(98.0)?
         .cas_code("64-18-6")?
@@ -48,8 +48,8 @@ pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .insert(user.id, conn)?;
 
     let _distilled_water = Reagent::new()
-        .name(Some(DISTILLED_WATER.to_owned()))?
-        .description(Some("Distilled water, pure".to_owned()))?
+        .name(DISTILLED_WATER.to_owned())?
+        .description("Distilled water, pure".to_owned())?
         .parent(Some(reagent_category.id))?
         .purity(100.0)?
         .cas_code("7732-18-5")?
@@ -58,8 +58,8 @@ pub(crate) fn init_reagents(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .insert(user.id, conn)?;
 
     let _liquid_nitrogen = Reagent::new()
-        .name(Some(LIQUID_NITROGEN.to_owned()))?
-        .description(Some("Liquid nitrogen, pure".to_owned()))?
+        .name(LIQUID_NITROGEN.to_owned())?
+        .description("Liquid nitrogen, pure".to_owned())?
         .parent(Some(reagent_category.id))?
         .purity(100.0)?
         .cas_code("7727-37-9")?

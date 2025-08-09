@@ -21,8 +21,8 @@ pub(crate) fn init_eppendorf_safelock_tube(
     let safelock_tube = Trackable::from_name(SAFELOCK_TUBE_2ML, conn)?;
     let eppendorf = eppendorf(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(Some(eppendorf_safelock_tube.to_owned()))?
-        .description(Some("Eppendorf Safe-Lock Tube 2ml used for extraction.".to_owned()))?
+        .name(eppendorf_safelock_tube.to_owned())?
+        .description("Eppendorf Safe-Lock Tube 2ml used for extraction.".to_owned())?
         .created_by(user.id)?
         .brand(eppendorf.id)?
         .parent(Some(safelock_tube.id))?
