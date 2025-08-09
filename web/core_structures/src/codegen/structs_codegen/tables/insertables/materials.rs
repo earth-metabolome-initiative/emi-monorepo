@@ -113,16 +113,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBui
 impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder {
     /// Sets the value of the `materials.description` column from table
     /// `materials`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableMaterialAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableMaterialAttributes::Description)
             })?;
         self.description = Some(description);
@@ -131,15 +131,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBui
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder {
     /// Sets the value of the `materials.icon` column from table `materials`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableMaterialAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableMaterialAttributes::Icon)
         })?;
         self.icon = Some(icon);
@@ -148,15 +148,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBui
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder {
     /// Sets the value of the `materials.name` column from table `materials`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableMaterialAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableMaterialAttributes::Name)
         })?;
         self.name = Some(name);

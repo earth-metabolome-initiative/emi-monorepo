@@ -202,9 +202,7 @@ impl CentrifugeProcedureModel {
             conn,
         )
     }
-    pub fn centrifuge_procedure_models_centrifuged_with_centrifuged_c_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn centrifuge_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

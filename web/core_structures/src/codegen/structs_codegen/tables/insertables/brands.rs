@@ -125,20 +125,26 @@ impl web_common_traits::database::ExtendableBuilder for InsertableBrandBuilder {
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
+        }
         if let Some(name) = other.name {
             self = self.name(name)?;
         }
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -151,29 +157,70 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
     /// Sets the value of the `brands.created_at` column from table `brands`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableBrandAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableBrandAttributes::CreatedAt,
-                    InsertableBrandAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
+    /// Sets the value of the `brands.created_at`, `brands.updated_at` columns
+    /// from table `brands`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableBrandAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableBrandAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -190,46 +237,53 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilde
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
     /// Sets the value of the `brands.name` column from table `brands`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableBrandAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableBrandAttributes::Name))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::Name,
+                    )
+            })?;
         self.name = Some(name);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
     /// Sets the value of the `brands.updated_at` column from table `brands`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableBrandAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableBrandAttributes::CreatedAt,
-                    InsertableBrandAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

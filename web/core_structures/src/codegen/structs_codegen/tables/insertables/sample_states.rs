@@ -116,16 +116,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleState
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder {
     /// Sets the value of the `sample_states.description` column from table
     /// `sample_states`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSampleStateAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableSampleStateAttributes::Description)
             })?;
         self.description = Some(description);
@@ -135,15 +135,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleState
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder {
     /// Sets the value of the `sample_states.icon` column from table
     /// `sample_states`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSampleStateAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableSampleStateAttributes::Icon)
         })?;
         self.icon = Some(icon);
@@ -153,15 +153,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleState
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder {
     /// Sets the value of the `sample_states.name` column from table
     /// `sample_states`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSampleStateAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableSampleStateAttributes::Name)
         })?;
         self.name = Some(name);

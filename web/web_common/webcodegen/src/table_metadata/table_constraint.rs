@@ -9,7 +9,7 @@ use diesel::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::errors::WebCodeGenError;
+use crate::{Table, errors::WebCodeGenError};
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
 #[diesel(table_name = crate::schema::table_constraints)]
@@ -148,6 +148,19 @@ impl TableConstraint {
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::table_constraints;
         table_constraints::table.load::<TableConstraint>(conn).map_err(WebCodeGenError::from)
+    }
+
+    /// Returns the table associated with this table constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+        Table::load(conn, &self.table_name, Some(&self.table_schema), &self.table_catalog)
     }
 
     /// Load all the constraints for a given table

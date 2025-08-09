@@ -172,11 +172,20 @@ impl web_common_traits::database::ExtendableBuilder for InsertableParentProcedur
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(parent_procedure_model_id) = other.parent_procedure_model_id {
-            self = self.parent_procedure_model(parent_procedure_model_id)?;
-        }
-        if let Some(child_procedure_model_id) = other.child_procedure_model_id {
-            self = self.child_procedure_model(child_procedure_model_id)?;
+        match (other.parent_procedure_model_id, other.child_procedure_model_id) {
+            (Some(parent_procedure_model_id), Some(child_procedure_model_id)) => {
+                self = self.parent_procedure_model_and_child_procedure_model(
+                    parent_procedure_model_id,
+                    child_procedure_model_id,
+                )?;
+            }
+            (None, Some(child_procedure_model_id)) => {
+                self = self.child_procedure_model(child_procedure_model_id)?;
+            }
+            (Some(parent_procedure_model_id), None) => {
+                self = self.parent_procedure_model(parent_procedure_model_id)?;
+            }
+            (None, None) => {}
         }
         if let Some(snoozable) = other.snoozable {
             self = self.snoozable(snoozable)?;
@@ -215,6 +224,19 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     > {
+        if let Some(parent_procedure_model_id) = self.parent_procedure_model_id {
+            pgrx_validation::must_be_distinct_i32(
+                    parent_procedure_model_id,
+                    child_procedure_model_id,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ParentProcedureModelId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ChildProcedureModelId,
+                        )
+                })?;
+        }
         self.child_procedure_model_id = Some(child_procedure_model_id);
         Ok(self)
     }
@@ -222,18 +244,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
 impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
     /// Sets the value of the `parent_procedure_models.copiable` column from
     /// table `parent_procedure_models`.
-    pub fn copiable<P>(
+    pub fn copiable<Copiable>(
         mut self,
-        copiable: P,
+        copiable: Copiable,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Copiable: TryInto<bool>,
+        <Copiable as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let copiable = copiable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+        let copiable = copiable.try_into().map_err(|err: <Copiable as TryInto<bool>>::Error| {
             Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Copiable)
         })?;
         self.copiable = Some(copiable);
@@ -243,20 +265,20 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
 impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
     /// Sets the value of the `parent_procedure_models.created_at` column from
     /// table `parent_procedure_models`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableParentProcedureModelAttributes::CreatedAt)
             },
         )?;
@@ -289,27 +311,70 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     > {
+        if let Some(child_procedure_model_id) = self.child_procedure_model_id {
+            pgrx_validation::must_be_distinct_i32(
+                    parent_procedure_model_id,
+                    child_procedure_model_id,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ParentProcedureModelId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ChildProcedureModelId,
+                        )
+                })?;
+        }
         self.parent_procedure_model_id = Some(parent_procedure_model_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
+    /// Sets the value of the
+    /// `parent_procedure_models.parent_procedure_model_id`,
+    /// `parent_procedure_models.child_procedure_model_id` columns from table
+    /// `parent_procedure_models`.
+    pub fn parent_procedure_model_and_child_procedure_model(
+        mut self,
+        parent_procedure_model_id: i32,
+        child_procedure_model_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
+    > {
+        pgrx_validation::must_be_distinct_i32(
+                parent_procedure_model_id,
+                child_procedure_model_id,
+            )
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ParentProcedureModelId,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelAttributes::ChildProcedureModelId,
+                    )
+            })?;
+        self.parent_procedure_model_id = Some(parent_procedure_model_id);
+        self.child_procedure_model_id = Some(child_procedure_model_id);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
     /// Sets the value of the `parent_procedure_models.repeatable` column from
     /// table `parent_procedure_models`.
-    pub fn repeatable<P>(
+    pub fn repeatable<Repeatable>(
         mut self,
-        repeatable: P,
+        repeatable: Repeatable,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Repeatable: TryInto<bool>,
+        <Repeatable as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let repeatable = repeatable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Repeatable)
-        })?;
+        let repeatable =
+            repeatable.try_into().map_err(|err: <Repeatable as TryInto<bool>>::Error| {
+                Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Repeatable)
+            })?;
         self.repeatable = Some(repeatable);
         Ok(self)
     }
@@ -317,20 +382,21 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
 impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
     /// Sets the value of the `parent_procedure_models.skippable` column from
     /// table `parent_procedure_models`.
-    pub fn skippable<P>(
+    pub fn skippable<Skippable>(
         mut self,
-        skippable: P,
+        skippable: Skippable,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Skippable: TryInto<bool>,
+        <Skippable as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let skippable = skippable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Skippable)
-        })?;
+        let skippable =
+            skippable.try_into().map_err(|err: <Skippable as TryInto<bool>>::Error| {
+                Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Skippable)
+            })?;
         self.skippable = Some(skippable);
         Ok(self)
     }
@@ -338,20 +404,21 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProce
 impl crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureModelBuilder {
     /// Sets the value of the `parent_procedure_models.snoozable` column from
     /// table `parent_procedure_models`.
-    pub fn snoozable<P>(
+    pub fn snoozable<Snoozable>(
         mut self,
-        snoozable: P,
+        snoozable: Snoozable,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableParentProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Snoozable: TryInto<bool>,
+        <Snoozable as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let snoozable = snoozable.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
-            Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Snoozable)
-        })?;
+        let snoozable =
+            snoozable.try_into().map_err(|err: <Snoozable as TryInto<bool>>::Error| {
+                Into::into(err).rename_field(InsertableParentProcedureModelAttributes::Snoozable)
+            })?;
         self.snoozable = Some(snoozable);
         Ok(self)
     }

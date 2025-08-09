@@ -176,17 +176,55 @@ impl<PositioningDeviceModel>
 {
     /// Sets the value of the `trackables.created_at` column from table
     /// `phone_models`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.phone_models_id_fkey =
             self.phone_models_id_fkey.created_at(created_at).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertablePhoneModelAttributes::Extension(
+                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl<PositioningDeviceModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+            >,
+        >,
+        PositioningDeviceModel,
+    >
+{
+    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
+    /// columns from table `phone_models`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.phone_models_id_fkey = self
+            .phone_models_id_fkey
+            .created_at_and_updated_at(created_at, updated_at)
+            .map_err(|e| {
                 e.into_field_name(|attribute| {
                     InsertablePhoneModelAttributes::Extension(
                         InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
@@ -237,13 +275,13 @@ impl<PositioningDeviceModel>
 {
     /// Sets the value of the `trackables.description` column from table
     /// `phone_models`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<Option<String>>,
+        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.phone_models_id_fkey =
             self.phone_models_id_fkey.description(description).map_err(|e| {
@@ -267,13 +305,13 @@ impl<PositioningDeviceModel>
     >
 {
     /// Sets the value of the `trackables.id` column from table `phone_models`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.phone_models_id_fkey = self.phone_models_id_fkey.id(id).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -297,13 +335,13 @@ impl<PositioningDeviceModel>
 {
     /// Sets the value of the `trackables.name` column from table
     /// `phone_models`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<Option<String>>,
+        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.phone_models_id_fkey = self.phone_models_id_fkey.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -312,6 +350,40 @@ impl<PositioningDeviceModel>
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl<PositioningDeviceModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+            >,
+        >,
+        PositioningDeviceModel,
+    >
+{
+    /// Sets the value of the `trackables.name`, `trackables.description`
+    /// columns from table `phone_models`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.phone_models_id_fkey =
+            self.phone_models_id_fkey.name_and_description(name, description).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertablePhoneModelAttributes::Extension(
+                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -339,6 +411,38 @@ impl<PositioningDeviceModel>
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl<PositioningDeviceModel>
+    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+            >,
+        >,
+        PositioningDeviceModel,
+    >
+{
+    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
+    /// from table `phone_models`.
+    pub fn parent_and_id<Id>(
+        mut self,
+        parent_id: ::rosetta_uuid::Uuid,
+        id: Id,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
+    where
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.phone_models_id_fkey =
+            self.phone_models_id_fkey.parent_and_id(parent_id, id).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertablePhoneModelAttributes::Extension(
+                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -382,13 +486,13 @@ impl<PositioningDeviceModel>
 {
     /// Sets the value of the `trackables.updated_at` column from table
     /// `phone_models`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.phone_models_id_fkey =

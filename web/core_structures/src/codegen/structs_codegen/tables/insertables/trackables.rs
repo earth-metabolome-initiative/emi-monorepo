@@ -215,32 +215,50 @@ impl web_common_traits::database::ExtendableBuilder for InsertableTrackableBuild
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(id) = other.id {
-            self = self.id(id)?;
+        match (other.name, other.description) {
+            (Some(name), Some(description)) => {
+                self = self.name_and_description(name, description)?;
+            }
+            (None, Some(description)) => {
+                self = self.description(Some(description))?;
+            }
+            (Some(name), None) => {
+                self = self.name(Some(name))?;
+            }
+            (None, None) => {}
         }
-        if let Some(name) = other.name {
-            self = self.name(Some(name))?;
+        match (other.parent_id, other.id) {
+            (Some(parent_id), Some(id)) => {
+                self = self.parent_and_id(parent_id, id)?;
+            }
+            (None, Some(id)) => {
+                self = self.id(id)?;
+            }
+            (Some(parent_id), None) => {
+                self = self.parent(Some(parent_id))?;
+            }
+            (None, None) => {}
         }
-        if let Some(description) = other.description {
-            self = self.description(Some(description))?;
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
         }
         if let Some(photograph_id) = other.photograph_id {
             self = self.photograph(Some(photograph_id))?;
         }
-        if let Some(parent_id) = other.parent_id {
-            self = self.parent(Some(parent_id))?;
-        }
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -254,29 +272,70 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTrackableBuilder {
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
     /// Sets the value of the `trackables.created_at` column from table
     /// `trackables`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableTrackableAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableTrackableAttributes::CreatedAt,
-                    InsertableTrackableAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
+    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
+    /// columns from table `trackables`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -295,33 +354,46 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
     /// Sets the value of the `trackables.description` column from table
     /// `trackables`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<Option<String>>,
+        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let description =
-            description.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+        let description = description.try_into().map_err(
+            |err: <Description as TryInto<Option<String>>>::Error| {
                 Into::into(err).rename_field(InsertableTrackableAttributes::Description)
-            })?;
+            },
+        )?;
         if let (Some(name), Some(description)) = (self.name.as_ref(), description.as_ref()) {
-            pgrx_validation::must_be_distinct(name, description).map_err(|e| {
-                e.rename_fields(
-                    InsertableTrackableAttributes::Name,
-                    InsertableTrackableAttributes::Description,
-                )
-            })?;
+            pgrx_validation::must_be_distinct(name, description)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Name,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                        )
+                })?;
         }
         if let Some(description) = description.as_ref() {
             pgrx_validation::must_be_paragraph(description)
-                .map_err(|e| e.rename_field(InsertableTrackableAttributes::Description))?;
+                .map_err(|e| {
+                    e
+                        .rename_field(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                        )
+                })?;
         }
         if let Some(description) = description.as_ref() {
             pgrx_validation::must_be_paragraph(description)
-                .map_err(|e| e.rename_field(InsertableTrackableAttributes::Description))?;
+                .map_err(|e| {
+                    e
+                        .rename_field(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                        )
+                })?;
         }
         self.description = description;
         Ok(self)
@@ -329,24 +401,26 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
     /// Sets the value of the `trackables.id` column from table `trackables`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<::rosetta_uuid::Uuid>>::Error| {
             Into::into(err).rename_field(InsertableTrackableAttributes::Id)
         })?;
         if let Some(parent_id) = self.parent_id {
-            pgrx_validation::must_be_distinct_uuid(id, parent_id).map_err(|e| {
-                e.rename_fields(
-                    InsertableTrackableAttributes::Id,
-                    InsertableTrackableAttributes::ParentId,
-                )
-            })?;
+            pgrx_validation::must_be_distinct_uuid(id, parent_id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::ParentId,
+                        )
+                })?;
         }
         self.id = Some(id);
         Ok(self)
@@ -354,26 +428,76 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
     /// Sets the value of the `trackables.name` column from table `trackables`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<Option<String>>,
+        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<Option<String>>>::Error| {
             Into::into(err).rename_field(InsertableTrackableAttributes::Name)
         })?;
         if let (Some(name), Some(description)) = (name.as_ref(), self.description.as_ref()) {
-            pgrx_validation::must_be_distinct(name, description).map_err(|e| {
-                e.rename_fields(
-                    InsertableTrackableAttributes::Name,
-                    InsertableTrackableAttributes::Description,
-                )
-            })?;
+            pgrx_validation::must_be_distinct(name, description)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Name,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                        )
+                })?;
         }
         self.name = name;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
+    /// Sets the value of the `trackables.name`, `trackables.description`
+    /// columns from table `trackables`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::Name)
+        })?;
+        let description =
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableTrackableAttributes::Description)
+            })?;
+        pgrx_validation::must_be_distinct(name.as_ref(), description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Name,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                    )
+            })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                    )
+            })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Description,
+                    )
+            })?;
+        self.name = Some(name);
+        self.description = Some(description);
         Ok(self)
     }
 }
@@ -384,7 +508,45 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
         mut self,
         parent_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>> {
+        if let (Some(parent_id), Some(id)) = (parent_id, self.id) {
+            pgrx_validation::must_be_distinct_uuid(id, parent_id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::ParentId,
+                        )
+                })?;
+        }
         self.parent_id = parent_id;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
+    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
+    /// from table `trackables`.
+    pub fn parent_and_id<Id>(
+        mut self,
+        parent_id: ::rosetta_uuid::Uuid,
+        id: Id,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
+    where
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let id = id.try_into().map_err(|err: <Id as TryInto<::rosetta_uuid::Uuid>>::Error| {
+            Into::into(err).rename_field(InsertableTrackableAttributes::Id)
+        })?;
+        pgrx_validation::must_be_distinct_uuid(id, parent_id)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::ParentId,
+                    )
+            })?;
+        self.parent_id = Some(parent_id);
+        self.id = Some(id);
         Ok(self)
     }
 }
@@ -402,27 +564,29 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBu
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder {
     /// Sets the value of the `trackables.updated_at` column from table
     /// `trackables`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableTrackableAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableTrackableAttributes::CreatedAt,
-                    InsertableTrackableAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

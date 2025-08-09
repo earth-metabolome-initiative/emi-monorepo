@@ -1,6 +1,6 @@
 //! Submodule defining the network of same-as columns.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use ::graph::{
     prelude::{Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder},
@@ -18,7 +18,7 @@ use graph::{
 use proc_macro2::TokenStream;
 use sorted_vec::prelude::SortedVec;
 
-use crate::{Column, KeyColumnUsage, Table, errors::WebCodeGenError};
+use crate::{CheckConstraint, Column, KeyColumnUsage, Table, errors::WebCodeGenError};
 
 #[derive(Debug, Clone)]
 /// A network of columns that are "extend" each other.
@@ -321,7 +321,7 @@ impl TableExtensionNetwork {
     pub fn ancestors_columns<'a>(
         &'a self,
         table: &'a Table,
-        covered_successors: &mut HashMap<usize, bool>,
+        covered_successors: &mut HashSet<usize>,
         conn: &mut PgConnection,
     ) -> Result<HashMap<&'a Table, Vec<Column>>, WebCodeGenError> {
         let table_id = self
@@ -348,50 +348,104 @@ impl TableExtensionNetwork {
             // parameters will be the primary key of the table, otherwise
             // we recursively determine it as the builder type with its own
             // generics.
-            match covered_successors.entry(extended_table_id) {
-                // If the extended table has already been covered, we
-                // return its primary key type as the generic parameter.
-                std::collections::hash_map::Entry::Occupied(_) => {}
-                // If the extended table has not been covered yet, we
-                // recursively determine its builder type generics.
-                std::collections::hash_map::Entry::Vacant(entry) => {
-                    entry.insert(true);
-                    let ancestor_columns = self
-                        .ancestors_columns(extended_table, covered_successors, conn)
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|(ancestor_table, columns)| {
-                            (
-                                ancestor_table,
-                                columns
-                                    .into_iter()
-                                    .filter(|column| {
-                                        // We filter out both the columns that are part of the
-                                        // same-as
-                                        // relationships with the current table, as those values
-                                        // will be
-                                        // handled by the descendant setter methods.
-                                        !same_as_columns.contains(column)
-                                    })
-                                    .collect::<Vec<_>>(),
-                            )
-                        })
-                        .collect::<HashMap<_, _>>();
+            if covered_successors.insert(extended_table_id) {
+                let ancestor_columns = self
+                    .ancestors_columns(extended_table, covered_successors, conn)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|(ancestor_table, columns)| {
+                        (
+                            ancestor_table,
+                            columns
+                                .into_iter()
+                                .filter(|column| {
+                                    // We filter out both the columns that are part of the
+                                    // same-as
+                                    // relationships with the current table, as those values
+                                    // will be
+                                    // handled by the descendant setter methods.
+                                    !same_as_columns.contains(column)
+                                })
+                                .collect::<Vec<_>>(),
+                        )
+                    })
+                    .collect::<HashMap<_, _>>();
 
-                    ancestors_columns.insert(
-                        extended_table,
-                        ancestor_columns
-                            .values()
-                            .flat_map(|columns| columns.iter().cloned())
-                            .collect(),
-                    );
-                }
+                ancestors_columns.insert(
+                    extended_table,
+                    ancestor_columns.values().flat_map(|columns| columns.iter().cloned()).collect(),
+                );
             }
         });
 
         ancestors_columns.insert(table, table.insertable_columns(conn, false)?);
 
         Ok(ancestors_columns)
+    }
+
+    /// Returns the check constraints associated with the ancestors of the
+    /// current table.
+    ///
+    /// # Arguments
+    ///
+    /// * `table`: A reference to the table to generate generics for.
+    /// * `covered_successors`: A mutable reference to a hashmap that tracks
+    ///   whether an ancestor extended by the current table has already been
+    ///   covered by a predecessor.
+    /// * `conn`: A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Implementation details
+    ///
+    /// The check constraints from the ancestors which are covered by same-as
+    /// relationships with check constraints in the descendant tables are
+    /// removed as they should be handled fully by the descendant setter
+    /// methods via the same-as relationships.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the generics cannot be generated.
+    pub fn ancestors_check_constraints<'a>(
+        &'a self,
+        table: &'a Table,
+        covered_successors: &mut HashSet<usize>,
+        conn: &mut PgConnection,
+    ) -> Result<HashMap<&'a Table, Vec<CheckConstraint>>, WebCodeGenError> {
+        let table_id = self
+            .extension_graph
+            .nodes_vocabulary()
+            .binary_search(table)
+            .expect("Failed to get node ID for the table");
+
+        let mut ancestors_check_constraints = HashMap::new();
+
+        self.extension_graph.successors(table_id).for_each(|extended_table_id| {
+            let extended_table = self
+                .extension_graph
+                .nodes_vocabulary()
+                .get(extended_table_id)
+                .expect("Failed to get extended table");
+            // If the extended table is already covered, its generic
+            // parameters will be the primary key of the table, otherwise
+            // we recursively determine it as the builder type with its own
+            // generics.
+            if covered_successors.insert(extended_table_id) {
+                let ancestor_check_constraints = self
+                    .ancestors_check_constraints(extended_table, covered_successors, conn)
+                    .unwrap_or_default();
+
+                ancestors_check_constraints.insert(
+                    extended_table,
+                    ancestor_check_constraints
+                        .values()
+                        .flat_map(|check_constraint| check_constraint.iter().cloned())
+                        .collect(),
+                );
+            }
+        });
+
+        ancestors_check_constraints.insert(table, table.check_constraints(conn)?);
+
+        Ok(ancestors_check_constraints)
     }
 
     /// Returns the generics with the expected default values for the provided
@@ -407,7 +461,7 @@ impl TableExtensionNetwork {
     fn generics_for_table_builder_type(
         &self,
         table: &Table,
-        covered_successors: &mut HashMap<usize, bool>,
+        covered_successors: &mut HashSet<usize>,
         conn: &mut PgConnection,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
         let table_id = self
@@ -435,25 +489,17 @@ impl TableExtensionNetwork {
                 // parameters will be the primary key of the table, otherwise
                 // we recursively determine it as the builder type with its own
                 // generics.
-                match covered_successors.entry(extended_table_id) {
-                    // If the extended table has already been covered, we
-                    // return its primary key type as the generic parameter.
-                    std::collections::hash_map::Entry::Occupied(_) => {
-                        let primary_key_ty = extended_table.primary_key_type(conn)?;
-                        Ok(quote::quote! { Option<#primary_key_ty> })
-                    }
-                    // If the extended table has not been covered yet, we
-                    // recursively determine its builder type generics.
-                    std::collections::hash_map::Entry::Vacant(entry) => {
-                        entry.insert(true);
-                        let extended_builder_generics = self.generics_for_table_builder_type(
-                            extended_table,
-                            covered_successors,
-                            conn,
-                        )?;
-                        let extended_builder_type = extended_table.insertable_builder_ty()?;
-                        Ok(quote::quote! { #extended_builder_type #extended_builder_generics })
-                    }
+                if covered_successors.insert(extended_table_id) {
+                    let extended_builder_generics = self.generics_for_table_builder_type(
+                        extended_table,
+                        covered_successors,
+                        conn,
+                    )?;
+                    let extended_builder_type = extended_table.insertable_builder_ty()?;
+                    Ok(quote::quote! { #extended_builder_type #extended_builder_generics })
+                } else {
+                    let primary_key_ty = extended_table.primary_key_type(conn)?;
+                    Ok(quote::quote! { Option<#primary_key_ty> })
                 }
             })
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -493,7 +539,7 @@ impl TableExtensionNetwork {
 
         // We create a hashmap to map whether an ancestor extended by the current
         // table has already been handled by a predecessor or not.
-        let mut covered_successors = HashMap::new();
+        let mut covered_successors = HashSet::new();
 
         // Otherwise, for each extended table, we generate the set of generics
         // with the expected default values to define the builder type.

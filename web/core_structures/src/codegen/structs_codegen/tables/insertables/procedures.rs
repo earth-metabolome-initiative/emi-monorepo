@@ -160,6 +160,18 @@ impl web_common_traits::database::ExtendableBuilder for InsertableProcedureBuild
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
+        }
         if let Some(id) = other.id {
             self = self.id(id)?;
         }
@@ -169,14 +181,8 @@ impl web_common_traits::database::ExtendableBuilder for InsertableProcedureBuild
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -190,29 +196,70 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureBuilder {
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
     /// Sets the value of the `procedures.created_at` column from table
     /// `procedures`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableProcedureAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableProcedureAttributes::CreatedAt,
-                    InsertableProcedureAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
+    /// Sets the value of the `procedures.created_at`, `procedures.updated_at`
+    /// columns from table `procedures`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableProcedureAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -230,15 +277,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBu
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
     /// Sets the value of the `procedures.id` column from table `procedures`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<::rosetta_uuid::Uuid>>::Error| {
             Into::into(err).rename_field(InsertableProcedureAttributes::Id)
         })?;
         self.id = Some(id);
@@ -259,27 +306,29 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBu
 impl crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder {
     /// Sets the value of the `procedures.updated_at` column from table
     /// `procedures`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcedureAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableProcedureAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableProcedureAttributes::CreatedAt,
-                    InsertableProcedureAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

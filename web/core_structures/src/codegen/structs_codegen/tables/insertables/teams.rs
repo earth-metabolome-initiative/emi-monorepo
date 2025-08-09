@@ -253,8 +253,29 @@ impl web_common_traits::database::ExtendableBuilder for InsertableTeamBuilder {
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(id) = other.id {
-            self = self.id(id)?;
+        match (other.id, other.parent_team_id) {
+            (Some(id), Some(parent_team_id)) => {
+                self = self.id_and_parent_team(id, parent_team_id)?;
+            }
+            (None, Some(parent_team_id)) => {
+                self = self.parent_team(Some(parent_team_id))?;
+            }
+            (Some(id), None) => {
+                self = self.id(id)?;
+            }
+            (None, None) => {}
+        }
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
         }
         if let Some(name) = other.name {
             self = self.name(name)?;
@@ -271,20 +292,11 @@ impl web_common_traits::database::ExtendableBuilder for InsertableTeamBuilder {
         if let Some(state_id) = other.state_id {
             self = self.state(state_id)?;
         }
-        if let Some(parent_team_id) = other.parent_team_id {
-            self = self.parent_team(Some(parent_team_id))?;
-        }
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -307,29 +319,70 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
     /// Sets the value of the `teams.created_at` column from table `teams`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableTeamAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableTeamAttributes::CreatedAt,
-                    InsertableTeamAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
+    /// Sets the value of the `teams.created_at`, `teams.updated_at` columns
+    /// from table `teams`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableTeamAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -346,16 +399,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
     /// Sets the value of the `teams.description` column from table `teams`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableTeamAttributes::Description)
             })?;
         self.description = Some(description);
@@ -364,63 +417,103 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
     /// Sets the value of the `teams.icon` column from table `teams`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableTeamAttributes::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| e.rename_field(InsertableTeamAttributes::Icon))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Icon,
+                    )
+            })?;
         self.icon = Some(icon);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
     /// Sets the value of the `teams.id` column from table `teams`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<i32>,
+        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
             Into::into(err).rename_field(InsertableTeamAttributes::Id)
         })?;
         if let Some(parent_team_id) = self.parent_team_id {
-            pgrx_validation::must_be_distinct_i32(parent_team_id, id).map_err(|e| {
-                e.rename_fields(
-                    InsertableTeamAttributes::ParentTeamId,
-                    InsertableTeamAttributes::Id,
-                )
-            })?;
+            pgrx_validation::must_be_distinct_i32(parent_team_id, id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
+                        )
+                })?;
         }
         self.id = Some(id);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.name` column from table `teams`.
-    pub fn name<P>(
+    /// Sets the value of the `teams.id`, `teams.parent_team_id` columns from
+    /// table `teams`.
+    pub fn id_and_parent_team<Id>(
         mut self,
-        name: P,
+        id: Id,
+        parent_team_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<i32>,
+        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
+            Into::into(err).rename_field(InsertableTeamAttributes::Id)
+        })?;
+        pgrx_validation::must_be_distinct_i32(parent_team_id, id)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
+                    )
+            })?;
+        self.id = Some(id);
+        self.parent_team_id = Some(parent_team_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
+    /// Sets the value of the `teams.name` column from table `teams`.
+    pub fn name<Name>(
+        mut self,
+        name: Name,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableTeamAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableTeamAttributes::Name))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Name,
+                    )
+            })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -431,6 +524,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
         mut self,
         parent_team_id: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
+        if let (Some(id), Some(parent_team_id)) = (self.id, parent_team_id) {
+            pgrx_validation::must_be_distinct_i32(parent_team_id, id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
+                        )
+                })?;
+        }
         self.parent_team_id = parent_team_id;
         Ok(self)
     }
@@ -447,27 +550,29 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
     /// Sets the value of the `teams.updated_at` column from table `teams`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableTeamAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableTeamAttributes::CreatedAt,
-                    InsertableTeamAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

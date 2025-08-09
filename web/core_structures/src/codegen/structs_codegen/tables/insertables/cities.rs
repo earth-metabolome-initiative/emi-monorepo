@@ -97,15 +97,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder {
     /// Sets the value of the `cities.name` column from table `cities`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCityAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableCityAttributes::Name)
         })?;
         self.name = Some(name);

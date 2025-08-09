@@ -450,16 +450,16 @@ impl
 {
     /// Sets the value of the `procedures.created_at` column from table
     /// `aliquoting_procedures`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.procedure = self.procedure.created_at(created_at).map_err(|e| {
@@ -469,6 +469,40 @@ impl
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.created_at`, `procedures.updated_at`
+    /// columns from table `aliquoting_procedures`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure =
+            self.procedure.created_at_and_updated_at(created_at, updated_at).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableAliquotingProcedureAttributes::Extension(
+                        InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -504,16 +538,16 @@ impl
 {
     /// Sets the value of the `procedures.updated_at` column from table
     /// `aliquoting_procedures`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {

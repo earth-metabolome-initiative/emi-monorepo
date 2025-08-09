@@ -52,16 +52,17 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableCountryBuilder {
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder {
     /// Sets the value of the `countries.iso` column from table `countries`.
-    pub fn iso<P>(
+    pub fn iso<Iso>(
         mut self,
-        iso: P,
+        iso: Iso,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCountryAttributes>>
     where
-        P: TryInto<::iso_codes::CountryCode>,
-        <P as TryInto<::iso_codes::CountryCode>>::Error: Into<validation_errors::SingleFieldError>,
+        Iso: TryInto<::iso_codes::CountryCode>,
+        <Iso as TryInto<::iso_codes::CountryCode>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
         let iso =
-            iso.try_into().map_err(|err: <P as TryInto<::iso_codes::CountryCode>>::Error| {
+            iso.try_into().map_err(|err: <Iso as TryInto<::iso_codes::CountryCode>>::Error| {
                 Into::into(err).rename_field(InsertableCountryAttributes::Iso)
             })?;
         self.iso = Some(iso);
@@ -70,15 +71,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuil
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder {
     /// Sets the value of the `countries.name` column from table `countries`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableCountryAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableCountryAttributes::Name)
         })?;
         self.name = Some(name);

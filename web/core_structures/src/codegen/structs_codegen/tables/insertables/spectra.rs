@@ -85,15 +85,15 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSpectrumBuilder {
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder {
     /// Sets the value of the `spectra.id` column from table `spectra`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectrumAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<i32>,
+        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
             Into::into(err).rename_field(InsertableSpectrumAttributes::Id)
         })?;
         self.id = Some(id);

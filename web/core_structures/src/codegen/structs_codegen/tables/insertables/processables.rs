@@ -131,19 +131,25 @@ impl<Trackable>
 {
     /// Sets the value of the `processables.kilograms` column from table
     /// `processables`.
-    pub fn kilograms<P>(
+    pub fn kilograms<Kilograms>(
         mut self,
-        kilograms: P,
+        kilograms: Kilograms,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        Kilograms: TryInto<f32>,
+        <Kilograms as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let kilograms = kilograms.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableProcessableAttributes::Kilograms)
-        })?;
+        let kilograms =
+            kilograms.try_into().map_err(|err: <Kilograms as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(InsertableProcessableAttributes::Kilograms)
+            })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
-            .map_err(|e| e.rename_field(InsertableProcessableAttributes::Kilograms))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcessableAttributes::Kilograms,
+                    )
+            })?;
         self.kilograms = Some(kilograms);
         Ok(self)
     }
@@ -155,16 +161,43 @@ impl
 {
     /// Sets the value of the `trackables.created_at` column from table
     /// `processables`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
+    /// columns from table `processables`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self
+            .id
+            .created_at_and_updated_at(created_at, updated_at)
+            .map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -192,13 +225,13 @@ impl
 {
     /// Sets the value of the `trackables.description` column from table
     /// `processables`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<Option<String>>,
+        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
@@ -210,13 +243,13 @@ impl
     >
 {
     /// Sets the value of the `trackables.id` column from table `processables`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
@@ -229,15 +262,40 @@ impl
 {
     /// Sets the value of the `trackables.name` column from table
     /// `processables`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<Option<String>>,
+        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.name`, `trackables.description`
+    /// columns from table `processables`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self
+            .id
+            .name_and_description(name, description)
+            .map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -254,6 +312,27 @@ impl
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     {
         self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcessableBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
+    /// from table `processables`.
+    pub fn parent_and_id<Id>(
+        mut self,
+        parent_id: ::rosetta_uuid::Uuid,
+        id: Id,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
+    where
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id =
+            self.id.parent_and_id(parent_id, id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -280,13 +359,13 @@ impl
 {
     /// Sets the value of the `trackables.updated_at` column from table
     /// `processables`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableProcessableAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;

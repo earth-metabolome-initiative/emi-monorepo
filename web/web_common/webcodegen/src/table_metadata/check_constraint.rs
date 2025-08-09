@@ -14,9 +14,14 @@ use sqlparser::{
 };
 
 use super::{Column, PgConstraint, PgExtension, PgOperator, PgProc, PgType};
-use crate::errors::{CheckConstraintError, UnsupportedCheckConstraintErrorSyntax, WebCodeGenError};
+use crate::{
+    Table, TableConstraint,
+    errors::{CheckConstraintError, UnsupportedCheckConstraintErrorSyntax, WebCodeGenError},
+};
 
-#[derive(Queryable, QueryableByName, Debug, Clone, Selectable)]
+#[derive(
+    Queryable, QueryableByName, Debug, Clone, Selectable, Ord, PartialEq, Eq, Hash, PartialOrd,
+)]
 #[diesel(table_name = crate::schema::check_constraints)]
 /// A struct representing a check constraint
 pub struct CheckConstraint {
@@ -38,7 +43,7 @@ struct TranslateExpression<'a, C1: Debug, C2: Debug> {
     self_columns: &'a [C2],
     involved_columns: &'a [Column],
     functions: &'a [PgProc],
-    attributes_enumeration: &'a syn::Ident,
+    attributes_enumeration: &'a syn::Type,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -758,9 +763,13 @@ impl CheckConstraint {
         contextual_columns: &[C1],
         self_columns: &[C2],
         extensions: &[E],
-        attributes_enumeration: &syn::Ident,
         conn: &mut PgConnection,
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
+        assert!(!contextual_columns.is_empty());
+
+        let table = contextual_columns[0].as_ref().table(conn)?;
+        let attributes_enumeration = table.insertable_enum_ty()?;
+
         let functions = self.functions(conn)?;
         let operators = self.operators(conn)?;
 
@@ -801,7 +810,7 @@ impl CheckConstraint {
             contextual_columns,
             self_columns,
             involved_columns: involved_columns.as_slice(),
-            attributes_enumeration,
+            attributes_enumeration: &attributes_enumeration,
             functions: &functions,
         };
 
@@ -913,6 +922,47 @@ impl CheckConstraint {
             .select(PgConstraint::as_select())
             .first(conn)
             .map_err(WebCodeGenError::from)
+    }
+
+    /// Returns the table constraint associated with this check constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn table_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TableConstraint, diesel::result::Error> {
+        use diesel::RunQueryDsl;
+
+        use crate::schema::table_constraints;
+
+        table_constraints::table
+            .filter(
+                table_constraints::constraint_name
+                    .eq(&self.constraint_name)
+                    .and(table_constraints::constraint_catalog.eq(&self.constraint_catalog))
+                    .and(table_constraints::constraint_schema.eq(&self.constraint_schema)),
+            )
+            .select(TableConstraint::as_select())
+            .first(conn)
+    }
+
+    /// Returns the table that this check constraint belongs to
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+        self.table_constraint(conn)?.table(conn)
     }
 
     /// Returns all the columns associated to this check constraint

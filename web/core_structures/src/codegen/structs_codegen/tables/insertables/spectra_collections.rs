@@ -167,6 +167,18 @@ impl web_common_traits::database::ExtendableBuilder for InsertableSpectraCollect
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
+        }
         if let Some(id) = other.id {
             self = self.id(id)?;
         }
@@ -179,14 +191,8 @@ impl web_common_traits::database::ExtendableBuilder for InsertableSpectraCollect
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -200,29 +206,71 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSpectraCollectionBu
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
     /// Sets the value of the `spectra_collections.created_at` column from table
     /// `spectra_collections`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableSpectraCollectionAttributes::CreatedAt,
-                    InsertableSpectraCollectionAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
+    /// Sets the value of the `spectra_collections.created_at`,
+    /// `spectra_collections.updated_at` columns from table
+    /// `spectra_collections`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -242,15 +290,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraColl
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
     /// Sets the value of the `spectra_collections.id` column from table
     /// `spectra_collections`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<i32>,
+        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
             Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Id)
         })?;
         self.id = Some(id);
@@ -260,17 +308,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraColl
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
     /// Sets the value of the `spectra_collections.notes` column from table
     /// `spectra_collections`.
-    pub fn notes<P>(
+    pub fn notes<Notes>(
         mut self,
-        notes: P,
+        notes: Notes,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Notes: TryInto<Option<String>>,
+        <Notes as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let notes = notes.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
-            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Notes)
-        })?;
+        let notes =
+            notes.try_into().map_err(|err: <Notes as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Notes)
+            })?;
         self.notes = notes;
         Ok(self)
     }
@@ -290,27 +339,29 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraColl
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
     /// Sets the value of the `spectra_collections.updated_at` column from table
     /// `spectra_collections`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableSpectraCollectionAttributes::CreatedAt,
-                    InsertableSpectraCollectionAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

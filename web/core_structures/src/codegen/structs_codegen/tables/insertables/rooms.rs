@@ -177,6 +177,18 @@ impl web_common_traits::database::ExtendableBuilder for InsertableRoomBuilder {
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        match (other.created_at, other.updated_at) {
+            (Some(created_at), Some(updated_at)) => {
+                self = self.created_at_and_updated_at(created_at, updated_at)?;
+            }
+            (None, Some(updated_at)) => {
+                self = self.updated_at(updated_at)?;
+            }
+            (Some(created_at), None) => {
+                self = self.created_at(created_at)?;
+            }
+            (None, None) => {}
+        }
         if let Some(name) = other.name {
             self = self.name(name)?;
         }
@@ -195,14 +207,8 @@ impl web_common_traits::database::ExtendableBuilder for InsertableRoomBuilder {
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
         }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
         if let Some(updated_by) = other.updated_by {
             self = self.updated_by(updated_by)?;
-        }
-        if let Some(updated_at) = other.updated_at {
-            self = self.updated_at(updated_at)?;
         }
         Ok(self)
     }
@@ -225,29 +231,70 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.created_at` column from table `rooms`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableRoomAttributes::CreatedAt)
             },
         )?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableRoomAttributes::CreatedAt,
-                    InsertableRoomAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.created_at = Some(created_at);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
+    /// Sets the value of the `rooms.created_at`, `rooms.updated_at` columns
+    /// from table `rooms`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        let created_at = created_at.try_into().map_err(
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableRoomAttributes::CreatedAt)
+            },
+        )?;
+        let updated_at = updated_at.try_into().map_err(
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+                Into::into(err).rename_field(InsertableRoomAttributes::UpdatedAt)
+            },
+        )?;
+        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                    )
+            })?;
+        self.created_at = Some(created_at);
+        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -264,37 +311,42 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.description` column from table `rooms`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableRoomAttributes::Description)
             })?;
         pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| e.rename_field(InsertableRoomAttributes::Description))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Description,
+                    )
+            })?;
         self.description = Some(description);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.geolocation` column from table `rooms`.
-    pub fn geolocation<P>(
+    pub fn geolocation<Geolocation>(
         mut self,
-        geolocation: P,
+        geolocation: Geolocation,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
+        Geolocation: TryInto<postgis_diesel::types::Point>,
+        <Geolocation as TryInto<postgis_diesel::types::Point>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+            |err: <Geolocation as TryInto<postgis_diesel::types::Point>>::Error| {
                 Into::into(err).rename_field(InsertableRoomAttributes::Geolocation)
             },
         )?;
@@ -304,64 +356,72 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.name` column from table `rooms`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableRoomAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableRoomAttributes::Name))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Name,
+                    )
+            })?;
         self.name = Some(name);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.qrcode` column from table `rooms`.
-    pub fn qrcode<P>(
+    pub fn qrcode<Qrcode>(
         mut self,
-        qrcode: P,
+        qrcode: Qrcode,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Qrcode: TryInto<::rosetta_uuid::Uuid>,
+        <Qrcode as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let qrcode =
-            qrcode.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+        let qrcode = qrcode.try_into().map_err(
+            |err: <Qrcode as TryInto<::rosetta_uuid::Uuid>>::Error| {
                 Into::into(err).rename_field(InsertableRoomAttributes::Qrcode)
-            })?;
+            },
+        )?;
         self.qrcode = Some(qrcode);
         Ok(self)
     }
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
     /// Sets the value of the `rooms.updated_at` column from table `rooms`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let updated_at = updated_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableRoomAttributes::UpdatedAt)
             },
         )?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
-                    InsertableRoomAttributes::CreatedAt,
-                    InsertableRoomAttributes::UpdatedAt,
-                )
-            })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                        )
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

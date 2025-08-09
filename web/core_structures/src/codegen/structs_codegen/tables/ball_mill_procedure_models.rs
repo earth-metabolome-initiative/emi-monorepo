@@ -201,9 +201,7 @@ impl BallMillProcedureModel {
             conn,
         )
     }
-    pub fn ball_mill_procedure_models_milled_with_milled_container_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn ball_mill_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

@@ -141,16 +141,16 @@ impl<Trackable>
     crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<Trackable>
 {
     /// Sets the value of the `reagents.cas_code` column from table `reagents`.
-    pub fn cas_code<P>(
+    pub fn cas_code<CasCode>(
         mut self,
-        cas_code: P,
+        cas_code: CasCode,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<::cas_codes::CAS>,
-        <P as TryInto<::cas_codes::CAS>>::Error: Into<validation_errors::SingleFieldError>,
+        CasCode: TryInto<::cas_codes::CAS>,
+        <CasCode as TryInto<::cas_codes::CAS>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let cas_code =
-            cas_code.try_into().map_err(|err: <P as TryInto<::cas_codes::CAS>>::Error| {
+            cas_code.try_into().map_err(|err: <CasCode as TryInto<::cas_codes::CAS>>::Error| {
                 Into::into(err).rename_field(InsertableReagentAttributes::CasCode)
             })?;
         self.cas_code = Some(cas_code);
@@ -162,17 +162,17 @@ impl<Trackable>
 {
     /// Sets the value of the `reagents.molecular_formula` column from table
     /// `reagents`.
-    pub fn molecular_formula<P>(
+    pub fn molecular_formula<MolecularFormula>(
         mut self,
-        molecular_formula: P,
+        molecular_formula: MolecularFormula,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<::molecular_formulas::MolecularFormula>,
-        <P as TryInto<::molecular_formulas::MolecularFormula>>::Error:
+        MolecularFormula: TryInto<::molecular_formulas::MolecularFormula>,
+        <MolecularFormula as TryInto<::molecular_formulas::MolecularFormula>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let molecular_formula = molecular_formula.try_into().map_err(
-            |err: <P as TryInto<::molecular_formulas::MolecularFormula>>::Error| {
+            |err: <MolecularFormula as TryInto<::molecular_formulas::MolecularFormula>>::Error| {
                 Into::into(err).rename_field(InsertableReagentAttributes::MolecularFormula)
             },
         )?;
@@ -184,22 +184,32 @@ impl<Trackable>
     crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<Trackable>
 {
     /// Sets the value of the `reagents.purity` column from table `reagents`.
-    pub fn purity<P>(
+    pub fn purity<Purity>(
         mut self,
-        purity: P,
+        purity: Purity,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        Purity: TryInto<f32>,
+        <Purity as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let purity = purity.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
+        let purity = purity.try_into().map_err(|err: <Purity as TryInto<f32>>::Error| {
             Into::into(err).rename_field(InsertableReagentAttributes::Purity)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(purity)
-            .map_err(|e| e.rename_field(InsertableReagentAttributes::Purity))
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::Purity,
+                    )
+            })
             .and_then(|_| {
                 pgrx_validation::must_be_smaller_than_f32(purity, 100f32)
-                    .map_err(|e| e.rename_field(InsertableReagentAttributes::Purity))
+                    .map_err(|e| {
+                        e
+                            .rename_field(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableReagentAttributes::Purity,
+                            )
+                    })
             })?;
         self.purity = Some(purity);
         Ok(self)
@@ -212,16 +222,43 @@ impl
 {
     /// Sets the value of the `trackables.created_at` column from table
     /// `reagents`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
+    /// columns from table `reagents`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self
+            .id
+            .created_at_and_updated_at(created_at, updated_at)
+            .map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -248,13 +285,13 @@ impl
 {
     /// Sets the value of the `trackables.description` column from table
     /// `reagents`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<Option<String>>,
+        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
@@ -266,13 +303,13 @@ impl
     >
 {
     /// Sets the value of the `trackables.id` column from table `reagents`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
@@ -284,15 +321,40 @@ impl
     >
 {
     /// Sets the value of the `trackables.name` column from table `reagents`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<Option<String>>,
+        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.name`, `trackables.description`
+    /// columns from table `reagents`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id = self
+            .id
+            .name_and_description(name, description)
+            .map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -308,6 +370,27 @@ impl
         parent_id: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>> {
         self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableReagentBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    >
+{
+    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
+    /// from table `reagents`.
+    pub fn parent_and_id<Id>(
+        mut self,
+        parent_id: ::rosetta_uuid::Uuid,
+        id: Id,
+    ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
+    where
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.id =
+            self.id.parent_and_id(parent_id, id).map_err(|e| e.into_field_name(From::from))?;
         Ok(self)
     }
 }
@@ -333,13 +416,13 @@ impl
 {
     /// Sets the value of the `trackables.updated_at` column from table
     /// `reagents`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableReagentAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;

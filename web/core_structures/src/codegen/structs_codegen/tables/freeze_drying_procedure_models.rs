@@ -201,9 +201,7 @@ impl FreezeDryingProcedureModel {
             conn,
         )
     }
-    pub fn freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn freeze_drying_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

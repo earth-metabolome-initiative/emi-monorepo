@@ -333,249 +333,6 @@ where
         self
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_at` column from table
-    /// `storage_procedure_models`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.created_by` column from table
-    /// `storage_procedure_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.deprecated` column from table
-    /// `storage_procedure_models`.
-    pub fn deprecated<P>(
-        mut self,
-        deprecated: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.description` column from table
-    /// `storage_procedure_models`.
-    pub fn description<P>(
-        mut self,
-        description: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.icon` column from table
-    /// `storage_procedure_models`.
-    pub fn icon<P>(
-        mut self,
-        icon: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.name` column from table
-    /// `storage_procedure_models`.
-    pub fn name<P>(
-        mut self,
-        name: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.photograph_id` column from table
-    /// `storage_procedure_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_at` column from table
-    /// `storage_procedure_models`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
-    >
-{
-    /// Sets the value of the `procedure_models.updated_by` column from table
-    /// `storage_procedure_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
-    > {
-        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableStorageProcedureModelAttributes::Extension(
-                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
 impl<ProcedureModel>
     crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
         ProcedureModel,
@@ -599,25 +356,48 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the `storage_procedure_models.kelvin` column from
-    /// table `storage_procedure_models`.
-    pub fn kelvin<P>(
+    /// Sets the value of the
+    /// `storage_procedure_models.kelvin_tolerance_percentage` column from table
+    /// `storage_procedure_models`.
+    pub fn kelvin_tolerance_percentage<KelvinTolerancePercentage>(
         mut self,
-        kelvin: P,
+        kelvin_tolerance_percentage: KelvinTolerancePercentage,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        KelvinTolerancePercentage: TryInto<f32>,
+        <KelvinTolerancePercentage as TryInto<f32>>::Error:
+            Into<validation_errors::SingleFieldError>,
     {
-        let kelvin = kelvin.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableStorageProcedureModelAttributes::Kelvin)
-        })?;
-        pgrx_validation::must_be_strictly_positive_f32(kelvin)
-            .map_err(|e| e.rename_field(InsertableStorageProcedureModelAttributes::Kelvin))?;
-        self.kelvin = Some(kelvin);
+        let kelvin_tolerance_percentage = kelvin_tolerance_percentage.try_into().map_err(
+            |err: <KelvinTolerancePercentage as TryInto<f32>>::Error| {
+                Into::into(err).rename_field(
+                    InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
+                )
+            },
+        )?;
+        pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
+                    )
+            })
+            .and_then(|_| {
+                pgrx_validation::must_be_smaller_than_f32(
+                        kelvin_tolerance_percentage,
+                        100f32,
+                    )
+                    .map_err(|e| {
+                        e
+                            .rename_field(
+                                crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
+                            )
+                    })
+            })?;
+        self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
 }
@@ -626,39 +406,30 @@ impl<ProcedureModel>
         ProcedureModel,
     >
 {
-    /// Sets the value of the
-    /// `storage_procedure_models.kelvin_tolerance_percentage` column from table
-    /// `storage_procedure_models`.
-    pub fn kelvin_tolerance_percentage<P>(
+    /// Sets the value of the `storage_procedure_models.kelvin` column from
+    /// table `storage_procedure_models`.
+    pub fn kelvin<Kelvin>(
         mut self,
-        kelvin_tolerance_percentage: P,
+        kelvin: Kelvin,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        Kelvin: TryInto<f32>,
+        <Kelvin as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let kelvin_tolerance_percentage =
-            kelvin_tolerance_percentage.try_into().map_err(|err: <P as TryInto<f32>>::Error| {
-                Into::into(err).rename_field(
-                    InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
-                )
-            })?;
-        pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
+        let kelvin = kelvin.try_into().map_err(|err: <Kelvin as TryInto<f32>>::Error| {
+            Into::into(err).rename_field(InsertableStorageProcedureModelAttributes::Kelvin)
+        })?;
+        pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
-                e.rename_field(InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage)
-            })
-            .and_then(|_| {
-                pgrx_validation::must_be_smaller_than_f32(kelvin_tolerance_percentage, 100f32)
-                    .map_err(|e| {
-                        e.rename_field(
-                            InsertableStorageProcedureModelAttributes::KelvinTolerancePercentage,
-                        )
-                    })
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelAttributes::Kelvin,
+                    )
             })?;
-        self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
+        self.kelvin = Some(kelvin);
         Ok(self)
     }
 }
@@ -799,6 +570,323 @@ impl<ProcedureModel>
                     InsertableStorageProcedureModelAttributes::ProcedureParentContainerId(attribute)
                 })
             })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at` column from table
+    /// `storage_procedure_models`.
+    pub fn created_at<CreatedAt>(
+        mut self,
+        created_at: CreatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at`,
+    /// `procedure_models.updated_at` columns from table
+    /// `storage_procedure_models`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self
+            .procedure_model
+            .created_at_and_updated_at(created_at, updated_at)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableStorageProcedureModelAttributes::Extension(
+                        InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_by` column from table
+    /// `storage_procedure_models`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.deprecated` column from table
+    /// `storage_procedure_models`.
+    pub fn deprecated<Deprecated>(
+        mut self,
+        deprecated: Deprecated,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        Deprecated: TryInto<bool>,
+        <Deprecated as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.description` column from table
+    /// `storage_procedure_models`.
+    pub fn description<Description>(
+        mut self,
+        description: Description,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.description(description).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.icon` column from table
+    /// `storage_procedure_models`.
+    pub fn icon<Icon>(
+        mut self,
+        icon: Icon,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name` column from table
+    /// `storage_procedure_models`.
+    pub fn name<Name>(
+        mut self,
+        name: Name,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.name(name).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name`,
+    /// `procedure_models.description` columns from table
+    /// `storage_procedure_models`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model =
+            self.procedure_model.name_and_description(name, description).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableStorageProcedureModelAttributes::Extension(
+                        InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.photograph_id` column from table
+    /// `storage_procedure_models`.
+    pub fn photograph(
+        mut self,
+        photograph_id: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.photograph(photograph_id).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_at` column from table
+    /// `storage_procedure_models`.
+    pub fn updated_at<UpdatedAt>(
+        mut self,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    >
+    where
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.updated_by` column from table
+    /// `storage_procedure_models`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableStorageProcedureModelAttributes>,
+    > {
+        self.procedure_model = self.procedure_model.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableStorageProcedureModelAttributes::Extension(
+                    InsertableStorageProcedureModelExtensionAttributes::ProcedureModel(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
 }

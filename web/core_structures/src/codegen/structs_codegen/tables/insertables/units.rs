@@ -111,15 +111,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
     /// Sets the value of the `units.icon` column from table `units`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableUnitAttributes::Icon)
         })?;
         self.icon = Some(icon);
@@ -128,15 +128,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
     /// Sets the value of the `units.name` column from table `units`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableUnitAttributes::Name)
         })?;
         self.name = Some(name);
@@ -145,15 +145,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder {
     /// Sets the value of the `units.unit` column from table `units`.
-    pub fn unit<P>(
+    pub fn unit<Unit>(
         mut self,
-        unit: P,
+        unit: Unit,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableUnitAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Unit: TryInto<String>,
+        <Unit as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let unit = unit.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let unit = unit.try_into().map_err(|err: <Unit as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableUnitAttributes::Unit)
         })?;
         self.unit = Some(unit);

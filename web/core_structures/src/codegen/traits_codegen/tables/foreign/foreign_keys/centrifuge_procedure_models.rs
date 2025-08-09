@@ -10,7 +10,7 @@ pub struct CentrifugeProcedureModelForeignKeys {
     pub centrifuged_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub centrifuge_procedure_models_centrifuged_with_centrifuged_c_fkey: Option<
+    pub centrifuge_pm_compatibility_rule: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
@@ -59,9 +59,7 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_model.is_some() && foreign_keys.centrifuged_with.is_some()
             && foreign_keys.centrifuged_container.is_some()
-            && foreign_keys
-                .centrifuge_procedure_models_centrifuged_with_centrifuged_c_fkey
-                .is_some()
+            && foreign_keys.centrifuge_pm_compatibility_rule.is_some()
     }
     fn update(
         &self,
@@ -101,8 +99,7 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
                     && self.centrifuged_container_id
                         == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .centrifuge_procedure_models_centrifuged_with_centrifuged_c_fkey = Some(
+                    foreign_keys.centrifuge_pm_compatibility_rule = Some(
                         compatibility_rules,
                     );
                     updated = true;
@@ -116,8 +113,7 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_models::Centri
                     && self.centrifuged_container_id
                         == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .centrifuge_procedure_models_centrifuged_with_centrifuged_c_fkey = None;
+                    foreign_keys.centrifuge_pm_compatibility_rule = None;
                     updated = true;
                 }
             }

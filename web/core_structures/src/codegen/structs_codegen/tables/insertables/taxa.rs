@@ -99,15 +99,15 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTaxonBuilder {
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
     /// Sets the value of the `taxa.id` column from table `taxa`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<i32>,
+        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
             Into::into(err).rename_field(InsertableTaxonAttributes::Id)
         })?;
         self.id = Some(id);
@@ -116,15 +116,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilde
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
     /// Sets the value of the `taxa.name` column from table `taxa`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableTaxonAttributes::Name)
         })?;
         self.name = Some(name);
@@ -133,16 +133,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilde
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
     /// Sets the value of the `taxa.parent_id` column from table `taxa`.
-    pub fn parent<P>(
+    pub fn parent<ParentId>(
         mut self,
-        parent_id: P,
+        parent_id: ParentId,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
     where
-        P: TryInto<Option<i32>>,
-        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+        ParentId: TryInto<Option<i32>>,
+        <ParentId as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let parent_id =
-            parent_id.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+            parent_id.try_into().map_err(|err: <ParentId as TryInto<Option<i32>>>::Error| {
                 Into::into(err).rename_field(InsertableTaxonAttributes::ParentId)
             })?;
         self.parent_id = parent_id;

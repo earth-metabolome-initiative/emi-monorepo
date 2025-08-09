@@ -1174,6 +1174,45 @@ impl Column {
         }
     }
 
+    /// Returns the multi-column getter method name for the provided columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `columns` - A slice of `Column` references
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column names
+    pub fn multi_column_getter_name<C: AsRef<Column>>(
+        columns: &[C],
+    ) -> Result<String, WebCodeGenError> {
+        Ok(columns
+            .iter()
+            .map(|c| c.as_ref().getter_name())
+            .collect::<Result<Vec<String>, WebCodeGenError>>()?
+            .join("_and_"))
+    }
+
+    /// Returns the multi-column getter method ident for the provided columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `columns` - A slice of `Column` references
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while sanitizing the column names
+    pub fn multi_column_getter_ident<C: AsRef<Column>>(
+        columns: &[C],
+    ) -> Result<Ident, WebCodeGenError> {
+        let getter_name = Self::multi_column_getter_name(columns)?;
+        if RESERVED_RUST_WORDS.contains(&getter_name.as_str()) {
+            Ok(Ident::new_raw(&getter_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&getter_name, proc_macro2::Span::call_site()))
+        }
+    }
+
     /// Returns whether the column is part of the table's primary key.
     ///
     /// # Arguments

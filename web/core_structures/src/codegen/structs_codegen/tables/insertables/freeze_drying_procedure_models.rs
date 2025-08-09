@@ -226,9 +226,7 @@ impl InsertableFreezeDryingProcedureModel {
             conn,
         )
     }
-    pub fn freeze_drying_procedure_model_freeze_dried_with_freeze_dri_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn freeze_drying_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -284,7 +282,7 @@ where
     fn default() -> Self {
         Self {
             procedure_model: Default::default(),
-            kelvin: Default::default(),
+            kelvin: Some(203.15f32),
             kelvin_tolerance_percentage: Some(5f32),
             pascal: Some(4f32),
             seconds: Some(259200f32),
@@ -397,43 +395,10 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
     ProcedureModel,
 > {
-    ///Sets the value of the `freeze_drying_procedure_models.kelvin` column from table `freeze_drying_procedure_models`.
-    pub fn kelvin<P>(
-        mut self,
-        kelvin: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<
-            InsertableFreezeDryingProcedureModelAttributes,
-        >,
-    >
-    where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let kelvin = kelvin
-            .try_into()
-            .map_err(|err: <P as TryInto<f32>>::Error| {
-                Into::into(err)
-                    .rename_field(InsertableFreezeDryingProcedureModelAttributes::Kelvin)
-            })?;
-        pgrx_validation::must_be_strictly_positive_f32(kelvin)
-            .map_err(|e| {
-                e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Kelvin)
-            })?;
-        self.kelvin = Some(kelvin);
-        Ok(self)
-    }
-}
-impl<
-    ProcedureModel,
-> crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
-    ProcedureModel,
-> {
     ///Sets the value of the `freeze_drying_procedure_models.kelvin_tolerance_percentage` column from table `freeze_drying_procedure_models`.
-    pub fn kelvin_tolerance_percentage<P>(
+    pub fn kelvin_tolerance_percentage<KelvinTolerancePercentage>(
         mut self,
-        kelvin_tolerance_percentage: P,
+        kelvin_tolerance_percentage: KelvinTolerancePercentage,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -441,12 +406,14 @@ impl<
         >,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        KelvinTolerancePercentage: TryInto<f32>,
+        <KelvinTolerancePercentage as TryInto<
+            f32,
+        >>::Error: Into<validation_errors::SingleFieldError>,
     {
         let kelvin_tolerance_percentage = kelvin_tolerance_percentage
             .try_into()
-            .map_err(|err: <P as TryInto<f32>>::Error| {
+            .map_err(|err: <KelvinTolerancePercentage as TryInto<f32>>::Error| {
                 Into::into(err)
                     .rename_field(
                         InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
@@ -456,7 +423,7 @@ impl<
             .map_err(|e| {
                 e
                     .rename_field(
-                        InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -467,7 +434,7 @@ impl<
                     .map_err(|e| {
                         e
                             .rename_field(
-                                InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::KelvinTolerancePercentage,
                             )
                     })
             })?;
@@ -480,10 +447,10 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
     ProcedureModel,
 > {
-    ///Sets the value of the `freeze_drying_procedure_models.pascal` column from table `freeze_drying_procedure_models`.
-    pub fn pascal<P>(
+    ///Sets the value of the `freeze_drying_procedure_models.kelvin` column from table `freeze_drying_procedure_models`.
+    pub fn kelvin<Kelvin>(
         mut self,
-        pascal: P,
+        kelvin: Kelvin,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -491,25 +458,64 @@ impl<
         >,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        Kelvin: TryInto<f32>,
+        <Kelvin as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        let kelvin = kelvin
+            .try_into()
+            .map_err(|err: <Kelvin as TryInto<f32>>::Error| {
+                Into::into(err)
+                    .rename_field(InsertableFreezeDryingProcedureModelAttributes::Kelvin)
+            })?;
+        pgrx_validation::must_be_strictly_positive_f32(kelvin)
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Kelvin,
+                    )
+            })?;
+        self.kelvin = Some(kelvin);
+        Ok(self)
+    }
+}
+impl<
+    ProcedureModel,
+> crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
+    ProcedureModel,
+> {
+    ///Sets the value of the `freeze_drying_procedure_models.pascal` column from table `freeze_drying_procedure_models`.
+    pub fn pascal<Pascal>(
+        mut self,
+        pascal: Pascal,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableFreezeDryingProcedureModelAttributes,
+        >,
+    >
+    where
+        Pascal: TryInto<f32>,
+        <Pascal as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let pascal = pascal
             .try_into()
-            .map_err(|err: <P as TryInto<f32>>::Error| {
+            .map_err(|err: <Pascal as TryInto<f32>>::Error| {
                 Into::into(err)
                     .rename_field(InsertableFreezeDryingProcedureModelAttributes::Pascal)
             })?;
         pgrx_validation::must_be_strictly_positive_f32(pascal)
             .map_err(|e| {
-                e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Pascal)
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Pascal,
+                    )
             })
             .and_then(|_| {
                 pgrx_validation::must_be_smaller_than_f32(pascal, 500f32)
                     .map_err(|e| {
                         e
                             .rename_field(
-                                InsertableFreezeDryingProcedureModelAttributes::Pascal,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Pascal,
                             )
                     })
             })?;
@@ -627,10 +633,6 @@ impl<
                     })
                 })?;
         }
-
-        println!("1) procedure_freeze_dried_with: {procedure_freeze_dried_with:?}");
-        println!("2) procedure_freeze_dried_with: {:?}", self.procedure_freeze_dried_with);
-
         self.procedure_freeze_dried_with = self
             .procedure_freeze_dried_with
             .extend_builder(procedure_freeze_dried_with)
@@ -649,9 +651,9 @@ impl<
     ProcedureModel,
 > {
     ///Sets the value of the `freeze_drying_procedure_models.seconds` column from table `freeze_drying_procedure_models`.
-    pub fn seconds<P>(
+    pub fn seconds<Seconds>(
         mut self,
-        seconds: P,
+        seconds: Seconds,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -659,12 +661,12 @@ impl<
         >,
     >
     where
-        P: TryInto<f32>,
-        <P as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        Seconds: TryInto<f32>,
+        <Seconds as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let seconds = seconds
             .try_into()
-            .map_err(|err: <P as TryInto<f32>>::Error| {
+            .map_err(|err: <Seconds as TryInto<f32>>::Error| {
                 Into::into(err)
                     .rename_field(
                         InsertableFreezeDryingProcedureModelAttributes::Seconds,
@@ -672,14 +674,17 @@ impl<
             })?;
         pgrx_validation::must_be_strictly_greater_than_f32(seconds, 7200f32)
             .map_err(|e| {
-                e.rename_field(InsertableFreezeDryingProcedureModelAttributes::Seconds)
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Seconds,
+                    )
             })
             .and_then(|_| {
                 pgrx_validation::must_be_strictly_smaller_than_f32(seconds, 604800f32)
                     .map_err(|e| {
                         e
                             .rename_field(
-                                InsertableFreezeDryingProcedureModelAttributes::Seconds,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelAttributes::Seconds,
                             )
                     })
             })?;
@@ -691,9 +696,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.created_at` column from table `freeze_drying_procedure_models`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -701,14 +706,52 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<
             ::rosetta_timestamp::TimestampUTC,
         >>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
             .created_at(created_at)
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| InsertableFreezeDryingProcedureModelAttributes::Extension(
+                        InsertableFreezeDryingProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
+    ///Sets the value of the `procedure_models.created_at`, `procedure_models.updated_at` columns from table `freeze_drying_procedure_models`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableFreezeDryingProcedureModelAttributes,
+        >,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<
+            ::rosetta_timestamp::TimestampUTC,
+        >>::Error: Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<
+            ::rosetta_timestamp::TimestampUTC,
+        >>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self
+            .procedure_model
+            .created_at_and_updated_at(created_at, updated_at)
             .map_err(|e| {
                 e
                     .into_field_name(|attribute| InsertableFreezeDryingProcedureModelAttributes::Extension(
@@ -752,9 +795,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.deprecated` column from table `freeze_drying_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn deprecated<Deprecated>(
         mut self,
-        deprecated: P,
+        deprecated: Deprecated,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -762,8 +805,8 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Deprecated: TryInto<bool>,
+        <Deprecated as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
@@ -783,9 +826,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.description` column from table `freeze_drying_procedure_models`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -793,8 +836,10 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<
+            String,
+        >>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
@@ -814,9 +859,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.icon` column from table `freeze_drying_procedure_models`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -824,8 +869,8 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
@@ -845,9 +890,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.name` column from table `freeze_drying_procedure_models`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -855,12 +900,48 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self
             .procedure_model
             .name(name)
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| InsertableFreezeDryingProcedureModelAttributes::Extension(
+                        InsertableFreezeDryingProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureModelBuilder<
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+> {
+    ///Sets the value of the `procedure_models.name`, `procedure_models.description` columns from table `freeze_drying_procedure_models`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<
+            InsertableFreezeDryingProcedureModelAttributes,
+        >,
+    >
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<
+            String,
+        >>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self
+            .procedure_model
+            .name_and_description(name, description)
             .map_err(|e| {
                 e
                     .into_field_name(|attribute| InsertableFreezeDryingProcedureModelAttributes::Extension(
@@ -903,9 +984,9 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
 > {
     ///Sets the value of the `procedure_models.updated_at` column from table `freeze_drying_procedure_models`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<
@@ -913,8 +994,8 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryin
         >,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<
             ::rosetta_timestamp::TimestampUTC,
         >>::Error: Into<validation_errors::SingleFieldError>,
     {

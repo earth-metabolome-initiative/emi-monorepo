@@ -119,17 +119,17 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
 impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
     /// Sets the value of the `addresses.geolocation` column from table
     /// `addresses`.
-    pub fn geolocation<P>(
+    pub fn geolocation<Geolocation>(
         mut self,
-        geolocation: P,
+        geolocation: Geolocation,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
+        Geolocation: TryInto<postgis_diesel::types::Point>,
+        <Geolocation as TryInto<postgis_diesel::types::Point>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+            |err: <Geolocation as TryInto<postgis_diesel::types::Point>>::Error| {
                 Into::into(err).rename_field(InsertableAddressAttributes::Geolocation)
             },
         )?;
@@ -140,16 +140,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
 impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
     /// Sets the value of the `addresses.postal_code` column from table
     /// `addresses`.
-    pub fn postal_code<P>(
+    pub fn postal_code<PostalCode>(
         mut self,
-        postal_code: P,
+        postal_code: PostalCode,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        PostalCode: TryInto<String>,
+        <PostalCode as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let postal_code =
-            postal_code.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            postal_code.try_into().map_err(|err: <PostalCode as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableAddressAttributes::PostalCode)
             })?;
         self.postal_code = Some(postal_code);
@@ -159,16 +159,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
 impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
     /// Sets the value of the `addresses.street_name` column from table
     /// `addresses`.
-    pub fn street_name<P>(
+    pub fn street_name<StreetName>(
         mut self,
-        street_name: P,
+        street_name: StreetName,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        StreetName: TryInto<String>,
+        <StreetName as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let street_name =
-            street_name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            street_name.try_into().map_err(|err: <StreetName as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableAddressAttributes::StreetName)
             })?;
         self.street_name = Some(street_name);
@@ -178,16 +178,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuil
 impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
     /// Sets the value of the `addresses.street_number` column from table
     /// `addresses`.
-    pub fn street_number<P>(
+    pub fn street_number<StreetNumber>(
         mut self,
-        street_number: P,
+        street_number: StreetNumber,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        StreetNumber: TryInto<String>,
+        <StreetNumber as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let street_number =
-            street_number.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            street_number.try_into().map_err(|err: <StreetNumber as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableAddressAttributes::StreetNumber)
             })?;
         self.street_number = Some(street_number);

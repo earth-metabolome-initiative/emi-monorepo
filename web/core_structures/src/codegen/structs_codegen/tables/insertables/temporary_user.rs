@@ -90,19 +90,24 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTemporaryUserBuilde
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder {
     /// Sets the value of the `temporary_user.email` column from table
     /// `temporary_user`.
-    pub fn email<P>(
+    pub fn email<Email>(
         mut self,
-        email: P,
+        email: Email,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Email: TryInto<String>,
+        <Email as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let email = email.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let email = email.try_into().map_err(|err: <Email as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableTemporaryUserAttributes::Email)
         })?;
         pgrx_validation::must_be_email(email.as_ref())
-            .map_err(|e| e.rename_field(InsertableTemporaryUserAttributes::Email))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes::Email,
+                    )
+            })?;
         self.email = Some(email);
         Ok(self)
     }

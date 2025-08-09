@@ -85,19 +85,25 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableLoginProviderBuilde
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.client_id` column from table
     /// `login_providers`.
-    pub fn client<P>(
+    pub fn client<ClientId>(
         mut self,
-        client_id: P,
+        client_id: ClientId,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        ClientId: TryInto<String>,
+        <ClientId as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let client_id = client_id.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableLoginProviderAttributes::ClientId)
-        })?;
+        let client_id =
+            client_id.try_into().map_err(|err: <ClientId as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableLoginProviderAttributes::ClientId)
+            })?;
         pgrx_validation::must_be_paragraph(client_id.as_ref())
-            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::ClientId))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::ClientId,
+                    )
+            })?;
         self.client_id = Some(client_id);
         Ok(self)
     }
@@ -105,19 +111,24 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.icon` column from table
     /// `login_providers`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let icon = icon.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableLoginProviderAttributes::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Icon))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::Icon,
+                    )
+            })?;
         self.icon = Some(icon);
         Ok(self)
     }
@@ -125,19 +136,24 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.name` column from table
     /// `login_providers`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableLoginProviderAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Name))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::Name,
+                    )
+            })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -145,17 +161,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.oauth_url` column from table
     /// `login_providers`.
-    pub fn oauth_url<P>(
+    pub fn oauth_url<OauthUrl>(
         mut self,
-        oauth_url: P,
+        oauth_url: OauthUrl,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        OauthUrl: TryInto<String>,
+        <OauthUrl as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let oauth_url = oauth_url.try_into().map_err(|err: <P as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableLoginProviderAttributes::OauthUrl)
-        })?;
+        let oauth_url =
+            oauth_url.try_into().map_err(|err: <OauthUrl as TryInto<String>>::Error| {
+                Into::into(err).rename_field(InsertableLoginProviderAttributes::OauthUrl)
+            })?;
         self.oauth_url = Some(oauth_url);
         Ok(self)
     }
@@ -163,16 +180,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.redirect_uri` column from table
     /// `login_providers`.
-    pub fn redirect_uri<P>(
+    pub fn redirect_uri<RedirectUri>(
         mut self,
-        redirect_uri: P,
+        redirect_uri: RedirectUri,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        RedirectUri: TryInto<String>,
+        <RedirectUri as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let redirect_uri =
-            redirect_uri.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            redirect_uri.try_into().map_err(|err: <RedirectUri as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableLoginProviderAttributes::RedirectUri)
             })?;
         self.redirect_uri = Some(redirect_uri);
@@ -182,19 +199,24 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
 impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
     /// Sets the value of the `login_providers.scope` column from table
     /// `login_providers`.
-    pub fn scope<P>(
+    pub fn scope<Scope>(
         mut self,
-        scope: P,
+        scope: Scope,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Scope: TryInto<String>,
+        <Scope as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let scope = scope.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let scope = scope.try_into().map_err(|err: <Scope as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableLoginProviderAttributes::Scope)
         })?;
         pgrx_validation::must_be_paragraph(scope.as_ref())
-            .map_err(|e| e.rename_field(InsertableLoginProviderAttributes::Scope))?;
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::Scope,
+                    )
+            })?;
         self.scope = Some(scope);
         Ok(self)
     }

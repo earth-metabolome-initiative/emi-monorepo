@@ -347,16 +347,16 @@ impl
 {
     /// Sets the value of the `procedure_models.created_at` column from table
     /// `packaging_procedure_models`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.created_at(created_at).map_err(|e| {
@@ -366,6 +366,45 @@ impl
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.created_at`,
+    /// `procedure_models.updated_at` columns from table
+    /// `packaging_procedure_models`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model = self
+            .procedure_model
+            .created_at_and_updated_at(created_at, updated_at)
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertablePackagingProcedureModelAttributes::Extension(
+                        InsertablePackagingProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -401,16 +440,16 @@ impl
 {
     /// Sets the value of the `procedure_models.deprecated` column from table
     /// `packaging_procedure_models`.
-    pub fn deprecated<P>(
+    pub fn deprecated<Deprecated>(
         mut self,
-        deprecated: P,
+        deprecated: Deprecated,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Deprecated: TryInto<bool>,
+        <Deprecated as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.deprecated(deprecated).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -429,16 +468,16 @@ impl
 {
     /// Sets the value of the `procedure_models.description` column from table
     /// `packaging_procedure_models`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.description(description).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -457,16 +496,16 @@ impl
 {
     /// Sets the value of the `procedure_models.icon` column from table
     /// `packaging_procedure_models`.
-    pub fn icon<P>(
+    pub fn icon<Icon>(
         mut self,
-        icon: P,
+        icon: Icon,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Icon: TryInto<String>,
+        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.icon(icon).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -485,16 +524,16 @@ impl
 {
     /// Sets the value of the `procedure_models.name` column from table
     /// `packaging_procedure_models`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.name(name).map_err(|e| {
             e.into_field_name(|attribute| {
@@ -503,6 +542,41 @@ impl
                 )
             })
         })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureModelBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelBuilder,
+    >
+{
+    /// Sets the value of the `procedure_models.name`,
+    /// `procedure_models.description` columns from table
+    /// `packaging_procedure_models`.
+    pub fn name_and_description<Name, Description>(
+        mut self,
+        name: Name,
+        description: Description,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
+    >
+    where
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure_model =
+            self.procedure_model.name_and_description(name, description).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertablePackagingProcedureModelAttributes::Extension(
+                        InsertablePackagingProcedureModelExtensionAttributes::ProcedureModel(
+                            attribute,
+                        ),
+                    )
+                })
+            })?;
         Ok(self)
     }
 }
@@ -537,16 +611,16 @@ impl
 {
     /// Sets the value of the `procedure_models.updated_at` column from table
     /// `packaging_procedure_models`.
-    pub fn updated_at<P>(
+    pub fn updated_at<UpdatedAt>(
         mut self,
-        updated_at: P,
+        updated_at: UpdatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertablePackagingProcedureModelAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         self.procedure_model = self.procedure_model.updated_at(updated_at).map_err(|e| {

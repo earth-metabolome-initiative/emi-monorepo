@@ -76,16 +76,16 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSpatialRefSyBuilder
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.auth_name` column from table
     /// `spatial_ref_sys`.
-    pub fn auth_name<P>(
+    pub fn auth_name<AuthName>(
         mut self,
-        auth_name: P,
+        auth_name: AuthName,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        AuthName: TryInto<Option<String>>,
+        <AuthName as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let auth_name =
-            auth_name.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+            auth_name.try_into().map_err(|err: <AuthName as TryInto<Option<String>>>::Error| {
                 Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthName)
             })?;
         self.auth_name = auth_name;
@@ -95,16 +95,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.auth_srid` column from table
     /// `spatial_ref_sys`.
-    pub fn auth_srid<P>(
+    pub fn auth_srid<AuthSrid>(
         mut self,
-        auth_srid: P,
+        auth_srid: AuthSrid,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
     where
-        P: TryInto<Option<i32>>,
-        <P as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
+        AuthSrid: TryInto<Option<i32>>,
+        <AuthSrid as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let auth_srid =
-            auth_srid.try_into().map_err(|err: <P as TryInto<Option<i32>>>::Error| {
+            auth_srid.try_into().map_err(|err: <AuthSrid as TryInto<Option<i32>>>::Error| {
                 Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthSrid)
             })?;
         self.auth_srid = auth_srid;
@@ -114,18 +114,19 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.proj4text` column from table
     /// `spatial_ref_sys`.
-    pub fn proj4text<P>(
+    pub fn proj4text<Proj4text>(
         mut self,
-        proj4text: P,
+        proj4text: Proj4text,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Proj4text: TryInto<Option<String>>,
+        <Proj4text as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let proj4text =
-            proj4text.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
+        let proj4text = proj4text.try_into().map_err(
+            |err: <Proj4text as TryInto<Option<String>>>::Error| {
                 Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Proj4text)
-            })?;
+            },
+        )?;
         self.proj4text = proj4text;
         Ok(self)
     }
@@ -133,15 +134,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.srid` column from table
     /// `spatial_ref_sys`.
-    pub fn srid<P>(
+    pub fn srid<Srid>(
         mut self,
-        srid: P,
+        srid: Srid,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
     where
-        P: TryInto<i32>,
-        <P as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        Srid: TryInto<i32>,
+        <Srid as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let srid = srid.try_into().map_err(|err: <P as TryInto<i32>>::Error| {
+        let srid = srid.try_into().map_err(|err: <Srid as TryInto<i32>>::Error| {
             Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srid)
         })?;
         self.srid = Some(srid);
@@ -151,17 +152,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefS
 impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
     /// Sets the value of the `spatial_ref_sys.srtext` column from table
     /// `spatial_ref_sys`.
-    pub fn srtext<P>(
+    pub fn srtext<Srtext>(
         mut self,
-        srtext: P,
+        srtext: Srtext,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
     where
-        P: TryInto<Option<String>>,
-        <P as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        Srtext: TryInto<Option<String>>,
+        <Srtext as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let srtext = srtext.try_into().map_err(|err: <P as TryInto<Option<String>>>::Error| {
-            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
-        })?;
+        let srtext =
+            srtext.try_into().map_err(|err: <Srtext as TryInto<Option<String>>>::Error| {
+                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
+            })?;
         self.srtext = srtext;
         Ok(self)
     }

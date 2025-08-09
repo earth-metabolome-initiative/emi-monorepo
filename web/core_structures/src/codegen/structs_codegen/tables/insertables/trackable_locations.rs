@@ -216,17 +216,17 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
     /// Sets the value of the `trackable_locations.created_at` column from table
     /// `trackable_locations`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableTrackableLocationAttributes::CreatedAt)
             },
         )?;
@@ -249,17 +249,17 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
     /// Sets the value of the `trackable_locations.geolocation` column from
     /// table `trackable_locations`.
-    pub fn geolocation<P>(
+    pub fn geolocation<Geolocation>(
         mut self,
-        geolocation: P,
+        geolocation: Geolocation,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
-        P: TryInto<postgis_diesel::types::Point>,
-        <P as TryInto<postgis_diesel::types::Point>>::Error:
+        Geolocation: TryInto<postgis_diesel::types::Point>,
+        <Geolocation as TryInto<postgis_diesel::types::Point>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let geolocation = geolocation.try_into().map_err(
-            |err: <P as TryInto<postgis_diesel::types::Point>>::Error| {
+            |err: <Geolocation as TryInto<postgis_diesel::types::Point>>::Error| {
                 Into::into(err).rename_field(InsertableTrackableLocationAttributes::Geolocation)
             },
         )?;
@@ -270,15 +270,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
     /// Sets the value of the `trackable_locations.id` column from table
     /// `trackable_locations`.
-    pub fn id<P>(
+    pub fn id<Id>(
         mut self,
-        id: P,
+        id: Id,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
-        P: TryInto<::rosetta_uuid::Uuid>,
-        <P as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        Id: TryInto<::rosetta_uuid::Uuid>,
+        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let id = id.try_into().map_err(|err: <P as TryInto<::rosetta_uuid::Uuid>>::Error| {
+        let id = id.try_into().map_err(|err: <Id as TryInto<::rosetta_uuid::Uuid>>::Error| {
             Into::into(err).rename_field(InsertableTrackableLocationAttributes::Id)
         })?;
         self.id = Some(id);
@@ -288,15 +288,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLo
 impl crate::codegen::structs_codegen::tables::insertables::InsertableTrackableLocationBuilder {
     /// Sets the value of the `trackable_locations.inferred` column from table
     /// `trackable_locations`.
-    pub fn inferred<P>(
+    pub fn inferred<Inferred>(
         mut self,
-        inferred: P,
+        inferred: Inferred,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableTrackableLocationAttributes>>
     where
-        P: TryInto<bool>,
-        <P as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        Inferred: TryInto<bool>,
+        <Inferred as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let inferred = inferred.try_into().map_err(|err: <P as TryInto<bool>>::Error| {
+        let inferred = inferred.try_into().map_err(|err: <Inferred as TryInto<bool>>::Error| {
             Into::into(err).rename_field(InsertableTrackableLocationAttributes::Inferred)
         })?;
         self.inferred = Some(inferred);

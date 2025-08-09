@@ -1,7 +1,7 @@
 //! Submodule defining the structs supporting the [`Insertable`] and
 //! [`Insertable`]-adjacent traits.
 
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashSet, path::Path};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -9,7 +9,7 @@ use quote::quote;
 use syn::Ident;
 
 use crate::{
-    Codegen, Column, Table,
+    CheckConstraint, Codegen, Column, Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
@@ -133,19 +133,66 @@ impl Codegen<'_> {
 
             // We re-export all of the setter methods associated with the extended
             // table, if any.
-            let mut covered = HashMap::new();
-            let extension_columns_map = self.table_extension_network().unwrap().ancestors_columns(
+            let mut covered = HashSet::new();
+            let ancestor_columns_map = self.table_extension_network().unwrap().ancestors_columns(
                 table,
                 &mut covered,
                 conn,
             )?;
-            let mut extension_columns: Vec<&Column> =
-                extension_columns_map.values().flatten().collect::<Vec<&Column>>();
-            extension_columns.sort_unstable();
-            let insertable_builder_methods = extension_columns
+            let mut ancestor_columns: Vec<&Column> =
+                ancestor_columns_map.values().flatten().collect::<Vec<&Column>>();
+            ancestor_columns.sort_unstable();
+            let mut insertable_builder_methods = ancestor_columns
                 .into_iter()
-                .map(|column| self.generate_setter_method(table, column, conn))
+                .map(|column| self.generate_setter_method(table, &[column], conn))
                 .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+            let mut covered = HashSet::new();
+            let ancestor_check_constraints_map = self
+                .table_extension_network()
+                .unwrap()
+                .ancestors_check_constraints(table, &mut covered, conn)?;
+            let mut ancestor_check_constraints: Vec<&CheckConstraint> =
+                ancestor_check_constraints_map
+                    .values()
+                    .flatten()
+                    .collect::<Vec<&CheckConstraint>>();
+            ancestor_check_constraints.sort_unstable();
+            let mut ancestor_check_constraint_columns = ancestor_check_constraints
+                .iter()
+                .filter_map(|check_constraint| {
+                    let Ok(columns) = check_constraint.columns(conn) else {
+                        return None;
+                    };
+
+                    // Check constraints which include columns which are automatically
+                    // generated are not considered, as they cannot be set by the user.
+                    if columns.iter().any(|column| column.is_always_automatically_generated()) {
+                        return None;
+                    }
+
+                    // We only take into account check constraints involving more than one column,
+                    // as the single column ones are already handled by the other methods.
+
+                    // Furthermore, as check constraints only apply to non-nullable columns,
+                    // we convert the columns to non-nullable columns.
+                    let non_nullable_columns: Vec<Column> =
+                        columns.into_iter().map(|column| column.to_non_nullable()).collect();
+
+                    if non_nullable_columns.len() > 1 { Some(non_nullable_columns) } else { None }
+                })
+                .collect::<Vec<Vec<Column>>>();
+
+            ancestor_check_constraint_columns.sort_unstable();
+            ancestor_check_constraint_columns.dedup();
+
+            insertable_builder_methods.extend(
+                ancestor_check_constraint_columns
+                    .iter()
+                    .map(|columns| self.generate_setter_method(table, columns.as_slice(), conn))
+                    .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?,
+            );
+
+            insertable_builder_methods.sort_unstable_by_key(|method| method.to_string());
 
             // When the table associated with the struct we are generating is not an
             // extension, we can implement the `TryFrom` trait to convert the insertable

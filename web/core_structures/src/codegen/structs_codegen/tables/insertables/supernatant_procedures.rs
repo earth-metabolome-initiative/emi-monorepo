@@ -444,113 +444,6 @@ where
         self
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_at` column from table
-    /// `supernatant_procedures`.
-    pub fn created_at<P>(
-        mut self,
-        created_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure = self.procedure.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureAttributes::Extension(
-                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_by` column from table
-    /// `supernatant_procedures`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    > {
-        self.procedure = self.procedure.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureAttributes::Extension(
-                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.updated_at` column from table
-    /// `supernatant_procedures`.
-    pub fn updated_at<P>(
-        mut self,
-        updated_at: P,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    >
-    where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureAttributes::Extension(
-                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.updated_by` column from table
-    /// `supernatant_procedures`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
-    > {
-        self.procedure = self.procedure.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableSupernatantProcedureAttributes::Extension(
-                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
 impl<Procedure>
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
         Procedure,
@@ -638,6 +531,147 @@ impl<Procedure>
         web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
     > {
         self.transferred_with = Some(transferred_with);
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.created_at` column from table
+    /// `supernatant_procedures`.
+    pub fn created_at<CreatedAt>(
+        mut self,
+        created_at: CreatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure = self.procedure.created_at(created_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureAttributes::Extension(
+                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.created_at`, `procedures.updated_at`
+    /// columns from table `supernatant_procedures`.
+    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+        mut self,
+        created_at: CreatedAt,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    >
+    where
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure =
+            self.procedure.created_at_and_updated_at(created_at, updated_at).map_err(|e| {
+                e.into_field_name(|attribute| {
+                    InsertableSupernatantProcedureAttributes::Extension(
+                        InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                    )
+                })
+            })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.created_by` column from table
+    /// `supernatant_procedures`.
+    pub fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    > {
+        self.procedure = self.procedure.created_by(created_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureAttributes::Extension(
+                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
+        self = self.updated_by(created_by)?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.updated_at` column from table
+    /// `supernatant_procedures`.
+    pub fn updated_at<UpdatedAt>(
+        mut self,
+        updated_at: UpdatedAt,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    >
+    where
+        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+            Into<validation_errors::SingleFieldError>,
+    {
+        self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureAttributes::Extension(
+                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
+        Ok(self)
+    }
+}
+impl
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    >
+{
+    /// Sets the value of the `procedures.updated_by` column from table
+    /// `supernatant_procedures`.
+    pub fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableSupernatantProcedureAttributes>,
+    > {
+        self.procedure = self.procedure.updated_by(updated_by).map_err(|e| {
+            e.into_field_name(|attribute| {
+                InsertableSupernatantProcedureAttributes::Extension(
+                    InsertableSupernatantProcedureExtensionAttributes::Procedure(attribute),
+                )
+            })
+        })?;
         Ok(self)
     }
 }

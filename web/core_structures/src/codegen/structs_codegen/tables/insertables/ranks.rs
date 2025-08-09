@@ -54,16 +54,16 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRankBuilder {
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder {
     /// Sets the value of the `ranks.description` column from table `ranks`.
-    pub fn description<P>(
+    pub fn description<Description>(
         mut self,
-        description: P,
+        description: Description,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Description: TryInto<String>,
+        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
         let description =
-            description.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
                 Into::into(err).rename_field(InsertableRankAttributes::Description)
             })?;
         self.description = Some(description);
@@ -72,15 +72,15 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder
 }
 impl crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder {
     /// Sets the value of the `ranks.name` column from table `ranks`.
-    pub fn name<P>(
+    pub fn name<Name>(
         mut self,
-        name: P,
+        name: Name,
     ) -> Result<Self, web_common_traits::database::InsertError<InsertableRankAttributes>>
     where
-        P: TryInto<String>,
-        <P as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        Name: TryInto<String>,
+        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
     {
-        let name = name.try_into().map_err(|err: <P as TryInto<String>>::Error| {
+        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
             Into::into(err).rename_field(InsertableRankAttributes::Name)
         })?;
         self.name = Some(name);

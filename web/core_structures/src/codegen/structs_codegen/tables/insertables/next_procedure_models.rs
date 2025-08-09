@@ -257,14 +257,20 @@ impl web_common_traits::database::ExtendableBuilder for InsertableNextProcedureM
         mut self,
         other: Self,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        match (other.current_id, other.successor_id) {
+            (Some(current_id), Some(successor_id)) => {
+                self = self.current_and_successor(current_id, successor_id)?;
+            }
+            (None, Some(successor_id)) => {
+                self = self.successor(successor_id)?;
+            }
+            (Some(current_id), None) => {
+                self = self.current(current_id)?;
+            }
+            (None, None) => {}
+        }
         if let Some(parent_id) = other.parent_id {
             self = self.parent(parent_id)?;
-        }
-        if let Some(current_id) = other.current_id {
-            self = self.current(current_id)?;
-        }
-        if let Some(successor_id) = other.successor_id {
-            self = self.successor(successor_id)?;
         }
         if let Some(created_by) = other.created_by {
             self = self.created_by(created_by)?;
@@ -284,20 +290,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableNextProcedureModelB
 impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
     /// Sets the value of the `next_procedure_models.created_at` column from
     /// table `next_procedure_models`.
-    pub fn created_at<P>(
+    pub fn created_at<CreatedAt>(
         mut self,
-        created_at: P,
+        created_at: CreatedAt,
     ) -> Result<
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
     >
     where
-        P: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
+        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
+        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
             Into<validation_errors::SingleFieldError>,
     {
         let created_at = created_at.try_into().map_err(
-            |err: <P as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
+            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
                 Into::into(err).rename_field(InsertableNextProcedureModelAttributes::CreatedAt)
             },
         )?;
@@ -329,7 +335,42 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedu
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
     > {
+        if let Some(successor_id) = self.successor_id {
+            pgrx_validation::must_be_distinct_i32(current_id, successor_id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CurrentId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::SuccessorId,
+                        )
+                })?;
+        }
         self.current_id = Some(current_id);
+        Ok(self)
+    }
+}
+impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelBuilder {
+    /// Sets the value of the `next_procedure_models.current_id`,
+    /// `next_procedure_models.successor_id` columns from table
+    /// `next_procedure_models`.
+    pub fn current_and_successor(
+        mut self,
+        current_id: i32,
+        successor_id: i32,
+    ) -> Result<
+        Self,
+        web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
+    > {
+        pgrx_validation::must_be_distinct_i32(current_id, successor_id)
+            .map_err(|e| {
+                e
+                    .rename_fields(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CurrentId,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::SuccessorId,
+                    )
+            })?;
+        self.current_id = Some(current_id);
+        self.successor_id = Some(successor_id);
         Ok(self)
     }
 }
@@ -357,6 +398,16 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedu
         Self,
         web_common_traits::database::InsertError<InsertableNextProcedureModelAttributes>,
     > {
+        if let Some(current_id) = self.current_id {
+            pgrx_validation::must_be_distinct_i32(current_id, successor_id)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::CurrentId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureModelAttributes::SuccessorId,
+                        )
+                })?;
+        }
         self.successor_id = Some(successor_id);
         Ok(self)
     }
