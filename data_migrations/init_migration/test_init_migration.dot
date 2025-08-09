@@ -27,86 +27,86 @@ subgraph cluster__1_0 {
 	label=<<U>DBGI Freezing</U>>;
 	style="rounded";
 	color="#EF3340";
-    T1 [label="Conical Tube Box", shape=box, color="#00ad43"];
-    T2 [label="Standard -80C Freezer", shape=box, color="#00ad43"];
+    T1 [label="Conical Tube Box", shape=box, style="filled,rounded", color="#FFF8D5", fillcolor="#FFF8D5"];
+    T2 [label="Standard -80C Freezer", shape=box, style="filled,rounded", color="#DDA0DD", fillcolor="#DDA0DD"];
 }
 subgraph cluster__1_1 {
 	label=<<U>DBGI Freeze Drying</U>>;
 	style="rounded";
 	color="#EF3340";
-    T3 [label="DBGI Conical Tube (Falcon)", shape=box, color="#00ad43"];
-    T4 [label="Sample Freeze Dryer", shape=box, color="#00ad43"];
+    T3 [label="DBGI Conical Tube (Falcon)", shape=box, style="filled,rounded", color="#E6AAD2", fillcolor="#E6AAD2"];
+    T4 [label="Sample Freeze Dryer", shape=box, style="filled,rounded", color="#F1BEB5", fillcolor="#F1BEB5"];
 }
 subgraph cluster__1_2 {
 	label=<<U>DBGI Falcon Storage</U>>;
 	style="rounded";
 	color="#EF3340";
-    T5 [label="DBGI Conical Tube (Falcon)", shape=box, color="#00ad43"];
-    T6 [label="DBGI Conical Tube Rack", shape=box, color="#00ad43"];
+    T5 [label="DBGI Conical Tube (Falcon)", shape=box, style="filled,rounded", color="#D3B8A1", fillcolor="#D3B8A1"];
+    T6 [label="DBGI Conical Tube Rack", shape=box, style="filled,rounded", color="#9DD6AD", fillcolor="#9DD6AD"];
 }
 subgraph cluster__1_3 {
 	label=<<U>DBGI Fractioning</U>>;
 	style="rounded";
 	color="#EF3340";
-    T7 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
-    T8 [label="DBGI Conical Tube (Falcon)", shape=box, color="#00ad43"];
-    T9 [label="Weighing Scale", shape=box, color="#00ad43"];
+    T7 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#FAF8F6", fillcolor="#FAF8F6"];
+    T8 [label="DBGI Conical Tube (Falcon)", shape=box, style="filled,rounded", color="#A5E3E0", fillcolor="#A5E3E0"];
+    T9 [label="Weighing Scale", shape=box, style="filled,rounded", color="#D5F6FB", fillcolor="#D5F6FB"];
 }
 subgraph cluster__1_4 {
 	label=<<U>DBGI Ball Mill 1</U>>;
 	style="rounded";
 	color="#EF3340";
-    T10 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
-    T11 [label="DBGI Ball Mill", shape=box, color="#00ad43"];
+    T10 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#D69759", fillcolor="#D69759"];
+    T11 [label="DBGI Ball Mill", shape=box, style="filled,rounded", color="#B2C9E2", fillcolor="#B2C9E2"];
 }
 subgraph cluster__1_5 {
 	label=<<U>DBGI Ball Mill 2</U>>;
 	style="rounded";
 	color="#EF3340";
-    T12 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
-    T13 [label="DBGI Ball Mill", shape=box, color="#00ad43"];
+    T12 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#EF9967", fillcolor="#EF9967"];
+    T13 [label="DBGI Ball Mill", shape=box, style="filled,rounded", color="#8686AF", fillcolor="#8686AF"];
 }
 subgraph cluster__1_6 {
 	label=<<U>DBGI Centrifuge</U>>;
 	style="rounded";
 	color="#EF3340";
-    T14 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
-    T15 [label="DBGI Centrifuge", shape=box, color="#00ad43"];
+    T14 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#807DDB", fillcolor="#807DDB"];
+    T15 [label="DBGI Centrifuge", shape=box, style="filled,rounded", color="#C4D5E0", fillcolor="#C4D5E0"];
 }
 subgraph cluster__1_7 {
 	label=<<U>DBGI Supernatant</U>>;
 	style="rounded";
 	color="#EF3340";
-    T16 [label="DBGI Pipette Tips 1000", shape=box, color="#00ad43"];
-    T17 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
-    T18 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
-    T19 [label="DBGI Pipette 1000", shape=box, color="#00ad43"];
+    T16 [label="DBGI Pipette Tips 1000", shape=box, style="filled,rounded", color="#EFDFD8", fillcolor="#EFDFD8"];
+    T17 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#BCC4E9", fillcolor="#BCC4E9"];
+    T18 [label="DBGI Long Term Storage Vial", shape=box, style="filled,rounded", color="#AEC6CF", fillcolor="#AEC6CF"];
+    T19 [label="DBGI Pipette 1000", shape=box, style="filled,rounded", color="#F6C1B2", fillcolor="#F6C1B2"];
 }
 subgraph cluster__1_8 {
 	label=<<U>DBGI Capping</U>>;
 	style="rounded";
 	color="#EF3340";
-    T20 [label="DBGI Sealed Cap", shape=box, color="#00ad43"];
-    T21 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
+    T20 [label="DBGI Sealed Cap", shape=box, style="filled,rounded", color="#CFCFC4", fillcolor="#CFCFC4"];
+    T21 [label="DBGI Long Term Storage Vial", shape=box, style="filled,rounded", color="#E4C9E0", fillcolor="#E4C9E0"];
 }
 subgraph cluster__1_9 {
 	label=<<U>DBGI Long Term Storage Vial Storage</U>>;
 	style="rounded";
 	color="#EF3340";
-    T22 [label="DBGI Long Term Storage Vial", shape=box, color="#00ad43"];
-    T23 [label="DBGI Long Term Storage Vial Box", shape=box, color="#00ad43"];
+    T22 [label="DBGI Long Term Storage Vial", shape=box, style="filled,rounded", color="#BBA151", fillcolor="#BBA151"];
+    T23 [label="DBGI Long Term Storage Vial Box", shape=box, style="filled,rounded", color="#CFAC94", fillcolor="#CFAC94"];
 }
 subgraph cluster__1_10 {
 	label=<<U>DBGI Dispose of Eppendorf Tube</U>>;
 	style="rounded";
 	color="#EF3340";
-    T24 [label="DBGI Eppendorf Tube", shape=box, color="#00ad43"];
+    T24 [label="DBGI Eppendorf Tube", shape=box, style="filled,rounded", color="#FFA4A9", fillcolor="#FFA4A9"];
 }
 subgraph cluster__1_11 {
 	label=<<U>DBGI Dispose of Pipette Tips</U>>;
 	style="rounded";
 	color="#EF3340";
-    T25 [label="DBGI Pipette Tips 1000", shape=box, color="#00ad43"];
+    T25 [label="DBGI Pipette Tips 1000", shape=box, style="filled,rounded", color="#974C5E", fillcolor="#974C5E"];
 }
     T2:s -> T4:n [label="And then", color="#EF3340", ltail=cluster__1_0, lhead=cluster__1_1];
     T4:s -> T6:n [label="And then", color="#EF3340", ltail=cluster__1_1, lhead=cluster__1_2];
@@ -131,29 +131,29 @@ subgraph cluster__4_1 {
 	label=<<U>Organism in Ecosystem Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T40 [label="Camera", shape=box, color="#00ad43"];
-    T41 [label="Organism", shape=box, color="#00ad43"];
+    T40 [label="Camera", shape=box, style="filled,rounded", color="#B4D9EF", fillcolor="#B4D9EF"];
+    T41 [label="Organism", shape=box, style="filled,rounded", color="#63B7B7", fillcolor="#63B7B7"];
 }
 subgraph cluster__4_2 {
 	label=<<U>Organism Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T42 [label="Camera", shape=box, color="#00ad43"];
-    T43 [label="Organism", shape=box, color="#00ad43"];
+    T42 [label="Camera", shape=box, style="filled,rounded", color="#DFFF8F", fillcolor="#DFFF8F"];
+    T43 [label="Organism", shape=box, style="filled,rounded", color="#B2F4E3", fillcolor="#B2F4E3"];
 }
 subgraph cluster__4_3 {
 	label=<<U>Organism Details Picture</U>>;
 	style="rounded";
 	color="#EF3340";
-    T44 [label="Camera", shape=box, color="#00ad43"];
-    T45 [label="Organism", shape=box, color="#00ad43"];
+    T44 [label="Camera", shape=box, style="filled,rounded", color="#D0E9C0", fillcolor="#D0E9C0"];
+    T45 [label="Organism", shape=box, style="filled,rounded", color="#DDE0E4", fillcolor="#DDE0E4"];
 }
 subgraph cluster__4_4 {
 	label=<<U>Organism Geolocation</U>>;
 	style="rounded";
 	color="#EF3340";
-    T46 [label="Geolocation Instrument", shape=box, color="#00ad43"];
-    T47 [label="Organism", shape=box, color="#00ad43"];
+    T46 [label="Geolocation Instrument", shape=box, style="filled,rounded", color="#D8CBE9", fillcolor="#D8CBE9"];
+    T47 [label="Organism", shape=box, style="filled,rounded", color="#F9CCB6", fillcolor="#F9CCB6"];
 }
     P21:s -> T41:n [label="And then", color="#EF3340", lhead=cluster__4_1];
     T41:s -> T43:n [label="And then", color="#EF3340", ltail=cluster__4_1, lhead=cluster__4_2];
@@ -171,22 +171,22 @@ subgraph cluster__5_3 {
 	label=<<U>Wrap in coffee filter paper</U>>;
 	style="rounded";
 	color="#EF3340";
-    T51 [label="Coffee filter wrapper", shape=box, color="#00ad43"];
-    T52 [label="Sample", shape=box, color="#00ad43"];
+    T51 [label="Coffee filter wrapper", shape=box, style="filled,rounded", color="#9AE2E3", fillcolor="#9AE2E3"];
+    T52 [label="Sample", shape=box, style="filled,rounded", color="#D3C7A2", fillcolor="#D3C7A2"];
 }
 subgraph cluster__5_4 {
 	label=<<U>Place in conical centrifugal tube</U>>;
 	style="rounded";
 	color="#EF3340";
-    T53 [label="Coffee filter wrapper", shape=box, color="#00ad43"];
-    T54 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
+    T53 [label="Coffee filter wrapper", shape=box, style="filled,rounded", color="#FFB347", fillcolor="#FFB347"];
+    T54 [label="Sample Conical Centrifugal Tube", shape=box, style="filled,rounded", color="#D0A48D", fillcolor="#D0A48D"];
 }
 subgraph cluster__5_5 {
 	label=<<U>Place in storage box</U>>;
 	style="rounded";
 	color="#EF3340";
-    T55 [label="Sample Conical Centrifugal Tube", shape=box, color="#00ad43"];
-    T56 [label="Conical Tube Box", shape=box, color="#00ad43"];
+    T55 [label="Sample Conical Centrifugal Tube", shape=box, style="filled,rounded", color="#E99FAA", fillcolor="#E99FAA"];
+    T56 [label="Conical Tube Box", shape=box, style="filled,rounded", color="#F6F3A9", fillcolor="#F6F3A9"];
 }
     P27:s -> P28:n [label="And then", color="#EF3340"];
     P28:s -> P29:n [label="And then", color="#EF3340"];

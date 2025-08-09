@@ -19,13 +19,24 @@ use web_common_traits::{
     prelude::{Builder, ExtensionTable},
 };
 
-use crate::{
-    NextProcedureModel, ParentProcedureModel, ProcedureModel, ProcedureModelTrackable,
-    SharedProcedureModelTrackable,
-};
+use crate::{NextProcedureModel, ParentProcedureModel, ProcedureModel, ProcedureModelTrackable};
 
 const RED: &str = "\"#EF3340\"";
-const GREEN: &str = "\"#00ad43\"";
+const PASTEL_COLORS: [&str; 99] = [
+    "#E7D27C", "#FFF8D5", "#DDA0DD", "#E6AAD2", "#F1BEB5", "#D3B8A1", "#9DD6AD", "#FAF8F6",
+    "#A5E3E0", "#D5F6FB", "#D69759", "#B2C9E2", "#EF9967", "#8686AF", "#807DDB", "#C4D5E0",
+    "#EFDFD8", "#BCC4E9", "#AEC6CF", "#F6C1B2", "#CFCFC4", "#E4C9E0", "#BBA151", "#CFAC94",
+    "#FFA4A9", "#974C5E", "#BCBC82", "#C5CBE1", "#C25964", "#F0EBD8", "#F6B8D0", "#ED8698",
+    "#E56E90", "#E8C6AA", "#75655A", "#EBCCFF", "#A3CCE3", "#C3D9C4", "#F8D0D2", "#E7D7CA",
+    "#B4D9EF", "#63B7B7", "#DFFF8F", "#B2F4E3", "#D0E9C0", "#DDE0E4", "#D8CBE9", "#F9CCB6",
+    "#AFC0EA", "#D4EDF0", "#EB618F", "#9AE2E3", "#D3C7A2", "#FFB347", "#D0A48D", "#E99FAA",
+    "#F6F3A9", "#5E5CB2", "#FFD1E1", "#F4B5C5", "#FFF5B2", "#BD5F60", "#C8BFD6", "#BEDDF1",
+    "#FFFAC8", "#9BCC9E", "#F8C57C", "#A16AD1", "#A4D8D8", "#D1FEB8", "#FFD5D9", "#E5C768",
+    "#6ECDDB", "#944547", "#F5E2E4", "#9ECB91", "#FFFEE0", "#2F4C39", "#D7CAB7", "#B1C086",
+    "#F7DFC2", "#C79098", "#EEF3F6", "#D4C6AA", "#B0E9D5", "#AFCF99", "#E5ECF8", "#E6E6FA",
+    "#FFDDB3", "#E9C9AA", "#3D426B", "#BDFCC9", "#FFA38C", "#FCEACD", "#A7796D", "#DBDBDC",
+    "#D05C39", "#DAD4B6", "#A2CFDD",
+];
 
 pub trait ProcedureModelDot: ExtensionTable<ProcedureModel>
 where
@@ -191,41 +202,13 @@ where
         for procedure_trackable in
             ProcedureModelTrackable::from_procedure_model_id(self.id(), conn)?
         {
+            let bgcolor = PASTEL_COLORS
+                .get(procedure_trackable.id as usize % PASTEL_COLORS.len())
+                .expect("Color index should be valid");
+
             dot.push_str(&format!(
-                "    T{} [label=\"{}\", shape=box, color={GREEN}];\n",
+                "    T{} [label=\"{}\", shape=box, style=\"filled,rounded\", color=\"{bgcolor}\", fillcolor=\"{bgcolor}\"];\n",
                 procedure_trackable.id, procedure_trackable.name
-            ));
-        }
-
-        Ok(dot)
-    }
-
-    /// Returns the shareable trackable edges associated with the procedure
-    /// model.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection` for database
-    ///   operations.
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while retrieving the shared trackable edges, it
-    ///   returns a `diesel::result::Error`.
-    fn shared_trackable_edges(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<String, diesel::result::Error> {
-        let mut dot = String::new();
-
-        // We link shared trackables to child procedures
-        for shared in
-            SharedProcedureModelTrackable::from_parent_procedure_model_id(self.id(), conn)?
-        {
-            dot.push_str(&format!(
-                "    T{} -> T{} [dir=both, style=dashed, color={GREEN}, label=\"Same as\"];\n",
-                shared.parent(conn)?.id(),
-                shared.child(conn)?.id()
             ));
         }
 

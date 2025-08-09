@@ -1,7 +1,9 @@
 //! Submodule to initialize the `instruments` in the database.
 
 use core_structures::{
-    traits::CompatibleWith, BallMillMachineModel, CameraModel, CentrifugeModel, CompatibilityRule, ContainerModel, FreezeDrierModel, FreezerModel, PipetteModel, PipetteTipModel, PositioningDeviceModel, Trackable, User, VolumetricContainerModel, WeighingInstrumentModel
+    BallMillMachineModel, CameraModel, CentrifugeModel, CompatibilityRule, ContainerModel,
+    FreezeDrierModel, FreezerModel, PipetteModel, PipetteTipModel, PositioningDeviceModel,
+    Trackable, User, VolumetricContainerModel, WeighingInstrumentModel, traits::CompatibleWith,
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
