@@ -189,16 +189,16 @@ CREATE TABLE IF NOT EXISTS supernatant_procedure_models (
 	-- The amount of liters that should be transferred
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	-- The source container from which the supernatant is taken.
-	stratified_source UUID NOT NULL REFERENCES volumetric_container_models(id) ON DELETE CASCADE,
+	stratified_source UUID NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_stratified_source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- Destination container to which the supernatant is transferred.
-	supernatant_destination UUID NOT NULL REFERENCES volumetric_container_models(id) ON DELETE CASCADE,
+	supernatant_destination UUID NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_supernatant_destination INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The device used for the aliquoting procedure.
-	transferred_with UUID NOT NULL REFERENCES pipette_models(id) ON DELETE CASCADE,
+	transferred_with UUID NOT NULL REFERENCES pipette_models(id),
 	procedure_transferred_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The pipette tip to be mounted on the pipette.
-	pipette_tip UUID NOT NULL REFERENCES pipette_tip_models(id) ON DELETE CASCADE,
+	pipette_tip UUID NOT NULL REFERENCES pipette_tip_models(id),
 	procedure_pipette_tip INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- We check that the `procedure_transferred_with` is indeed a trackable that is compatible with the procedure model.
 	FOREIGN KEY (procedure_transferred_with, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,

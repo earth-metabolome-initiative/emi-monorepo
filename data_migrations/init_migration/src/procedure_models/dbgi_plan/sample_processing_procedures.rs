@@ -135,7 +135,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("DBGI Freeze Drying")?
         .description("DBGI Freeze Drying procedure model")?
         .created_by(user.id)?
-        .procedure_freeze_dried_container(procedure_conical_tubes_box_builder)?
+        .procedure_freeze_dried_container(procedure_conical_tube_builder.clone())?
         .procedure_freeze_dried_with(
             ProcedureModelTrackable::new()
                 .name("Sample Freeze Dryer")?
@@ -203,6 +203,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .procedure_stratified_source(procedure_safelock_tube_builder.clone())?
         .procedure_supernatant_destination(long_term_storage_vial_builder.clone())?
         .procedure_transferred_with(pipette_1000_builder.clone())?
+        .procedure_pipette_tip(pipette_tips_1000_builder.clone())?
         .insert(user.id, conn)?;
 
     let capping_procedure = CappingProcedureModel::new()

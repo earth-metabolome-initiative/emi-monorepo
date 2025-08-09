@@ -1,14 +1,14 @@
 //! Submodule to initialize the `instruments` in the database.
 
 use core_structures::{
-    BallMillMachineModel, CameraModel, CentrifugeModel, CompatibilityRule, ContainerModel,
-    FreezeDrierModel, FreezerModel, PipetteModel, PositioningDeviceModel, Trackable, User,
-    VolumetricContainerModel, WeighingInstrumentModel, traits::CompatibleWith,
+    traits::CompatibleWith, BallMillMachineModel, CameraModel, CentrifugeModel, CompatibilityRule, ContainerModel, FreezeDrierModel, FreezerModel, PipetteModel, PipetteTipModel, PositioningDeviceModel, Trackable, User, VolumetricContainerModel, WeighingInstrumentModel
 };
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::containers::{POLYSTYRENE_BOX, SAFELOCK_TUBE_2ML};
+use crate::trackables::containers::{
+    CONICAL_CENTRIFUGAL_TUBE_50ML, POLYSTYRENE_BOX, SAFELOCK_TUBE_2ML,
+};
 pub mod ball_mill_instrument;
 pub mod centrifuge_instrument;
 pub mod pipette_1000;
@@ -52,12 +52,16 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    let _freeze_dryer = FreezeDrierModel::new()
+    let freeze_dryer = FreezeDrierModel::new()
         .name(FREEZE_DRYER.to_owned())?
         .description("Freeze dryer".to_owned())?
         .parent(Some(instrument.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
+
+    let procedure_conical_tube_builder =
+        VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)?;
+    freeze_dryer.compatible_with(&procedure_conical_tube_builder, user, conn)?;
 
     let _weighing_scale = WeighingInstrumentModel::new()
         .name(WEIGHING_SCALE.to_owned())?
@@ -114,34 +118,37 @@ pub(crate) fn init_instruments(user: &User, conn: &mut PgConnection) -> anyhow::
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    let _pipettes_1000 = VolumetricContainerModel::new()
+    let pipettes_1000 = PipetteModel::new()
         .name(PIPETTES_1000.to_owned())?
-        .description("Pipettes for liquid handling".to_owned())?
+        .description("Pipettes for handling 1ml of liquid".to_owned())?
         .parent(Some(pipettes.id))?
         .created_by(user.id)?
-        .liters(0.001)?
         .insert(user.id, conn)?;
 
-    let _pipette_tips_1000 = Trackable::new()
+    let pipette_tips_1000 = PipetteTipModel::new()
         .name(PIPETTE_TIPS_1000.to_owned())?
-        .description("Pipette tips for liquid handling".to_owned())?
+        .description("Pipette tips for handling 1ml of liquid".to_owned())?
         .parent(Some(pipette_tips.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    let _pipettes_200 = PipetteModel::new()
+    pipettes_1000.compatible_with(&pipette_tips_1000, user, conn)?;
+
+    let pipettes_200 = PipetteModel::new()
         .name(PIPETTES_200.to_owned())?
-        .description("Pipettes for liquid handling".to_owned())?
+        .description("Pipettes for handling 0.2ml of liquid".to_owned())?
         .parent(Some(pipettes.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    let _pipette_tips_200 = Trackable::new()
+    let pipette_tips_200 = PipetteTipModel::new()
         .name(PIPETTE_TIPS_200.to_owned())?
-        .description("Pipette tips for liquid handling".to_owned())?
+        .description("Pipette tips for handling 0.2ml of liquid".to_owned())?
         .parent(Some(pipette_tips.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?;
+
+    pipettes_200.compatible_with(&pipette_tips_200, user, conn)?;
 
     Ok(())
 }

@@ -42,14 +42,12 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) -> an
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn)?;
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn)?;
     let observation_procedure = init_organism_observation_procedure(user, conn)?;
-    let full_organism_collection = init_full_organism_collection(user, conn)?;
     let part_of_organism_collection = init_part_of_organism_collection(user, conn)?;
     let data_enrichment = init_data_enrichment_procedure(user, conn)?;
 
     for procedure in [
         &collection_preparation,
         &observation_procedure,
-        &full_organism_collection,
         &part_of_organism_collection,
         &sample_processing_procedure,
         &positive_lcms_procedure,
