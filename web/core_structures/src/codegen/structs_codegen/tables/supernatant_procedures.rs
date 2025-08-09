@@ -537,10 +537,10 @@ impl SupernatantProcedure {
         procedure_model_id: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl,
-            RunQueryDsl, SelectableHelper, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
@@ -556,7 +556,6 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure_id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(

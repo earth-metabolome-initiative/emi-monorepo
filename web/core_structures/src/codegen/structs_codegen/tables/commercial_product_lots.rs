@@ -104,10 +104,9 @@ impl CommercialProductLot {
         lot: &str,
         product_model_id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
@@ -119,7 +118,6 @@ impl CommercialProductLot {
             )
             .order_by(commercial_product_lots::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_lot(
@@ -151,10 +149,10 @@ impl CommercialProductLot {
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
@@ -166,7 +164,6 @@ impl CommercialProductLot {
             .order_by(commercial_product_lots::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

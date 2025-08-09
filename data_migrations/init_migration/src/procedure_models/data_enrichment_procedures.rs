@@ -5,6 +5,7 @@ use core_structures::{
     ProcedureModel,
     traits::{ChildOptions, ParentProcedureModel},
 };
+use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 mod weather_retrieval_procedure;
 
@@ -24,34 +25,34 @@ const DATA_ENRICHMENT_PROCEDURES: &str = "Data Enrichment Procedure";
 pub(crate) fn init_data_enrichment_procedure(
     user: &core_structures::User,
     conn: &mut diesel::PgConnection,
-) -> ProcedureModel {
-    if let Some(procedure) = ProcedureModel::from_name(DATA_ENRICHMENT_PROCEDURES, conn).unwrap() {
-        return procedure;
+) -> anyhow::Result<ProcedureModel> {
+    if let Some(procedure) =
+        ProcedureModel::from_name(DATA_ENRICHMENT_PROCEDURES, conn).optional()?
+    {
+        return Ok(procedure);
     }
 
     let data_enrichment_procedure = ProcedureModel::new()
 		.name(DATA_ENRICHMENT_PROCEDURES)
-		.unwrap()
+		?
 		.description(
 			"Procedure model for Negative Ionization LC-MS analysis, used in various analytical procedures.",
 		)
-		.unwrap()
+		?
 		.created_by(user.id)
-		.unwrap()
+		?
 		.insert(user.id, conn)
-		.unwrap();
+		?;
 
     let weather_retrieval_procedure =
-        weather_retrieval_procedure::init_weather_retrieval_procedure(user, conn);
+        weather_retrieval_procedure::init_weather_retrieval_procedure(user, conn)?;
 
-    data_enrichment_procedure
-        .child(
-            &weather_retrieval_procedure,
-            ChildOptions::default().inherit_trackables(),
-            user,
-            conn,
-        )
-        .unwrap();
+    data_enrichment_procedure.child(
+        &weather_retrieval_procedure,
+        ChildOptions::default().inherit_trackables(),
+        user,
+        conn,
+    )?;
 
-    data_enrichment_procedure
+    Ok(data_enrichment_procedure)
 }

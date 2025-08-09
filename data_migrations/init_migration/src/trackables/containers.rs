@@ -19,92 +19,65 @@ pub const SAMPLE_CONTAINER: &str = "Sample Container";
 pub const SPRAYER: &str = "Sprayer";
 pub const POLYSTYRENE_BOX: &str = "Polystyrene Box";
 
-pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) {
+pub(crate) fn init_containers(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     let container = ContainerModel::new()
-        .name(Some("Container".to_owned()))
-        .unwrap()
-        .description(Some("Containers used in laboratory procedures".to_owned()))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some("Container".to_owned()))?
+        .description(Some("Containers used in laboratory procedures".to_owned()))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let _bottle = ContainerModel::new()
-        .name(Some(BOTTLE.to_owned()))
-        .unwrap()
-        .description(Some("Bottle, a common container for liquids".to_owned()))
-        .unwrap()
-        .parent(Some(container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(BOTTLE.to_owned()))?
+        .description(Some("Bottle, a common container for liquids".to_owned()))?
+        .parent(Some(container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let sample_container = ContainerModel::new()
-        .name(Some(SAMPLE_CONTAINER.to_owned()))
-        .unwrap()
-        .description(Some("Sample container, a common container for samples".to_owned()))
-        .unwrap()
-        .parent(Some(container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(SAMPLE_CONTAINER.to_owned()))?
+        .description(Some("Sample container, a common container for samples".to_owned()))?
+        .parent(Some(container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let r#box = ContainerModel::new()
-        .name(Some(BOX.to_owned()))
-        .unwrap()
-        .description(Some("Box, a common container for samples".to_owned()))
-        .unwrap()
-        .parent(Some(container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(BOX.to_owned()))?
+        .description(Some("Box, a common container for samples".to_owned()))?
+        .parent(Some(container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let polystyrene_box = ContainerModel::new()
-        .name(Some(POLYSTYRENE_BOX.to_owned()))
-        .unwrap()
+        .name(Some(POLYSTYRENE_BOX.to_owned()))?
         .description(Some(
             "Polystyrene box, a container typically used for liquid nitrogen".to_owned(),
-        ))
-        .unwrap()
-        .parent(Some(r#box.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        ))?
+        .parent(Some(r#box.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let _shelf = ContainerModel::new()
-        .name(Some(SHELF.to_owned()))
-        .unwrap()
-        .description(Some("Shelf, a common container for storing other containers".to_owned()))
-        .unwrap()
-        .parent(Some(container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(SHELF.to_owned()))?
+        .description(Some("Shelf, a common container for storing other containers".to_owned()))?
+        .parent(Some(container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let _sprayer = ContainerModel::new()
         .name(Some(SPRAYER.to_owned()))
-        .unwrap()
+        ?
         .description(Some(
             "Sprayer, a container for liquids, usually Ethanol, used in laboratory or field procedures".to_owned(),
         ))
-        .unwrap()
+        ?
         .parent(Some(container.id))
-        .unwrap()
+        ?
         .created_by(user.id)
-        .unwrap()
+        ?
         .insert(user.id, conn)
-        .unwrap();
+        ?;
 
-    wet_lab_containers::init_wet_lab_containers(user, &container, &sample_container, conn);
+    wet_lab_containers::init_wet_lab_containers(user, &container, &sample_container, conn)?;
+
+    Ok(())
 }

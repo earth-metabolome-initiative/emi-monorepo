@@ -1,6 +1,7 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{ProcedureModel, User};
+use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the DBGI Collection preparation procedure model.
@@ -20,20 +21,20 @@ pub const E70_ETHANOL: &str = "Ethanol 70 percent";
 pub(crate) fn init_ethanol_70_percent(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> ProcedureModel {
-    if let Some(procedure) = ProcedureModel::from_name(E70_ETHANOL, conn).unwrap() {
-        return procedure;
+) -> anyhow::Result<ProcedureModel> {
+    if let Some(procedure) = ProcedureModel::from_name(E70_ETHANOL, conn).optional()? {
+        return Ok(procedure);
     }
 
-    ProcedureModel::new()
+    Ok(ProcedureModel::new()
         .name(E70_ETHANOL)
-        .unwrap()
+        ?
         .description(
 			"Procedure model for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",
         )
-        .unwrap()
+        ?
         .created_by(user.id)
-        .unwrap()
+        ?
         .insert(user.id, conn)
-		.unwrap()
+		?)
 }

@@ -63,27 +63,23 @@ impl UserEmail {
     pub fn from_email(
         email: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
         Self::table()
             .filter(user_emails::email.eq(email))
             .order_by(user_emails::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_email_and_created_by(
         email: &str,
         created_by: &i32,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
@@ -91,17 +87,15 @@ impl UserEmail {
             .filter(user_emails::email.eq(email).and(user_emails::created_by.eq(created_by)))
             .order_by(user_emails::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by_and_primary_email(
         created_by: &i32,
         primary_email: &bool,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
@@ -113,7 +107,6 @@ impl UserEmail {
             )
             .order_by(user_emails::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(

@@ -44,9 +44,7 @@ async fn test_init_migration() {
         }
     }
 
-    let procedure_model = ProcedureModel::from_name(DBGI_PLAN, &mut conn)
-        .expect("Failed to find the procedure model")
-        .unwrap();
+    let procedure_model = ProcedureModel::from_name(DBGI_PLAN, &mut conn).unwrap();
 
     let dot = procedure_model
         .to_dot(&mut conn)

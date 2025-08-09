@@ -35,17 +35,14 @@ impl LoginProvider {
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
         Self::table()
             .filter(login_providers::name.eq(name))
             .order_by(login_providers::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_icon(

@@ -1,7 +1,7 @@
 //! Login providers migration
 
 use core_structures::{LoginProvider, User};
-use diesel::PgConnection;
+use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::prelude::*;
 
 /// Initialize the GitHub login provider if it does not exist
@@ -20,18 +20,19 @@ use web_common_traits::prelude::*;
 fn init_github_login_provider(
     user: &User,
     conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
-    if LoginProvider::from_name("GitHub", conn)?.is_none() {
-        let _provider = LoginProvider::new()
-            .icon("github")?
-            .name("GitHub")?
-            .oauth_url("https://github.com/login/oauth/authorize")?
-            .client(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
-            .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
-            .scope("read:user,user:email")?
-            .insert(user.id, conn)?;
+) -> anyhow::Result<LoginProvider> {
+    if let Some(provider) = LoginProvider::from_name("GitHub", conn).optional()? {
+        return Ok(provider);
     }
-    Ok(())
+
+    Ok(LoginProvider::new()
+        .icon("github")?
+        .name("GitHub")?
+        .oauth_url("https://github.com/login/oauth/authorize")?
+        .client(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
+        .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
+        .scope("read:user,user:email")?
+        .insert(user.id, conn)?)
 }
 
 /// Initialize login providers in the database.
@@ -45,9 +46,7 @@ fn init_github_login_provider(
 ///
 /// * If the login provider cannot be created or inserted into the database, an
 ///   error is returned.
-pub(crate) fn init_login_providers(
-    user: &User,
-    conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
-    init_github_login_provider(user, conn)
+pub(crate) fn init_login_providers(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
+    let _github = init_github_login_provider(user, conn)?;
+    Ok(())
 }

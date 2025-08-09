@@ -15,56 +15,38 @@ pub(super) fn init_conical_centrifugal_tubes(
     container: &ContainerModel,
     wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
-) {
+) -> anyhow::Result<()> {
     let conical_tube = ContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE.to_owned()))
-        .unwrap()
-        .description(Some("Conical tube, a common container for samples".to_owned()))
-        .unwrap()
-        .parent(Some(wet_lab_container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(CONICAL_CENTRIFUGAL_TUBE.to_owned()))?
+        .description(Some("Conical tube, a common container for samples".to_owned()))?
+        .parent(Some(wet_lab_container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let conical_tube_50ml = VolumetricContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML.to_owned()))
-        .unwrap()
-        .description(Some("Conical tube of 50ml, used for sample collection.".to_owned()))
-        .unwrap()
-        .parent(Some(conical_tube.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .liters(0.05)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML.to_owned()))?
+        .description(Some("Conical tube of 50ml, used for sample collection.".to_owned()))?
+        .parent(Some(conical_tube.id))?
+        .created_by(user.id)?
+        .liters(0.05)?
+        .insert(user.id, conn)?;
 
     let conical_tube_rack = ContainerModel::new()
-        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned()))
-        .unwrap()
-        .description(Some("Conical tube rack, a common container for conical tubes".to_owned()))
-        .unwrap()
-        .parent(Some(container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(CONICAL_CENTRIFUGAL_TUBE_50ML_RACK.to_owned()))?
+        .description(Some("Conical tube rack, a common container for conical tubes".to_owned()))?
+        .parent(Some(container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
-    conical_tube_rack.compatible_with_quantity(&conical_tube_50ml, 24, user, conn).unwrap();
+    conical_tube_rack.compatible_with_quantity(&conical_tube_50ml, 24, user, conn)?;
 
-    ContainerModel::from_name(POLYSTYRENE_BOX, conn)
-        .unwrap()
-        .unwrap()
-        .compatible_with(&conical_tube_50ml, user, conn)
-        .unwrap();
+    ContainerModel::from_name(POLYSTYRENE_BOX, conn)?.compatible_with(
+        &conical_tube_50ml,
+        user,
+        conn,
+    )?;
 
-    ContainerModel::from_name(SHELF, conn)
-        .unwrap()
-        .unwrap()
-        .compatible_with(&conical_tube_rack, user, conn)
-        .unwrap();
+    ContainerModel::from_name(SHELF, conn)?.compatible_with(&conical_tube_rack, user, conn)?;
+
+    Ok(())
 }

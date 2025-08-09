@@ -66,10 +66,9 @@ impl Address {
         street_name: &str,
         street_number: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::addresses::addresses;
@@ -82,7 +81,6 @@ impl Address {
             )
             .order_by(addresses::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_city_id(

@@ -25,29 +25,31 @@ pub const DBGI_COLLECTION_PREPARATION: &str = "DBGI Collection preparation";
 pub(super) fn init_dbgi_collection_preparation(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> ProcedureModel {
+) -> anyhow::Result<ProcedureModel> {
     let dbgi_collection_preparation = ProcedureModel::new()
-        .name(DBGI_COLLECTION_PREPARATION)
-        .unwrap()
-        .description("DBGI Collection preparation procedure model")
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(DBGI_COLLECTION_PREPARATION)?
+        .description("DBGI Collection preparation procedure model")?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
-    let make_ethanol_70 = init_ethanol_70_percent(user, conn);
-    let make_solvent = init_sample_extraction_solvent_procedure(user, conn);
+    let make_ethanol_70 = init_ethanol_70_percent(user, conn)?;
+    let make_solvent = init_sample_extraction_solvent_procedure(user, conn)?;
 
-    dbgi_collection_preparation
-        .child(&make_ethanol_70, ChildOptions::default().inherit_trackables(), user, conn)
-        .unwrap();
+    dbgi_collection_preparation.child(
+        &make_ethanol_70,
+        ChildOptions::default().inherit_trackables(),
+        user,
+        conn,
+    )?;
 
-    dbgi_collection_preparation
-        .child(&make_solvent, ChildOptions::default().inherit_trackables(), user, conn)
-        .unwrap();
+    dbgi_collection_preparation.child(
+        &make_solvent,
+        ChildOptions::default().inherit_trackables(),
+        user,
+        conn,
+    )?;
 
-    dbgi_collection_preparation.extend(&[&make_ethanol_70, &make_solvent], user, conn).unwrap();
+    dbgi_collection_preparation.extend(&[&make_ethanol_70, &make_solvent], user, conn)?;
 
-    dbgi_collection_preparation
+    Ok(dbgi_collection_preparation)
 }

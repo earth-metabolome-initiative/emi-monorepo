@@ -46,10 +46,10 @@ pub(crate) use sample_collection_procedures::{
 // REFRIGERATED_SAMPLE_BOX}; pub(crate) use
 // weighing_procedure::WEIGHING_PROCEDURE;
 
-pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) {
+pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     // emi_solvent_procedure::init_emi_solvent_procedure_models(user, conn)?;
     // ethanol_70_percent::init_ethanol_70_percent(user, conn)?;
-    dbgi_plan::init_dbgi_plan(user, conn);
+    dbgi_plan::init_dbgi_plan(user, conn)?;
 
     // precollection_procedure::init_precollection_procedure_model(user,
     // conn)?;
@@ -66,4 +66,6 @@ pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) {
     // mass_spec_procedure::init_mass_spec_procedure(user, conn)?;
     // data_enrichment_procedure::init_data_enrichment_procedure(user,
     // conn)?;
+
+    Ok(())
 }

@@ -6,6 +6,7 @@ mod centrifuge_models;
 mod disposal_procedure_models;
 mod documents;
 mod freeze_drier_models;
+mod freeze_drying_procedure_models;
 mod freezer_models;
 mod geolocation_procedure_models;
 mod instrument_models;

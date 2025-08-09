@@ -20,10 +20,11 @@ pub mod tools;
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(super) fn init_trackables(user: &User, conn: &mut PgConnection) {
-    reagents::init_reagents(user, conn);
-    containers::init_containers(user, conn);
-    instruments::init_instruments(user, conn);
-    tools::init_tools(user, conn);
-    organisms::init_organisms(user, conn);
+pub(super) fn init_trackables(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
+    reagents::init_reagents(user, conn)?;
+    containers::init_containers(user, conn)?;
+    instruments::init_instruments(user, conn)?;
+    tools::init_tools(user, conn)?;
+    organisms::init_organisms(user, conn)?;
+    Ok(())
 }

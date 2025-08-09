@@ -12,25 +12,19 @@ pub(super) fn init_wrappers(
     user: &User,
     wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
-) {
+) -> anyhow::Result<()> {
     let coffee_filter_wrapper = ContainerModel::new()
-        .name(Some(COFFEE_FILTER_WRAPPER.to_owned()))
-        .unwrap()
+        .name(Some(COFFEE_FILTER_WRAPPER.to_owned()))?
         .description(Some(
             "Coffee filters used to wrap sample in the field prior to storage in Falcon tubes"
                 .to_owned(),
-        ))
-        .unwrap()
-        .parent(Some(wet_lab_container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        ))?
+        .parent(Some(wet_lab_container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
-    VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)
-        .unwrap()
-        .unwrap()
-        .compatible_with_quantity(&coffee_filter_wrapper, 1i16, user, conn)
-        .unwrap();
+    VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)?
+        .compatible_with_quantity(&coffee_filter_wrapper, 1i16, user, conn)?;
+
+    Ok(())
 }

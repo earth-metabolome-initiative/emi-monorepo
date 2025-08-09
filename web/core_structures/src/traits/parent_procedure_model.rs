@@ -2,6 +2,7 @@
 
 //! Submodule defining the `ParentProcedureModel` trait.
 
+use diesel::OptionalExtension;
 use web_common_traits::{
     database::{InsertError, Insertable, InsertableVariant},
     prelude::ExtensionTable,
@@ -101,7 +102,9 @@ where
                         &child_trackable.name,
                         self.id(),
                         conn,
-                    )? {
+                    )
+                    .optional()?
+                {
                     parent_trackable
                 } else {
                     ProcedureModelTrackable::new()

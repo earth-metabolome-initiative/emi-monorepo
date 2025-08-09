@@ -11,30 +11,21 @@ pub(super) fn init_safelock_tubes(
     user: &User,
     wet_lab_container: &ContainerModel,
     conn: &mut PgConnection,
-) {
+) -> anyhow::Result<()> {
     let safelock_tube = ContainerModel::new()
-        .name(Some(SAFELOCK_TUBE.to_owned()))
-        .unwrap()
-        .description(Some("Safelock Tube, used to perform extractions".to_owned()))
-        .unwrap()
-        .parent(Some(wet_lab_container.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(SAFELOCK_TUBE.to_owned()))?
+        .description(Some("Safelock Tube, used to perform extractions".to_owned()))?
+        .parent(Some(wet_lab_container.id))?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     let _safelock_tube_2ml = VolumetricContainerModel::new()
-        .name(Some(SAFELOCK_TUBE_2ML.to_owned()))
-        .unwrap()
-        .description(Some("Safelock tube of 2ml, used for sample extraction.".to_owned()))
-        .unwrap()
-        .parent(Some(safelock_tube.id))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .liters(0.002)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap();
+        .name(Some(SAFELOCK_TUBE_2ML.to_owned()))?
+        .description(Some("Safelock tube of 2ml, used for sample extraction.".to_owned()))?
+        .parent(Some(safelock_tube.id))?
+        .created_by(user.id)?
+        .liters(0.002)?
+        .insert(user.id, conn)?;
+
+    Ok(())
 }

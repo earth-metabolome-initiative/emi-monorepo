@@ -64,10 +64,9 @@ impl TemporaryUser {
         email: &str,
         login_provider_id: &i16,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
@@ -79,7 +78,6 @@ impl TemporaryUser {
             )
             .order_by(temporary_user::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_email(

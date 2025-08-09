@@ -142,17 +142,14 @@ impl ProcedureModel {
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::procedure_models::procedure_models;
         Self::table()
             .filter(procedure_models::name.eq(name))
             .order_by(procedure_models::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

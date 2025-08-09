@@ -1,6 +1,7 @@
 //! Submodule defining the full organism collection procedure model.
 
 use core_structures::{ProcedureModel, User};
+use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the full organism collection procedure model.
@@ -20,20 +21,16 @@ const FULL_ORGANISM_COLLECTION: &str = "Full organism collection procedure";
 pub(crate) fn init_full_organism_collection(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> ProcedureModel {
-    if let Some(existing) = ProcedureModel::from_name(FULL_ORGANISM_COLLECTION, conn).unwrap() {
-        return existing;
+) -> anyhow::Result<ProcedureModel> {
+    if let Some(existing) = ProcedureModel::from_name(FULL_ORGANISM_COLLECTION, conn).optional()? {
+        return Ok(existing);
     }
 
-    ProcedureModel::new()
-        .name(FULL_ORGANISM_COLLECTION)
-        .unwrap()
+    Ok(ProcedureModel::new()
+        .name(FULL_ORGANISM_COLLECTION)?
         .description(
             "Procedure model for collecting a full organism, including all its parts and tissues.",
-        )
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap()
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?)
 }

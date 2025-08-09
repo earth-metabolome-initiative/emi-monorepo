@@ -28,17 +28,14 @@ impl Country {
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::countries::countries;
         Self::table()
             .filter(countries::name.eq(name))
             .order_by(countries::iso.asc())
             .first::<Self>(conn)
-            .optional()
     }
 }
 impl AsRef<Country> for Country {

@@ -178,14 +178,13 @@ impl crate::Table {
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
             let ok_return_type = if is_unique {
-                additional_imports.push(syn::parse_quote! { diesel::OptionalExtension });
-                quote! { Option<Self> }
+                quote! { Self }
             } else {
                 quote! { Vec<Self> }
             };
 
             let load_statement = if is_unique {
-                quote! { .first::<Self>(conn).optional() }
+                quote! { .first::<Self>(conn) }
             } else {
                 quote! { .load::<Self>(conn) }
             };

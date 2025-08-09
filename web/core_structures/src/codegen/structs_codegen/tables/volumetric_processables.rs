@@ -78,10 +78,10 @@ impl VolumetricProcessable {
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            ExpressionMethods, JoinOnDsl, OptionalExtension, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
@@ -93,7 +93,6 @@ impl VolumetricProcessable {
             .order_by(volumetric_processables::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

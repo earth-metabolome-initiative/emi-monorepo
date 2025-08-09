@@ -133,10 +133,9 @@ impl Procedure {
         procedure_model_id: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
@@ -146,7 +145,6 @@ impl Procedure {
             )
             .order_by(procedures::id.asc())
             .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_model_id(

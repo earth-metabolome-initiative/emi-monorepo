@@ -176,6 +176,7 @@ sophia_api = "0.9.0"
 sophia_sparql_client = "0.9.0"
 fmtastic = "0.2.1"
 byteorder = "1.5.0"
+anyhow = {version="1.0", features=["backtrace"] }
 image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
@@ -201,3 +202,6 @@ pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]
 debug = true # Include debug info.
+
+[profile.release]
+debug = true # Don't include debug info.

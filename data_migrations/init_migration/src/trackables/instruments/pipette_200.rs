@@ -2,7 +2,7 @@
 //! 200 instrument.
 
 use core_structures::{CommercialProduct, Trackable, User};
-use diesel::PgConnection;
+use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::{
@@ -12,30 +12,25 @@ use crate::{
 
 /// Returns and possibly initializes the Gilson pipettes 200
 /// trackable in the database.
-pub(crate) fn init_gilson_pipette_200(user: &User, conn: &mut PgConnection) -> CommercialProduct {
+pub(crate) fn init_gilson_pipette_200(
+    user: &User,
+    conn: &mut PgConnection,
+) -> anyhow::Result<CommercialProduct> {
     let device_name = "Gilson pipette 200";
-    if let Some(instrument) = CommercialProduct::from_name(device_name, conn).unwrap() {
-        return instrument;
+    if let Some(instrument) = CommercialProduct::from_name(device_name, conn).optional()? {
+        return Ok(instrument);
     }
 
-    let pipette = Trackable::from_name(PIPETTES_200, conn)
-        .unwrap()
-        .expect("Centrifuge trackable should exist");
-    let brand = gilson(user, conn).unwrap();
+    let pipette = Trackable::from_name(PIPETTES_200, conn)?;
+    let brand = gilson(user, conn)?;
 
-    CommercialProduct::new()
-        .name(Some(device_name.to_owned()))
-        .unwrap()
-        .description(Some("Gilson pipette 200, used to precipitate solid material.".to_owned()))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .parent(Some(pipette.id))
-        .unwrap()
-        .brand(brand.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap()
+    Ok(CommercialProduct::new()
+        .name(Some(device_name.to_owned()))?
+        .description(Some("Gilson pipette 200, used to precipitate solid material.".to_owned()))?
+        .created_by(user.id)?
+        .parent(Some(pipette.id))?
+        .brand(brand.id)?
+        .insert(user.id, conn)?)
 }
 
 /// Returns and possibly initializes the Gilson pipette 200 tip tool
@@ -43,28 +38,20 @@ pub(crate) fn init_gilson_pipette_200(user: &User, conn: &mut PgConnection) -> C
 pub(crate) fn init_sarstedt_pipette_tip_200(
     user: &User,
     conn: &mut PgConnection,
-) -> CommercialProduct {
+) -> anyhow::Result<CommercialProduct> {
     let device_name = "Sarstedt Tip for Gilson Pipette 200μl";
-    if let Some(instrument) = CommercialProduct::from_name(device_name, conn).unwrap() {
-        return instrument;
+    if let Some(instrument) = CommercialProduct::from_name(device_name, conn).optional()? {
+        return Ok(instrument);
     }
 
-    let pipette_tip = Trackable::from_name(PIPETTE_TIPS_200, conn)
-        .unwrap()
-        .expect("Pipette tips trackable should exist");
-    let brand = sarstedt(user, conn).unwrap();
+    let pipette_tip = Trackable::from_name(PIPETTE_TIPS_200, conn)?;
+    let brand = sarstedt(user, conn)?;
 
-    CommercialProduct::new()
-        .name(Some(device_name.to_owned()))
-        .unwrap()
-        .description(Some("Tip for Gilson Pipette 200µl to manipulate liquids".to_owned()))
-        .unwrap()
-        .created_by(user.id)
-        .unwrap()
-        .parent(Some(pipette_tip.id))
-        .unwrap()
-        .brand(brand.id)
-        .unwrap()
-        .insert(user.id, conn)
-        .unwrap()
+    Ok(CommercialProduct::new()
+        .name(Some(device_name.to_owned()))?
+        .description(Some("Tip for Gilson Pipette 200µl to manipulate liquids".to_owned()))?
+        .created_by(user.id)?
+        .parent(Some(pipette_tip.id))?
+        .brand(brand.id)?
+        .insert(user.id, conn)?)
 }
