@@ -58,16 +58,15 @@ impl ProcedureModel {
             }
 
             let child_trackable = shared_trackables.child(conn)?;
-            if let Some(parent_trackable) = shared_trackables
+            if shared_trackables
                 .child_procedure_model(conn)?
                 .procedure_model_trackable_equivalent(
                     procedure_model_trackable,
                     Some(&child_trackable),
                     conn,
-                )?
+                )?.is_some()
             {
-                assert_eq!(parent_trackable.name, procedure_model_trackable.name);
-                return Ok(Some(parent_trackable));
+                return Ok(Some(shared_trackables.parent(conn)?));
             }
         }
         Ok(None)

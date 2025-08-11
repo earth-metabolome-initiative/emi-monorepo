@@ -1,7 +1,7 @@
 //! Submodule creating the instrument commercial product model for the Pipette
 //! 1000 instrument.
 
-use core_structures::{CommercialProduct, Trackable, User};
+use core_structures::{CommercialProduct, PipetteModel, PipetteTipModel, User};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -21,7 +21,7 @@ pub(crate) fn init_gilson_pipette_1000(
         return Ok(instrument);
     }
 
-    let pipette = Trackable::from_name(PIPETTES_1000, conn)?;
+    let pipette = PipetteModel::from_name(PIPETTES_1000, conn)?;
     let brand = gilson(user, conn)?;
 
     Ok(CommercialProduct::new()
@@ -44,7 +44,7 @@ pub(crate) fn init_sarstedt_pipette_tip_1000(
         return Ok(instrument);
     }
 
-    let pipette_tip = Trackable::from_name(PIPETTE_TIPS_1000, conn)?;
+    let pipette_tip = PipetteTipModel::from_name(PIPETTE_TIPS_1000, conn)?;
     let brand = sarstedt(user, conn)?;
 
     Ok(CommercialProduct::new()

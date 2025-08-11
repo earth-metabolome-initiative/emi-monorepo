@@ -4,7 +4,7 @@
 
 use diesel::OptionalExtension;
 use web_common_traits::{
-    database::{InsertError, Insertable, InsertableVariant},
+    database::{InsertError, Insertable, InsertableVariant, Read},
     prelude::ExtensionTable,
 };
 
@@ -83,9 +83,11 @@ where
         for<'a> &'a C: diesel::Identifiable<Id = &'a i32>,
     {
         use diesel::Identifiable;
+        let child_procedure = ProcedureModel::read(*child_procedure.id(), conn)?
+            .expect("Child procedure model not found");
         let parent_procedure_model = crate::ParentProcedureModel::new()
             .parent_procedure_model(*self.id())?
-            .child_procedure_model(*child_procedure.id())?
+            .child_procedure_model(child_procedure.id)?
             .snoozable(options.snoozable)?
             .copiable(options.copiable)?
             .repeatable(options.repeatable)?
@@ -95,7 +97,7 @@ where
 
         if options.inherit_trackables {
             for child_trackable in
-                ProcedureModelTrackable::from_procedure_model_id(child_procedure.id(), conn)?
+                ProcedureModelTrackable::from_procedure_model_id(&child_procedure.id, conn)?
             {
                 let parent_trackable = if let Some(parent_trackable) =
                     ProcedureModelTrackable::from_name_and_procedure_model_id(
