@@ -2,6 +2,7 @@
 pub mod codegen;
 pub use codegen::*;
 pub mod document;
+pub mod impls;
 pub mod traits;
 
 #[cfg(feature = "postgres")]

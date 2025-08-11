@@ -3,15 +3,15 @@
 use core_structures::{
     BallMillMachineModel, BallMillProcedureModel, CappingProcedureModel, CentrifugeModel,
     CentrifugeProcedureModel, ContainerModel, DisposalProcedureModel, FractioningProcedureModel,
-    FreezeDryingProcedureModel, FreezerModel, FreezingProcedureModel, ProcedureModel,
-    ProcedureModelTrackable, StorageProcedureModel, SupernatantProcedureModel, Trackable,
-    VolumetricContainerModel, WeighingInstrumentModel,
+    FreezeDryingProcedureModel, FreezerModel, FreezingProcedureModel, PipetteModel,
+    PipetteTipModel, ProcedureModel, ProcedureModelTrackable, StorageProcedureModel,
+    SupernatantProcedureModel, Trackable, VolumetricContainerModel, WeighingInstrumentModel,
     traits::{AppendProcedureModel, ParentProcedureModel},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::{
-    procedure_models::sample_collection_procedures::CONICAL_TUBE_BOX,
+    procedure_models::sample_collection_procedures::{CONICAL_TUBE_BOX, SAMPLE_CCT},
     trackables::{
         containers::{
             CONICAL_CENTRIFUGAL_TUBE_50ML, POLYSTYRENE_BOX, SAFELOCK_TUBE_2ML, VIAL_1_5ML,
@@ -26,7 +26,6 @@ use crate::{
     },
 };
 
-pub(crate) const DBGI_CONICAL_TUBE: &str = "DBGI Conical Tube (Falcon)";
 pub(crate) const DBGI_EPPENDORF_TUBE: &str = "DBGI Eppendorf Tube";
 
 pub(super) fn init_dbgi_sample_processing_procedures(
@@ -49,8 +48,8 @@ pub(super) fn init_dbgi_sample_processing_procedures(
     let vial_box = ContainerModel::from_name(VIAL_BOX, conn)?;
     let ball_mill = BallMillMachineModel::from_name(BALL_MILL_MACHINE, conn)?;
     let centrifuge = CentrifugeModel::from_name(SAFELOCK_CENTRIFUGE, conn)?;
-    let pipette_1000 = Trackable::from_name(PIPETTES_1000, conn)?;
-    let pipette_tips_1000 = Trackable::from_name(PIPETTE_TIPS_1000, conn)?;
+    let pipette_1000 = PipetteModel::from_name(PIPETTES_1000, conn)?;
+    let pipette_tips_1000 = PipetteTipModel::from_name(PIPETTE_TIPS_1000, conn)?;
     let sealed_cap = Trackable::from_name(VIAL_1_5ML_SEALED_CAP, conn)?;
 
     let procedure_weighing_scale_builder = ProcedureModelTrackable::new()
@@ -64,7 +63,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .trackable(conical_tubes_box.id)?;
 
     let procedure_conical_tube_builder = ProcedureModelTrackable::new()
-        .name(DBGI_CONICAL_TUBE)?
+        .name(SAMPLE_CCT)?
         .created_by(user.id)?
         .trackable(conical_tube.id)?;
 

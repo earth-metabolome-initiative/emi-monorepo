@@ -108,7 +108,7 @@ where
                     parent_trackable
                 } else {
                     ProcedureModelTrackable::new()
-                        .name(child_trackable.name)
+                        .name(&child_trackable.name)
                         .unwrap()
                         .procedure_model(*self.id())
                         .unwrap()

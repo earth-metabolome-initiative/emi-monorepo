@@ -190,6 +190,8 @@ where
     ///
     /// # Arguments
     ///
+    /// * `root_procedure_model` - The root procedure model to which the
+    ///   trackables belong.
     /// * `conn` - A mutable reference to a `PgConnection` for database
     ///   operations.
     ///
@@ -197,18 +199,29 @@ where
     ///
     /// * If an error occurs while retrieving the trackable nodes, it returns a
     ///   `diesel::result::Error`.
-    fn trackable_nodes(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
+    fn trackable_nodes(
+        &self,
+        root_procedure_model: &ProcedureModel,
+        conn: &mut PgConnection,
+    ) -> Result<String, diesel::result::Error> {
         let mut dot = String::new();
         for procedure_trackable in
             ProcedureModelTrackable::from_procedure_model_id(self.id(), conn)?
         {
+            let root_trackable = root_procedure_model
+                .procedure_model_trackable_equivalent(&procedure_trackable, None, conn)?
+                .expect("Trackable should have an equivalent in the root procedure model");
+
             let bgcolor = PASTEL_COLORS
-                .get(procedure_trackable.id as usize % PASTEL_COLORS.len())
+                .get(root_trackable.id as usize % PASTEL_COLORS.len())
+                .expect("Color index should be valid");
+            let border_color = PASTEL_COLORS
+                .get((root_trackable.id * 10) as usize % PASTEL_COLORS.len())
                 .expect("Color index should be valid");
 
             dot.push_str(&format!(
-                "    T{} [label=\"{}\", shape=box, style=\"filled,rounded\", color=\"{bgcolor}\", fillcolor=\"{bgcolor}\"];\n",
-                procedure_trackable.id, procedure_trackable.name
+                "    T{} [label=\"{}\", shape=box, style=\"filled,rounded\", color=\"{border_color}\", fillcolor=\"{bgcolor}\"];\n",
+                procedure_trackable.id, root_trackable.name,
             ));
         }
 
@@ -218,6 +231,7 @@ where
     fn procedure_nodes_and_edges(
         &self,
         subgraph_prefix: &str,
+        root_procedure_model: &ProcedureModel,
         conn: &mut PgConnection,
     ) -> Result<String, diesel::result::Error> {
         let mut dot = String::new();
@@ -242,7 +256,11 @@ where
                 procedures.insert(child_procedure.id, None);
             } else {
                 let subgraph_prefix = format!("{}_{}", subgraph_prefix, i);
-                dot.push_str(child_procedure.to_subgraph(&subgraph_prefix, conn)?.as_str());
+                dot.push_str(
+                    child_procedure
+                        .to_subgraph(&subgraph_prefix, root_procedure_model, conn)?
+                        .as_str(),
+                );
                 procedures.insert(child_procedure.id, Some(subgraph_prefix));
             }
         }
@@ -289,6 +307,8 @@ where
     ///
     /// * `subgraph_prefix` - A prefix for the subgraph label, typically the
     ///   procedure model's name.
+    /// * `root_procedure_model` - The root procedure model to which the
+    ///   trackables belong.
     /// * `conn` - A mutable reference to a `PgConnection` for database
     ///   operations.
     ///
@@ -299,6 +319,7 @@ where
     fn to_subgraph(
         &self,
         subgraph_prefix: &str,
+        root_procedure_model: &ProcedureModel,
         conn: &mut PgConnection,
     ) -> Result<String, diesel::result::Error> {
         if self.last_node(conn)?.is_none() {
@@ -319,7 +340,7 @@ where
         dot.push_str(&format!("\tcolor={RED};\n"));
 
         if ParentProcedureModel::from_parent_procedure_model_id(self.id(), conn)?.is_empty() {
-            dot.push_str(self.trackable_nodes(conn)?.as_str());
+            dot.push_str(self.trackable_nodes(root_procedure_model, conn)?.as_str());
         }
         // dot.push_str(self.shared_trackable_edges(conn)?.as_str());
 
@@ -343,7 +364,11 @@ where
                 procedures.insert(child_procedure.id, None);
             } else {
                 let subgraph_prefix = format!("{}_{}", subgraph_prefix, i);
-                dot.push_str(child_procedure.to_subgraph(&subgraph_prefix, conn)?.as_str());
+                dot.push_str(
+                    child_procedure
+                        .to_subgraph(&subgraph_prefix, root_procedure_model, conn)?
+                        .as_str(),
+                );
                 procedures.insert(child_procedure.id, Some(subgraph_prefix));
             }
         }
@@ -422,7 +447,9 @@ where
         // dot.push_str(&self.trackable_nodes(conn)?);
         // dot.push_str(&self.shared_trackable_edges(conn)?);
 
-        dot.push_str(self.procedure_nodes_and_edges("", conn)?.as_str());
+        let root_procedure_model = ProcedureModel::read(*self.id(), conn)?
+            .expect("Root procedure model should be present in the database");
+        dot.push_str(self.procedure_nodes_and_edges("", &root_procedure_model, conn)?.as_str());
 
         dot.push_str("}\n");
 

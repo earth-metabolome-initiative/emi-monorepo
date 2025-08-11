@@ -16,7 +16,7 @@ use crate::trackables::containers::{
 /// The name of the part of organism collection procedure model.
 const PART_OF_ORGANISM: &str = "Part-of organisms collection procedure";
 pub(crate) const CONICAL_TUBE_BOX: &str = "Conical Tube Box";
-const SAMPLE_CCT: &str = "Sample Conical Centrifugal Tube";
+pub(crate) const SAMPLE_CCT: &str = "Sample Conical Centrifugal Tube";
 
 /// Initializes the part of organism collection procedure model in the database.
 ///

@@ -204,4 +204,4 @@ pedantic = { level = "deny", priority = -1 }
 debug = true # Include debug info.
 
 [profile.release]
-debug = true # Don't include debug info.
+debug = false # Don't include debug info.
