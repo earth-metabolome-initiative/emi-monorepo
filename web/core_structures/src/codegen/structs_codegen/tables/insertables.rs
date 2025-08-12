@@ -130,11 +130,6 @@ pub use geolocation_procedure_models::{
     InsertableGeolocationProcedureModelBuilder,
     InsertableGeolocationProcedureModelExtensionAttributes,
 };
-mod instrument_models;
-pub use instrument_models::{
-    InsertableInstrumentModel, InsertableInstrumentModelAttributes,
-    InsertableInstrumentModelBuilder, InsertableInstrumentModelExtensionAttributes,
-};
 mod instrument_states;
 pub use instrument_states::{
     InsertableInstrumentState, InsertableInstrumentStateAttributes,
@@ -359,10 +354,10 @@ pub use volumetric_processables::{
     InsertableVolumetricProcessable, InsertableVolumetricProcessableAttributes,
     InsertableVolumetricProcessableBuilder, InsertableVolumetricProcessableExtensionAttributes,
 };
-mod weighing_instrument_models;
-pub use weighing_instrument_models::{
-    InsertableWeighingInstrumentModel, InsertableWeighingInstrumentModelAttributes,
-    InsertableWeighingInstrumentModelBuilder, InsertableWeighingInstrumentModelExtensionAttributes,
+mod weighing_device_models;
+pub use weighing_device_models::{
+    InsertableWeighingDeviceModel, InsertableWeighingDeviceModelAttributes,
+    InsertableWeighingDeviceModelBuilder, InsertableWeighingDeviceModelExtensionAttributes,
 };
 mod weighing_procedure_models;
 pub use weighing_procedure_models::{

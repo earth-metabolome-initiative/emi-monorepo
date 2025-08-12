@@ -1,18 +1,11 @@
 use core_structures::{
-    CameraModel, GeolocationProcedureModel, PhotographProcedureModel, PositioningDeviceModel,
-    ProcedureModel, ProcedureModelTrackable, Trackable, User,
+    GeolocationProcedureModel, PhotographProcedureModel, ProcedureModel, User,
     traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::{
-    instruments::{CAMERA, GEOLOCATION_INSTRUMENT},
-    organisms::ORGANISM,
-};
-
-/// The name of the Organism observation procedure model.
-const ORGANISM_OBSERVATION: &str = "Organism observation procedure";
+use crate::procedure_model_trackables::{organism::organism_builder, phone::phone_builder};
 
 /// Initializes the Organism observation procedure model in the database.
 ///
@@ -29,58 +22,35 @@ pub(crate) fn init_organism_observation_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureModel> {
-    if let Some(existing) = ProcedureModel::from_name(ORGANISM_OBSERVATION, conn).optional()? {
+    let name = "Organism observation procedure";
+
+    if let Some(existing) = ProcedureModel::from_name(name, conn).optional()? {
         return Ok(existing);
     }
 
-    let camera = CameraModel::from_name(CAMERA, conn)?;
-    let positioning_device = PositioningDeviceModel::from_name(GEOLOCATION_INSTRUMENT, conn)?;
-    let organism = Trackable::from_name(ORGANISM, conn)?;
-
-    let camera_builder =
-        ProcedureModelTrackable::new().name(CAMERA)?.created_by(user.id)?.trackable(camera.id)?;
-
-    let positioning_device_builder = ProcedureModelTrackable::new()
-        .name(GEOLOCATION_INSTRUMENT)?
-        .created_by(user.id)?
-        .trackable(positioning_device.id)?;
-
-    let organism_builder = ProcedureModelTrackable::new()
-        .name(ORGANISM)?
-        .created_by(user.id)?
-        .trackable(organism.id)?;
-
     let observation_procedure = ProcedureModel::new()
-        .name(ORGANISM_OBSERVATION)
-        ?
+        .name(name)?
         .description(
 			"Procedure for observing an organism, and relevant details for identification and study.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-		?;
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     // Place the colored cardboard arrow in the field pointing towards the organism
     let arrow_reminder = ProcedureModel::new()
-        .name("Place Arrow")
-        ?
+        .name("Place Arrow")?
         .description(
 			"Place a colored cardboard arrow in the field pointing towards the organism to facilitate its identification later.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-		?;
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     // Take a picture of organism and surrounding ecosystem
     let organism_in_ecosystem_picture = PhotographProcedureModel::new()
         .name("Organism in Ecosystem Picture")?
         .description("Photograph of the organism in its surrounding ecosystem.")?
-        .procedure_photographed_with(camera_builder.clone())?
-        .trackable(organism_builder.clone())?
+        .procedure_photographed_with(phone_builder(user, conn)?)?
+        .trackable(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -88,8 +58,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_picture = PhotographProcedureModel::new()
         .name("Organism Picture")?
         .description("Photograph of the full organism for identification.")?
-        .procedure_photographed_with(camera_builder.clone())?
-        .trackable(organism_builder.clone())?
+        .procedure_photographed_with(phone_builder(user, conn)?)?
+        .trackable(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -98,8 +68,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_details_picture = PhotographProcedureModel::new()
         .name("Organism Details Picture")?
         .description("Photograph of details of the organism to facilitate identification.")?
-        .procedure_photographed_with(camera_builder.clone())?
-        .trackable(organism_builder.clone())?
+        .procedure_photographed_with(phone_builder(user, conn)?)?
+        .trackable(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -107,8 +77,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_geolocation = GeolocationProcedureModel::new()
         .name("Organism Geolocation")?
         .description("Geolocation of the organism observation.")?
-        .procedure_geolocated_with(positioning_device_builder.clone())?
-        .trackable(organism_builder.clone())?
+        .procedure_geolocated_with(phone_builder(user, conn)?)?
+        .trackable(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 

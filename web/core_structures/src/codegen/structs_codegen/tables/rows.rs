@@ -28,7 +28,6 @@ mod freeze_drying_procedure_models;
 mod freezer_models;
 mod freezing_procedure_models;
 mod geolocation_procedure_models;
-mod instrument_models;
 mod instrument_states;
 mod into_iter;
 mod len;
@@ -85,7 +84,7 @@ mod user_organizations;
 mod users;
 mod volumetric_container_models;
 mod volumetric_processables;
-mod weighing_instrument_models;
+mod weighing_device_models;
 mod weighing_procedure_models;
 mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
@@ -197,9 +196,6 @@ pub enum Rows {
         Vec<
             crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
         >,
-    ),
-    InstrumentModel(
-        Vec<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel>,
     ),
     InstrumentState(
         Vec<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>,
@@ -366,9 +362,9 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
         >,
     ),
-    WeighingInstrumentModel(
+    WeighingDeviceModel(
         Vec<
-            crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
+            crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
         >,
     ),
     WeighingProcedureModel(
@@ -589,13 +585,6 @@ impl Rows {
             }
             Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
                 geolocation_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::InstrumentModel(instrument_models) => {
-                instrument_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -971,8 +960,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::WeighingInstrumentModel(weighing_instrument_models) => {
-                weighing_instrument_models
+            Rows::WeighingDeviceModel(weighing_device_models) => {
+                weighing_device_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1054,7 +1043,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
                 geolocation_procedure_models.primary_keys()
             }
-            Rows::InstrumentModel(instrument_models) => instrument_models.primary_keys(),
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
             Rows::Material(materials) => materials.primary_keys(),
@@ -1136,8 +1124,8 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::VolumetricProcessable(volumetric_processables) => {
                 volumetric_processables.primary_keys()
             }
-            Rows::WeighingInstrumentModel(weighing_instrument_models) => {
-                weighing_instrument_models.primary_keys()
+            Rows::WeighingDeviceModel(weighing_device_models) => {
+                weighing_device_models.primary_keys()
             }
             Rows::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.primary_keys()

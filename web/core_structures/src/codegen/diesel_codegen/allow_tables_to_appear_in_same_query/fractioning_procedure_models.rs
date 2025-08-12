@@ -13,8 +13,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     fractioning_procedure_models,
     volumetric_container_models
 );
-use crate::codegen::diesel_codegen::tables::weighing_instrument_models::weighing_instrument_models;
-diesel::allow_tables_to_appear_in_same_query!(
-    fractioning_procedure_models,
-    weighing_instrument_models
-);
+use crate::codegen::diesel_codegen::tables::weighing_device_models::weighing_device_models;
+diesel::allow_tables_to_appear_in_same_query!(fractioning_procedure_models, weighing_device_models);

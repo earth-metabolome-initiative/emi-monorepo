@@ -30,7 +30,6 @@ pub enum TableName {
     FreezerModel,
     FreezingProcedureModel,
     GeolocationProcedureModel,
-    InstrumentModel,
     InstrumentState,
     LoginProvider,
     Material,
@@ -84,7 +83,7 @@ pub enum TableName {
     User,
     VolumetricContainerModel,
     VolumetricProcessable,
-    WeighingInstrumentModel,
+    WeighingDeviceModel,
     WeighingProcedureModel,
     WeighingProcedure,
 }
@@ -144,7 +143,6 @@ impl core::fmt::Display for TableName {
             TableName::GeolocationProcedureModel => {
                 write!(f, stringify!(GeolocationProcedureModel))
             }
-            TableName::InstrumentModel => write!(f, stringify!(InstrumentModel)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
@@ -226,9 +224,7 @@ impl core::fmt::Display for TableName {
             TableName::VolumetricProcessable => {
                 write!(f, stringify!(VolumetricProcessable))
             }
-            TableName::WeighingInstrumentModel => {
-                write!(f, stringify!(WeighingInstrumentModel))
-            }
+            TableName::WeighingDeviceModel => write!(f, stringify!(WeighingDeviceModel)),
             TableName::WeighingProcedureModel => {
                 write!(f, stringify!(WeighingProcedureModel))
             }

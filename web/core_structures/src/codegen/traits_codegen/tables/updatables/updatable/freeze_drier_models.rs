@@ -1,21 +1,21 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
 for crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel
 where
-    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+    crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+    <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+    <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+    <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
     >,
-    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::trackables::Trackable: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,

@@ -28,14 +28,10 @@ pub(crate) fn init_weather_retrieval_procedure(
     }
 
     Ok(ProcedureModel::new()
-        .name(WEATHER_RETRIEVAL_PROCEDURE)
-        ?
+        .name(WEATHER_RETRIEVAL_PROCEDURE)?
         .description(
             "Procedure model for retrieving and storing weather data associated with sample collection events. This procedure ensures that relevant meteorological information is linked to each sample, supporting downstream data enrichment and analysis."
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-        ?)
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?)
 }

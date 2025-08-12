@@ -76,9 +76,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::GeolocationProcedureModel(geolocation_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(geolocation_procedure_models)
             }
-            super::Row::InstrumentModel(instrument_models) => {
-                crate::codegen::tables::rows::Rows::from(instrument_models)
-            }
             super::Row::InstrumentState(instrument_states) => {
                 crate::codegen::tables::rows::Rows::from(instrument_states)
             }
@@ -214,8 +211,8 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::VolumetricProcessable(volumetric_processables) => {
                 crate::codegen::tables::rows::Rows::from(volumetric_processables)
             }
-            super::Row::WeighingInstrumentModel(weighing_instrument_models) => {
-                crate::codegen::tables::rows::Rows::from(weighing_instrument_models)
+            super::Row::WeighingDeviceModel(weighing_device_models) => {
+                crate::codegen::tables::rows::Rows::from(weighing_device_models)
             }
             super::Row::WeighingProcedureModel(weighing_procedure_models) => {
                 crate::codegen::tables::rows::Rows::from(weighing_procedure_models)

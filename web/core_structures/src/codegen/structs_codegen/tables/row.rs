@@ -28,7 +28,6 @@ mod freezer_models;
 mod freezing_procedure_models;
 mod from_row;
 mod geolocation_procedure_models;
-mod instrument_models;
 mod instrument_states;
 mod login_providers;
 mod materials;
@@ -84,7 +83,7 @@ mod user_organizations;
 mod users;
 mod volumetric_container_models;
 mod volumetric_processables;
-mod weighing_instrument_models;
+mod weighing_device_models;
 mod weighing_procedure_models;
 mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
@@ -158,9 +157,6 @@ pub enum Row {
     ),
     GeolocationProcedureModel(
         crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
-    ),
-    InstrumentModel(
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
     ),
     InstrumentState(
         crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
@@ -269,8 +265,8 @@ pub enum Row {
     VolumetricProcessable(
         crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
     ),
-    WeighingInstrumentModel(
-        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
+    WeighingDeviceModel(
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
     ),
     WeighingProcedureModel(
         crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
@@ -352,9 +348,6 @@ impl Row {
             }
             Row::GeolocationProcedureModel(geolocation_procedure_models) => {
                 geolocation_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::InstrumentModel(instrument_models) => {
-                instrument_models.upsert(conn)?.map(Row::from)
             }
             Row::InstrumentState(instrument_states) => {
                 instrument_states.upsert(conn)?.map(Row::from)
@@ -457,8 +450,8 @@ impl Row {
             Row::VolumetricProcessable(volumetric_processables) => {
                 volumetric_processables.upsert(conn)?.map(Row::from)
             }
-            Row::WeighingInstrumentModel(weighing_instrument_models) => {
-                weighing_instrument_models.upsert(conn)?.map(Row::from)
+            Row::WeighingDeviceModel(weighing_device_models) => {
+                weighing_device_models.upsert(conn)?.map(Row::from)
             }
             Row::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.upsert(conn)?.map(Row::from)
@@ -526,7 +519,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::GeolocationProcedureModel(geolocation_procedure_models) => {
                 geolocation_procedure_models.primary_key()
             }
-            Row::InstrumentModel(instrument_models) => instrument_models.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
             Row::Material(materials) => materials.primary_key(),
@@ -608,8 +600,8 @@ impl web_common_traits::prelude::Row for Row {
             Row::VolumetricProcessable(volumetric_processables) => {
                 volumetric_processables.primary_key()
             }
-            Row::WeighingInstrumentModel(weighing_instrument_models) => {
-                weighing_instrument_models.primary_key()
+            Row::WeighingDeviceModel(weighing_device_models) => {
+                weighing_device_models.primary_key()
             }
             Row::WeighingProcedureModel(weighing_procedure_models) => {
                 weighing_procedure_models.primary_key()

@@ -1,0 +1,26 @@
+//! Submodule defining partial builders for procedure model trackables related
+//! to phones.
+
+use core_structures::{User, tables::insertables::InsertableProcedureModelTrackableBuilder};
+use diesel::PgConnection;
+
+use crate::{
+    procedure_model_trackables::default_pmt::default_pmt, trackables::instruments::phone::phone,
+};
+
+/// Returns a partial builder for a phone trackable.
+///
+/// # Arguments
+///
+/// * `user` - The user who is creating the trackable.
+/// * `conn` - The database connection to use for the insertion.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+pub(crate) fn phone_builder(
+    user: &User,
+    conn: &mut PgConnection,
+) -> anyhow::Result<InsertableProcedureModelTrackableBuilder> {
+    default_pmt(user, phone(user, conn)?.phone_models_camera(conn)?.id(conn)?)
+}

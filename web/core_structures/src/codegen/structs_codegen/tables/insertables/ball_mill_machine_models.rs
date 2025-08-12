@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableBallMillMachineModelExtensionAttributes {
-    InstrumentModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
-    ),
+    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
 }
 impl core::fmt::Display for InsertableBallMillMachineModelExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::InstrumentModel(e) => write!(f, "{e}"),
+            Self::Trackable(e) => write!(f, "{e}"),
         }
     }
 }
@@ -18,15 +16,13 @@ pub enum InsertableBallMillMachineModelAttributes {
     Extension(InsertableBallMillMachineModelExtensionAttributes),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes>
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
     for InsertableBallMillMachineModelAttributes
 {
     fn from(
-        instrument_models: crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
+        trackables: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
     ) -> Self {
-        Self::Extension(InsertableBallMillMachineModelExtensionAttributes::InstrumentModel(
-            instrument_models,
-        ))
+        Self::Extension(InsertableBallMillMachineModelExtensionAttributes::Trackable(trackables))
     }
 }
 impl core::fmt::Display for InsertableBallMillMachineModelAttributes {
@@ -53,30 +49,29 @@ impl InsertableBallMillMachineModel {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+        crate::codegen::structs_codegen::tables::trackables::Trackable,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+            crate::codegen::structs_codegen::tables::trackables::Trackable,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel::table(
-                ),
+                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
                 self.id,
             ),
             conn,
@@ -86,18 +81,15 @@ impl InsertableBallMillMachineModel {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableBallMillMachineModelBuilder<
-    InstrumentModel
-        = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
 > {
-    pub(crate) id: InstrumentModel,
+    pub(crate) id: Trackable,
 }
-impl<InstrumentModel> web_common_traits::database::ExtendableBuilder
-for InsertableBallMillMachineModelBuilder<InstrumentModel>
+impl<Trackable> web_common_traits::database::ExtendableBuilder
+for InsertableBallMillMachineModelBuilder<Trackable>
 where
-    InstrumentModel: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes,
+    Trackable: web_common_traits::database::ExtendableBuilder<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
     >,
 {
     type Attributes = InsertableBallMillMachineModelAttributes;
@@ -110,7 +102,7 @@ where
             .extend_builder(other.id)
             .map_err(|err| {
                 err.into_field_name(|attribute| InsertableBallMillMachineModelAttributes::Extension(
-                    InsertableBallMillMachineModelExtensionAttributes::InstrumentModel(
+                    InsertableBallMillMachineModelExtensionAttributes::Trackable(
                         attribute,
                     ),
                 ))
@@ -118,10 +110,10 @@ where
         Ok(self)
     }
 }
-impl<InstrumentModel> web_common_traits::prelude::SetPrimaryKey
-    for InsertableBallMillMachineModelBuilder<InstrumentModel>
+impl<Trackable> web_common_traits::prelude::SetPrimaryKey
+    for InsertableBallMillMachineModelBuilder<Trackable>
 where
-    InstrumentModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type PrimaryKey = ::rosetta_uuid::Uuid;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
@@ -131,9 +123,7 @@ where
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.created_at` column from table
@@ -156,9 +146,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
@@ -188,9 +176,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.created_by` column from table
@@ -209,9 +195,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.description` column from table
@@ -233,9 +217,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.id` column from table
@@ -257,9 +239,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.name` column from table
@@ -281,9 +261,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.name`, `trackables.description`
@@ -311,9 +289,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.parent_id` column from table
@@ -331,9 +307,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
@@ -357,9 +331,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.photograph_id` column from table
@@ -377,9 +349,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.updated_at` column from table
@@ -402,9 +372,7 @@ impl
 }
 impl
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
     >
 {
     /// Sets the value of the `trackables.updated_by` column from table
@@ -420,8 +388,8 @@ impl
         Ok(self)
     }
 }
-impl<InstrumentModel, C> web_common_traits::database::TryInsertGeneric<C>
-for InsertableBallMillMachineModelBuilder<InstrumentModel>
+impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableBallMillMachineModelBuilder<Trackable>
 where
     Self: web_common_traits::database::InsertableVariant<
         C,
@@ -431,7 +399,7 @@ where
             InsertableBallMillMachineModelAttributes,
         >,
     >,
-    InstrumentModel: web_common_traits::database::TryInsertGeneric<
+    Trackable: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,

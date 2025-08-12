@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS pouring_procedure_models (
 CREATE TABLE IF NOT EXISTS mixing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The weighting device used to measure the solid.
-	measured_with UUID NOT NULL REFERENCES weighing_instrument_models(id) ON DELETE CASCADE,
+	measured_with UUID NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
 	procedure_measured_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The volumetric container into which the solid is mixed.
@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS capping_procedure_models (
 CREATE TABLE IF NOT EXISTS weighing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The instrument used for weighing.
-	weighed_with UUID NOT NULL REFERENCES weighing_instrument_models(id) ON DELETE CASCADE,
+	weighed_with UUID NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
 	-- The instrument used for weighing should always be a trackable that is compatible with the procedure model.
 	procedure_weighed_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The sample container is the one that is being weighed.
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS fractioning_procedure_models (
 		AND must_be_smaller_than_f32(tolerance_percentage, 100.0)
 	),
 	-- The scale used to measure the fraction in kilograms.
-	weighed_with UUID NOT NULL REFERENCES weighing_instrument_models(id) ON DELETE CASCADE,
+	weighed_with UUID NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
 	procedure_weighed_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- Source container from which the fraction is taken.
 	procedure_fragment_source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,

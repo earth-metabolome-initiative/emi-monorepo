@@ -64,7 +64,8 @@ impl ProcedureModel {
                     procedure_model_trackable,
                     Some(&child_trackable),
                     conn,
-                )?.is_some()
+                )?
+                .is_some()
             {
                 return Ok(Some(shared_trackables.parent(conn)?));
             }

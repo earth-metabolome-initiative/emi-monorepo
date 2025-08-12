@@ -7,9 +7,9 @@ use core_structures::{
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::procedure_models::{
-    init_data_enrichment_procedure, init_full_organism_collection,
-    init_negative_ionization_lcms_procedure, init_organism_observation_procedure,
-    init_part_of_organism_collection, init_positive_ionization_lcms_procedure,
+    init_data_enrichment_procedure, init_negative_ionization_lcms_procedure,
+    init_organism_observation_procedure, init_part_of_organism_collection,
+    init_positive_ionization_lcms_procedure,
 };
 mod dbgi_collection_preparation;
 mod sample_processing_procedures;
@@ -28,7 +28,10 @@ pub const DBGI_PLAN: &str = "DBGI Plan";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) -> anyhow::Result<()> {
+pub(super) fn init_dbgi_plan(
+    user: &User,
+    conn: &mut diesel::PgConnection,
+) -> anyhow::Result<ProcedureModel> {
     let dbgi_plan = ProcedureModel::new()
         .name(DBGI_PLAN)?
         .description("DBGI Plan procedure model")?
@@ -70,5 +73,6 @@ pub(super) fn init_dbgi_plan(user: &User, conn: &mut diesel::PgConnection) -> an
         user,
         conn,
     )?;
-    Ok(())
+
+    Ok(dbgi_plan)
 }

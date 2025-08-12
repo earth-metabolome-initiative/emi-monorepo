@@ -30,7 +30,6 @@ pub enum TablePrimaryKey {
     FreezerModel(::rosetta_uuid::Uuid),
     FreezingProcedureModel(i32),
     GeolocationProcedureModel(i32),
-    InstrumentModel(::rosetta_uuid::Uuid),
     InstrumentState(i16),
     LoginProvider(i16),
     Material(i16),
@@ -84,7 +83,7 @@ pub enum TablePrimaryKey {
     User(i32),
     VolumetricContainerModel(::rosetta_uuid::Uuid),
     VolumetricProcessable(::rosetta_uuid::Uuid),
-    WeighingInstrumentModel(::rosetta_uuid::Uuid),
+    WeighingDeviceModel(::rosetta_uuid::Uuid),
     WeighingProcedureModel(i32),
     WeighingProcedure(::rosetta_uuid::Uuid),
 }
@@ -168,9 +167,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::GeolocationProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::GeolocationProcedureModel
-            }
-            TablePrimaryKey::InstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentModel
             }
             TablePrimaryKey::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
@@ -313,8 +309,8 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::VolumetricProcessable(_) => {
                 crate::codegen::tables::table_names::TableName::VolumetricProcessable
             }
-            TablePrimaryKey::WeighingInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
+            TablePrimaryKey::WeighingDeviceModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingDeviceModel
             }
             TablePrimaryKey::WeighingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingProcedureModel

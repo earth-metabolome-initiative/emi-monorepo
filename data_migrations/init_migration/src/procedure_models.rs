@@ -3,18 +3,6 @@
 use core_structures::User;
 use diesel::PgConnection;
 
-// mod aliquoting_mass_spec_extracts_procedure;
-// mod collection_procedure;
-// mod data_enrichment_procedure;
-// mod emi_solvent_procedure;
-// mod ethanol_70_percent;
-// mod extraction_procedure;
-// mod freeze_drying_procedure;
-// mod freezing_procedure;
-// mod mass_spec_procedure;
-// mod precollection_procedure;
-// mod shared_step_models;
-// mod weighing_procedure;
 mod dbgi_plan;
 pub use dbgi_plan::DBGI_PLAN;
 mod analysis_procedures;
@@ -30,21 +18,7 @@ pub(crate) use analysis_procedures::{
 pub(crate) use collection_preparation_procedures::{
     init_ethanol_70_percent, init_sample_extraction_solvent_procedure,
 };
-pub(crate) use sample_collection_procedures::{
-    init_full_organism_collection, init_part_of_organism_collection,
-};
-
-// pub(crate) use
-// aliquoting_mass_spec_extracts_procedure::ALIQUOTING_MASS_SPEC_EXTRACTS;
-// pub(crate) use collection_procedure::COLLECTION_PROCEDURE;
-// pub(crate) use data_enrichment_procedure::DATA_ENRICHMENT_PROCEDURE;
-// pub(crate) use extraction_procedure::EXTRACTION_PROCEDURE;
-// pub(crate) use freeze_drying_procedure::FREEZE_DRYING;
-// pub(crate) use freezing_procedure::FREEZING_PROCEDURE;
-// pub(crate) use mass_spec_procedure::MASS_SPEC_PROCEDURE;
-// pub(crate) use precollection_procedure::{PRECOLLECTION_PROCEDURE,
-// REFRIGERATED_SAMPLE_BOX}; pub(crate) use
-// weighing_procedure::WEIGHING_PROCEDURE;
+pub(crate) use sample_collection_procedures::init_part_of_organism_collection;
 
 pub(crate) fn init_procedure_models(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
     // emi_solvent_procedure::init_emi_solvent_procedure_models(user, conn)?;

@@ -30,7 +30,6 @@ impl super::Rows {
             super::Rows::FreezerModel(rows) => rows.len(),
             super::Rows::FreezingProcedureModel(rows) => rows.len(),
             super::Rows::GeolocationProcedureModel(rows) => rows.len(),
-            super::Rows::InstrumentModel(rows) => rows.len(),
             super::Rows::InstrumentState(rows) => rows.len(),
             super::Rows::LoginProvider(rows) => rows.len(),
             super::Rows::Material(rows) => rows.len(),
@@ -84,7 +83,7 @@ impl super::Rows {
             super::Rows::User(rows) => rows.len(),
             super::Rows::VolumetricContainerModel(rows) => rows.len(),
             super::Rows::VolumetricProcessable(rows) => rows.len(),
-            super::Rows::WeighingInstrumentModel(rows) => rows.len(),
+            super::Rows::WeighingDeviceModel(rows) => rows.len(),
             super::Rows::WeighingProcedureModel(rows) => rows.len(),
             super::Rows::WeighingProcedure(rows) => rows.len(),
         }

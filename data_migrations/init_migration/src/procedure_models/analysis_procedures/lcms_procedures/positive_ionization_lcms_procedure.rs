@@ -15,16 +15,12 @@ pub(crate) fn init_positive_ionization_lcms_procedure(
     }
 
     Ok(ProcedureModel::new()
-		.name(POSITIVE_IONIZATION_LCMS)
-		?
+		.name(POSITIVE_IONIZATION_LCMS)?
 		.description(
 			"Procedure model for Positive Ionization LC-MS analysis, used in various analytical procedures.",
-		)
-		?
-		.created_by(user.id)
-		?
-		.insert(user.id, conn)
-		?)
+		)?
+		.created_by(user.id)?
+		.insert(user.id, conn)?)
 
     // Execute calibration with Thermo Fisher calibration solution
     // Register one minute of running the LCMS with blank sample

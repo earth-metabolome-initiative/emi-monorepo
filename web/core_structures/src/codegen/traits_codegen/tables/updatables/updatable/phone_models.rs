@@ -44,10 +44,10 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.phone_models_id_fkey(conn)?.can_update(user_id, conn)? {
+        if !self.phone_models_camera(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.phone_models_id_fkey1(conn)?.can_update(user_id, conn)? {
+        if !self.phone_models_positioning(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

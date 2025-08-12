@@ -134,11 +134,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::GeolocationProcedureModel)
                     .collect::<Vec<_>>()
             }
-            super::Rows::InstrumentModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::InstrumentModel)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::InstrumentState(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::InstrumentState)
@@ -380,9 +375,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::VolumetricProcessable)
                     .collect::<Vec<_>>()
             }
-            super::Rows::WeighingInstrumentModel(rows) => {
+            super::Rows::WeighingDeviceModel(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::WeighingInstrumentModel)
+                    .map(crate::codegen::tables::row::Row::WeighingDeviceModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::WeighingProcedureModel(rows) => {

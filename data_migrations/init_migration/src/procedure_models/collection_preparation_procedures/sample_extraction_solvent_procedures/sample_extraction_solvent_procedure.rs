@@ -23,14 +23,10 @@ pub(crate) fn init_sample_extraction_solvent_procedure(
     }
 
     Ok(ProcedureModel::new()
-        .name(SAMPLE_EXTRACTION_SOLVENT)
-        ?
+        .name(SAMPLE_EXTRACTION_SOLVENT)?
         .description(
 			"Procedure model for sample extraction solvent preparation, used in various laboratory and field procedures.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-		?)
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?)
 }

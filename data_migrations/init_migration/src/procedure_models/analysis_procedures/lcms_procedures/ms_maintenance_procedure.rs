@@ -4,12 +4,12 @@ use core_structures::{ProcedureModel, User};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-const MS_MAINTENANCE: &str = "MS Maintenance";
-
 pub(crate) fn init_ms_maintenance_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureModel> {
+    const MS_MAINTENANCE: &str = "MS Maintenance";
+
     if let Some(procedure) = ProcedureModel::from_name(MS_MAINTENANCE, conn).optional()? {
         return Ok(procedure);
     }

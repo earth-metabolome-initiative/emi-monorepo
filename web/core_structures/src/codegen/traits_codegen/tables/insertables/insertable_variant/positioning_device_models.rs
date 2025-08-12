@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    InstrumentModel,
+    Trackable,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelBuilder<
-    InstrumentModel,
+    Trackable,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -18,7 +18,7 @@ where
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     >,
     C: diesel::connection::LoadConnection,
-    InstrumentModel: web_common_traits::database::TryInsertGeneric<
+    Trackable: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
@@ -54,8 +54,8 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelExtensionAttributes::InstrumentModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelExtensionAttributes::Trackable(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
                     ),
                 ))
             })?;

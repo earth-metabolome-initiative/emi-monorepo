@@ -55,9 +55,9 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let id = if self.phone_models_id_fkey.is_complete() {
+        let id = if self.phone_models_camera.is_complete() {
             let id = self
-                .phone_models_id_fkey
+                .phone_models_camera
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes::Extension(
@@ -67,7 +67,7 @@ where
                     ))
                 })?;
             let _ = self
-                .phone_models_id_fkey1
+                .phone_models_positioning
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
@@ -80,7 +80,7 @@ where
             id
         } else {
             let id = self
-                .phone_models_id_fkey1
+                .phone_models_positioning
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes::Extension(
@@ -90,7 +90,7 @@ where
                     ))
                 })?;
             let _ = self
-                .phone_models_id_fkey
+                .phone_models_camera
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {

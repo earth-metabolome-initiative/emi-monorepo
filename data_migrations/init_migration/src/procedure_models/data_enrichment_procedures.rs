@@ -33,16 +33,12 @@ pub(crate) fn init_data_enrichment_procedure(
     }
 
     let data_enrichment_procedure = ProcedureModel::new()
-		.name(DATA_ENRICHMENT_PROCEDURES)
-		?
+		.name(DATA_ENRICHMENT_PROCEDURES)?
 		.description(
 			"Procedure model for Negative Ionization LC-MS analysis, used in various analytical procedures.",
-		)
-		?
-		.created_by(user.id)
-		?
-		.insert(user.id, conn)
-		?;
+		)?
+		.created_by(user.id)?
+		.insert(user.id, conn)?;
 
     let weather_retrieval_procedure =
         weather_retrieval_procedure::init_weather_retrieval_procedure(user, conn)?;

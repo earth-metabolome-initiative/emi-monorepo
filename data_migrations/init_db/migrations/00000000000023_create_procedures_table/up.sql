@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS weighing_procedures (
 	-- We enforce that the model of this procedure must be a weighing procedure model.
 	procedure_model_id INTEGER NOT NULL REFERENCES weighing_procedure_models(procedure_model_id),
 	-- The identifier of the instrument used for weighing.
-	weighted_with UUID NOT NULL REFERENCES weighing_instrument_models(id),
+	weighted_with UUID NOT NULL REFERENCES weighing_device_models(id),
 	-- The container being weighed, which must be a volumetric container model.
 	weighted_container_id UUID NOT NULL REFERENCES volumetric_container_models(id),
 	-- The measured weight, which must be strictly positive.

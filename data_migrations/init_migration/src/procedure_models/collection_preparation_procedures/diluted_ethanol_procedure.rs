@@ -27,14 +27,10 @@ pub(crate) fn init_ethanol_70_percent(
     }
 
     Ok(ProcedureModel::new()
-        .name(E70_ETHANOL)
-        ?
+        .name(E70_ETHANOL)?
         .description(
 			"Procedure model for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-		?)
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?)
 }

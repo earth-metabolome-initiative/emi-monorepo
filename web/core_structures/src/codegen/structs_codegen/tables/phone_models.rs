@@ -22,14 +22,6 @@ where
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
-    > for PhoneModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{
-}
-impl
-    web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     > for PhoneModel
 where
@@ -51,7 +43,7 @@ impl diesel::Identifiable for PhoneModel {
     }
 }
 impl PhoneModel {
-    pub fn phone_models_id_fkey<C: diesel::connection::LoadConnection>(
+    pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -83,7 +75,7 @@ impl PhoneModel {
             conn,
         )
     }
-    pub fn phone_models_id_fkey1<C: diesel::connection::LoadConnection>(
+    pub fn phone_models_positioning<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

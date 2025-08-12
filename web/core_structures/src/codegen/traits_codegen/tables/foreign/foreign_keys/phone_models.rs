@@ -1,9 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoneModelForeignKeys {
-    pub phone_models_id_fkey:
+    pub phone_models_camera:
         Option<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
-    pub phone_models_id_fkey1: Option<
+    pub phone_models_positioning: Option<
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     >,
 }
@@ -26,7 +26,8 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.phone_models_id_fkey.is_some() && foreign_keys.phone_models_id_fkey1.is_some()
+        foreign_keys.phone_models_camera.is_some()
+            && foreign_keys.phone_models_positioning.is_some()
     }
     fn update(
         &self,
@@ -43,7 +44,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == camera_models.id {
-                    foreign_keys.phone_models_id_fkey = Some(camera_models);
+                    foreign_keys.phone_models_camera = Some(camera_models);
                     updated = true;
                 }
             }
@@ -52,7 +53,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.id == camera_models.id {
-                    foreign_keys.phone_models_id_fkey = None;
+                    foreign_keys.phone_models_camera = None;
                     updated = true;
                 }
             }
@@ -63,7 +64,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == positioning_device_models.id {
-                    foreign_keys.phone_models_id_fkey1 = Some(positioning_device_models);
+                    foreign_keys.phone_models_positioning = Some(positioning_device_models);
                     updated = true;
                 }
             }
@@ -72,7 +73,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.id == positioning_device_models.id {
-                    foreign_keys.phone_models_id_fkey1 = None;
+                    foreign_keys.phone_models_positioning = None;
                     updated = true;
                 }
             }

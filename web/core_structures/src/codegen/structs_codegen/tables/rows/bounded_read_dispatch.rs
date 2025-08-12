@@ -87,9 +87,6 @@ where
     crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -249,7 +246,7 @@ where
     crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel: web_common_traits::prelude::BoundedRead<
@@ -494,14 +491,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::GeolocationProcedureModel => {
                 crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::InstrumentModel => {
-                crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -932,8 +921,8 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::WeighingInstrumentModel => {
-                crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel::bounded_read(
+            crate::codegen::tables::table_names::TableName::WeighingDeviceModel => {
+                crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::bounded_read(
                         offset,
                         limit,
                         conn,

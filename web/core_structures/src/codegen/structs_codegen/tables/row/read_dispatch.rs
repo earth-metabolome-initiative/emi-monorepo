@@ -87,9 +87,6 @@ where
     crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::database::Read<
         C,
     >,
@@ -249,7 +246,7 @@ where
     crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel: web_common_traits::database::Read<
@@ -523,15 +520,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::InstrumentModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel::read(
                             primary_key,
                             conn,
                         )?
@@ -1014,10 +1002,10 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingInstrumentModel(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel::read(
+                    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
                             primary_key,
                             conn,
                         )?

@@ -5,7 +5,7 @@ pub struct WeighingProcedureModelForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
     >,
     pub weighed_with: Option<
-        crate::codegen::structs_codegen::tables::weighing_instrument_models::WeighingInstrumentModel,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
     >,
     pub sample_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
@@ -26,7 +26,7 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingInstrumentModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
                 self.weighed_with,
             ),
         ));
@@ -94,25 +94,21 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::WeighingInstrumentModel(
-                    weighing_instrument_models,
-                ),
+                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.weighed_with == weighing_instrument_models.id {
-                    foreign_keys.weighed_with = Some(weighing_instrument_models);
+                if self.weighed_with == weighing_device_models.id {
+                    foreign_keys.weighed_with = Some(weighing_device_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::WeighingInstrumentModel(
-                    weighing_instrument_models,
-                ),
+                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.weighed_with == weighing_instrument_models.id {
+                if self.weighed_with == weighing_device_models.id {
                     foreign_keys.weighed_with = None;
                     updated = true;
                 }

@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    InstrumentModel,
+    Trackable,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-    InstrumentModel,
+    Trackable,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -18,7 +18,7 @@ where
         crate::codegen::structs_codegen::tables::camera_models::CameraModel,
     >,
     C: diesel::connection::LoadConnection,
-    InstrumentModel: web_common_traits::database::TryInsertGeneric<
+    Trackable: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
@@ -54,8 +54,8 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelExtensionAttributes::InstrumentModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentModelAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelExtensionAttributes::Trackable(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
                     ),
                 ))
             })?;

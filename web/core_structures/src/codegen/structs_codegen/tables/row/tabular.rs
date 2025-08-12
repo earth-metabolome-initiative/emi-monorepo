@@ -75,9 +75,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::GeolocationProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::GeolocationProcedureModel
             }
-            super::Row::InstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::InstrumentModel
-            }
             super::Row::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
             }
@@ -201,8 +198,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::VolumetricProcessable(_) => {
                 crate::codegen::tables::table_names::TableName::VolumetricProcessable
             }
-            super::Row::WeighingInstrumentModel(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingInstrumentModel
+            super::Row::WeighingDeviceModel(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingDeviceModel
             }
             super::Row::WeighingProcedureModel(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingProcedureModel

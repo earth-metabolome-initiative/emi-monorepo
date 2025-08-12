@@ -1,22 +1,17 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    ContainerModel, PackagingProcedureModel, ProcedureModel, ProcedureModelTrackable,
-    StorageProcedureModel, Trackable, User, VolumetricContainerModel,
+    PackagingProcedureModel, ProcedureModel, ProcedureModelTrackable, StorageProcedureModel,
+    Trackable, User,
     traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::trackables::containers::{
-    CONICAL_CENTRIFUGAL_TUBE_50ML, POLYSTYRENE_BOX,
-    wet_lab_containers::wrappers::COFFEE_FILTER_WRAPPER,
+use crate::procedure_model_trackables::{
+    coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
+    conical_tubes_box::cct_box_builder,
 };
-
-/// The name of the part of organism collection procedure model.
-const PART_OF_ORGANISM: &str = "Part-of organisms collection procedure";
-pub(crate) const CONICAL_TUBE_BOX: &str = "Conical Tube Box";
-pub(crate) const SAMPLE_CCT: &str = "Sample Conical Centrifugal Tube";
 
 /// Initializes the part of organism collection procedure model in the database.
 ///
@@ -33,20 +28,11 @@ pub(crate) fn init_part_of_organism_collection(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureModel> {
-    if let Some(existing) = ProcedureModel::from_name(PART_OF_ORGANISM, conn).optional()? {
+    let name = "Part of Organism Collection";
+
+    if let Some(existing) = ProcedureModel::from_name(name, conn).optional()? {
         return Ok(existing);
     }
-
-    let cct = VolumetricContainerModel::from_name(CONICAL_CENTRIFUGAL_TUBE_50ML, conn)?;
-    let cct_builder =
-        ProcedureModelTrackable::new().name(SAMPLE_CCT)?.trackable(cct.id)?.created_by(user.id)?;
-
-    let coffee_filter_wrapper = ContainerModel::from_name(COFFEE_FILTER_WRAPPER, conn)?;
-
-    let coffee_filter_wrapper_builder = ProcedureModelTrackable::new()
-        .name("Coffee filter wrapper")?
-        .trackable(coffee_filter_wrapper.id)?
-        .created_by(user.id)?;
 
     let sample = Trackable::from_name("Sample", conn)?;
 
@@ -54,7 +40,7 @@ pub(crate) fn init_part_of_organism_collection(
         ProcedureModelTrackable::new().name("Sample")?.trackable(sample.id)?.created_by(user.id)?;
 
     let collection = ProcedureModel::new()
-        .name(PART_OF_ORGANISM)?
+        .name(name)?
         .description(
             "Procedure model to collect part of organisms, such as leaves, stems, or roots.",
         )?
@@ -71,46 +57,32 @@ pub(crate) fn init_part_of_organism_collection(
     // Remind the user to sterilize / clean the scalpel and gloves with ethanol 70
     // percent
     let sterilization_reminder = ProcedureModel::new()
-        .name("Sterilize scalpel and gloves")
-        ?
+        .name("Sterilize scalpel and gloves")?
         .description(
             "Please sterilize the scalpel and gloves with ethanol 70 percent to avoid contamination.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-        ?;
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     // Cut the part of the organism to be collected with a sterile scalpel
     let cut_part = ProcedureModel::new()
-        .name("Cut part of organism")
-        ?
+        .name("Cut part of organism")?
         .description(
             "Use a sterile scalpel to cut the desired part of the organism, such as leaves, stems, or roots.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-        ?;
+        )?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     // Wrapping procedure with coffee filter paper
     let coffee_filter_wrapping = PackagingProcedureModel::new()
-        .name("Wrap in coffee filter paper")
-        ?
+        .name("Wrap in coffee filter paper")?
         .description(
             "Wrap the cut part of the organism in a coffee filter paper to protect it during transport.",
-        )
-        ?
-        .created_by(user.id)
-        ?
-        .procedure_packaged_with(coffee_filter_wrapper_builder.clone())
-        ?
-        .procedure_sample(sample_builder)
-        ?
-        .insert(user.id, conn)
-        ?;
+        )?
+        .created_by(user.id)?
+        .procedure_packaged_with(coffee_wrapper_builder(user, conn)?)?
+        .procedure_sample(sample_builder)?
+        .insert(user.id, conn)?;
 
     // Placing the wrapped sample in the conical centrifugal tube
     let place_in_tube = StorageProcedureModel::new()
@@ -118,35 +90,23 @@ pub(crate) fn init_part_of_organism_collection(
         .description(
             "Place the wrapped sample in a conical centrifugal tube for storage and transport.",
         )?
-        .procedure_parent_container(cct_builder.clone())?
-        .procedure_child_container(coffee_filter_wrapper_builder)?
+        .procedure_parent_container(cct_builder(user, conn)?)?
+        .procedure_child_container(coffee_wrapper_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
     // Put it in the storage box
     let place_in_storage_box = StorageProcedureModel::new()
-        .name("Place in storage box")
-        ?
+        .name("Place in storage box")?
         .description(
             "Place the conical centrifugal tube with the sample in a storage box for long-term storage.",
-        )
-        ?
+        )?
         .procedure_parent_container(
-            ProcedureModelTrackable::new()
-            .name(CONICAL_TUBE_BOX)
-            ?
-            .trackable(ContainerModel::from_name(POLYSTYRENE_BOX, conn)?.id)
-            ?
-            .created_by(user.id)
-            ?
-        )
-        ?
-        .procedure_child_container(cct_builder)
-        ?
-        .created_by(user.id)
-        ?
-        .insert(user.id, conn)
-        ?;
+            cct_box_builder(user, conn)?
+        )?
+        .procedure_child_container(cct_builder(user, conn)?)?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
 
     for procedure in [
         &gloves_reminder,
