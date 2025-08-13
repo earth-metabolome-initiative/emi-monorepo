@@ -26,6 +26,52 @@ pub enum InsertablePlacingProcedureModelAttributes {
     ),
     Quantity,
 }
+impl core::str::FromStr for InsertablePlacingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "PlacedInto" => Ok(Self::PlacedInto),
+            "ProcedurePlacedInto" => {
+                Ok(
+                    Self::ProcedurePlacedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "Quantity" => Ok(Self::Quantity),
+            "source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "placed_into" => Ok(Self::PlacedInto),
+            "procedure_placed_into" => {
+                Ok(
+                    Self::ProcedurePlacedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "quantity" => Ok(Self::Quantity),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertablePlacingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

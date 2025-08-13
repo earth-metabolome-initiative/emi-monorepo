@@ -35,6 +35,86 @@ pub enum InsertableAliquotingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableAliquotingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Liters" => Ok(Self::Liters),
+            "AliquotedFrom" => Ok(Self::AliquotedFrom),
+            "ProcedureAliquotedFrom" => {
+                Ok(
+                    Self::ProcedureAliquotedFrom(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "AliquotedInto" => Ok(Self::AliquotedInto),
+            "ProcedureAliquotedInto" => {
+                Ok(
+                    Self::ProcedureAliquotedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "AliquotedWith" => Ok(Self::AliquotedWith),
+            "ProcedureAliquotedWith" => {
+                Ok(
+                    Self::ProcedureAliquotedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "PipetteTip" => Ok(Self::PipetteTip),
+            "ProcedurePipetteTip" => {
+                Ok(
+                    Self::ProcedurePipetteTip(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "liters" => Ok(Self::Liters),
+            "aliquoted_from" => Ok(Self::AliquotedFrom),
+            "procedure_aliquoted_from" => {
+                Ok(
+                    Self::ProcedureAliquotedFrom(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "aliquoted_into" => Ok(Self::AliquotedInto),
+            "procedure_aliquoted_into" => {
+                Ok(
+                    Self::ProcedureAliquotedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "aliquoted_with" => Ok(Self::AliquotedWith),
+            "procedure_aliquoted_with" => {
+                Ok(
+                    Self::ProcedureAliquotedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "pipette_tip" => Ok(Self::PipetteTip),
+            "procedure_pipette_tip" => {
+                Ok(
+                    Self::ProcedurePipetteTip(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableAliquotingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -362,9 +442,7 @@ impl InsertableAliquotingProcedureModel {
             conn,
         )
     }
-    pub fn aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn aliquoting_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

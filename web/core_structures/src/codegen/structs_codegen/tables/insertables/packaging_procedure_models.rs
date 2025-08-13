@@ -25,6 +25,50 @@ pub enum InsertablePackagingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertablePackagingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "PackagedWith" => Ok(Self::PackagedWith),
+            "ProcedurePackagedWith" => {
+                Ok(
+                    Self::ProcedurePackagedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "ProcedureSampleId" => {
+                Ok(
+                    Self::ProcedureSampleId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "packaged_with" => Ok(Self::PackagedWith),
+            "procedure_packaged_with" => {
+                Ok(
+                    Self::ProcedurePackagedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "procedure_sample_id" => {
+                Ok(
+                    Self::ProcedureSampleId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertablePackagingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

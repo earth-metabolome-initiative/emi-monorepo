@@ -5,6 +5,18 @@ pub enum InsertableTemporaryUserAttributes {
     Email,
     LoginProviderId,
 }
+impl core::str::FromStr for InsertableTemporaryUserAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Email" => Ok(Self::Email),
+            "LoginProviderId" => Ok(Self::LoginProviderId),
+            "email" => Ok(Self::Email),
+            "login_provider_id" => Ok(Self::LoginProviderId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTemporaryUserAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

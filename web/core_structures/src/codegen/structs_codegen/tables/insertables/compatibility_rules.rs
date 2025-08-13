@@ -7,6 +7,24 @@ pub enum InsertableCompatibilityRuleAttributes {
     CreatedBy,
     CreatedAt,
 }
+impl core::str::FromStr for InsertableCompatibilityRuleAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "LeftTrackableId" => Ok(Self::LeftTrackableId),
+            "RightTrackableId" => Ok(Self::RightTrackableId),
+            "Quantity" => Ok(Self::Quantity),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "left_trackable_id" => Ok(Self::LeftTrackableId),
+            "right_trackable_id" => Ok(Self::RightTrackableId),
+            "quantity" => Ok(Self::Quantity),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCompatibilityRuleAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

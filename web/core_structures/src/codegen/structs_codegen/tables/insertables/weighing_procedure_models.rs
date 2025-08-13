@@ -26,6 +26,52 @@ pub enum InsertableWeighingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableWeighingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "WeighedWith" => Ok(Self::WeighedWith),
+            "ProcedureWeighedWith" => {
+                Ok(
+                    Self::ProcedureWeighedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "SampleContainerId" => Ok(Self::SampleContainerId),
+            "ProcedureSampleContainer" => {
+                Ok(
+                    Self::ProcedureSampleContainer(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "weighed_with" => Ok(Self::WeighedWith),
+            "procedure_weighed_with" => {
+                Ok(
+                    Self::ProcedureWeighedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "sample_container_id" => Ok(Self::SampleContainerId),
+            "procedure_sample_container" => {
+                Ok(
+                    Self::ProcedureSampleContainer(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableWeighingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

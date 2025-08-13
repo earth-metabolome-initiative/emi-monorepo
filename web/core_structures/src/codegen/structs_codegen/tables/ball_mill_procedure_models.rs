@@ -201,7 +201,7 @@ impl BallMillProcedureModel {
             conn,
         )
     }
-    pub fn ball_mill_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn ball_mill_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

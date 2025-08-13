@@ -8,6 +8,24 @@ pub enum InsertableAddressAttributes {
     PostalCode,
     Geolocation,
 }
+impl core::str::FromStr for InsertableAddressAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "CityId" => Ok(Self::CityId),
+            "StreetName" => Ok(Self::StreetName),
+            "StreetNumber" => Ok(Self::StreetNumber),
+            "PostalCode" => Ok(Self::PostalCode),
+            "Geolocation" => Ok(Self::Geolocation),
+            "city_id" => Ok(Self::CityId),
+            "street_name" => Ok(Self::StreetName),
+            "street_number" => Ok(Self::StreetNumber),
+            "postal_code" => Ok(Self::PostalCode),
+            "geolocation" => Ok(Self::Geolocation),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableAddressAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

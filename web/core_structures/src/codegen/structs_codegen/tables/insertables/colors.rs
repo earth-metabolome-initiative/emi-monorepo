@@ -6,6 +6,20 @@ pub enum InsertableColorAttributes {
     Description,
     Id,
 }
+impl core::str::FromStr for InsertableColorAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "HexadecimalValue" => Ok(Self::HexadecimalValue),
+            "Description" => Ok(Self::Description),
+            "name" => Ok(Self::Name),
+            "hexadecimal_value" => Ok(Self::HexadecimalValue),
+            "description" => Ok(Self::Description),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableColorAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

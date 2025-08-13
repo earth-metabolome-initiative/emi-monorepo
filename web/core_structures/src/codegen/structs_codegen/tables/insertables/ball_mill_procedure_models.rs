@@ -30,6 +30,60 @@ pub enum InsertableBallMillProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableBallMillProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kelvin" => Ok(Self::Kelvin),
+            "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
+            "Seconds" => Ok(Self::Seconds),
+            "Hertz" => Ok(Self::Hertz),
+            "MilledWith" => Ok(Self::MilledWith),
+            "ProcedureMilledWith" => {
+                Ok(
+                    Self::ProcedureMilledWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "MilledContainerId" => Ok(Self::MilledContainerId),
+            "ProcedureMilledContainerId" => {
+                Ok(
+                    Self::ProcedureMilledContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kelvin" => Ok(Self::Kelvin),
+            "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
+            "seconds" => Ok(Self::Seconds),
+            "hertz" => Ok(Self::Hertz),
+            "milled_with" => Ok(Self::MilledWith),
+            "procedure_milled_with" => {
+                Ok(
+                    Self::ProcedureMilledWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "milled_container_id" => Ok(Self::MilledContainerId),
+            "procedure_milled_container_id" => {
+                Ok(
+                    Self::ProcedureMilledContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableBallMillProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -226,7 +280,7 @@ impl InsertableBallMillProcedureModel {
             conn,
         )
     }
-    pub fn ball_mill_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn ball_mill_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

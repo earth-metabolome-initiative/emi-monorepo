@@ -30,6 +30,68 @@ pub enum InsertableMixingProcedureModelAttributes {
     ),
     Kilograms,
 }
+impl core::str::FromStr for InsertableMixingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "MeasuredWith" => Ok(Self::MeasuredWith),
+            "ProcedureMeasuredWith" => {
+                Ok(
+                    Self::ProcedureMeasuredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "Source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "MixedWith" => Ok(Self::MixedWith),
+            "ProcedureMixedInto" => {
+                Ok(
+                    Self::ProcedureMixedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "Kilograms" => Ok(Self::Kilograms),
+            "measured_with" => Ok(Self::MeasuredWith),
+            "procedure_measured_with" => {
+                Ok(
+                    Self::ProcedureMeasuredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "mixed_with" => Ok(Self::MixedWith),
+            "procedure_mixed_into" => {
+                Ok(
+                    Self::ProcedureMixedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kilograms" => Ok(Self::Kilograms),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableMixingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

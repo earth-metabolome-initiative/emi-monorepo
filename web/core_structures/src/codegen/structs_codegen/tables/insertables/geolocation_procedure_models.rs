@@ -25,6 +25,50 @@ pub enum InsertableGeolocationProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableGeolocationProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "GeolocatedWith" => Ok(Self::GeolocatedWith),
+            "ProcedureGeolocatedWith" => {
+                Ok(
+                    Self::ProcedureGeolocatedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "TrackableId" => {
+                Ok(
+                    Self::TrackableId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "geolocated_with" => Ok(Self::GeolocatedWith),
+            "procedure_geolocated_with" => {
+                Ok(
+                    Self::ProcedureGeolocatedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "trackable_id" => {
+                Ok(
+                    Self::TrackableId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableGeolocationProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

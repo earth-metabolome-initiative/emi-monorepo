@@ -12,8 +12,8 @@ mod users;
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
 pub use procedure_models::DBGI_PLAN;
-use trackables::init_compatibility_rules;
 use procedure_models::init_procedure_models;
+use trackables::init_compatibility_rules;
 use users::init_root_user;
 
 /// Executes the init migration.
@@ -29,8 +29,8 @@ pub fn init_migration(conn: &mut PgConnection) -> anyhow::Result<()> {
     conn.transaction(|conn| {
         let darwin = init_root_user(conn)?;
         init_login_providers(&darwin, conn)?;
-        init_procedure_models(&darwin, conn)?;
         init_compatibility_rules(&darwin, conn)?;
+        init_procedure_models(&darwin, conn)?;
         Ok(())
     })
 }

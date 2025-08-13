@@ -31,3 +31,4 @@ mod trackable_ancestors;
 mod trackables;
 mod users;
 mod weighing_device_models;
+mod weighing_procedure_models;

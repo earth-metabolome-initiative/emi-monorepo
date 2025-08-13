@@ -13,6 +13,36 @@ pub enum InsertableTeamAttributes {
     UpdatedBy,
     UpdatedAt,
 }
+impl core::str::FromStr for InsertableTeamAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Id" => Ok(Self::Id),
+            "Name" => Ok(Self::Name),
+            "Description" => Ok(Self::Description),
+            "Icon" => Ok(Self::Icon),
+            "ColorId" => Ok(Self::ColorId),
+            "StateId" => Ok(Self::StateId),
+            "ParentTeamId" => Ok(Self::ParentTeamId),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedBy" => Ok(Self::UpdatedBy),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "id" => Ok(Self::Id),
+            "name" => Ok(Self::Name),
+            "description" => Ok(Self::Description),
+            "icon" => Ok(Self::Icon),
+            "color_id" => Ok(Self::ColorId),
+            "state_id" => Ok(Self::StateId),
+            "parent_team_id" => Ok(Self::ParentTeamId),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_by" => Ok(Self::UpdatedBy),
+            "updated_at" => Ok(Self::UpdatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTeamAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

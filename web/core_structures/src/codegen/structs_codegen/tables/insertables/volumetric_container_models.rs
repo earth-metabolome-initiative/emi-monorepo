@@ -30,6 +30,16 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContai
         ))
     }
 }
+impl core::str::FromStr for InsertableVolumetricContainerModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Liters" => Ok(Self::Liters),
+            "liters" => Ok(Self::Liters),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableVolumetricContainerModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

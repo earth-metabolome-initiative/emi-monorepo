@@ -21,6 +21,24 @@ pub enum InsertableSupernatantProcedureAttributes {
     TransferredWith,
     PipetteTip,
 }
+impl core::str::FromStr for InsertableSupernatantProcedureAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ProcedureModelId" => Ok(Self::ProcedureModelId),
+            "StratifiedSource" => Ok(Self::StratifiedSource),
+            "SupernatantDestination" => Ok(Self::SupernatantDestination),
+            "TransferredWith" => Ok(Self::TransferredWith),
+            "PipetteTip" => Ok(Self::PipetteTip),
+            "procedure_model_id" => Ok(Self::ProcedureModelId),
+            "stratified_source" => Ok(Self::StratifiedSource),
+            "supernatant_destination" => Ok(Self::SupernatantDestination),
+            "transferred_with" => Ok(Self::TransferredWith),
+            "pipette_tip" => Ok(Self::PipetteTip),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableSupernatantProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

@@ -7,7 +7,7 @@ pub struct StorageProcedureModelForeignKeys {
         Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     pub child_container:
         Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
-    pub storage_pm_compatibility_rule:
+    pub storage_pm_compatibility_rules:
         Option<crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -45,7 +45,7 @@ impl web_common_traits::prelude::HasForeignKeys
         foreign_keys.procedure_model.is_some()
             && foreign_keys.parent_container.is_some()
             && foreign_keys.child_container.is_some()
-            && foreign_keys.storage_pm_compatibility_rule.is_some()
+            && foreign_keys.storage_pm_compatibility_rules.is_some()
     }
     fn update(
         &self,
@@ -64,7 +64,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.parent_container_id == compatibility_rules.left_trackable_id
                     && self.child_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.storage_pm_compatibility_rule = Some(compatibility_rules);
+                    foreign_keys.storage_pm_compatibility_rules = Some(compatibility_rules);
                     updated = true;
                 }
             }
@@ -75,7 +75,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.parent_container_id == compatibility_rules.left_trackable_id
                     && self.child_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.storage_pm_compatibility_rule = None;
+                    foreign_keys.storage_pm_compatibility_rules = None;
                     updated = true;
                 }
             }

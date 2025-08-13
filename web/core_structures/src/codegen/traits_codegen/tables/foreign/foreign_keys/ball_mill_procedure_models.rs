@@ -10,7 +10,7 @@ pub struct BallMillProcedureModelForeignKeys {
     pub milled_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub ball_mill_pm_compatibility_rule: Option<
+    pub ball_mill_pm_compatibility_rules: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
@@ -49,7 +49,7 @@ impl web_common_traits::prelude::HasForeignKeys
         foreign_keys.procedure_model.is_some()
             && foreign_keys.milled_with.is_some()
             && foreign_keys.milled_container.is_some()
-            && foreign_keys.ball_mill_pm_compatibility_rule.is_some()
+            && foreign_keys.ball_mill_pm_compatibility_rules.is_some()
     }
     fn update(
         &self,
@@ -88,7 +88,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.milled_with == compatibility_rules.left_trackable_id
                     && self.milled_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.ball_mill_pm_compatibility_rule = Some(compatibility_rules);
+                    foreign_keys.ball_mill_pm_compatibility_rules = Some(compatibility_rules);
                     updated = true;
                 }
             }
@@ -99,7 +99,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.milled_with == compatibility_rules.left_trackable_id
                     && self.milled_container_id == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.ball_mill_pm_compatibility_rule = None;
+                    foreign_keys.ball_mill_pm_compatibility_rules = None;
                     updated = true;
                 }
             }

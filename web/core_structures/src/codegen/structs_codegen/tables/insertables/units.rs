@@ -7,6 +7,22 @@ pub enum InsertableUnitAttributes {
     ColorId,
     Id,
 }
+impl core::str::FromStr for InsertableUnitAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Unit" => Ok(Self::Unit),
+            "Icon" => Ok(Self::Icon),
+            "ColorId" => Ok(Self::ColorId),
+            "name" => Ok(Self::Name),
+            "unit" => Ok(Self::Unit),
+            "icon" => Ok(Self::Icon),
+            "color_id" => Ok(Self::ColorId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableUnitAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

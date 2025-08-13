@@ -35,6 +35,86 @@ pub enum InsertableSupernatantProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableSupernatantProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Liters" => Ok(Self::Liters),
+            "StratifiedSource" => Ok(Self::StratifiedSource),
+            "ProcedureStratifiedSource" => {
+                Ok(
+                    Self::ProcedureStratifiedSource(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "SupernatantDestination" => Ok(Self::SupernatantDestination),
+            "ProcedureSupernatantDestination" => {
+                Ok(
+                    Self::ProcedureSupernatantDestination(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "TransferredWith" => Ok(Self::TransferredWith),
+            "ProcedureTransferredWith" => {
+                Ok(
+                    Self::ProcedureTransferredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "PipetteTip" => Ok(Self::PipetteTip),
+            "ProcedurePipetteTip" => {
+                Ok(
+                    Self::ProcedurePipetteTip(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "liters" => Ok(Self::Liters),
+            "stratified_source" => Ok(Self::StratifiedSource),
+            "procedure_stratified_source" => {
+                Ok(
+                    Self::ProcedureStratifiedSource(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "supernatant_destination" => Ok(Self::SupernatantDestination),
+            "procedure_supernatant_destination" => {
+                Ok(
+                    Self::ProcedureSupernatantDestination(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "transferred_with" => Ok(Self::TransferredWith),
+            "procedure_transferred_with" => {
+                Ok(
+                    Self::ProcedureTransferredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "pipette_tip" => Ok(Self::PipetteTip),
+            "procedure_pipette_tip" => {
+                Ok(
+                    Self::ProcedurePipetteTip(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableSupernatantProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -362,9 +442,7 @@ impl InsertableSupernatantProcedureModel {
             conn,
         )
     }
-    pub fn supernatant_procedure_models_transferred_with_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn supernatant_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

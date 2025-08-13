@@ -7,6 +7,24 @@ pub enum InsertableSpatialRefSyAttributes {
     Srtext,
     Proj4text,
 }
+impl core::str::FromStr for InsertableSpatialRefSyAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Srid" => Ok(Self::Srid),
+            "AuthName" => Ok(Self::AuthName),
+            "AuthSrid" => Ok(Self::AuthSrid),
+            "Srtext" => Ok(Self::Srtext),
+            "Proj4text" => Ok(Self::Proj4text),
+            "srid" => Ok(Self::Srid),
+            "auth_name" => Ok(Self::AuthName),
+            "auth_srid" => Ok(Self::AuthSrid),
+            "srtext" => Ok(Self::Srtext),
+            "proj4text" => Ok(Self::Proj4text),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableSpatialRefSyAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

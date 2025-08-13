@@ -7,6 +7,22 @@ pub enum InsertableUserAttributes {
     CreatedAt,
     UpdatedAt,
 }
+impl core::str::FromStr for InsertableUserAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "FirstName" => Ok(Self::FirstName),
+            "LastName" => Ok(Self::LastName),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "first_name" => Ok(Self::FirstName),
+            "last_name" => Ok(Self::LastName),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_at" => Ok(Self::UpdatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableUserAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

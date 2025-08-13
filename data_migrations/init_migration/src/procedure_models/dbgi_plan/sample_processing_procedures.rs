@@ -24,7 +24,7 @@ use crate::{
         weighing_device::weighing_device_builder,
     },
     trackables::{
-        containers::{boxes::vial_box, vials::vial_1_5ml},
+        containers::{boxes::vial_rack_1_5ml, vials::vial_1_5ml},
         instruments::freezer::freezer,
     },
 };
@@ -47,7 +47,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
     let long_term_storage_vial_box_builder = ProcedureModelTrackable::new()
         .name("Long Term Storage Vial Box")?
         .created_by(user.id)?
-        .trackable(vial_box(user, conn)?.id)?;
+        .trackable(vial_rack_1_5ml(user, conn)?.id)?;
 
     let storage_freezer = ProcedureModelTrackable::new()
         .name("Sample Storage Freezer")?

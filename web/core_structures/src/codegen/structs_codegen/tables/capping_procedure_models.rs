@@ -197,9 +197,7 @@ impl CappingProcedureModel {
             conn,
         )
     }
-    pub fn capping_procedure_models_container_id_capped_with_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn capping_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

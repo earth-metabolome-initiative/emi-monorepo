@@ -6,6 +6,22 @@ pub enum InsertableTaxonAttributes {
     ParentId,
     RankId,
 }
+impl core::str::FromStr for InsertableTaxonAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Id" => Ok(Self::Id),
+            "Name" => Ok(Self::Name),
+            "ParentId" => Ok(Self::ParentId),
+            "RankId" => Ok(Self::RankId),
+            "id" => Ok(Self::Id),
+            "name" => Ok(Self::Name),
+            "parent_id" => Ok(Self::ParentId),
+            "rank_id" => Ok(Self::RankId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTaxonAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

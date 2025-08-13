@@ -10,6 +10,30 @@ pub enum InsertableParentProcedureModelAttributes {
     CreatedBy,
     CreatedAt,
 }
+impl core::str::FromStr for InsertableParentProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ParentProcedureModelId" => Ok(Self::ParentProcedureModelId),
+            "ChildProcedureModelId" => Ok(Self::ChildProcedureModelId),
+            "Snoozable" => Ok(Self::Snoozable),
+            "Copiable" => Ok(Self::Copiable),
+            "Repeatable" => Ok(Self::Repeatable),
+            "Skippable" => Ok(Self::Skippable),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "parent_procedure_model_id" => Ok(Self::ParentProcedureModelId),
+            "child_procedure_model_id" => Ok(Self::ChildProcedureModelId),
+            "snoozable" => Ok(Self::Snoozable),
+            "copiable" => Ok(Self::Copiable),
+            "repeatable" => Ok(Self::Repeatable),
+            "skippable" => Ok(Self::Skippable),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableParentProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

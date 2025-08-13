@@ -17,6 +17,44 @@ pub enum InsertableProjectAttributes {
     ExpectedEndDate,
     EndDate,
 }
+impl core::str::FromStr for InsertableProjectAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Id" => Ok(Self::Id),
+            "Name" => Ok(Self::Name),
+            "Description" => Ok(Self::Description),
+            "StateId" => Ok(Self::StateId),
+            "Icon" => Ok(Self::Icon),
+            "ColorId" => Ok(Self::ColorId),
+            "ParentProjectId" => Ok(Self::ParentProjectId),
+            "Budget" => Ok(Self::Budget),
+            "Expenses" => Ok(Self::Expenses),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedBy" => Ok(Self::UpdatedBy),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "ExpectedEndDate" => Ok(Self::ExpectedEndDate),
+            "EndDate" => Ok(Self::EndDate),
+            "id" => Ok(Self::Id),
+            "name" => Ok(Self::Name),
+            "description" => Ok(Self::Description),
+            "state_id" => Ok(Self::StateId),
+            "icon" => Ok(Self::Icon),
+            "color_id" => Ok(Self::ColorId),
+            "parent_project_id" => Ok(Self::ParentProjectId),
+            "budget" => Ok(Self::Budget),
+            "expenses" => Ok(Self::Expenses),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_by" => Ok(Self::UpdatedBy),
+            "updated_at" => Ok(Self::UpdatedAt),
+            "expected_end_date" => Ok(Self::ExpectedEndDate),
+            "end_date" => Ok(Self::EndDate),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableProjectAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

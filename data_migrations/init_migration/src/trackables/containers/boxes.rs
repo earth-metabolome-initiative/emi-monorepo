@@ -53,11 +53,11 @@ pub(crate) fn polystyrene_box(
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn vial_box(
+pub(crate) fn vial_rack_1_5ml(
     user: &core_structures::User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<core_structures::ContainerModel> {
-    let name = "Vial Box";
+    let name = "Vial Rack 1.5ml (9x9)";
 
     if let Some(existing_box) = core_structures::ContainerModel::from_name(name, conn).optional()? {
         return Ok(existing_box);
@@ -76,20 +76,20 @@ pub(crate) fn vial_box(
 ///
 /// * `user` - The user for whom the product is being created.
 /// * `conn` - The database connection.
-pub(crate) fn init_fisherbrand_kryobox_vial_box(
+pub(crate) fn init_fisherbrand_kryobox_vial_rack(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {
-    let name = "Fisherbrand Kryobox Vial Box";
+    let name = "Fisherbrand Kryobox Vial Rack 1.5ml (9x9)";
     if let Some(existing) = CommercialProduct::from_name(name, conn).optional()? {
         return Ok(existing);
     }
 
-    let vial_box_trackable = vial_box(user, conn)?;
+    let vial_box_trackable = vial_rack_1_5ml(user, conn)?;
     let fisherbrand = fisherbrand(user, conn)?;
     Ok(CommercialProduct::new()
         .name(name.to_owned())?
-        .description("Fisherbrand Kryobox Vial Box, used to store vials.".to_owned())?
+        .description("Fisherbrand Kryobox Vial Rack, used to store vials.".to_owned())?
         .created_by(user.id)?
         .brand(fisherbrand.id)?
         .parent(Some(vial_box_trackable.id))?

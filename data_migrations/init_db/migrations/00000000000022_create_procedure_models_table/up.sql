@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (
 	FOREIGN KEY (procedure_pipette_tip, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
 	FOREIGN KEY (procedure_pipette_tip, pipette_tip) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `aliquoted_with` is compatible with the `pipette_tip`.
-	FOREIGN KEY (aliquoted_with, pipette_tip) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE,
+	CONSTRAINT aliquoting_pm_compatibility_rules FOREIGN KEY (aliquoted_with, pipette_tip) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id),
 	-- We check that the `source` is indeed a trackable that is compatible with the procedure model.
 	FOREIGN KEY (procedure_aliquoted_from, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
 	FOREIGN KEY (procedure_aliquoted_from, aliquoted_from) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS supernatant_procedure_models (
 	FOREIGN KEY (procedure_pipette_tip, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
 	FOREIGN KEY (procedure_pipette_tip, pipette_tip) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `transferred_with` is compatible with the `pipette_tip`.
-	FOREIGN KEY (transferred_with, pipette_tip) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE,
+	CONSTRAINT supernatant_pm_compatibility_rules FOREIGN KEY (transferred_with, pipette_tip) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE,
 	-- We check that the `procedure_stratified_source` is indeed a trackable that is compatible with the procedure model.
 	FOREIGN KEY (procedure_stratified_source, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
 	FOREIGN KEY (procedure_stratified_source, stratified_source) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
@@ -238,16 +238,16 @@ CREATE TABLE IF NOT EXISTS capping_procedure_models (
 	-- We check that the `capped_with` is indeed a trackable that is compatible with the procedure model.
 	FOREIGN KEY (procedure_capped_with, capped_with) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `capped_with` is indeed a cap that can be used with the `container_id`.
-	FOREIGN KEY (container_id, capped_with) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT capping_pm_compatibility_rules FOREIGN KEY (container_id, capped_with) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS weighing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
 	-- The instrument used for weighing.
-	weighed_with UUID NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
+	weighed_with UUID NOT NULL REFERENCES weighing_device_models(id),
 	-- The instrument used for weighing should always be a trackable that is compatible with the procedure model.
 	procedure_weighed_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The sample container is the one that is being weighed.
-	sample_container_id UUID NOT NULL REFERENCES volumetric_container_models(id) ON DELETE CASCADE,
+	sample_container_id UUID NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_sample_container INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- We check that the `weighed_with` is indeed a trackable that is compatible with the procedure model.
 	FOREIGN KEY (procedure_weighed_with, weighed_with) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS storage_procedure_models (
 	-- We check that the `child_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_child_container_id, child_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `parent_container_id` is indeed a container that can hold the `child_container_id`.
-	CONSTRAINT storage_pm_compatibility_rule FOREIGN KEY (parent_container_id, child_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id)
+	CONSTRAINT storage_pm_compatibility_rules FOREIGN KEY (parent_container_id, child_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id)
 );
 CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
@@ -364,7 +364,7 @@ CREATE TABLE IF NOT EXISTS freezing_procedure_models (
 		frozen_container_id
 	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `frozen_with` is indeed a container that can hold the `frozen_container_id`.
-	CONSTRAINT freezing_pm_compatibility_rule FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT freezing_pm_compatibility_rules FOREIGN KEY (frozen_with, frozen_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
@@ -400,7 +400,7 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedure_models (
 	-- We check that the `procedure_centrifuged_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_centrifuged_container_id, centrifuged_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `centrifuged_with` is indeed a container that can hold the `centrifuged_with`.
-	CONSTRAINT centrifuge_pm_compatibility_rule FOREIGN KEY (centrifuged_with, centrifuged_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT centrifuge_pm_compatibility_rules FOREIGN KEY (centrifuged_with, centrifuged_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_models (
 	-- We check that the `milled_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_milled_container_id, milled_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `milled_with` is indeed a ball mill machine that can hold the `milled_container_id`.
-	CONSTRAINT ball_mill_pm_compatibility_rule FOREIGN KEY (milled_with, milled_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
+	CONSTRAINT ball_mill_pm_compatibility_rules FOREIGN KEY (milled_with, milled_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
@@ -472,7 +472,7 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
 	-- We check that the `freeze_dried_container_id` is indeed a container that is compatible with the procedure model.
 	FOREIGN KEY (procedure_freeze_dried_container_id, freeze_dried_container_id) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE,
 	-- We check that the `freeze_dried_container_id` is indeed a freeze drier that can hold the `freeze_dried_with`.
-	CONSTRAINT freeze_drying_pm_compatibility_rule FOREIGN KEY (freeze_dried_with, freeze_dried_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id)
+	CONSTRAINT freeze_drying_pm_compatibility_rules FOREIGN KEY (freeze_dried_with, freeze_dried_container_id) REFERENCES compatibility_rules(left_trackable_id, right_trackable_id)
 );
 CREATE TABLE IF NOT EXISTS geolocation_procedure_models (
 	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),

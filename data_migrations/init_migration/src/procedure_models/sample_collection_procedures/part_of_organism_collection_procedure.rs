@@ -1,8 +1,7 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    PackagingProcedureModel, ProcedureModel, ProcedureModelTrackable, StorageProcedureModel,
-    Trackable, User,
+    PackagingProcedureModel, ProcedureModel, StorageProcedureModel, User,
     traits::{AppendProcedureModel, ChildOptions, ParentProcedureModel},
 };
 use diesel::OptionalExtension;
@@ -10,7 +9,7 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::procedure_model_trackables::{
     coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
-    conical_tubes_box::cct_box_builder,
+    conical_tubes_box::cct_box_builder, organism::sample_builder,
 };
 
 /// Initializes the part of organism collection procedure model in the database.
@@ -33,11 +32,6 @@ pub(crate) fn init_part_of_organism_collection(
     if let Some(existing) = ProcedureModel::from_name(name, conn).optional()? {
         return Ok(existing);
     }
-
-    let sample = Trackable::from_name("Sample", conn)?;
-
-    let sample_builder =
-        ProcedureModelTrackable::new().name("Sample")?.trackable(sample.id)?.created_by(user.id)?;
 
     let collection = ProcedureModel::new()
         .name(name)?
@@ -81,7 +75,7 @@ pub(crate) fn init_part_of_organism_collection(
         )?
         .created_by(user.id)?
         .procedure_packaged_with(coffee_wrapper_builder(user, conn)?)?
-        .procedure_sample(sample_builder)?
+        .procedure_sample(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
     // Placing the wrapped sample in the conical centrifugal tube

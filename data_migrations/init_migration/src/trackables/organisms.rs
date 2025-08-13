@@ -27,3 +27,27 @@ pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<T
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
+
+/// Returns the sample trackable.
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the sample is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<Trackable> {
+    const SAMPLE: &str = "sample";
+
+    if let Some(existing_sample) = Trackable::from_name(SAMPLE, conn).optional()? {
+        return Ok(existing_sample);
+    }
+
+    Ok(Trackable::new()
+        .name(SAMPLE.to_owned())?
+        .description("Samples used in laboratory procedures".to_owned())?
+        .created_by(user.id)?
+        .insert(user.id, conn)?)
+}

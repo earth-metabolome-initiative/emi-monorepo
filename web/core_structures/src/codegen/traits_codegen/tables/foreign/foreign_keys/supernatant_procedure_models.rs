@@ -16,7 +16,7 @@ pub struct SupernatantProcedureModelForeignKeys {
     pub pipette_tip: Option<
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     >,
-    pub supernatant_procedure_models_transferred_with_pipette_tip_fkey: Option<
+    pub supernatant_pm_compatibility_rules: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
@@ -84,9 +84,7 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_models::Super
             && foreign_keys.supernatant_destination.is_some()
             && foreign_keys.transferred_with.is_some()
             && foreign_keys.pipette_tip.is_some()
-            && foreign_keys
-                .supernatant_procedure_models_transferred_with_pipette_tip_fkey
-                .is_some()
+            && foreign_keys.supernatant_pm_compatibility_rules.is_some()
     }
     fn update(
         &self,
@@ -105,8 +103,7 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_models::Super
                 if self.transferred_with == compatibility_rules.left_trackable_id
                     && self.pipette_tip == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .supernatant_procedure_models_transferred_with_pipette_tip_fkey = Some(
+                    foreign_keys.supernatant_pm_compatibility_rules = Some(
                         compatibility_rules,
                     );
                     updated = true;
@@ -119,8 +116,7 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_models::Super
                 if self.transferred_with == compatibility_rules.left_trackable_id
                     && self.pipette_tip == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .supernatant_procedure_models_transferred_with_pipette_tip_fkey = None;
+                    foreign_keys.supernatant_pm_compatibility_rules = None;
                     updated = true;
                 }
             }

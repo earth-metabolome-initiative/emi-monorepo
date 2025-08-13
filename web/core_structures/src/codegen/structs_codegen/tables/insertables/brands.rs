@@ -8,6 +8,24 @@ pub enum InsertableBrandAttributes {
     UpdatedBy,
     UpdatedAt,
 }
+impl core::str::FromStr for InsertableBrandAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedBy" => Ok(Self::UpdatedBy),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "name" => Ok(Self::Name),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_by" => Ok(Self::UpdatedBy),
+            "updated_at" => Ok(Self::UpdatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableBrandAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

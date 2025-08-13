@@ -17,6 +17,16 @@ pub enum InsertableContainerAttributes {
     Id,
     ContainerModelId,
 }
+impl core::str::FromStr for InsertableContainerAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ContainerModelId" => Ok(Self::ContainerModelId),
+            "container_model_id" => Ok(Self::ContainerModelId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableContainerAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

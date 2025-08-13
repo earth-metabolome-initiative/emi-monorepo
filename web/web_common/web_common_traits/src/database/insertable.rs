@@ -1,6 +1,6 @@
 //! Submodule defining traits regarding tables that can be extended with new
 //! rows.
-use std::convert::Infallible;
+use std::{convert::Infallible, str::FromStr};
 
 use common_traits::prelude::BuilderError;
 use generic_backend_request_errors::GenericBackendRequestError;
@@ -145,6 +145,10 @@ pub enum InsertError<FieldName> {
     ValidationError(validation_errors::Error<FieldName>),
     /// A diesel error occurred.
     DieselError(String),
+    /// A compatibility rule was violated.
+    CompatibilityRule(String, FieldName, FieldName),
+    /// Unknown attribute error.
+    UnknownAttribute(String),
     /// A server error occurred.
     ServerError(GenericBackendRequestError),
 }
@@ -164,6 +168,10 @@ impl<FieldName> InsertError<FieldName> {
                 InsertError::ValidationError(error.into_field_name(convert))
             }
             InsertError::DieselError(error) => InsertError::DieselError(error),
+            InsertError::CompatibilityRule(constraint_name, left, right) => {
+                InsertError::CompatibilityRule(constraint_name, convert(left), convert(right))
+            }
+            InsertError::UnknownAttribute(attribute) => InsertError::UnknownAttribute(attribute),
             InsertError::ServerError(error) => InsertError::ServerError(error),
         }
     }
@@ -186,6 +194,15 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
             InsertError::DieselError(error) => {
                 write!(f, "Diesel error: {error}")
             }
+            InsertError::CompatibilityRule(constraint_name, left, right) => {
+                write!(
+                    f,
+                    "Compatibility rule `{constraint_name}` missing: provided `{left}` is not known to be compatible with `{right}`"
+                )
+            }
+            InsertError::UnknownAttribute(attribute) => {
+                write!(f, "Unknown attribute error: `{attribute}`")
+            }
             InsertError::ServerError(error) => {
                 <GenericBackendRequestError as core::fmt::Display>::fmt(error, f)
             }
@@ -204,6 +221,15 @@ impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
             }
             InsertError::DieselError(error) => {
                 write!(f, "Diesel error: {error:?}")
+            }
+            InsertError::CompatibilityRule(constraint_name, left, right) => {
+                write!(
+                    f,
+                    "Compatibility rule `{constraint_name}` missing: provided `{left:?}` is not known to be compatible with `{right:?}`"
+                )
+            }
+            InsertError::UnknownAttribute(attribute) => {
+                write!(f, "Unknown attribute error: `{attribute:?}`")
             }
             InsertError::ServerError(error) => {
                 <GenericBackendRequestError as core::fmt::Debug>::fmt(error, f)
@@ -238,8 +264,63 @@ impl<FieldName> From<validation_errors::DoubleFieldError<FieldName>> for InsertE
     }
 }
 
-impl<FieldName> From<diesel::result::Error> for InsertError<FieldName> {
+impl<FieldName> From<diesel::result::Error> for InsertError<FieldName>
+where
+    FieldName: FromStr,
+{
     fn from(error: diesel::result::Error) -> Self {
+        // We check whether the error is a foreign key violation, and
+        // if it is a compatibility rule violation.
+        if let diesel::result::Error::DatabaseError(
+            diesel::result::DatabaseErrorKind::ForeignKeyViolation,
+            info,
+        ) = &error
+        {
+            if let Some(detail) = info.details() {
+                if detail.contains("compatibility_rules") {
+                    // We retrieve the names of the two columns involved in the
+                    // compatibility rule violation.
+                    //
+                    // An example of a detail is:
+                    //
+                    // Some("Key (frozen_with,
+                    // frozen_container_id)=(af54ac83-a40f-4b83-940c-998fc70332ac,
+                    // c11af75e-42cd-4972-bdd0-2edce335b5af) is not present in table
+                    // \"compatibility_rules\".")
+                    //
+                    // First, we split the detail by the `=` character to get the
+                    // part that contains the two columns.
+                    if let Some(first_part) = detail.split('=').next() {
+                        // Then, we remove the leading `Key (` and trailing `)` characters.
+                        let first_part =
+                            first_part.trim_start_matches("Key (").trim_end_matches(')');
+
+                        // Now, we split the first part by the `,` character to get the two
+                        // column names, which need to be trimmed of any whitespace.
+                        if let Ok(mut field_names) = first_part
+                            .split(',')
+                            .map(str::trim)
+                            .map(|s| s.parse::<FieldName>())
+                            .collect::<Result<Vec<FieldName>, _>>()
+                        {
+                            if let (Some(second), Some(first)) =
+                                (field_names.pop(), field_names.pop())
+                            {
+                                // We return a compatibility rule error with the two field names.
+                                return InsertError::CompatibilityRule(
+                                    info.constraint_name()
+                                        .unwrap_or("Unknown constraint")
+                                        .to_owned(),
+                                    first,
+                                    second,
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         InsertError::DieselError(error.to_string())
     }
 }

@@ -9,6 +9,26 @@ pub enum InsertableOrganizationAttributes {
     Domain,
     Id,
 }
+impl core::str::FromStr for InsertableOrganizationAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Url" => Ok(Self::Url),
+            "Country" => Ok(Self::Country),
+            "AlphaTwoCode" => Ok(Self::AlphaTwoCode),
+            "StateProvince" => Ok(Self::StateProvince),
+            "Domain" => Ok(Self::Domain),
+            "name" => Ok(Self::Name),
+            "url" => Ok(Self::Url),
+            "country" => Ok(Self::Country),
+            "alpha_two_code" => Ok(Self::AlphaTwoCode),
+            "state_province" => Ok(Self::StateProvince),
+            "domain" => Ok(Self::Domain),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableOrganizationAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

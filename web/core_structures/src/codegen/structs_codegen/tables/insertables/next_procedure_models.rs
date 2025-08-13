@@ -7,6 +7,24 @@ pub enum InsertableNextProcedureModelAttributes {
     CreatedBy,
     CreatedAt,
 }
+impl core::str::FromStr for InsertableNextProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ParentId" => Ok(Self::ParentId),
+            "CurrentId" => Ok(Self::CurrentId),
+            "SuccessorId" => Ok(Self::SuccessorId),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "parent_id" => Ok(Self::ParentId),
+            "current_id" => Ok(Self::CurrentId),
+            "successor_id" => Ok(Self::SuccessorId),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableNextProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

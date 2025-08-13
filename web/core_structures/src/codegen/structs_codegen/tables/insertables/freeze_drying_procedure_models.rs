@@ -30,6 +30,60 @@ pub enum InsertableFreezeDryingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableFreezeDryingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kelvin" => Ok(Self::Kelvin),
+            "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
+            "Pascal" => Ok(Self::Pascal),
+            "Seconds" => Ok(Self::Seconds),
+            "FreezeDriedWith" => Ok(Self::FreezeDriedWith),
+            "ProcedureFreezeDriedWith" => {
+                Ok(
+                    Self::ProcedureFreezeDriedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "FreezeDriedContainerId" => Ok(Self::FreezeDriedContainerId),
+            "ProcedureFreezeDriedContainerId" => {
+                Ok(
+                    Self::ProcedureFreezeDriedContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kelvin" => Ok(Self::Kelvin),
+            "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
+            "pascal" => Ok(Self::Pascal),
+            "seconds" => Ok(Self::Seconds),
+            "freeze_dried_with" => Ok(Self::FreezeDriedWith),
+            "procedure_freeze_dried_with" => {
+                Ok(
+                    Self::ProcedureFreezeDriedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "freeze_dried_container_id" => Ok(Self::FreezeDriedContainerId),
+            "procedure_freeze_dried_container_id" => {
+                Ok(
+                    Self::ProcedureFreezeDriedContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableFreezeDryingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -226,7 +280,7 @@ impl InsertableFreezeDryingProcedureModel {
             conn,
         )
     }
-    pub fn freeze_drying_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn freeze_drying_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

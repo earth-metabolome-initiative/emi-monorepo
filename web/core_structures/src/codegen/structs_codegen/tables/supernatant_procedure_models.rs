@@ -331,9 +331,7 @@ impl SupernatantProcedureModel {
             conn,
         )
     }
-    pub fn supernatant_procedure_models_transferred_with_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn supernatant_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

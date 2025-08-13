@@ -29,6 +29,58 @@ pub enum InsertableFreezingProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableFreezingProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kelvin" => Ok(Self::Kelvin),
+            "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
+            "Seconds" => Ok(Self::Seconds),
+            "FrozenWith" => Ok(Self::FrozenWith),
+            "ProcedureFrozenWith" => {
+                Ok(
+                    Self::ProcedureFrozenWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "FrozenContainerId" => Ok(Self::FrozenContainerId),
+            "ProcedureFrozenContainerId" => {
+                Ok(
+                    Self::ProcedureFrozenContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kelvin" => Ok(Self::Kelvin),
+            "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
+            "seconds" => Ok(Self::Seconds),
+            "frozen_with" => Ok(Self::FrozenWith),
+            "procedure_frozen_with" => {
+                Ok(
+                    Self::ProcedureFrozenWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "frozen_container_id" => Ok(Self::FrozenContainerId),
+            "procedure_frozen_container_id" => {
+                Ok(
+                    Self::ProcedureFrozenContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableFreezingProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -223,7 +275,7 @@ impl InsertableFreezingProcedureModel {
             conn,
         )
     }
-    pub fn freezing_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn freezing_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

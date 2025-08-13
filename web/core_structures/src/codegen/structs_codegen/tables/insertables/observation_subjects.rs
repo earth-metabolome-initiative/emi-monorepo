@@ -7,6 +7,22 @@ pub enum InsertableObservationSubjectAttributes {
     ColorId,
     Id,
 }
+impl core::str::FromStr for InsertableObservationSubjectAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Description" => Ok(Self::Description),
+            "Icon" => Ok(Self::Icon),
+            "ColorId" => Ok(Self::ColorId),
+            "name" => Ok(Self::Name),
+            "description" => Ok(Self::Description),
+            "icon" => Ok(Self::Icon),
+            "color_id" => Ok(Self::ColorId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableObservationSubjectAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

@@ -19,6 +19,16 @@ pub enum InsertableBinaryQuestionProcedureModelAttributes {
     ProcedureModelId,
     TrackableId,
 }
+impl core::str::FromStr for InsertableBinaryQuestionProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "TrackableId" => Ok(Self::TrackableId),
+            "trackable_id" => Ok(Self::TrackableId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableBinaryQuestionProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

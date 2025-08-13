@@ -4,6 +4,18 @@ pub enum InsertableEmailProviderAttributes {
     EmailId,
     LoginProviderId,
 }
+impl core::str::FromStr for InsertableEmailProviderAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "EmailId" => Ok(Self::EmailId),
+            "LoginProviderId" => Ok(Self::LoginProviderId),
+            "email_id" => Ok(Self::EmailId),
+            "login_provider_id" => Ok(Self::LoginProviderId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableEmailProviderAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

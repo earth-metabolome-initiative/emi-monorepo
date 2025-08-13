@@ -9,6 +9,26 @@ pub enum InsertableLoginProviderAttributes {
     OauthUrl,
     Scope,
 }
+impl core::str::FromStr for InsertableLoginProviderAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Icon" => Ok(Self::Icon),
+            "ClientId" => Ok(Self::ClientId),
+            "RedirectUri" => Ok(Self::RedirectUri),
+            "OauthUrl" => Ok(Self::OauthUrl),
+            "Scope" => Ok(Self::Scope),
+            "name" => Ok(Self::Name),
+            "icon" => Ok(Self::Icon),
+            "client_id" => Ok(Self::ClientId),
+            "redirect_uri" => Ok(Self::RedirectUri),
+            "oauth_url" => Ok(Self::OauthUrl),
+            "scope" => Ok(Self::Scope),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableLoginProviderAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

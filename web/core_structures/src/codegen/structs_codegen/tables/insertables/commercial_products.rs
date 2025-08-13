@@ -18,6 +18,18 @@ pub enum InsertableCommercialProductAttributes {
     DeprecationDate,
     BrandId,
 }
+impl core::str::FromStr for InsertableCommercialProductAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "DeprecationDate" => Ok(Self::DeprecationDate),
+            "BrandId" => Ok(Self::BrandId),
+            "deprecation_date" => Ok(Self::DeprecationDate),
+            "brand_id" => Ok(Self::BrandId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCommercialProductAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

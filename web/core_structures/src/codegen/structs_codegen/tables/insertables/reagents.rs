@@ -28,6 +28,20 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTracka
         Self::Extension(InsertableReagentExtensionAttributes::Trackable(trackables))
     }
 }
+impl core::str::FromStr for InsertableReagentAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Purity" => Ok(Self::Purity),
+            "CasCode" => Ok(Self::CasCode),
+            "MolecularFormula" => Ok(Self::MolecularFormula),
+            "purity" => Ok(Self::Purity),
+            "cas_code" => Ok(Self::CasCode),
+            "molecular_formula" => Ok(Self::MolecularFormula),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableReagentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

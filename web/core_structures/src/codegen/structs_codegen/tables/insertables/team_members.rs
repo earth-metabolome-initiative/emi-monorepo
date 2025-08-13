@@ -4,6 +4,18 @@ pub enum InsertableTeamMemberAttributes {
     TeamId,
     MemberId,
 }
+impl core::str::FromStr for InsertableTeamMemberAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "TeamId" => Ok(Self::TeamId),
+            "MemberId" => Ok(Self::MemberId),
+            "team_id" => Ok(Self::TeamId),
+            "member_id" => Ok(Self::MemberId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTeamMemberAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

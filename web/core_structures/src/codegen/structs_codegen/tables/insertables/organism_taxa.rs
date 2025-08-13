@@ -6,6 +6,22 @@ pub enum InsertableOrganismTaxonAttributes {
     OrganismId,
     TaxonId,
 }
+impl core::str::FromStr for InsertableOrganismTaxonAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "OrganismId" => Ok(Self::OrganismId),
+            "TaxonId" => Ok(Self::TaxonId),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "organism_id" => Ok(Self::OrganismId),
+            "taxon_id" => Ok(Self::TaxonId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableOrganismTaxonAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

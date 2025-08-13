@@ -20,6 +20,22 @@ pub enum InsertableAliquotingProcedureAttributes {
     PipetteTip,
     AliquotedContainerId,
 }
+impl core::str::FromStr for InsertableAliquotingProcedureAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ProcedureModelId" => Ok(Self::ProcedureModelId),
+            "AliquotedWith" => Ok(Self::AliquotedWith),
+            "PipetteTip" => Ok(Self::PipetteTip),
+            "AliquotedContainerId" => Ok(Self::AliquotedContainerId),
+            "procedure_model_id" => Ok(Self::ProcedureModelId),
+            "aliquoted_with" => Ok(Self::AliquotedWith),
+            "pipette_tip" => Ok(Self::PipetteTip),
+            "aliquoted_container_id" => Ok(Self::AliquotedContainerId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableAliquotingProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

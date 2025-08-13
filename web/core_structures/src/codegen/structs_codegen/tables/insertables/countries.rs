@@ -4,6 +4,18 @@ pub enum InsertableCountryAttributes {
     Iso,
     Name,
 }
+impl core::str::FromStr for InsertableCountryAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Iso" => Ok(Self::Iso),
+            "Name" => Ok(Self::Name),
+            "iso" => Ok(Self::Iso),
+            "name" => Ok(Self::Name),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCountryAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

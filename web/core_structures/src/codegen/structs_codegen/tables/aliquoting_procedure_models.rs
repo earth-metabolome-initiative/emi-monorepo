@@ -331,9 +331,7 @@ impl AliquotingProcedureModel {
             conn,
         )
     }
-    pub fn aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn aliquoting_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

@@ -10,6 +10,30 @@ pub enum InsertableSharedProcedureModelTrackableAttributes {
     CreatedBy,
     CreatedAt,
 }
+impl core::str::FromStr for InsertableSharedProcedureModelTrackableAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ParentId" => Ok(Self::ParentId),
+            "ParentTrackableId" => Ok(Self::ParentTrackableId),
+            "ParentProcedureModelId" => Ok(Self::ParentProcedureModelId),
+            "ChildId" => Ok(Self::ChildId),
+            "ChildTrackableId" => Ok(Self::ChildTrackableId),
+            "ChildProcedureModelId" => Ok(Self::ChildProcedureModelId),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "parent_id" => Ok(Self::ParentId),
+            "parent_trackable_id" => Ok(Self::ParentTrackableId),
+            "parent_procedure_model_id" => Ok(Self::ParentProcedureModelId),
+            "child_id" => Ok(Self::ChildId),
+            "child_trackable_id" => Ok(Self::ChildTrackableId),
+            "child_procedure_model_id" => Ok(Self::ChildProcedureModelId),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableSharedProcedureModelTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

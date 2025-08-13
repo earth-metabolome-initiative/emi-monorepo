@@ -5,6 +5,18 @@ pub enum InsertableCityAttributes {
     Name,
     Iso,
 }
+impl core::str::FromStr for InsertableCityAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Iso" => Ok(Self::Iso),
+            "name" => Ok(Self::Name),
+            "iso" => Ok(Self::Iso),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCityAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

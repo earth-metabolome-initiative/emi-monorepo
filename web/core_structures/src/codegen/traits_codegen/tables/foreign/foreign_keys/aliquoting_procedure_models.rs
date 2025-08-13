@@ -16,7 +16,7 @@ pub struct AliquotingProcedureModelForeignKeys {
     pub pipette_tip: Option<
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     >,
-    pub aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey: Option<
+    pub aliquoting_pm_compatibility_rules: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
@@ -83,9 +83,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
             && foreign_keys.aliquoted_into.is_some()
             && foreign_keys.aliquoted_with.is_some()
             && foreign_keys.pipette_tip.is_some()
-            && foreign_keys
-                .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey
-                .is_some()
+            && foreign_keys.aliquoting_pm_compatibility_rules.is_some()
     }
     fn update(
         &self,
@@ -104,8 +102,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
                 if self.aliquoted_with == compatibility_rules.left_trackable_id
                     && self.pipette_tip == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey = Some(
+                    foreign_keys.aliquoting_pm_compatibility_rules = Some(
                         compatibility_rules,
                     );
                     updated = true;
@@ -118,8 +115,7 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_models::Aliquo
                 if self.aliquoted_with == compatibility_rules.left_trackable_id
                     && self.pipette_tip == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys
-                        .aliquoting_procedure_models_aliquoted_with_pipette_tip_fkey = None;
+                    foreign_keys.aliquoting_pm_compatibility_rules = None;
                     updated = true;
                 }
             }

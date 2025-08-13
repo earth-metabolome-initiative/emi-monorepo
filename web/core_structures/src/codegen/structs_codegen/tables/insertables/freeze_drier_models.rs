@@ -25,6 +25,14 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTracka
         Self::Extension(InsertableFreezeDrierModelExtensionAttributes::Trackable(trackables))
     }
 }
+impl core::str::FromStr for InsertableFreezeDrierModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableFreezeDrierModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

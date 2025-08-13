@@ -31,6 +31,70 @@ pub enum InsertableFractioningProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableFractioningProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kilograms" => Ok(Self::Kilograms),
+            "TolerancePercentage" => Ok(Self::TolerancePercentage),
+            "WeighedWith" => Ok(Self::WeighedWith),
+            "ProcedureWeighedWith" => {
+                Ok(
+                    Self::ProcedureWeighedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "ProcedureFragmentSource" => {
+                Ok(
+                    Self::ProcedureFragmentSource(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "FragmentPlacedInto" => Ok(Self::FragmentPlacedInto),
+            "ProcedureFragmentPlacedInto" => {
+                Ok(
+                    Self::ProcedureFragmentPlacedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kilograms" => Ok(Self::Kilograms),
+            "tolerance_percentage" => Ok(Self::TolerancePercentage),
+            "weighed_with" => Ok(Self::WeighedWith),
+            "procedure_weighed_with" => {
+                Ok(
+                    Self::ProcedureWeighedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "procedure_fragment_source" => {
+                Ok(
+                    Self::ProcedureFragmentSource(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "fragment_placed_into" => Ok(Self::FragmentPlacedInto),
+            "procedure_fragment_placed_into" => {
+                Ok(
+                    Self::ProcedureFragmentPlacedInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableFractioningProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

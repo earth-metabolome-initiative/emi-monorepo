@@ -30,3 +30,4 @@ mod teams;
 mod trackable_ancestors;
 mod trackables;
 mod weighing_device_models;
+mod weighing_procedure_models;

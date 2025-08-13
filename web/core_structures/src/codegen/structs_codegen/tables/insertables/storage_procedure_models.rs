@@ -28,6 +28,56 @@ pub enum InsertableStorageProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableStorageProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kelvin" => Ok(Self::Kelvin),
+            "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
+            "ParentContainerId" => Ok(Self::ParentContainerId),
+            "ProcedureParentContainerId" => {
+                Ok(
+                    Self::ProcedureParentContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "ChildContainerId" => Ok(Self::ChildContainerId),
+            "ProcedureChildContainerId" => {
+                Ok(
+                    Self::ProcedureChildContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kelvin" => Ok(Self::Kelvin),
+            "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
+            "parent_container_id" => Ok(Self::ParentContainerId),
+            "procedure_parent_container_id" => {
+                Ok(
+                    Self::ProcedureParentContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "child_container_id" => Ok(Self::ChildContainerId),
+            "procedure_child_container_id" => {
+                Ok(
+                    Self::ProcedureChildContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableStorageProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -220,7 +270,7 @@ impl InsertableStorageProcedureModel {
             conn,
         )
     }
-    pub fn storage_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn storage_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

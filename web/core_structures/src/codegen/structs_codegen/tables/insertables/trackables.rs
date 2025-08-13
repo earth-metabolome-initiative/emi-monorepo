@@ -11,6 +11,32 @@ pub enum InsertableTrackableAttributes {
     UpdatedBy,
     UpdatedAt,
 }
+impl core::str::FromStr for InsertableTrackableAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Id" => Ok(Self::Id),
+            "Name" => Ok(Self::Name),
+            "Description" => Ok(Self::Description),
+            "PhotographId" => Ok(Self::PhotographId),
+            "ParentId" => Ok(Self::ParentId),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedBy" => Ok(Self::UpdatedBy),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "id" => Ok(Self::Id),
+            "name" => Ok(Self::Name),
+            "description" => Ok(Self::Description),
+            "photograph_id" => Ok(Self::PhotographId),
+            "parent_id" => Ok(Self::ParentId),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_by" => Ok(Self::UpdatedBy),
+            "updated_at" => Ok(Self::UpdatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTrackableAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

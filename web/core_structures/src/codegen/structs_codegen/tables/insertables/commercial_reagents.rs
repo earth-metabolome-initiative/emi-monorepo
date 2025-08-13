@@ -19,6 +19,16 @@ pub enum InsertableCommercialReagentAttributes {
     Id,
     CommercialProductLotId,
 }
+impl core::str::FromStr for InsertableCommercialReagentAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "CommercialProductLotId" => Ok(Self::CommercialProductLotId),
+            "commercial_product_lot_id" => Ok(Self::CommercialProductLotId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCommercialReagentAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

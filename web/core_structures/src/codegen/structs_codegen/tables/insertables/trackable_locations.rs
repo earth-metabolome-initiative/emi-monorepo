@@ -9,6 +9,28 @@ pub enum InsertableTrackableLocationAttributes {
     CreatedAt,
     CreatedBy,
 }
+impl core::str::FromStr for InsertableTrackableLocationAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Id" => Ok(Self::Id),
+            "TrackableId" => Ok(Self::TrackableId),
+            "ContainerId" => Ok(Self::ContainerId),
+            "Geolocation" => Ok(Self::Geolocation),
+            "Inferred" => Ok(Self::Inferred),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "id" => Ok(Self::Id),
+            "trackable_id" => Ok(Self::TrackableId),
+            "container_id" => Ok(Self::ContainerId),
+            "geolocation" => Ok(Self::Geolocation),
+            "inferred" => Ok(Self::Inferred),
+            "created_at" => Ok(Self::CreatedAt),
+            "created_by" => Ok(Self::CreatedBy),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableTrackableLocationAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

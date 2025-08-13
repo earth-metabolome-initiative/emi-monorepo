@@ -44,50 +44,44 @@ CREATE TABLE IF NOT EXISTS trackable_ancestors (
     ancestor_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
     PRIMARY KEY (trackable_id, ancestor_id)
 );
-
-CREATE OR REPLACE FUNCTION update_trackable_ancestors()
-RETURNS TRIGGER AS $$
-DECLARE
-    rec RECORD;
-BEGIN
-    -- Delete all ancestors for this trackable
-    DELETE FROM trackable_ancestors WHERE trackable_id = NEW.id;
-
-    -- If it has a parent, rebuild ancestry
-    IF NEW.parent_id IS NOT NULL THEN
-        -- Direct parent
-        INSERT INTO trackable_ancestors (trackable_id, ancestor_id)
-        VALUES (NEW.id, NEW.parent_id);
-
-        -- Inherit parent's ancestors
-        INSERT INTO trackable_ancestors (trackable_id, ancestor_id)
-        SELECT NEW.id, ancestor_id
-        FROM trackable_ancestors
-        WHERE trackable_id = NEW.parent_id;
-    END IF;
-
-    -- Recurse: update all descendants of this trackable
-    FOR rec IN
-        WITH RECURSIVE descendants AS (
-            SELECT id FROM trackables WHERE parent_id = NEW.id
-            UNION
-            SELECT t.id
-            FROM trackables t
-            JOIN descendants d ON t.parent_id = d.id
-        )
-        SELECT id FROM descendants
-    LOOP
-        -- Rebuild each descendant's ancestors by simulating an UPDATE
-        UPDATE trackables SET parent_id = parent_id WHERE id = rec.id;
-    END LOOP;
-
-    RETURN NEW;
+CREATE OR REPLACE FUNCTION update_trackable_ancestors() RETURNS TRIGGER AS $$
+DECLARE rec RECORD;
+BEGIN -- Delete all ancestors for this trackable
+DELETE FROM trackable_ancestors
+WHERE trackable_id = NEW.id;
+-- If it has a parent, rebuild ancestry
+IF NEW.parent_id IS NOT NULL THEN -- Direct parent
+INSERT INTO trackable_ancestors (trackable_id, ancestor_id)
+VALUES (NEW.id, NEW.parent_id);
+-- Inherit parent's ancestors
+INSERT INTO trackable_ancestors (trackable_id, ancestor_id)
+SELECT NEW.id,
+    ancestor_id
+FROM trackable_ancestors
+WHERE trackable_id = NEW.parent_id;
+END IF;
+-- Recurse: update all descendants of this trackable
+FOR rec IN WITH RECURSIVE descendants AS (
+    SELECT id
+    FROM trackables
+    WHERE parent_id = NEW.id
+    UNION
+    SELECT t.id
+    FROM trackables t
+        JOIN descendants d ON t.parent_id = d.id
+)
+SELECT id
+FROM descendants LOOP -- Rebuild each descendant's ancestors by simulating an UPDATE
+UPDATE trackables
+SET parent_id = parent_id
+WHERE id = rec.id;
+END LOOP;
+RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS trg_update_trackable_ancestors ON trackables;
-
 CREATE TRIGGER trg_update_trackable_ancestors
-AFTER INSERT OR UPDATE OF parent_id ON trackables
-FOR EACH ROW
-EXECUTE FUNCTION update_trackable_ancestors();
+AFTER
+INSERT
+    OR
+UPDATE OF parent_id ON trackables FOR EACH ROW EXECUTE FUNCTION update_trackable_ancestors();

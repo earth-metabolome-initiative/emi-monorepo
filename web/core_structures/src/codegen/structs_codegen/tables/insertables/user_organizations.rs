@@ -4,6 +4,18 @@ pub enum InsertableUserOrganizationAttributes {
     UserId,
     OrganizationId,
 }
+impl core::str::FromStr for InsertableUserOrganizationAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "UserId" => Ok(Self::UserId),
+            "OrganizationId" => Ok(Self::OrganizationId),
+            "user_id" => Ok(Self::UserId),
+            "organization_id" => Ok(Self::OrganizationId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableUserOrganizationAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

@@ -199,7 +199,7 @@ impl StorageProcedureModel {
             conn,
         )
     }
-    pub fn storage_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn storage_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<

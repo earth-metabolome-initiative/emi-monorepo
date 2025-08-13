@@ -18,6 +18,18 @@ pub enum InsertableCommercialProductLotAttributes {
     Lot,
     ProductModelId,
 }
+impl core::str::FromStr for InsertableCommercialProductLotAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Lot" => Ok(Self::Lot),
+            "ProductModelId" => Ok(Self::ProductModelId),
+            "lot" => Ok(Self::Lot),
+            "product_model_id" => Ok(Self::ProductModelId),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableCommercialProductLotAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

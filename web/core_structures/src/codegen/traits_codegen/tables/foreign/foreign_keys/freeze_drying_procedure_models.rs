@@ -10,7 +10,7 @@ pub struct FreezeDryingProcedureModelForeignKeys {
     pub freeze_dried_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub freeze_drying_pm_compatibility_rule: Option<
+    pub freeze_drying_pm_compatibility_rules: Option<
         crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
     >,
 }
@@ -60,7 +60,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
         foreign_keys.procedure_model.is_some()
             && foreign_keys.freeze_dried_with.is_some()
             && foreign_keys.freeze_dried_container.is_some()
-            && foreign_keys.freeze_drying_pm_compatibility_rule.is_some()
+            && foreign_keys.freeze_drying_pm_compatibility_rules.is_some()
     }
     fn update(
         &self,
@@ -80,7 +80,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                     && self.freeze_dried_container_id
                         == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.freeze_drying_pm_compatibility_rule = Some(
+                    foreign_keys.freeze_drying_pm_compatibility_rules = Some(
                         compatibility_rules,
                     );
                     updated = true;
@@ -94,7 +94,7 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::Fre
                     && self.freeze_dried_container_id
                         == compatibility_rules.right_trackable_id
                 {
-                    foreign_keys.freeze_drying_pm_compatibility_rule = None;
+                    foreign_keys.freeze_drying_pm_compatibility_rules = None;
                     updated = true;
                 }
             }

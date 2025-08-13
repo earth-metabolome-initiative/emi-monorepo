@@ -164,6 +164,101 @@ impl Table {
         }))
     }
 
+    /// Returns the implementation of the `FromStr` trait for the insertable
+    /// attributes enumeration.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the database connection fails.
+    fn insertable_enum_from_str_impl(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        // We retrieve the insertable columns for the current table, without
+        // the extension tables (i.e. not executing recursion to the ancestors).
+        let insertable_columns = self.insertable_columns(conn, false)?;
+
+        // We obtain the enum identifier.
+        let insertable_enum = self.insertable_enum_ident()?;
+
+        // We obtain the identifiers for the columns.
+        let mut column_camel_case_idents = Vec::new();
+        let mut column_snake_case_names = Vec::new();
+        let mut column_camel_case_names = Vec::new();
+
+        for insertable_column in &insertable_columns {
+            let column_camel_case_ident = insertable_column.camel_case_ident()?;
+            let column_snake_case_name = insertable_column.snake_case_name()?;
+            let column_camel_case_name = insertable_column.camel_case_name()?;
+
+            column_camel_case_idents.push(
+                if let Some(partial_builder_constraint) =
+                    insertable_column.requires_partial_builder(conn)?
+                {
+                    // If the column requires a partial builder, we use the
+                    // partial builder identifier.
+                    let foreign_columns = partial_builder_constraint.foreign_columns(conn)?;
+
+                    // We expect the partial builder to have exactly one column.
+                    assert_eq!(
+                        foreign_columns.len(),
+                        1,
+                        "Partial builder on `{}.{}` must have exactly one column",
+                        partial_builder_constraint.table_name,
+                        partial_builder_constraint.column_name
+                    );
+
+                    let foreign_table = partial_builder_constraint
+                        .foreign_table(conn)?
+                        .expect("Partial builder must have a foreign table");
+
+                    let foreign_builder_enum_type = foreign_table.insertable_enum_ty()?;
+                    let foreign_column_camel_case_ident = foreign_columns[0].camel_case_ident()?;
+                    quote::quote! {
+                        #column_camel_case_ident(#foreign_builder_enum_type::#foreign_column_camel_case_ident)
+                    }
+                } else {
+                    // Otherwise, we use the column identifier.
+                    quote::quote! {
+                        #column_camel_case_ident
+                    }
+                },
+            );
+            column_snake_case_names.push(column_snake_case_name);
+            column_camel_case_names.push(column_camel_case_name);
+        }
+
+        // We generate the `FromStr` implementation for the insertable enum.
+        Ok(quote::quote! {
+            impl core::str::FromStr for #insertable_enum {
+                type Err = web_common_traits::database::InsertError<Self>;
+
+                fn from_str(s: &str) -> Result<Self, Self::Err> {
+                    match s {
+                        #(
+                            // For each column, we match the string against the
+                            // camel case name of the column.
+                            #column_camel_case_names => Ok(Self::#column_camel_case_idents),
+                        )*
+                        // We also match against the snake case names.
+                        #(
+                            #column_snake_case_names => Ok(Self::#column_camel_case_idents),
+                        )*
+                        // If the string does not match any of the columns,
+                        // we return an error.
+                        _ => Err(
+                            web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())
+                        ),
+                    }
+                }
+            }
+        })
+    }
+
     /// Returns the definition and implementation of the attributes enumeration
     /// for the current [`Table`].
     ///
@@ -280,6 +375,8 @@ impl Table {
             })
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
+        let from_str_impl = self.insertable_enum_from_str_impl(conn)?;
+
         Ok(quote::quote! {
             #insertable_extension_enum_definition
 
@@ -290,6 +387,8 @@ impl Table {
             }
 
             #(#from_implementations)*
+
+            #from_str_impl
 
             impl core::fmt::Display for #insertable_enum {
                 fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

@@ -7,6 +7,22 @@ pub enum InsertableUserEmailAttributes {
     CreatedAt,
     PrimaryEmail,
 }
+impl core::str::FromStr for InsertableUserEmailAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Email" => Ok(Self::Email),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "PrimaryEmail" => Ok(Self::PrimaryEmail),
+            "email" => Ok(Self::Email),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "primary_email" => Ok(Self::PrimaryEmail),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableUserEmailAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

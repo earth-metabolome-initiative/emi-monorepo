@@ -29,6 +29,66 @@ pub enum InsertablePouringProcedureModelAttributes {
     ),
     Liters,
 }
+impl core::str::FromStr for InsertablePouringProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "MeasuredWith" => {
+                Ok(
+                    Self::MeasuredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "Source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "PouredInto" => Ok(Self::PouredInto),
+            "ProcedurePouredInto" => {
+                Ok(
+                    Self::ProcedurePouredInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "Liters" => Ok(Self::Liters),
+            "measured_with" => {
+                Ok(
+                    Self::MeasuredWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "source" => {
+                Ok(
+                    Self::Source(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "poured_into" => Ok(Self::PouredInto),
+            "procedure_poured_into" => {
+                Ok(
+                    Self::ProcedurePouredInto(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "liters" => Ok(Self::Liters),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertablePouringProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

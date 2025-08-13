@@ -12,6 +12,32 @@ pub enum InsertableProcedureModelAttributes {
     UpdatedBy,
     UpdatedAt,
 }
+impl core::str::FromStr for InsertableProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Name" => Ok(Self::Name),
+            "Description" => Ok(Self::Description),
+            "Deprecated" => Ok(Self::Deprecated),
+            "PhotographId" => Ok(Self::PhotographId),
+            "Icon" => Ok(Self::Icon),
+            "CreatedBy" => Ok(Self::CreatedBy),
+            "CreatedAt" => Ok(Self::CreatedAt),
+            "UpdatedBy" => Ok(Self::UpdatedBy),
+            "UpdatedAt" => Ok(Self::UpdatedAt),
+            "name" => Ok(Self::Name),
+            "description" => Ok(Self::Description),
+            "deprecated" => Ok(Self::Deprecated),
+            "photograph_id" => Ok(Self::PhotographId),
+            "icon" => Ok(Self::Icon),
+            "created_by" => Ok(Self::CreatedBy),
+            "created_at" => Ok(Self::CreatedAt),
+            "updated_by" => Ok(Self::UpdatedBy),
+            "updated_at" => Ok(Self::UpdatedAt),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

@@ -20,6 +20,22 @@ pub enum InsertableWeighingProcedureAttributes {
     WeightedContainerId,
     Kilograms,
 }
+impl core::str::FromStr for InsertableWeighingProcedureAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ProcedureModelId" => Ok(Self::ProcedureModelId),
+            "WeightedWith" => Ok(Self::WeightedWith),
+            "WeightedContainerId" => Ok(Self::WeightedContainerId),
+            "Kilograms" => Ok(Self::Kilograms),
+            "procedure_model_id" => Ok(Self::ProcedureModelId),
+            "weighted_with" => Ok(Self::WeightedWith),
+            "weighted_container_id" => Ok(Self::WeightedContainerId),
+            "kilograms" => Ok(Self::Kilograms),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
 impl core::fmt::Display for InsertableWeighingProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {

@@ -30,6 +30,60 @@ pub enum InsertableCentrifugeProcedureModelAttributes {
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes,
     ),
 }
+impl core::str::FromStr for InsertableCentrifugeProcedureModelAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Kelvin" => Ok(Self::Kelvin),
+            "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
+            "Seconds" => Ok(Self::Seconds),
+            "RotationPerMinute" => Ok(Self::RotationPerMinute),
+            "CentrifugedWith" => Ok(Self::CentrifugedWith),
+            "ProcedureCentrifugedWith" => {
+                Ok(
+                    Self::ProcedureCentrifugedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "CentrifugedContainerId" => Ok(Self::CentrifugedContainerId),
+            "ProcedureCentrifugedContainerId" => {
+                Ok(
+                    Self::ProcedureCentrifugedContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "kelvin" => Ok(Self::Kelvin),
+            "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
+            "seconds" => Ok(Self::Seconds),
+            "rotation_per_minute" => Ok(Self::RotationPerMinute),
+            "centrifuged_with" => Ok(Self::CentrifugedWith),
+            "procedure_centrifuged_with" => {
+                Ok(
+                    Self::ProcedureCentrifugedWith(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            "centrifuged_container_id" => Ok(Self::CentrifugedContainerId),
+            "procedure_centrifuged_container_id" => {
+                Ok(
+                    Self::ProcedureCentrifugedContainerId(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureModelTrackableAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
+        }
+    }
+}
 impl core::fmt::Display for InsertableCentrifugeProcedureModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -227,7 +281,7 @@ impl InsertableCentrifugeProcedureModel {
             conn,
         )
     }
-    pub fn centrifuge_pm_compatibility_rule<C: diesel::connection::LoadConnection>(
+    pub fn centrifuge_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
