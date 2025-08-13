@@ -1,4 +1,4 @@
-//! Submodule defining the compatibility rules for pipettes.
+//! Submodule defining the compatibility rules for freeze dryer.
 
 use core_structures::traits::CompatibleWith;
 
