@@ -3,7 +3,10 @@
 use core_structures::traits::CompatibleWith;
 
 use crate::trackables::containers::{
-    boxes::vial_rack_1_5ml, vial_caps::{sealed_cap_vial_1_5ml, splitted_cap_vial_1_5ml}, vial_inserts::vial_insert_200ul, vials::vial_1_5ml
+    boxes::vial_rack_1_5ml,
+    vial_caps::{sealed_cap_vial_1_5ml, splitted_cap_vial_1_5ml},
+    vial_inserts::vial_insert_200ul,
+    vials::vial_1_5ml,
 };
 
 /// Initializes the compatibility rules for vials.

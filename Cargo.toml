@@ -33,6 +33,7 @@ members = [
   "data_structures/sorted_vec",
   "utils/functional_properties",
   "utils/image_validation",
+  "utils/mermaid",
   "web/web_common/media_types",
   "web/web_common/media_types/media_types_builder",
   "web/web_common/ws_messages",
@@ -182,6 +183,7 @@ media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 multi_ranged = { path = "data_structures/multi_ranged" }
+mermaid = { path = "utils/mermaid" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

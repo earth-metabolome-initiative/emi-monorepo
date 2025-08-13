@@ -4,7 +4,7 @@ use core_structures::traits::CompatibleWith;
 
 use crate::trackables::containers::{
     boxes::polystyrene_box, conical_centrifugal_tubes::conical_centrifugal_tube_50ml,
-    racks::conical_centrifugal_tube_50ml_rack, wrappers::coffee_filter_wrapper
+    racks::conical_centrifugal_tube_50ml_rack, wrappers::coffee_filter_wrapper,
 };
 
 /// Initializes the compatibility rules for conical centrifugal tubes.
