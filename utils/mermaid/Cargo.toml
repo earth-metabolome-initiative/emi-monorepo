@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 serde = { workspace = true, optional = true }
+url.workspace = true
 
 [features]
 default = ["serde"]

@@ -1,12 +1,18 @@
 mod builder;
+mod click_event;
+mod error;
 mod shape;
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
-pub(crate) use shape::NodeShape;
+pub use error::NodeError;
+pub use shape::NodeShape;
 
-use crate::colors::Colors;
+use crate::{
+    nodes::click_event::ClickEvent,
+    shared::{label::Label, style_class::StyleClass},
+};
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a node in a Mermaid diagram.
 pub struct Node {
@@ -15,15 +21,11 @@ pub struct Node {
     /// The visual shape of the node (e.g., rectangle, circle, etc.).
     shape: NodeShape,
     /// The text label displayed inside the node.
-    label: String,
-    /// The color of the node's border.
-    stroke_color: Colors,
-    /// The color of the node's label text.
-    text_color: Colors,
-    /// The background color of the node.
-    fill_color: Colors,
-    /// The thickness of the node's border.
-    stroke_width: u8,
+    label: Label,
+    /// The style classes applied to the node.
+    style_classes: Vec<Rc<StyleClass>>,
+    /// The click event associated with the node, if any.
+    click_event: Option<ClickEvent>,
 }
 
 impl Node {
@@ -34,28 +36,16 @@ impl Node {
 
 impl Display for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // First line is the node id with its label and shape e.g. 2@{label: "stop",
-        // shape: circle}
-        writeln!(f, "{}@{{label: \"{}\", shape: {}}}", self.id, self.label, self.shape)?;
-        // Second line is the node styling : style 2
-        // fill:#bbf,stroke:#ff0000,stroke-width:2px,color:#ff0000
-        write!(
-            f,
-            "style {} fill:{},stroke:{},stroke-width:{}px,color:{}",
-            self.id, self.fill_color, self.stroke_color, self.stroke_width, self.text_color
-        )
-    }
-}
+        writeln!(f, "{}@{{label: {}, shape: {}}}", self.id, self.label, self.shape)?;
 
-/// Unit tests for the Node struct
-#[cfg(test)]
-mod tests {
-    use super::*;
+        for style_class in &self.style_classes {
+            write!(f, "class {} {}", self.id, style_class)?;
+        }
 
-    #[test]
-    fn test_node_display_default() {
-        let node = Node::default();
-        let expected = "0@{label: \"hello\", shape: rect}\nstyle 0 fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000";
-        assert_eq!(format!("{}", node), expected);
+        if let Some(click_event) = &self.click_event {
+            write!(f, "{}", click_event)?;
+        }
+
+        Ok(())
     }
 }

@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
-mod colors;
-mod graph;
+mod diagrams;
+mod errors;
 mod links;
 mod nodes;
+mod shared;
