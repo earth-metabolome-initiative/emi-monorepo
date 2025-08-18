@@ -4,7 +4,8 @@
 mod renderers;
 pub use renderers::Renderer;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the configuration options for a Mermaid diagram.
 pub struct Configuration {
     /// The title of the diagram.

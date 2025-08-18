@@ -4,3 +4,4 @@ mod errors;
 mod links;
 mod nodes;
 mod shared;
+pub mod traits;

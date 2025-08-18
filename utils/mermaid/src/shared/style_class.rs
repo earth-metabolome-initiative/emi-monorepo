@@ -1,13 +1,16 @@
 //! Submodule providing structs for style class definitions in Mermaid diagrams.
 
+mod builder;
 mod color;
+mod error;
 mod font_style;
 mod font_weight;
 mod style_properties;
 mod units;
-
 use std::fmt::Display;
 
+pub use builder::StyleClassBuilder;
+pub use error::StyleClassError;
 pub use style_properties::StyleProperty;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]

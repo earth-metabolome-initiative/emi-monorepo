@@ -1,6 +1,10 @@
 //! Submodule defining a node which may be used in a flowchart diagram
 //! in Mermaid syntax.
 
+mod builder;
+mod click_event;
+pub use click_event::ClickEvent;
+
 use crate::nodes::Node;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,4 +14,6 @@ use crate::nodes::Node;
 pub struct FlowchartNode {
     /// Underlying properties of a diagram node.
     node: Node,
+    /// The click event associated with the node, if any.
+    click_event: Option<ClickEvent>,
 }

@@ -5,6 +5,8 @@ use std::fmt::Display;
 
 use crate::diagrams::class_diagram::visibility::Visibility;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a method argument in a Mermaid class diagram.
 pub struct Argument {
     /// The name of the argument (e.g., `x`).
@@ -19,6 +21,8 @@ impl Display for Argument {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a class method for Mermaid class diagrams, including its name,
 /// arguments, and visibility.
 pub struct ClassMethod {

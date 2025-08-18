@@ -6,6 +6,8 @@ use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents a JavaScript function call that can be triggered by a click event
+/// on a Mermaid node.
 pub struct JsFunctionCall {
     /// The name of the JavaScript function to call.
     function_name: String,

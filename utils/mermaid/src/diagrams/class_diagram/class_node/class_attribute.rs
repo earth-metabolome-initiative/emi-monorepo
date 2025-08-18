@@ -7,6 +7,7 @@ use crate::diagrams::class_diagram::visibility::Visibility;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Struct representing a class attribute in a class diagram.
 pub struct ClassAttribute {
     /// The name of the class attribute.
     name: String,
