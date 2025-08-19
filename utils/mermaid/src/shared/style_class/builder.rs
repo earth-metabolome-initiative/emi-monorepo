@@ -1,14 +1,59 @@
 //! Submodule providing a builder struct for style classes in Mermaid diagrams.
 
-use crate::shared::style_class::{StyleClassError, StyleProperty};
+use std::fmt::Display;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+use common_traits::prelude::{Builder, BuilderError};
+
+use crate::shared::{
+    StyleClass,
+    style_class::{StyleClassError, StyleProperty},
+};
+
+#[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder struct for creating style classes in Mermaid diagrams.
 pub struct StyleClassBuilder {
     /// The name of the style class.
     name: Option<String>,
     /// The properties associated with the style class.
     properties: Vec<StyleProperty>,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum StyleClassAttribute {
+    Name,
+    Properties,
+}
+
+impl Display for StyleClassAttribute {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            StyleClassAttribute::Name => write!(f, "name"),
+            StyleClassAttribute::Properties => write!(f, "properties"),
+        }
+    }
+}
+
+impl Builder for StyleClassBuilder {
+    type Attribute = StyleClassAttribute;
+    type Error = StyleClassError;
+    type Object = StyleClass;
+
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && !self.properties.is_empty()
+    }
+
+    fn build(self) -> Result<Self::Object, Self::Error> {
+        if self.properties.is_empty() {
+            return Err(BuilderError::IncompleteBuild(StyleClassAttribute::Properties).into());
+        }
+
+        Ok(StyleClass {
+            name: self.name.ok_or(BuilderError::IncompleteBuild(StyleClassAttribute::Name))?,
+            properties: self.properties,
+        })
+    }
 }
 
 impl StyleClassBuilder {

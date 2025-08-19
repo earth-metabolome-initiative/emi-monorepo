@@ -37,6 +37,27 @@ pub enum StyleProperty {
     BorderRadius(Unit),
 }
 
+impl StyleProperty {
+    /// Returns whether the provided style property is of the same type as
+    /// `self`.
+    pub fn is_same_type(&self, other: &StyleProperty) -> bool {
+        match (self, other) {
+            (StyleProperty::Fill(_), StyleProperty::Fill(_)) => true,
+            (StyleProperty::Stroke(_), StyleProperty::Stroke(_)) => true,
+            (StyleProperty::Color(_), StyleProperty::Color(_)) => true,
+            (StyleProperty::StrokeWidth(_), StyleProperty::StrokeWidth(_)) => true,
+            (StyleProperty::FontSize(_), StyleProperty::FontSize(_)) => true,
+            (StyleProperty::FontWeight(_), StyleProperty::FontWeight(_)) => true,
+            (StyleProperty::FontStyle(_), StyleProperty::FontStyle(_)) => true,
+            (StyleProperty::StrokeDasharray(_, _), StyleProperty::StrokeDasharray(_, _)) => true,
+            (StyleProperty::StrokeDashoffset(_), StyleProperty::StrokeDashoffset(_)) => true,
+            (StyleProperty::Opacity(_), StyleProperty::Opacity(_)) => true,
+            (StyleProperty::BorderRadius(_), StyleProperty::BorderRadius(_)) => true,
+            _ => false,
+        }
+    }
+}
+
 impl Display for StyleProperty {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

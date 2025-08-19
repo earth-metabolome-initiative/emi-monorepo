@@ -22,6 +22,18 @@ pub struct StyleClass {
     properties: Vec<StyleProperty>,
 }
 
+impl StyleClass {
+    /// Returns the name of the style class.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns the properties of the style class.
+    pub fn properties(&self) -> &[StyleProperty] {
+        &self.properties
+    }
+}
+
 impl Display for StyleClass {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "classDef {} ", self.name)?;

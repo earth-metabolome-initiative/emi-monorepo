@@ -3,6 +3,8 @@
 
 use std::fmt::Display;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EntityRelationshipAttribute {
     /// The name of the class attribute.
     name: String,

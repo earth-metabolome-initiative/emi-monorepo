@@ -3,8 +3,12 @@
 
 mod builder;
 mod configuration;
+mod entity_relationship_edge;
 mod entity_relationship_node;
 use configuration::EntityRelationshipConfiguration;
+use entity_relationship_edge::EREdge;
+use entity_relationship_node::ERNode;
+pub use entity_relationship_node::ERNodeAttribute;
 
 use crate::shared::generic_diagram::GenericDiagram;
 
@@ -13,5 +17,5 @@ pub struct EntityRelationshipDiagram {
     /// Configuration options for the entity-relationship diagram.
     configuration: EntityRelationshipConfiguration,
     /// Underlying generic diagram structure.
-    diagram: GenericDiagram,
+    diagram: GenericDiagram<ERNode, EREdge>,
 }

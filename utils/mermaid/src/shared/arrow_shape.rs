@@ -6,6 +6,8 @@ pub enum ArrowShape {
     /// Arrow shape with a normal arrowhead.
     #[default]
     Normal,
+    /// A sharp arrowhead shape.
+    Sharp,
     /// X shape arrowhead.
     X,
     /// Circle shape arrowhead.
@@ -29,6 +31,7 @@ impl ArrowShape {
     pub fn left(&self) -> &str {
         match self {
             ArrowShape::Normal => "<",
+            ArrowShape::Sharp => "(",
             ArrowShape::X => "x",
             ArrowShape::Circle => "o",
             ArrowShape::Triangle => "<|",
@@ -44,6 +47,7 @@ impl ArrowShape {
     pub fn right(&self) -> &str {
         match self {
             ArrowShape::Normal => ">",
+            ArrowShape::Sharp => ")",
             ArrowShape::X => "x",
             ArrowShape::Circle => "o",
             ArrowShape::Triangle => "|>",

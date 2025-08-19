@@ -7,9 +7,9 @@
 pub enum LineStyle {
     /// A normal line style.
     #[default]
-    Normal,
+    Solid,
     /// A Thick line style.
     Thick,
-    /// A Dotted line style.
-    Dotted,
+    /// A Dashed line style.
+    Dashed,
 }

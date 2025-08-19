@@ -1,0 +1,29 @@
+//! Submodule defining the node trait used in Mermaid diagrams.
+
+use crate::{
+    shared::{StyleClass, StyleProperty},
+    traits::NodeBuilder,
+};
+
+/// Trait representing a node in a Mermaid diagram.
+pub trait Node {
+    /// Type of the builder used to construct this node.
+    type Builder: NodeBuilder<Node = Self>;
+
+    /// Returns the identifier of the node.
+    fn id(&self) -> u32;
+
+    /// Returns the label of the node.
+    fn label(&self) -> &str;
+
+    /// Returns an iterator over the CSS classes associated with the node.
+    fn classes(&self) -> impl Iterator<Item = &StyleClass>;
+
+    /// Returns an iterator over the style properties associated with the node.
+    fn styles(&self) -> impl Iterator<Item = &StyleProperty>;
+
+    /// Returns whether the node is stylized.
+    fn has_styles(&self) -> bool {
+        self.styles().next().is_some()
+    }
+}

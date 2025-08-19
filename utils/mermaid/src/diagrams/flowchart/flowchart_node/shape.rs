@@ -3,8 +3,9 @@ use std::{fmt::Display, str::FromStr};
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// NodeShape represents all supported node shapes for Mermaid diagrams.
-pub enum NodeShape {
+/// FlowchartNodeShape represents all supported node shapes for Mermaid
+/// diagrams.
+pub enum FlowchartNodeShape {
     /// Standard process shape
     #[default]
     Rectangle,
@@ -100,7 +101,7 @@ pub enum NodeShape {
     TextBlock,
 }
 
-impl Display for NodeShape {
+impl Display for FlowchartNodeShape {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Rectangle => write!(f, "rect"),
@@ -153,7 +154,7 @@ impl Display for NodeShape {
     }
 }
 
-impl FromStr for NodeShape {
+impl FromStr for FlowchartNodeShape {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_ascii_lowercase().as_str() {
