@@ -10,7 +10,7 @@ use crate::{
 };
 
 /// Trait for building nodes in Mermaid diagrams.
-pub trait NodeBuilder: Builder {
+pub trait NodeBuilder: Builder<Object = Self::Node> {
     /// Type of the node that this builder constructs.
     type Node: Node<Builder = Self>;
 

@@ -5,12 +5,13 @@ use std::{fmt::Display, rc::Rc};
 use common_traits::prelude::Builder;
 
 use crate::{
+    errors::Error,
     shared::{StyleClass, StyleClassBuilder},
     traits::{Configuration, ConfigurationBuilder, Diagram, Edge, Node, NodeBuilder},
 };
 
 /// Trait defining the builder for Mermaid diagrams.
-pub trait DiagramBuilder: Builder<Object = <Self as DiagramBuilder>::Diagram> {
+pub trait DiagramBuilder: Default + Into<Self::Diagram> {
     /// Type of the diagram that this builder constructs.
     type Diagram: Diagram<
             Builder = Self,
@@ -42,9 +43,16 @@ pub trait DiagramBuilder: Builder<Object = <Self as DiagramBuilder>::Diagram> {
     ///
     /// * If the configuration builder is incomplete or invalid.
     fn configuration(
-        &mut self,
+        self,
         configuration: Self::ConfigurationBuilder,
-    ) -> Result<&mut Self, Self::Error>;
+    ) -> Result<
+        Self,
+        Error<
+            <Self::NodeBuilder as Builder>::Attribute,
+            <Self::EdgeBuilder as Builder>::Attribute,
+            <Self::ConfigurationBuilder as Builder>::Attribute,
+        >,
+    >;
 
     /// Adds a style class to the diagram being built.
     ///
@@ -59,7 +67,14 @@ pub trait DiagramBuilder: Builder<Object = <Self as DiagramBuilder>::Diagram> {
     fn style_class(
         &mut self,
         style_class: StyleClassBuilder,
-    ) -> Result<Rc<StyleClass>, Self::Error>;
+    ) -> Result<
+        Rc<StyleClass>,
+        Error<
+            <Self::NodeBuilder as Builder>::Attribute,
+            <Self::EdgeBuilder as Builder>::Attribute,
+            <Self::ConfigurationBuilder as Builder>::Attribute,
+        >,
+    >;
 
     #[must_use]
     /// Returns the number of nodes currently in the diagram.
@@ -73,8 +88,29 @@ pub trait DiagramBuilder: Builder<Object = <Self as DiagramBuilder>::Diagram> {
     ///
     /// # Errors
     ///
+    /// * If the node already exists in the diagram.
     /// * If the node cannot be built due to missing attributes or other issues.
-    fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error>;
+    fn node(
+        &mut self,
+        node: Self::NodeBuilder,
+    ) -> Result<
+        Rc<Self::Node>,
+        Error<
+            <Self::NodeBuilder as Builder>::Attribute,
+            <Self::EdgeBuilder as Builder>::Attribute,
+            <Self::ConfigurationBuilder as Builder>::Attribute,
+        >,
+    >;
+
+    /// Returns a reference to the requested node by label if it exists.
+    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
+    where
+        S: AsRef<str>;
+
+    /// Returns a reference to the request style class by name if it exists.
+    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
+    where
+        S: AsRef<str>;
 
     /// Builds and adds an edge to the diagram being built.
     ///
@@ -86,5 +122,15 @@ pub trait DiagramBuilder: Builder<Object = <Self as DiagramBuilder>::Diagram> {
     ///
     /// * If the source or destination nodes cannot be found in the diagram.
     /// * If the edge cannot be built due to missing attributes or other issues.
-    fn edge(&mut self, edge: Self::EdgeBuilder) -> Result<Rc<Self::Edge>, Self::Error>;
+    fn edge(
+        &mut self,
+        edge: Self::EdgeBuilder,
+    ) -> Result<
+        Rc<Self::Edge>,
+        Error<
+            <Self::NodeBuilder as Builder>::Attribute,
+            <Self::EdgeBuilder as Builder>::Attribute,
+            <Self::ConfigurationBuilder as Builder>::Attribute,
+        >,
+    >;
 }

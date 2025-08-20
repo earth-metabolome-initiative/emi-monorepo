@@ -39,11 +39,11 @@ impl Edge for FlowchartEdge {
         self.edge.label()
     }
 
-    fn source(&self) -> &Self::Node {
+    fn source(&self) -> &Rc<Self::Node> {
         self.edge.source()
     }
 
-    fn destination(&self) -> &Self::Node {
+    fn destination(&self) -> &Rc<Self::Node> {
         self.edge.destination()
     }
 
@@ -68,7 +68,7 @@ impl Display for FlowchartEdge {
             LineStyle::Dashed => format!("-{}-", ".".repeat(self.length as usize)),
         };
 
-        write!(
+        writeln!(
             f,
             "{NODE_LETTER}{} {EDGE_LETTER}{}@{left_arrow}{segment}{right_arrow}{} {NODE_LETTER}{}",
             self.source().id(),
@@ -80,10 +80,10 @@ impl Display for FlowchartEdge {
                 self.right_arrow_shape().as_ref().map_or_else(|| "", |shape| shape.right()),
         )?;
 
-        write!(f, "{EDGE_LETTER}{}@{{curve:{}}}", self.id, self.curve_style)?;
+        writeln!(f, "{EDGE_LETTER}{}@{{curve:{}}}", self.id, self.curve_style)?;
 
         for class in &self.style_classes {
-            write!(f, "class {EDGE_LETTER}{} {class};", self.id)?;
+            writeln!(f, "class {EDGE_LETTER}{} {class};", self.id)?;
         }
 
         if !self.style_properties.is_empty() {
@@ -94,6 +94,7 @@ impl Display for FlowchartEdge {
                 }
                 write!(f, "{style} ")?;
             }
+            writeln!(f)?;
         }
         Ok(())
     }

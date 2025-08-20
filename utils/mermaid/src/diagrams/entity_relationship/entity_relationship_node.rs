@@ -6,10 +6,9 @@ use std::fmt::Display;
 mod attribute;
 mod builder;
 use attribute::EntityRelationshipAttribute;
-pub use builder::ERNodeAttribute;
+pub use builder::{ERNodeAttribute, ERNodeBuilder};
 
 use crate::{
-    diagrams::entity_relationship::entity_relationship_node::builder::ERNodeBuilder,
     shared::{GenericNode, NODE_LETTER, StyleClass, StyleProperty},
     traits::Node,
 };
@@ -43,17 +42,30 @@ impl Node for ERNode {
     }
 
     fn is_compatible_arrow_shape(shape: crate::shared::ArrowShape) -> bool {
-        matches!(shape, crate::shared::ArrowShape::Normal | crate::shared::ArrowShape::Sharp)
+        matches!(
+            shape,
+            crate::shared::ArrowShape::OneOrMore
+                | crate::shared::ArrowShape::ExactlyOne
+                | crate::shared::ArrowShape::ZeroOrOne
+                | crate::shared::ArrowShape::ZeroOrMore
+        )
     }
 }
 
 impl Display for ERNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{NODE_LETTER}{}[\"`{}`\"] {{", self.id(), self.label())?;
-        for attr in &self.attributes {
-            writeln!(f, "    {attr}")?;
+        write!(f, "{NODE_LETTER}{}[\"{}\"]", self.id(), self.label())?;
+
+        if self.attributes.is_empty() {
+            writeln!(f)?;
+        } else {
+            writeln!(f, " {{")?;
+
+            for attr in &self.attributes {
+                writeln!(f, "    {attr}")?;
+            }
+            writeln!(f, "}}")?;
         }
-        writeln!(f, "}}")?;
 
         for class in self.classes() {
             writeln!(f, "class {NODE_LETTER}{} {};", self.id(), class)?;

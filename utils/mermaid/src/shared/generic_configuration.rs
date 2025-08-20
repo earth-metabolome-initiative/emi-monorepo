@@ -14,14 +14,12 @@ use crate::{
     traits::{Configuration, ConfigurationBuilder},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the configuration options for a Mermaid diagram.
 pub struct GenericConfiguration {
     /// The title of the diagram.
     title: Option<String>,
-    /// Whether to automatically wrap markdown labels.
-    markdown_auto_wrap: bool,
     /// The renderer to use for the diagram.
     renderer: Renderer,
     /// The direction of the flowchart.
@@ -35,10 +33,6 @@ impl Configuration for GenericConfiguration {
         self.title.as_deref()
     }
 
-    fn markdown_auto_wrap(&self) -> bool {
-        self.markdown_auto_wrap
-    }
-
     fn renderer(&self) -> &Renderer {
         &self.renderer
     }
@@ -48,14 +42,26 @@ impl Configuration for GenericConfiguration {
     }
 }
 
+impl Display for GenericConfiguration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "---")?;
+        if let Some(title) = &self.title {
+            writeln!(f, "title: {}", title)?;
+        }
+        writeln!(f, "config:")?;
+        writeln!(f, "  layout: {}", self.renderer)?;
+        writeln!(f, "---")?;
+
+        Ok(())
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating a `GenericConfiguration`.
 pub struct GenericConfigurationBuilder {
     /// The title of the diagram.
     title: Option<String>,
-    /// Whether to automatically wrap markdown labels.
-    markdown_auto_wrap: bool,
     /// The renderer to use for the diagram.
     renderer: Renderer,
     /// The direction of the flowchart.
@@ -67,8 +73,6 @@ pub struct GenericConfigurationBuilder {
 pub enum GenericConfigurationAttribute {
     /// Title of the diagram.
     Title,
-    /// Markdown auto-wrap setting.
-    MarkdownAutoWrap,
     /// Renderer used for the diagram.
     Renderer,
     /// Direction of the flowchart.
@@ -79,7 +83,6 @@ impl Display for GenericConfigurationAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             GenericConfigurationAttribute::Title => write!(f, "title"),
-            GenericConfigurationAttribute::MarkdownAutoWrap => write!(f, "markdownAutoWrap"),
             GenericConfigurationAttribute::Renderer => write!(f, "renderer"),
             GenericConfigurationAttribute::Direction => write!(f, "direction"),
         }
@@ -98,7 +101,6 @@ impl Builder for GenericConfigurationBuilder {
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(GenericConfiguration {
             title: self.title,
-            markdown_auto_wrap: self.markdown_auto_wrap,
             renderer: self.renderer,
             direction: self.direction,
         })
@@ -115,11 +117,6 @@ impl ConfigurationBuilder for GenericConfigurationBuilder {
         }
         self.title = Some(title);
         Ok(self)
-    }
-
-    fn markdown_auto_wrap(mut self, auto_wrap: bool) -> Self {
-        self.markdown_auto_wrap = auto_wrap;
-        self
     }
 
     fn renderer(mut self, renderer: Renderer) -> Self {

@@ -11,7 +11,7 @@ pub mod click_event;
 pub mod line_style;
 pub(crate) use arrow_shape::ArrowShape;
 pub use click_event::ClickEvent;
-pub(crate) use line_style::LineStyle;
+pub use line_style::LineStyle;
 mod constants;
 pub(crate) use constants::{EDGE_LETTER, NODE_LETTER};
 pub(crate) mod generic_node;

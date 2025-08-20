@@ -1,7 +1,7 @@
 //! Submodule defining an edge which may be used in a flowchart diagram
 //! in Mermaid syntax.
 
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use crate::{
     diagrams::class_diagram::{class_edge::multiplicity::Multiplicity, class_node::ClassNode},
@@ -34,11 +34,11 @@ impl Edge for ClassEdge {
         self.edge.label()
     }
 
-    fn source(&self) -> &Self::Node {
+    fn source(&self) -> &Rc<Self::Node> {
         self.edge.source()
     }
 
-    fn destination(&self) -> &Self::Node {
+    fn destination(&self) -> &Rc<Self::Node> {
         self.edge.destination()
     }
 
@@ -57,7 +57,7 @@ impl Edge for ClassEdge {
 
 impl Display for ClassEdge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
+        writeln!(
             f,
             "{NODE_LETTER}{} {left_multiplicity}{left_arrow}{segment}{right_arrow}{right_multiplicity} {NODE_LETTER}{}{}",
             self.source().id(),

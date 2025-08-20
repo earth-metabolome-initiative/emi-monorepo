@@ -2,11 +2,13 @@
 //! Mermaid.
 
 mod builder;
+use std::fmt::Display;
+
 pub use builder::{ClassDiagramConfigurationAttribute, ClassDiagramConfigurationBuilder};
 
 use crate::{shared::generic_configuration::GenericConfiguration, traits::Configuration};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Configuration for class diagrams in Mermaid syntax.
 pub struct ClassDiagramConfiguration {
@@ -14,6 +16,21 @@ pub struct ClassDiagramConfiguration {
     generic: GenericConfiguration,
     /// Whether to hide empty members in the class diagram.
     hide_empty_members_box: bool,
+}
+
+impl Display for ClassDiagramConfiguration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "---")?;
+        if let Some(title) = &self.title() {
+            writeln!(f, "title: {}", title)?;
+        }
+        writeln!(f, "config:")?;
+        writeln!(f, "  class:")?;
+        writeln!(f, "    hideEmptyMembersBox: \"{}\"", self.hide_empty_members_box)?;
+        writeln!(f, "---")?;
+
+        Ok(())
+    }
 }
 
 impl Configuration for ClassDiagramConfiguration {
@@ -25,10 +42,6 @@ impl Configuration for ClassDiagramConfiguration {
 
     fn direction(&self) -> &crate::shared::generic_configuration::Direction {
         self.generic.direction()
-    }
-
-    fn markdown_auto_wrap(&self) -> bool {
-        self.generic.markdown_auto_wrap()
     }
 
     fn renderer(&self) -> &crate::shared::generic_configuration::Renderer {

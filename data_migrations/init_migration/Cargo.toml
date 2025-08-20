@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 core_structures = { workspace = true, features = ["backend"] }
+core_structures_vis = { workspace = true }
 diesel.workspace = true
 tokio.workspace = true
 chrono.workspace = true

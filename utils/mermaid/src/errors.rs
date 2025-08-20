@@ -10,7 +10,21 @@ pub use edge_error::EdgeError;
 mod node_error;
 pub use node_error::NodeError;
 
-use crate::shared::style_class::StyleClassError;
+use crate::{
+    diagrams::{
+        class_diagram::{
+            ClassDiagramConfigurationAttribute, ClassEdgeAttribute, ClassNodeAttribute,
+        },
+        entity_relationship::ERNodeAttribute,
+        flowchart::{
+            FlowchartConfigurationAttribute, FlowchartEdgeAttribute, FlowchartNodeAttribute,
+        },
+    },
+    shared::{
+        generic_configuration::GenericConfigurationAttribute, generic_edge::GenericEdgeAttribute,
+        style_class::StyleClassError,
+    },
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
@@ -26,6 +40,41 @@ pub enum Error<NodeAttr, EdgeAttr, ConfigAttr> {
     /// An error regarding style classes.
     StyleClass(StyleClassError),
 }
+
+/// Type alias for the `NodeError` type specialized for class diagrams.
+pub type ClassDiagramNodeError = NodeError<ClassNodeAttribute>;
+/// Type alias for the `NodeError` type specialized for entity-relationship
+/// diagrams.
+pub type ERDiagramNodeError = NodeError<ERNodeAttribute>;
+/// Type alias for the `NodeError` type specialized for flowcharts.
+pub type FlowchartNodeError = NodeError<FlowchartNodeAttribute>;
+
+/// Type alias for the `EdgeError` type specialized for class diagrams.
+pub type ClassDiagramEdgeError = EdgeError<ClassEdgeAttribute>;
+/// Type alias for the `EdgeError` type specialized for entity-relationship
+/// diagrams.
+pub type ERDiagramEdgeError = EdgeError<GenericEdgeAttribute>;
+/// Type alias for the `EdgeError` type specialized for flowcharts.
+pub type FlowchartEdgeError = EdgeError<FlowchartEdgeAttribute>;
+
+/// Type alias for the `ConfigError` type specialized for class diagrams.
+pub type ClassDiagramConfigError = ConfigError<ClassDiagramConfigurationAttribute>;
+/// Type alias for the `ConfigError` type specialized for entity-relationship
+/// diagrams.
+pub type ERDiagramConfigError = ConfigError<GenericConfigurationAttribute>;
+/// Type alias for the `ConfigError` type specialized for flowcharts.
+pub type FlowchartConfigError = ConfigError<FlowchartConfigurationAttribute>;
+
+/// Type alias for the `Error` type specialized for class diagrams.
+pub type ClassDiagramError =
+    Error<ClassNodeAttribute, ClassEdgeAttribute, ClassDiagramConfigurationAttribute>;
+/// Type alias for the `Error` type specialized for entity-relationship
+/// diagrams.
+pub type ERDiagramError =
+    Error<ERNodeAttribute, GenericEdgeAttribute, GenericConfigurationAttribute>;
+/// Type alias for the `Error` type specialized for flowcharts.
+pub type FlowchartError =
+    Error<FlowchartNodeAttribute, FlowchartEdgeAttribute, FlowchartConfigurationAttribute>;
 
 impl<NodeAttr, EdgeAttr, ConfigAttr> From<StyleClassError>
     for Error<NodeAttr, EdgeAttr, ConfigAttr>
@@ -48,6 +97,14 @@ impl<NodeAttr, EdgeAttr, ConfigAttr> From<EdgeError<EdgeAttr>>
 {
     fn from(error: EdgeError<EdgeAttr>) -> Self {
         Error::Edge(error)
+    }
+}
+
+impl<NodeAttr, EdgeAttr, ConfigAttr> From<ConfigError<ConfigAttr>>
+    for Error<NodeAttr, EdgeAttr, ConfigAttr>
+{
+    fn from(error: ConfigError<ConfigAttr>) -> Self {
+        Error::Config(error)
     }
 }
 

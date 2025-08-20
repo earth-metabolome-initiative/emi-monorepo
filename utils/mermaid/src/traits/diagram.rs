@@ -1,10 +1,10 @@
 //! Submodule defining the `Diagram` trait for Mermaid diagrams.
 
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use crate::{
     shared::StyleClass,
-    traits::{DiagramBuilder, Edge, Node},
+    traits::{Configuration, DiagramBuilder, Edge, Node},
 };
 
 /// Trait representing a Mermaid diagram.
@@ -16,22 +16,27 @@ pub trait Diagram: Display {
     /// Type of edge used in the diagram.
     type Edge: Edge<Node = Self::Node> + Display;
     /// The configuration options for the diagram.
-    type Configuration: Display;
+    type Configuration: Configuration + Display;
 
-    /// Returns the title of the diagram, if any.
-    fn title(&self) -> Option<&str>;
+    /// Returns the configuration of the diagram.
+    fn configuration(&self) -> &Self::Configuration;
 
-    /// Iterates across the style classes associated with this diagram.
-    fn style_classes(&self) -> impl Iterator<Item = &StyleClass>;
-
-    /// Returns whether the diagram contains a certain node.
-    fn contains_node<N>(&self, node: N) -> bool
-    where
-        N: AsRef<Self::Node>;
-
-    /// Iterates across the nodes in this diagram.
+    /// Returns an iterator over the nodes in the diagram.
     fn nodes(&self) -> impl Iterator<Item = &Self::Node>;
 
-    /// Iterates across the edges in this diagram.
+    /// Returns an iterator over the edges in the diagram.
     fn edges(&self) -> impl Iterator<Item = &Self::Edge>;
+
+    /// Returns an iterator over the style classes associated with the diagram.
+    fn style_classes(&self) -> impl Iterator<Item = &StyleClass>;
+
+    /// Returns the reference to the requested node by label if it exists.
+    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
+    where
+        S: AsRef<str>;
+
+    /// Returns the reference to the requested style class by name if it exists.
+    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
+    where
+        S: AsRef<str>;
 }

@@ -1,0 +1,44 @@
+---
+title: Trackables Hierarchy
+config:
+  layout: dagre
+---
+erDiagram
+direction LR
+v0["Conical Centrifugal Tube 50ml"]
+v1["Rack"]
+v2["Conical Centrifugal Tube 50ml Rack"]
+v3["Polystyrene Box"]
+v4["Coffee Filter Wrapper"]
+v5["Vial 1.5ml"]
+v6["Sealed Cap for Vial 1.5ml"]
+v7["Splitted Cap for Vial 1.5ml"]
+v8["Vial Insert 200μl"]
+v9["Vial Rack 1.5ml (9x9)"]
+v10["Pipette 1000µl"]
+v11["Pipette Tip 1ml"]
+v12["Pipette 200μl"]
+v13["Pipette Tip 200μl"]
+v14["Safelock Tube 2ml"]
+v15["Ball Mill Machine"]
+v16["Safelock Centrifuge"]
+v17["Freezer -80°C"]
+v18["Freeze dryer"]
+v19["Weighing Scale"]
+v20["Phone"]
+v21["Organism"]
+v22["sample"]
+v2 ||--|| v1 : "child of"
+v2 ||--|| v0 : "compatible with"
+v3 ||--|| v0 : "compatible with"
+v0 ||--|| v4 : "compatible with"
+v5 ||--|| v6 : "compatible with"
+v5 ||--|| v7 : "compatible with"
+v5 ||--|| v8 : "compatible with"
+v9 ||--|| v5 : "compatible with"
+v10 ||--|| v11 : "compatible with"
+v12 ||--|| v13 : "compatible with"
+v15 ||--|| v14 : "compatible with"
+v16 ||--|| v14 : "compatible with"
+v17 ||--|| v3 : "compatible with"
+v18 ||--|| v0 : "compatible with"

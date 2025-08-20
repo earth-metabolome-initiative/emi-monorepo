@@ -50,8 +50,15 @@ async fn test_init_migration() {
         .to_dot(&mut conn)
         .expect("Failed to convert the procedure model to DOT format");
 
+    let er = core_structures_vis::trackables_hierarchy(&mut conn)
+        .expect("Failed to generate the trackables hierarchy ERD");
+
     // We write out the DOT file to a file.
     std::fs::write("test_init_migration.dot", dot).expect("Failed to write the DOT file");
+
+    // We write out the ERD to a file.
+    std::fs::write("test_init_migration_erd.mermaid", er.to_string())
+        .expect("Failed to write the ERD file");
 
     docker.stop().await.expect("Failed to stop the docker container");
 }

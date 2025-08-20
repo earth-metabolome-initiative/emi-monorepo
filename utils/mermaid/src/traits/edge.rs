@@ -1,5 +1,7 @@
 //! Submodule defining the trait for representing edges in Mermaid diagrams.
 
+use std::rc::Rc;
+
 use crate::{
     shared::{ArrowShape, LineStyle},
     traits::{EdgeBuilder, Node},
@@ -16,10 +18,10 @@ pub trait Edge {
     fn label(&self) -> Option<&str>;
 
     /// Returns a reference to the source node of the edge.
-    fn source(&self) -> &Self::Node;
+    fn source(&self) -> &Rc<Self::Node>;
 
     /// Returns a reference to the destination node of the edge.
-    fn destination(&self) -> &Self::Node;
+    fn destination(&self) -> &Rc<Self::Node>;
 
     /// Returns the line style of the edge.
     fn line_style(&self) -> LineStyle;

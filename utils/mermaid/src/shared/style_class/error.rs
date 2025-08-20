@@ -3,7 +3,7 @@
 
 use common_traits::prelude::BuilderError;
 
-use crate::shared::style_class::{StyleProperty, builder::StyleClassAttribute};
+use crate::shared::{style_class::{builder::StyleClassAttribute, StyleProperty}, StyleClass};
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -16,6 +16,8 @@ pub enum StyleClassError {
     DuplicateClass(String),
     /// The property was duplicated.
     DuplicateProperty(StyleProperty),
+    /// The style class is unknown in the context of the diagram.
+    UnknownClass(StyleClass),
     /// Builder errors.
     Builder(BuilderError<StyleClassAttribute>),
 }
@@ -32,6 +34,9 @@ impl std::fmt::Display for StyleClassError {
             StyleClassError::EmptyName => write!(f, "Style class name cannot be empty."),
             StyleClassError::DuplicateProperty(property) => {
                 write!(f, "Duplicate property found: `{property}`")
+            }
+            StyleClassError::UnknownClass(class) => {
+                write!(f, "Unknown style class: `{}`", class.name())
             }
             StyleClassError::DuplicateClass(name) => write!(f, "Duplicate style class: `{name}`"),
             StyleClassError::Builder(error) => write!(f, "Builder error: {error}"),

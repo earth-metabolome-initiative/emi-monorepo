@@ -37,11 +37,11 @@ impl<N: Node> Edge for GenericEdge<N> {
         self.label.as_deref()
     }
 
-    fn source(&self) -> &Self::Node {
+    fn source(&self) -> &Rc<Self::Node> {
         &self.source
     }
 
-    fn destination(&self) -> &Self::Node {
+    fn destination(&self) -> &Rc<Self::Node> {
         &self.destination
     }
 

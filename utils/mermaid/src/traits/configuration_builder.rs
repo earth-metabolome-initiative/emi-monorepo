@@ -26,10 +26,6 @@ pub trait ConfigurationBuilder:
     fn title<S: ToString>(self, title: S) -> Result<Self, Self::Error>;
 
     #[must_use]
-    /// Sets the markdown auto-wrap option.
-    fn markdown_auto_wrap(self, auto_wrap: bool) -> Self;
-
-    #[must_use]
     /// Sets the renderer to use for the diagram.
     fn renderer(self, renderer: Renderer) -> Self;
 

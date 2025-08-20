@@ -13,12 +13,14 @@ use crate::{
     shared::generic_node::GenericNodeAttribute,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 /// Enum representing errors related to nodes in Mermaid diagrams.
 pub enum NodeError<NodeAttr> {
     /// The provided node label is empty.
     EmptyLabel,
+    /// The provided node already exists in the diagram.
+    DuplicateNode(String),
     /// An error occurred while building the node.
     Builder(BuilderError<NodeAttr>),
 }
@@ -27,6 +29,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<FlowchartNodeAttribute>
     fn from(error: NodeError<GenericNodeAttribute>) -> Self {
         match error {
             NodeError::EmptyLabel => NodeError::EmptyLabel,
+            NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
                 NodeError::Builder(builder_error.into_field_name(From::from))
             }
@@ -38,6 +41,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<ERNodeAttribute> {
     fn from(error: NodeError<GenericNodeAttribute>) -> Self {
         match error {
             NodeError::EmptyLabel => NodeError::EmptyLabel,
+            NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
                 NodeError::Builder(builder_error.into_field_name(From::from))
             }
@@ -49,6 +53,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<ClassNodeAttribute> {
     fn from(error: NodeError<GenericNodeAttribute>) -> Self {
         match error {
             NodeError::EmptyLabel => NodeError::EmptyLabel,
+            NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
                 NodeError::Builder(builder_error.into_field_name(From::from))
             }
@@ -66,6 +71,7 @@ impl<NodeAttr: Display> std::fmt::Display for NodeError<NodeAttr> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             NodeError::EmptyLabel => write!(f, "Node label cannot be empty."),
+            NodeError::DuplicateNode(node) => write!(f, "Node `{node}` already exists in the diagram."),
             NodeError::Builder(error) => write!(f, "Builder error: `{error}`"),
         }
     }
@@ -75,7 +81,7 @@ impl<NodeAttr: Debug + Display + 'static> core::error::Error for NodeError<NodeA
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             NodeError::Builder(error) => Some(error),
-            NodeError::EmptyLabel => None,
+            NodeError::EmptyLabel | NodeError::DuplicateNode(_) => None,
         }
     }
 }

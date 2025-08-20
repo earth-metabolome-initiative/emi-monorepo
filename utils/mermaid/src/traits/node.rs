@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// Trait representing a node in a Mermaid diagram.
-pub trait Node {
+pub trait Node: PartialOrd + Ord + Eq + PartialEq {
     /// Type of the builder used to construct this node.
     type Builder: NodeBuilder<Node = Self>;
 
@@ -26,7 +26,7 @@ pub trait Node {
     fn has_styles(&self) -> bool {
         self.styles().next().is_some()
     }
-
+    
     /// Returns whether the provided arrow shape is compatible with the node.
     fn is_compatible_arrow_shape(shape: ArrowShape) -> bool;
 }

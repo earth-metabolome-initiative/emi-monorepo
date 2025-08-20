@@ -19,6 +19,8 @@ pub struct FlowchartConfigurationBuilder {
     generic: GenericConfigurationBuilder,
     /// Whether to enable html labels in the flowchart.
     html_labels: bool,
+    /// Whether to automatically wrap markdown labels.
+    markdown_auto_wrap: bool,
     /// The curve style used for edges in the flowchart.
     curve_style: CurveStyle,
 }
@@ -27,6 +29,12 @@ impl FlowchartConfigurationBuilder {
     /// Sets whether to enable html labels in the flowchart.
     pub fn html_labels(mut self, enable: bool) -> Self {
         self.html_labels = enable;
+        self
+    }
+
+    /// Sets whether to automatically wrap markdown labels.
+    pub fn markdown_auto_wrap(mut self, auto_wrap: bool) -> Self {
+        self.markdown_auto_wrap = auto_wrap;
         self
     }
 
@@ -45,6 +53,8 @@ pub enum FlowchartConfigurationAttribute {
     Generic(GenericConfigurationAttribute),
     /// HTML labels attribute.
     HtmlLabels,
+    /// Markdown auto-wrap attribute.
+    MarkdownAutoWrap,
     /// Curve style attribute.
     CurveStyle,
 }
@@ -60,6 +70,7 @@ impl Display for FlowchartConfigurationAttribute {
         match self {
             FlowchartConfigurationAttribute::Generic(attr) => write!(f, "{attr}"),
             FlowchartConfigurationAttribute::HtmlLabels => write!(f, "html_labels"),
+            FlowchartConfigurationAttribute::MarkdownAutoWrap => write!(f, "markdown_auto_wrap"),
             FlowchartConfigurationAttribute::CurveStyle => write!(f, "curve_style"),
         }
     }
@@ -77,6 +88,7 @@ impl Builder for FlowchartConfigurationBuilder {
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(FlowchartConfiguration {
             generic: self.generic.build()?,
+            markdown_auto_wrap: self.markdown_auto_wrap,
             html_labels: self.html_labels,
             curve_style: self.curve_style,
         })
@@ -93,11 +105,6 @@ impl ConfigurationBuilder for FlowchartConfigurationBuilder {
 
     fn direction(mut self, direction: crate::shared::generic_configuration::Direction) -> Self {
         self.generic = self.generic.direction(direction);
-        self
-    }
-
-    fn markdown_auto_wrap(mut self, auto_wrap: bool) -> Self {
-        self.generic = self.generic.markdown_auto_wrap(auto_wrap);
         self
     }
 

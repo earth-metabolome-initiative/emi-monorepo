@@ -19,6 +19,7 @@ use crate::{
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for the entity-relationship node in Mermaid syntax.
 pub struct ERNodeBuilder {
     /// Shared attributes builder for the node.
     builder: GenericNodeBuilder,

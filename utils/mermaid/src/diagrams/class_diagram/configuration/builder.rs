@@ -86,11 +86,6 @@ impl ConfigurationBuilder for ClassDiagramConfigurationBuilder {
         self
     }
 
-    fn markdown_auto_wrap(mut self, auto_wrap: bool) -> Self {
-        self.generic = self.generic.markdown_auto_wrap(auto_wrap);
-        self
-    }
-
     fn renderer(mut self, renderer: crate::shared::generic_configuration::Renderer) -> Self {
         self.generic = self.generic.renderer(renderer);
         self

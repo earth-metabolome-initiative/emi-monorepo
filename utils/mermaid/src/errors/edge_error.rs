@@ -10,7 +10,7 @@ use crate::{
     shared::{ArrowShape, generic_edge::GenericEdgeAttribute},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 /// Enum representing errors related to edges in Mermaid diagrams.
 pub enum EdgeError<EdgeAttr> {
@@ -20,6 +20,10 @@ pub enum EdgeError<EdgeAttr> {
     IncompatibleLeftArrowShape(ArrowShape),
     /// The provided right arrow shape is not compatible with the diagram.
     IncompatibleRightArrowShape(ArrowShape),
+    /// The provided source node does not exist in the diagram.
+    SourceNodeNotFound(String),
+    /// The provided destination node does not exist in the diagram.
+    DestinationNodeNotFound(String),
     /// An error occurred while building the edge.
     Builder(BuilderError<EdgeAttr>),
 }
@@ -40,6 +44,8 @@ impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<FlowchartEdgeAttribute>
             EdgeError::IncompatibleRightArrowShape(shape) => {
                 EdgeError::IncompatibleRightArrowShape(shape)
             }
+            EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
+            EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
             EdgeError::Builder(builder_error) => {
                 EdgeError::Builder(builder_error.into_field_name(From::from))
             }
@@ -57,6 +63,8 @@ impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<ClassEdgeAttribute> {
             EdgeError::IncompatibleRightArrowShape(shape) => {
                 EdgeError::IncompatibleRightArrowShape(shape)
             }
+            EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
+            EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
             EdgeError::Builder(builder_error) => {
                 EdgeError::Builder(builder_error.into_field_name(From::from))
             }
@@ -73,6 +81,12 @@ impl<EdgeAttr: Display> std::fmt::Display for EdgeError<EdgeAttr> {
             }
             EdgeError::IncompatibleRightArrowShape(shape) => {
                 write!(f, "Incompatible right arrow shape: `{}`", shape.right())
+            }
+            EdgeError::SourceNodeNotFound(node) => {
+                write!(f, "Source node not found: `{}`", node)
+            }
+            EdgeError::DestinationNodeNotFound(node) => {
+                write!(f, "Destination node not found: `{}`", node)
             }
             EdgeError::Builder(error) => write!(f, "Builder error: `{error}`"),
         }
