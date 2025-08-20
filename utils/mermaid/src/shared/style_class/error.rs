@@ -31,7 +31,7 @@ impl std::fmt::Display for StyleClassError {
         match self {
             StyleClassError::EmptyName => write!(f, "Style class name cannot be empty."),
             StyleClassError::DuplicateProperty(property) => {
-                write!(f, "Duplicate property found: `{}`", property)
+                write!(f, "Duplicate property found: `{property}`")
             }
             StyleClassError::DuplicateClass(name) => write!(f, "Duplicate style class: `{name}`"),
             StyleClassError::Builder(error) => write!(f, "Builder error: {error}"),

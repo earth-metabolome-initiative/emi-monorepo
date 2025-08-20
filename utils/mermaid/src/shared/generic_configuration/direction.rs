@@ -3,10 +3,10 @@
 
 use std::fmt::Display;
 
-#[derive(Default, Debug, Clone, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the direction of a flowchart in Mermaid diagrams.
-pub enum FlowchartDirection {
+pub enum Direction {
     /// The flowchart extends horizontally.
     #[default]
     LeftToRight,
@@ -18,14 +18,17 @@ pub enum FlowchartDirection {
     BottomToTop,
 }
 
-impl Display for FlowchartDirection {
+impl Display for Direction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let direction = match self {
-            FlowchartDirection::LeftToRight => "LR",
-            FlowchartDirection::TopToBottom => "TB",
-            FlowchartDirection::RightToLeft => "RL",
-            FlowchartDirection::BottomToTop => "BT",
-        };
-        write!(f, "direction {direction}",)
+        write!(
+            f,
+            "direction {}",
+            match self {
+                Self::LeftToRight => "LR",
+                Self::TopToBottom => "TB",
+                Self::RightToLeft => "RL",
+                Self::BottomToTop => "BT",
+            }
+        )
     }
 }

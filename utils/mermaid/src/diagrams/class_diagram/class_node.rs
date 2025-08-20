@@ -12,7 +12,7 @@ pub use class_method::ClassMethod;
 
 use crate::{
     diagrams::class_diagram::class_node::builder::ClassNodeBuilder,
-    shared::{GenericNode, StyleClass, StyleProperty},
+    shared::{ClickEvent, GenericNode, NODE_LETTER, StyleClass, StyleProperty},
     traits::Node,
 };
 
@@ -22,6 +22,8 @@ use crate::{
 pub struct ClassNode {
     /// Underlying generic node.
     node: GenericNode,
+    /// The click event associated with the node, if any.
+    click_event: Option<ClickEvent>,
     /// The annotation of the class node, which usually
     /// contains functional information such as `trait`, `interface`, etc.
     annotation: Option<String>,
@@ -49,13 +51,17 @@ impl Node for ClassNode {
     fn classes(&self) -> impl Iterator<Item = &StyleClass> {
         self.node.classes()
     }
+
+    fn is_compatible_arrow_shape(_shape: crate::shared::ArrowShape) -> bool {
+        unimplemented!("Complete the matching logic for ClassNode's arrow shapes")
+    }
 }
 
 impl Display for ClassNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "class v{}[{}] {{\n", self.id(), self.label())?;
+        writeln!(f, "class {NODE_LETTER}{}[{}] {{", self.id(), self.label())?;
         if let Some(annotation) = &self.annotation {
-            write!(f, "    <<{}>>", annotation)?;
+            writeln!(f, "    <<{annotation}>>")?;
         }
 
         for attr in &self.attributes {
@@ -64,10 +70,14 @@ impl Display for ClassNode {
         for method in &self.methods {
             writeln!(f, "    {method}")?;
         }
-        write!(f, "}}")?;
+        writeln!(f, "}}")?;
+
+        if let Some(click_event) = &self.click_event {
+            writeln!(f, " click {NODE_LETTER}{} {}", self.id(), click_event)?;
+        }
 
         for class in self.classes() {
-            write!(f, "cssClass {} {};", self.id(), class)?;
+            writeln!(f, "cssClass {} {};", self.id(), class)?;
         }
 
         Ok(())

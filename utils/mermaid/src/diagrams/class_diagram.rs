@@ -2,19 +2,16 @@
 
 pub mod class_edge;
 pub mod class_node;
-pub mod configuration;
+mod configuration;
 pub mod visibility;
 use class_edge::ClassEdge;
+pub use class_edge::ClassEdgeAttribute;
 use class_node::ClassNode;
 pub use class_node::ClassNodeAttribute;
 use configuration::ClassDiagramConfiguration;
+pub use configuration::ClassDiagramConfigurationAttribute;
 
 use crate::shared::generic_diagram::GenericDiagram;
 
 /// Represents a class diagram in Mermaid syntax.
-pub struct ClassDiagram {
-    /// Configuration options for the class diagram.
-    configuration: ClassDiagramConfiguration,
-    /// Underlying generic diagram structure.
-    diagram: GenericDiagram<ClassNode, ClassEdge>,
-}
+pub type ClassDiagram = GenericDiagram<ClassNode, ClassEdge, ClassDiagramConfiguration>;

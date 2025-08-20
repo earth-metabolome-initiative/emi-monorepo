@@ -41,18 +41,22 @@ impl Node for ERNode {
     fn classes(&self) -> impl Iterator<Item = &StyleClass> {
         self.node.classes()
     }
+
+    fn is_compatible_arrow_shape(shape: crate::shared::ArrowShape) -> bool {
+        matches!(shape, crate::shared::ArrowShape::Normal | crate::shared::ArrowShape::Sharp)
+    }
 }
 
 impl Display for ERNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{NODE_LETTER}{}[\"`{}`\"] {{\n", self.id(), self.label())?;
+        writeln!(f, "{NODE_LETTER}{}[\"`{}`\"] {{", self.id(), self.label())?;
         for attr in &self.attributes {
             writeln!(f, "    {attr}")?;
         }
-        write!(f, "}}")?;
+        writeln!(f, "}}")?;
 
         for class in self.classes() {
-            write!(f, "class {NODE_LETTER}{} {};", self.id(), class)?;
+            writeln!(f, "class {NODE_LETTER}{} {};", self.id(), class)?;
         }
 
         Ok(())

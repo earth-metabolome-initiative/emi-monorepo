@@ -68,26 +68,26 @@ impl Builder for ERNodeBuilder {
 impl NodeBuilder for ERNodeBuilder {
     type Node = ERNode;
 
-    fn id(&mut self, id: u32) -> &mut Self {
-        self.builder.id(id);
+    fn id(mut self, id: u32) -> Self {
+        self.builder = self.builder.id(id);
         self
     }
 
-    fn label<S: ToString>(&mut self, label: S) -> Result<&mut Self, Self::Error> {
-        self.builder.label(label)?;
+    fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
+        self.builder = self.builder.label(label)?;
         Ok(self)
     }
 
-    fn style_class(&mut self, style_class: Rc<StyleClass>) -> Result<&mut Self, StyleClassError> {
-        self.builder.style_class(style_class)?;
+    fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
+        self.builder = self.builder.style_class(style_class)?;
         Ok(self)
     }
 
     fn style_property(
-        &mut self,
+        mut self,
         property: crate::shared::StyleProperty,
-    ) -> Result<&mut Self, StyleClassError> {
-        self.builder.style_property(property)?;
+    ) -> Result<Self, StyleClassError> {
+        self.builder = self.builder.style_property(property)?;
         Ok(self)
     }
 }

@@ -12,9 +12,14 @@ pub trait Diagram: Display {
     /// Type of the associated builder for this diagram.
     type Builder: DiagramBuilder<Diagram = Self, Node = Self::Node, Edge = Self::Edge>;
     /// Type of the node used in the diagram.
-    type Node: Node;
+    type Node: Node + Display;
     /// Type of edge used in the diagram.
-    type Edge: Edge<Node = Self::Node>;
+    type Edge: Edge<Node = Self::Node> + Display;
+    /// The configuration options for the diagram.
+    type Configuration: Display;
+
+    /// Returns the title of the diagram, if any.
+    fn title(&self) -> Option<&str>;
 
     /// Iterates across the style classes associated with this diagram.
     fn style_classes(&self) -> impl Iterator<Item = &StyleClass>;

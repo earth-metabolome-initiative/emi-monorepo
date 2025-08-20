@@ -37,11 +37,15 @@ impl Node for GenericNode {
     }
 
     fn classes(&self) -> impl Iterator<Item = &StyleClass> {
-        self.classes.iter().map(|c| c.as_ref())
+        self.classes.iter().map(AsRef::as_ref)
     }
 
     fn styles(&self) -> impl Iterator<Item = &StyleProperty> {
         self.style.iter()
+    }
+
+    fn is_compatible_arrow_shape(_shape: super::ArrowShape) -> bool {
+        true
     }
 }
 
@@ -104,12 +108,12 @@ impl Builder for GenericNodeBuilder {
 impl NodeBuilder for GenericNodeBuilder {
     type Node = GenericNode;
 
-    fn id(&mut self, id: u32) -> &mut Self {
+    fn id(mut self, id: u32) -> Self {
         self.id = Some(id);
         self
     }
 
-    fn label<S: ToString>(&mut self, label: S) -> Result<&mut Self, Self::Error> {
+    fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
         let label = label.to_string();
         if label.is_empty() {
             return Err(crate::errors::NodeError::EmptyLabel);
@@ -119,7 +123,7 @@ impl NodeBuilder for GenericNodeBuilder {
         Ok(self)
     }
 
-    fn style_class(&mut self, style_class: Rc<StyleClass>) -> Result<&mut Self, StyleClassError> {
+    fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
         if self.classes.iter().any(|c| c.name() == style_class.name()) {
             return Err(StyleClassError::DuplicateClass(style_class.name().to_owned()));
         }
@@ -128,8 +132,8 @@ impl NodeBuilder for GenericNodeBuilder {
         Ok(self)
     }
 
-    fn style_property(&mut self, property: StyleProperty) -> Result<&mut Self, StyleClassError> {
-        if self.style.iter().any(|p| p.is_same_type(&property)) {
+    fn style_property(mut self, property: StyleProperty) -> Result<Self, StyleClassError> {
+        if self.style.iter().any(|p| p.is_same_type(property)) {
             return Err(StyleClassError::DuplicateProperty(property));
         }
 

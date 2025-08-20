@@ -1,7 +1,7 @@
 //! Submodule defining the node trait used in Mermaid diagrams.
 
 use crate::{
-    shared::{StyleClass, StyleProperty},
+    shared::{ArrowShape, StyleClass, StyleProperty},
     traits::NodeBuilder,
 };
 
@@ -26,4 +26,7 @@ pub trait Node {
     fn has_styles(&self) -> bool {
         self.styles().next().is_some()
     }
+
+    /// Returns whether the provided arrow shape is compatible with the node.
+    fn is_compatible_arrow_shape(shape: ArrowShape) -> bool;
 }

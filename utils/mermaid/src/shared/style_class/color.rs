@@ -14,7 +14,7 @@ pub struct Color {
 
 impl Color {
     /// Returns the color as a hexadecimal string.
-    pub fn to_hex(&self) -> String {
+    pub fn to_hex(self) -> String {
         format!("#{:02x}{:02x}{:02x}", self.red, self.green, self.blue)
     }
 }

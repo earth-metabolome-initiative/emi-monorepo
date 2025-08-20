@@ -8,6 +8,8 @@ use std::fmt::Display;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// An enumeration representing the visibility of class members in Mermaid class
+/// diagrams.
 pub enum Visibility {
     /// Public visibility, denoted by `+`.
     Public,

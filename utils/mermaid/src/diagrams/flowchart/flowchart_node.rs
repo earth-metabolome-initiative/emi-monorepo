@@ -2,16 +2,17 @@
 //! in Mermaid syntax.
 
 mod builder;
-mod click_event;
 mod shape;
 use std::{fmt::Display, rc::Rc};
 
 pub use builder::{FlowchartNodeAttribute, FlowchartNodeBuilder};
-pub use click_event::ClickEvent;
 use shape::FlowchartNodeShape;
 
 use crate::{
-    shared::{GenericNode, NODE_LETTER, StyleClass, style_class::StyleProperty},
+    shared::{
+        ClickEvent, GenericNode, NODE_LETTER, StyleClass, generic_configuration::Direction,
+        style_class::StyleProperty,
+    },
     traits::Node,
 };
 
@@ -19,7 +20,7 @@ use crate::{
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a node in a flowchart diagram, which can have various
 /// properties and may include click events.
-pub(crate) struct FlowchartNode {
+pub struct FlowchartNode {
     /// Underlying node structure.
     node: GenericNode,
     /// The click event associated with the node, if any.
@@ -28,6 +29,8 @@ pub(crate) struct FlowchartNode {
     shape: FlowchartNodeShape,
     /// The sub-nodes, when the node is a subgraph.
     subnodes: Vec<Rc<FlowchartNode>>,
+    /// The direction of the subgraph, if applicable.
+    direction: Option<Direction>,
 }
 
 impl Node for FlowchartNode {
@@ -48,12 +51,16 @@ impl Node for FlowchartNode {
     fn classes(&self) -> impl Iterator<Item = &StyleClass> {
         self.node.classes()
     }
+
+    fn is_compatible_arrow_shape(shape: crate::shared::ArrowShape) -> bool {
+        matches!(shape, crate::shared::ArrowShape::Normal | crate::shared::ArrowShape::Sharp)
+    }
 }
 
 impl Display for FlowchartNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.subnodes.is_empty() {
-            write!(
+            writeln!(
                 f,
                 "{NODE_LETTER}{}@{{shape:{}, label:\"`{}`\"}}",
                 self.id(),
@@ -61,15 +68,23 @@ impl Display for FlowchartNode {
                 self.label()
             )?;
 
+            if let Some(click_event) = &self.click_event {
+                writeln!(f, " click {NODE_LETTER}{} {click_event}", self.id(),)?;
+            }
+
             for class in self.classes() {
-                write!(f, "class {NODE_LETTER}{} {};", self.id(), class)?;
+                writeln!(f, "class {NODE_LETTER}{} {class};", self.id(),)?;
             }
         } else {
-            write!(f, "subgraph {NODE_LETTER}{} [{}] {{\n", self.id(), self.label())?;
+            writeln!(f, "subgraph {NODE_LETTER}{} [{}] {{", self.id(), self.label())?;
+            if let Some(direction) = &self.direction {
+                writeln!(f, "    {direction}")?;
+            }
+
             for node in &self.subnodes {
                 writeln!(f, "    {node}")?;
             }
-            write!(f, "}}")?;
+            writeln!(f, "}}")?;
         }
         if self.has_styles() {
             write!(f, "style {NODE_LETTER}{} ", self.id())?;
@@ -77,8 +92,9 @@ impl Display for FlowchartNode {
                 if style_number > 0 {
                     write!(f, ", ")?;
                 }
-                write!(f, "{} ", style)?;
+                write!(f, "{style} ")?;
             }
+            writeln!(f)?;
         }
         Ok(())
     }

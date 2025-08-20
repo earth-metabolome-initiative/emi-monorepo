@@ -15,14 +15,39 @@ pub trait NodeBuilder: Builder {
     type Node: Node<Builder = Self>;
 
     /// Adds the provided style class to the node being built.
-    fn style_class(&mut self, style_class: Rc<StyleClass>) -> Result<&mut Self, StyleClassError>;
+    ///
+    /// # Arguments
+    ///
+    /// * `style_class` - The style class to add to the node.
+    ///
+    /// # Errors
+    ///
+    /// * If the style class name clashes with a previously applied class.
+    fn style_class(self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError>;
 
     /// Adds a style property to the node being built.
-    fn style_property(&mut self, property: StyleProperty) -> Result<&mut Self, StyleClassError>;
+    ///
+    /// # Arguments
+    ///
+    /// * `property` - The style property to add to the node.
+    ///
+    /// # Errors
+    ///
+    /// * If the style property has already been set for the node.
+    fn style_property(self, property: StyleProperty) -> Result<Self, StyleClassError>;
 
     /// Sets the label for the node being built.
-    fn label<S: ToString>(&mut self, label: S) -> Result<&mut Self, Self::Error>;
+    ///
+    /// # Arguments
+    ///
+    /// * `label` - The label to set for the node.
+    ///
+    /// # Errors
+    ///
+    /// * If the label is empty.
+    fn label<S: ToString>(self, label: S) -> Result<Self, Self::Error>;
 
+    #[must_use]
     /// Sets the ID for the node being built.
-    fn id(&mut self, id: u32) -> &mut Self;
+    fn id(self, id: u32) -> Self;
 }

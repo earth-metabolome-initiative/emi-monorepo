@@ -55,7 +55,7 @@ impl Display for ClassMethod {
         }
 
         if let Some(return_type) = &self.return_type {
-            write!(f, ": {}", return_type)?;
+            write!(f, ": {return_type}")?;
         } else {
             write!(f, ": void")?;
         }

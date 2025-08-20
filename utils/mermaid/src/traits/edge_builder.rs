@@ -5,24 +5,78 @@ use std::rc::Rc;
 
 use common_traits::prelude::Builder;
 
-use crate::traits::{Edge, Node};
+use crate::{
+    shared::{ArrowShape, LineStyle},
+    traits::{Edge, Node},
+};
 
 /// Trait representing an edge builder in a Mermaid diagram.
-pub trait EdgeBuilder: Builder {
+pub trait EdgeBuilder: Builder<Object = <Self as EdgeBuilder>::Edge> {
     /// The type of edge this builder constructs.
     type Edge: Edge<Builder = Self, Node = Self::Node>;
     /// Type of the node this edge connects to.
     type Node: Node;
 
     /// Set the label for this edge.
-    fn label<S: ToString>(&mut self, label: S) -> &mut Self;
+    ///
+    /// # Arguments
+    ///
+    /// * `label` - The label to set for this edge.
+    ///
+    /// # Errors
+    ///
+    /// * If the label is empty.
+    fn label<S: ToString>(self, label: S) -> Result<Self, Self::Error>;
 
     /// Set the source node for this edge.
-    fn source(&mut self, node: Rc<Self::Node>) -> &mut Self;
+    ///
+    /// # Arguments
+    ///
+    /// * `node` - The source node for this edge.
+    ///
+    /// # Errors
+    ///
+    /// * If the node is not compatible with any of the other set parameters.
+    fn source(self, node: Rc<Self::Node>) -> Result<Self, Self::Error>;
 
-    /// Set the target node for this edge.
-    fn destination(&mut self, node: Rc<Self::Node>) -> &mut Self;
+    /// Set the destination node for this edge.
+    ///
+    /// # Arguments
+    ///
+    /// * `node` - The destination node for this edge.
+    ///
+    /// # Errors
+    ///
+    /// * If the node is not compatible with any of the other set parameters.
+    fn destination(self, node: Rc<Self::Node>) -> Result<Self, Self::Error>;
 
-    /// Build the edge from the current state of the builder.
-    fn build(self) -> Self::Edge;
+    #[must_use]
+    /// Set the style class for this edge.
+    ///
+    /// # Arguments
+    ///
+    /// * `class` - The style class to set for this edge.
+    fn line_style(self, style: LineStyle) -> Self;
+
+    /// Set the left arrow shape for this edge.
+    ///
+    /// # Arguments
+    ///
+    /// * `shape` - The shape of the left arrow.
+    ///
+    /// # Errors
+    ///
+    /// * If the shape is not compatible with the associated node type.
+    fn left_arrow_shape(self, shape: ArrowShape) -> Result<Self, Self::Error>;
+
+    /// Set the right arrow shape for this edge.
+    ///
+    /// # Arguments
+    ///
+    /// * `shape` - The shape of the right arrow.
+    ///
+    /// # Errors
+    ///
+    /// * If the shape is not compatible with the associated node type.
+    fn right_arrow_shape(self, shape: ArrowShape) -> Result<Self, Self::Error>;
 }

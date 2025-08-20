@@ -1,7 +1,5 @@
 //! Submodule providing an enumeration of possible curve styles for flowchart
-//! edges in Mermaid diagrams. These styles include basis, bumpX, bumpY,
-//! cardinal, catmullRom, linear, monotoneX, monotoneY, natural, step,
-//! stepAfter, and stepBefore.
+//! edges in Mermaid diagrams.
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -10,27 +8,27 @@ pub enum CurveStyle {
     /// Basis curve style.
     #[default]
     Basis,
-    /// BumpX curve style.
+    /// `BumpX` curve style.
     BumpX,
-    /// BumpY curve style.
+    /// `BumpY` curve style.
     BumpY,
-    /// Cardinal curve style.
+    /// `Cardinal` curve style.
     Cardinal,
-    /// CatmullRom curve style.
+    /// `CatmullRom` curve style.
     CatmullRom,
-    /// Linear curve style.
+    /// `Linear` curve style.
     Linear,
-    /// MonotoneX curve style.
+    /// `MonotoneX` curve style.
     MonotoneX,
-    /// MonotoneY curve style.
+    /// `MonotoneY` curve style.
     MonotoneY,
-    /// Natural curve style.
+    /// `Natural` curve style.
     Natural,
-    /// Step curve style.
+    /// `Step` curve style.
     Step,
-    /// StepAfter curve style.
+    /// `StepAfter` curve style.
     StepAfter,
-    /// StepBefore curve style.
+    /// `StepBefore` curve style.
     StepBefore,
 }
 

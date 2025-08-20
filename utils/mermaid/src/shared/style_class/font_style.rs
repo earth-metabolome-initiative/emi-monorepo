@@ -1,4 +1,4 @@
-//! Submodule providing the enumeration FontStyle which defines
+//! Submodule providing the enumeration `FontStyle` which defines
 //! different font styles that can be applied to text in Mermaid diagrams.
 
 use std::fmt::Display;

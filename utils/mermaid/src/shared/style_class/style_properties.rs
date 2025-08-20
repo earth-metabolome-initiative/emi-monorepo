@@ -9,7 +9,7 @@ use crate::shared::style_class::{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// StyleProperty enumerates all supported style properties for Mermaid class
+/// `StyleProperty` enumerates all supported style properties for Mermaid class
 /// definitions.
 pub enum StyleProperty {
     /// Sets the fill color of the node (e.g., `fill: #ff0000`)
@@ -40,21 +40,21 @@ pub enum StyleProperty {
 impl StyleProperty {
     /// Returns whether the provided style property is of the same type as
     /// `self`.
-    pub fn is_same_type(&self, other: &StyleProperty) -> bool {
-        match (self, other) {
-            (StyleProperty::Fill(_), StyleProperty::Fill(_)) => true,
-            (StyleProperty::Stroke(_), StyleProperty::Stroke(_)) => true,
-            (StyleProperty::Color(_), StyleProperty::Color(_)) => true,
-            (StyleProperty::StrokeWidth(_), StyleProperty::StrokeWidth(_)) => true,
-            (StyleProperty::FontSize(_), StyleProperty::FontSize(_)) => true,
-            (StyleProperty::FontWeight(_), StyleProperty::FontWeight(_)) => true,
-            (StyleProperty::FontStyle(_), StyleProperty::FontStyle(_)) => true,
-            (StyleProperty::StrokeDasharray(_, _), StyleProperty::StrokeDasharray(_, _)) => true,
-            (StyleProperty::StrokeDashoffset(_), StyleProperty::StrokeDashoffset(_)) => true,
-            (StyleProperty::Opacity(_), StyleProperty::Opacity(_)) => true,
-            (StyleProperty::BorderRadius(_), StyleProperty::BorderRadius(_)) => true,
-            _ => false,
-        }
+    pub fn is_same_type(self, other: StyleProperty) -> bool {
+        matches!(
+            (self, other),
+            (StyleProperty::Fill(_), StyleProperty::Fill(_))
+                | (StyleProperty::Stroke(_), StyleProperty::Stroke(_))
+                | (StyleProperty::Color(_), StyleProperty::Color(_))
+                | (StyleProperty::StrokeWidth(_), StyleProperty::StrokeWidth(_))
+                | (StyleProperty::FontSize(_), StyleProperty::FontSize(_))
+                | (StyleProperty::FontWeight(_), StyleProperty::FontWeight(_))
+                | (StyleProperty::FontStyle(_), StyleProperty::FontStyle(_))
+                | (StyleProperty::StrokeDasharray(_, _), StyleProperty::StrokeDasharray(_, _))
+                | (StyleProperty::StrokeDashoffset(_), StyleProperty::StrokeDashoffset(_))
+                | (StyleProperty::Opacity(_), StyleProperty::Opacity(_))
+                | (StyleProperty::BorderRadius(_), StyleProperty::BorderRadius(_))
+        )
     }
 }
 

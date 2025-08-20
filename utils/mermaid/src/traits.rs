@@ -12,3 +12,7 @@ pub mod edge;
 pub use edge::Edge;
 pub mod edge_builder;
 pub use edge_builder::EdgeBuilder;
+pub mod configuration;
+pub use configuration::Configuration;
+pub mod configuration_builder;
+pub use configuration_builder::ConfigurationBuilder;

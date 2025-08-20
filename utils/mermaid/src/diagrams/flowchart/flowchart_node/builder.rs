@@ -10,6 +10,7 @@ use crate::{
     errors::NodeError,
     shared::{
         StyleClass, StyleClassError,
+        generic_configuration::Direction,
         generic_node::{GenericNodeAttribute, GenericNodeBuilder},
     },
     traits::NodeBuilder,
@@ -27,6 +28,8 @@ pub struct FlowchartNodeBuilder {
     shape: Option<FlowchartNodeShape>,
     /// Possible subnodes of the flowchart node.
     subnodes: Vec<Rc<FlowchartNode>>,
+    /// The direction of the subgraph, if applicable.
+    direction: Option<Direction>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -41,6 +44,8 @@ pub enum FlowchartNodeAttribute {
     Shape,
     /// Subnodes attribute, representing child nodes.
     Subnodes,
+    /// Direction attribute, representing the flow direction of the subgraph.
+    Direction,
 }
 
 impl From<GenericNodeAttribute> for FlowchartNodeAttribute {
@@ -56,6 +61,7 @@ impl Display for FlowchartNodeAttribute {
             FlowchartNodeAttribute::ClickEvent => write!(f, "clickEvent"),
             FlowchartNodeAttribute::Shape => write!(f, "shape"),
             FlowchartNodeAttribute::Subnodes => write!(f, "subnodes"),
+            FlowchartNodeAttribute::Direction => write!(f, "direction"),
         }
     }
 }
@@ -70,6 +76,10 @@ impl Builder for FlowchartNodeBuilder {
     }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
+        if self.direction.is_some() && self.subnodes.is_empty() {
+            return Err(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Subnodes).into());
+        }
+
         Ok(FlowchartNode {
             node: self.builder.build()?,
             click_event: self.click_event,
@@ -77,6 +87,7 @@ impl Builder for FlowchartNodeBuilder {
                 .shape
                 .ok_or(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Shape))?,
             subnodes: self.subnodes,
+            direction: self.direction,
         })
     }
 }
@@ -84,26 +95,26 @@ impl Builder for FlowchartNodeBuilder {
 impl NodeBuilder for FlowchartNodeBuilder {
     type Node = FlowchartNode;
 
-    fn id(&mut self, id: u32) -> &mut Self {
-        self.builder.id(id);
+    fn id(mut self, id: u32) -> Self {
+        self.builder = self.builder.id(id);
         self
     }
 
-    fn label<S: ToString>(&mut self, label: S) -> Result<&mut Self, Self::Error> {
-        self.builder.label(label)?;
+    fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
+        self.builder = self.builder.label(label)?;
         Ok(self)
     }
 
-    fn style_class(&mut self, style_class: Rc<StyleClass>) -> Result<&mut Self, StyleClassError> {
-        self.builder.style_class(style_class)?;
+    fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
+        self.builder = self.builder.style_class(style_class)?;
         Ok(self)
     }
 
     fn style_property(
-        &mut self,
+        mut self,
         property: crate::shared::StyleProperty,
-    ) -> Result<&mut Self, StyleClassError> {
-        self.builder.style_property(property)?;
+    ) -> Result<Self, StyleClassError> {
+        self.builder = self.builder.style_property(property)?;
         Ok(self)
     }
 }

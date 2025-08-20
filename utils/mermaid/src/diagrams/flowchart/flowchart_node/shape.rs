@@ -3,7 +3,7 @@ use std::{fmt::Display, str::FromStr};
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// FlowchartNodeShape represents all supported node shapes for Mermaid
+/// `FlowchartNodeShape` represents all supported node shapes for Mermaid
 /// diagrams.
 pub enum FlowchartNodeShape {
     /// Standard process shape

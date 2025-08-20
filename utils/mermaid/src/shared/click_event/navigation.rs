@@ -5,8 +5,6 @@
 
 use std::fmt::Display;
 
-use url::Url;
-
 /// Represents a navigation event triggered by a click on a node in a Mermaid
 /// diagram. This can include external links, with options for opening in a new
 /// tab and whether to use an anchor-like link or a JavaScript function for
@@ -26,7 +24,7 @@ use url::Url;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Navigation {
     /// The URL to navigate to when the node is clicked.
-    url: Url,
+    url: String,
     /// Whether to open the link in a new tab.
     new_tab: bool,
     /// Whether to employ an anchor-like link or a JavaScript function for

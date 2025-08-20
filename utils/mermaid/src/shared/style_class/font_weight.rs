@@ -1,4 +1,4 @@
-//! Submodule providing the FontWeight enum used in Mermaid diagrams.
+//! Submodule providing the `FontWeight` enum used in Mermaid diagrams.
 
 use std::fmt::Display;
 

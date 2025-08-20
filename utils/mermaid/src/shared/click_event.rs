@@ -23,8 +23,8 @@ pub enum ClickEvent {
 impl Display for ClickEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ClickEvent::Navigation(nav) => write!(f, "click {nav}",),
-            ClickEvent::JsFunctionCall(js_call) => write!(f, "click {js_call}",),
+            ClickEvent::Navigation(nav) => write!(f, "{nav}",),
+            ClickEvent::JsFunctionCall(js_call) => write!(f, "{js_call}",),
         }
     }
 }
