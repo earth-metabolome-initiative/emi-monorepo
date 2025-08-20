@@ -19,6 +19,7 @@ members = [
   "data_retrieval/downloader",
   "web/core_structures",
   "web/core_structures/core_structures_builder",
+  "web/core_structures/core_structures_vis",
   "utils/diesel_migrations_utils",
   "utils/common_traits",
   "utils/inflector",
@@ -135,6 +136,7 @@ functional_properties = { path = "utils/functional_properties" }
 inflector = { path = "utils/inflector" }
 core_structures = { path = "web/core_structures" }
 core_structures_builder = { path = "web/core_structures/core_structures_builder" }
+core_structures_vis = { path = "web/core_structures/core_structures_vis" }
 ws_messages = { path = "web/web_common/ws_messages" }
 iter_utils = { path = "utils/iter_utils" }
 regex = "1.11"

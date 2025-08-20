@@ -1,0 +1,8 @@
+[package]
+name = "core_structures_vis"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_structures.workspace = true
+mermaid.workspace = true
