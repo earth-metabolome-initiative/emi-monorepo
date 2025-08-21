@@ -11,7 +11,7 @@ pub trait Node: PartialOrd + Ord + Eq + PartialEq {
     type Builder: NodeBuilder<Node = Self>;
 
     /// Returns the identifier of the node.
-    fn id(&self) -> u32;
+    fn id(&self) -> usize;
 
     /// Returns the label of the node.
     fn label(&self) -> &str;
@@ -26,7 +26,7 @@ pub trait Node: PartialOrd + Ord + Eq + PartialEq {
     fn has_styles(&self) -> bool {
         self.styles().next().is_some()
     }
-    
+
     /// Returns whether the provided arrow shape is compatible with the node.
     fn is_compatible_arrow_shape(shape: ArrowShape) -> bool;
 }

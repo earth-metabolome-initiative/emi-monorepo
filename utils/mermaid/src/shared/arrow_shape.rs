@@ -2,6 +2,7 @@
 
 #[derive(Default, Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents the shape of an arrow that can be used in Mermaid diagrams.
 pub enum ArrowShape {
     /// Arrow shape with a normal arrowhead.
     #[default]

@@ -113,7 +113,7 @@ impl Builder for ClassNodeBuilder {
 impl NodeBuilder for ClassNodeBuilder {
     type Node = ClassNode;
 
-    fn id(mut self, id: u32) -> Self {
+    fn id(mut self, id: usize) -> Self {
         self.builder = self.builder.id(id);
         self
     }

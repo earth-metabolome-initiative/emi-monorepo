@@ -29,7 +29,7 @@ impl Node for ERNode {
         self.node.label()
     }
 
-    fn id(&self) -> u32 {
+    fn id(&self) -> usize {
         self.node.id()
     }
 
@@ -68,7 +68,7 @@ impl Display for ERNode {
         }
 
         for class in self.classes() {
-            writeln!(f, "class {NODE_LETTER}{} {};", self.id(), class)?;
+            writeln!(f, "class {NODE_LETTER}{} {}", self.id(), class)?;
         }
 
         Ok(())

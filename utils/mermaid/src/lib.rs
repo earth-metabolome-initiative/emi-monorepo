@@ -13,7 +13,10 @@ pub use errors::{
 pub mod prelude {
     pub use crate::{
         diagrams::{class_diagram::*, entity_relationship::*, flowchart::*},
-        shared::LineStyle,
+        shared::{
+            ArrowShape, Color, Direction, LineStyle, Renderer, StyleClass, StyleClassBuilder,
+            StyleProperty,
+        },
         traits::*,
     };
 }

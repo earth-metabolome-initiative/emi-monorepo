@@ -3,7 +3,10 @@
 
 use common_traits::prelude::BuilderError;
 
-use crate::shared::{style_class::{builder::StyleClassAttribute, StyleProperty}, StyleClass};
+use crate::shared::{
+    StyleClass,
+    style_class::{StyleProperty, builder::StyleClassAttribute},
+};
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]

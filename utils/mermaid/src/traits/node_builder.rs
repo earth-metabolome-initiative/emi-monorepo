@@ -49,5 +49,5 @@ pub trait NodeBuilder: Builder<Object = Self::Node> {
 
     #[must_use]
     /// Sets the ID for the node being built.
-    fn id(self, id: u32) -> Self;
+    fn id(self, id: usize) -> Self;
 }

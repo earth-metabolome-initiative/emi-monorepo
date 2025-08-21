@@ -13,7 +13,7 @@ use crate::{
         generic_configuration::Direction,
         generic_node::{GenericNodeAttribute, GenericNodeBuilder},
     },
-    traits::NodeBuilder,
+    traits::{Node, NodeBuilder},
 };
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -25,11 +25,65 @@ pub struct FlowchartNodeBuilder {
     /// The click event associated with the node, if any.
     click_event: Option<ClickEvent>,
     /// The shape of the flowchart node.
-    shape: Option<FlowchartNodeShape>,
+    shape: FlowchartNodeShape,
     /// Possible subnodes of the flowchart node.
     subnodes: Vec<Rc<FlowchartNode>>,
     /// The direction of the subgraph, if applicable.
     direction: Option<Direction>,
+}
+
+impl FlowchartNodeBuilder {
+    #[must_use]
+    /// Sets the click event for the flowchart node.
+    pub fn click_event(mut self, click_event: ClickEvent) -> Self {
+        self.click_event = Some(click_event);
+        self
+    }
+
+    #[must_use]
+    /// Sets the shape of the flowchart node.
+    pub fn shape(mut self, shape: FlowchartNodeShape) -> Self {
+        self.shape = shape;
+        self
+    }
+
+    /// Adds a subnode to the flowchart node.
+    ///
+    /// # Arguments
+    ///
+    /// * `subnode`: The subnode to be added, wrapped in a `Rc` for shared
+    ///   ownership.
+    ///
+    /// # Errors
+    ///
+    /// * If the subnode is already present in the list, an error is returned.
+    pub fn subnode(
+        mut self,
+        subnode: Rc<FlowchartNode>,
+    ) -> Result<Self, NodeError<FlowchartNodeAttribute>> {
+        if self.subnodes.contains(&subnode) {
+            return Err(NodeError::DuplicateNode(subnode.label().to_owned()));
+        }
+
+        self.subnodes.push(subnode);
+        Ok(self)
+    }
+
+    /// Returns whether the current node builder is a subgraph node.
+    pub fn is_subgraph(&self) -> bool {
+        !self.subnodes.is_empty()
+    }
+
+    #[must_use]
+    /// Sets the direction of the subgraph for the flowchart node.
+    ///
+    /// # Arguments
+    ///
+    /// * `direction`: The direction of the subgraph.
+    pub fn direction(mut self, direction: Direction) -> Self {
+        self.direction = Some(direction);
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -44,6 +98,8 @@ pub enum FlowchartNodeAttribute {
     Shape,
     /// Subnodes attribute, representing child nodes.
     Subnodes,
+    /// Whether the node is part of a subgraph.
+    PartOfSubgraph,
     /// Direction attribute, representing the flow direction of the subgraph.
     Direction,
 }
@@ -61,6 +117,7 @@ impl Display for FlowchartNodeAttribute {
             FlowchartNodeAttribute::ClickEvent => write!(f, "clickEvent"),
             FlowchartNodeAttribute::Shape => write!(f, "shape"),
             FlowchartNodeAttribute::Subnodes => write!(f, "subnodes"),
+            FlowchartNodeAttribute::PartOfSubgraph => write!(f, "partOfSubgraph"),
             FlowchartNodeAttribute::Direction => write!(f, "direction"),
         }
     }
@@ -72,7 +129,7 @@ impl Builder for FlowchartNodeBuilder {
     type Error = NodeError<Self::Attribute>;
 
     fn is_complete(&self) -> bool {
-        self.builder.is_complete() && self.shape.is_some()
+        self.builder.is_complete()
     }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
@@ -83,9 +140,7 @@ impl Builder for FlowchartNodeBuilder {
         Ok(FlowchartNode {
             node: self.builder.build()?,
             click_event: self.click_event,
-            shape: self
-                .shape
-                .ok_or(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Shape))?,
+            shape: self.shape,
             subnodes: self.subnodes,
             direction: self.direction,
         })
@@ -95,7 +150,7 @@ impl Builder for FlowchartNodeBuilder {
 impl NodeBuilder for FlowchartNodeBuilder {
     type Node = FlowchartNode;
 
-    fn id(mut self, id: u32) -> Self {
+    fn id(mut self, id: usize) -> Self {
         self.builder = self.builder.id(id);
         self
     }

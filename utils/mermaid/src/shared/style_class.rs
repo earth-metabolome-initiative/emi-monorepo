@@ -10,11 +10,15 @@ mod units;
 use std::fmt::Display;
 
 pub use builder::StyleClassBuilder;
+pub use color::Color;
 pub use error::StyleClassError;
 pub use style_properties::StyleProperty;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents a style class in Mermaid diagrams, which can be used to define
+/// styles for nodes, edges, and other elements. It includes a name and a set of
+/// properties that define the style.
 pub struct StyleClass {
     /// The name of the style class.
     name: String,
@@ -43,6 +47,6 @@ impl Display for StyleClass {
             }
             write!(f, "{property}")?;
         }
-        write!(f, ";")
+        writeln!(f)
     }
 }

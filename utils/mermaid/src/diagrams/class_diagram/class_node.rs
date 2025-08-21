@@ -40,7 +40,7 @@ impl Node for ClassNode {
         self.node.label()
     }
 
-    fn id(&self) -> u32 {
+    fn id(&self) -> usize {
         self.node.id()
     }
 
@@ -77,7 +77,7 @@ impl Display for ClassNode {
         }
 
         for class in self.classes() {
-            writeln!(f, "cssClass {} {};", self.id(), class)?;
+            writeln!(f, "cssClass {} {}", self.id(), class)?;
         }
 
         Ok(())

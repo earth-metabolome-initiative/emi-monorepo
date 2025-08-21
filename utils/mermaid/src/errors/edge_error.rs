@@ -83,10 +83,10 @@ impl<EdgeAttr: Display> std::fmt::Display for EdgeError<EdgeAttr> {
                 write!(f, "Incompatible right arrow shape: `{}`", shape.right())
             }
             EdgeError::SourceNodeNotFound(node) => {
-                write!(f, "Source node not found: `{}`", node)
+                write!(f, "Source node not found: `{node}`",)
             }
             EdgeError::DestinationNodeNotFound(node) => {
-                write!(f, "Destination node not found: `{}`", node)
+                write!(f, "Destination node not found: `{node}`",)
             }
             EdgeError::Builder(error) => write!(f, "Builder error: `{error}`"),
         }

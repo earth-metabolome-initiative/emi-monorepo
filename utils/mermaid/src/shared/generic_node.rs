@@ -16,7 +16,7 @@ use crate::{
 /// Struct representing a generic node in Mermaid diagrams.
 pub(crate) struct GenericNode {
     /// Unique identifier for the node.
-    id: u32,
+    id: usize,
     /// Label for the node.
     label: String,
     /// Classes associated with the node, used for styling.
@@ -28,7 +28,7 @@ pub(crate) struct GenericNode {
 impl Node for GenericNode {
     type Builder = GenericNodeBuilder;
 
-    fn id(&self) -> u32 {
+    fn id(&self) -> usize {
         self.id
     }
 
@@ -54,7 +54,7 @@ impl Node for GenericNode {
 /// Builder for creating a `GenericNode`.
 pub(crate) struct GenericNodeBuilder {
     /// Unique identifier for the node.
-    id: Option<u32>,
+    id: Option<usize>,
     /// Label for the node.
     label: Option<String>,
     /// Classes associated with the node, used for styling.
@@ -108,7 +108,7 @@ impl Builder for GenericNodeBuilder {
 impl NodeBuilder for GenericNodeBuilder {
     type Node = GenericNode;
 
-    fn id(mut self, id: u32) -> Self {
+    fn id(mut self, id: usize) -> Self {
         self.id = Some(id);
         self
     }

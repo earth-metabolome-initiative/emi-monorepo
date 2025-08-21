@@ -6,7 +6,7 @@ mod shape;
 use std::{fmt::Display, rc::Rc};
 
 pub use builder::{FlowchartNodeAttribute, FlowchartNodeBuilder};
-use shape::FlowchartNodeShape;
+pub use shape::FlowchartNodeShape;
 
 use crate::{
     shared::{
@@ -33,6 +33,13 @@ pub struct FlowchartNode {
     direction: Option<Direction>,
 }
 
+impl FlowchartNode {
+    /// Returns an iterator over the subnodes of the flowchart node.
+    pub fn subnodes(&self) -> impl Iterator<Item = &FlowchartNode> {
+        self.subnodes.iter().map(AsRef::as_ref)
+    }
+}
+
 impl Node for FlowchartNode {
     type Builder = FlowchartNodeBuilder;
 
@@ -40,7 +47,7 @@ impl Node for FlowchartNode {
         self.node.label()
     }
 
-    fn id(&self) -> u32 {
+    fn id(&self) -> usize {
         self.node.id()
     }
 
@@ -62,7 +69,7 @@ impl Display for FlowchartNode {
         if self.subnodes.is_empty() {
             writeln!(
                 f,
-                "{NODE_LETTER}{}@{{shape:{}, label:\"`{}`\"}}",
+                "{NODE_LETTER}{}@{{shape: {}, label: \"{}\"}}",
                 self.id(),
                 self.shape,
                 self.label()
@@ -73,18 +80,18 @@ impl Display for FlowchartNode {
             }
 
             for class in self.classes() {
-                writeln!(f, "class {NODE_LETTER}{} {class};", self.id(),)?;
+                writeln!(f, "class {NODE_LETTER}{} {}", self.id(), class.name())?;
             }
         } else {
-            writeln!(f, "subgraph {NODE_LETTER}{} [{}] {{", self.id(), self.label())?;
+            writeln!(f, "subgraph {NODE_LETTER}{} [\"`{}`\"]", self.id(), self.label())?;
             if let Some(direction) = &self.direction {
-                writeln!(f, "    {direction}")?;
+                writeln!(f, "    direction {direction}")?;
             }
 
             for node in &self.subnodes {
-                writeln!(f, "    {node}")?;
+                write!(f, "    {node}")?;
             }
-            writeln!(f, "}}")?;
+            writeln!(f, "end")?;
         }
         if self.has_styles() {
             write!(f, "style {NODE_LETTER}{} ", self.id())?;

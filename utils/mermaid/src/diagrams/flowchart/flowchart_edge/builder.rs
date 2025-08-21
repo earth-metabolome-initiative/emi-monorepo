@@ -21,7 +21,7 @@ use crate::{
 /// Builder for creating a `FlowchartEdge`.
 pub struct FlowchartEdgeBuilder {
     /// Unique identifier for the edge.
-    id: Option<u32>,
+    id: Option<usize>,
     /// Underlying generic edge builder.
     edge_builder: GenericEdgeBuilder<FlowchartNode>,
     /// Classes associated with the edge.
@@ -36,13 +36,21 @@ pub struct FlowchartEdgeBuilder {
 
 impl FlowchartEdgeBuilder {
     /// Creates a new `FlowchartEdgeBuilder`.
-    pub fn id(&mut self, id: u32) -> &mut Self {
+    pub fn id(mut self, id: usize) -> Self {
         self.id = Some(id);
         self
     }
 
     /// Adds a style class to the edge builder.
-    pub fn style_class(&mut self, class: Rc<StyleClass>) -> Result<&mut Self, StyleClassError> {
+    ///
+    /// # Arguments
+    ///
+    /// * `class`: The style class to be added
+    ///
+    /// # Errors
+    ///
+    /// * If the class is already present, an error is returned.
+    pub fn style_class(mut self, class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
         if self.style_classes.iter().any(|c| c.name() == class.name()) {
             return Err(StyleClassError::DuplicateClass(class.name().to_string()));
         }
@@ -51,10 +59,15 @@ impl FlowchartEdgeBuilder {
     }
 
     /// Adds a style property to the edge builder.
-    pub fn style_property(
-        &mut self,
-        property: StyleProperty,
-    ) -> Result<&mut Self, StyleClassError> {
+    ///
+    /// # Arguments
+    ///
+    /// * `property`: The style property to be added.
+    ///
+    /// # Errors
+    ///
+    /// * If the property is already present, an error is returned.
+    pub fn style_property(mut self, property: StyleProperty) -> Result<Self, StyleClassError> {
         if self.style_properties.iter().any(|p| p.is_same_type(property)) {
             return Err(StyleClassError::DuplicateProperty(property));
         }
@@ -63,13 +76,13 @@ impl FlowchartEdgeBuilder {
     }
 
     /// Sets the curve style for the edge.
-    pub fn curve_style(&mut self, style: CurveStyle) -> &mut Self {
+    pub fn curve_style(mut self, style: CurveStyle) -> Self {
         self.curve_style = style;
         self
     }
 
     /// Sets the length of the edge.
-    pub fn length(&mut self, length: u8) -> &mut Self {
+    pub fn length(mut self, length: u8) -> Self {
         self.length = length;
         self
     }

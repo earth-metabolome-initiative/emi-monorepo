@@ -3,7 +3,7 @@
 
 use std::fmt::Display;
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents the direction of a flowchart in Mermaid diagrams.
 pub enum Direction {
@@ -16,6 +16,18 @@ pub enum Direction {
     RightToLeft,
     /// The flowchart extends in a bottom-to-top direction.
     BottomToTop,
+}
+
+impl Direction {
+    /// Changes the orientation from vertical to horizontal or vice versa.
+    pub fn flip(self) -> Self {
+        match self {
+            Self::LeftToRight => Self::TopToBottom,
+            Self::TopToBottom => Self::LeftToRight,
+            Self::RightToLeft => Self::BottomToTop,
+            Self::BottomToTop => Self::RightToLeft,
+        }
+    }
 }
 
 impl Display for Direction {

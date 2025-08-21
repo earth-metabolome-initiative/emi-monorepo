@@ -1,15 +1,16 @@
 //! Submodule providing structs used across different type of Mermaid diagrams.
 
 pub mod generic_configuration;
+pub use generic_configuration::{Direction, Renderer};
 pub(crate) mod generic_diagram;
 pub mod javascript_function_signature;
 pub mod javascript_types;
 pub mod style_class;
-pub use style_class::{StyleClass, StyleClassBuilder, StyleClassError, StyleProperty};
+pub use style_class::{Color, StyleClass, StyleClassBuilder, StyleClassError, StyleProperty};
 pub mod arrow_shape;
 pub mod click_event;
 pub mod line_style;
-pub(crate) use arrow_shape::ArrowShape;
+pub use arrow_shape::ArrowShape;
 pub use click_event::ClickEvent;
 pub use line_style::LineStyle;
 mod constants;

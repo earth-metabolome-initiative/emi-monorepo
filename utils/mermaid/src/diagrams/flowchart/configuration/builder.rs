@@ -14,6 +14,7 @@ use crate::{
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating flowchart configurations with various properties.
 pub struct FlowchartConfigurationBuilder {
     /// Generic configuration options which apply to all Mermaid diagrams.
     generic: GenericConfigurationBuilder,
@@ -26,18 +27,21 @@ pub struct FlowchartConfigurationBuilder {
 }
 
 impl FlowchartConfigurationBuilder {
+    #[must_use]
     /// Sets whether to enable html labels in the flowchart.
     pub fn html_labels(mut self, enable: bool) -> Self {
         self.html_labels = enable;
         self
     }
 
+    #[must_use]
     /// Sets whether to automatically wrap markdown labels.
     pub fn markdown_auto_wrap(mut self, auto_wrap: bool) -> Self {
         self.markdown_auto_wrap = auto_wrap;
         self
     }
 
+    #[must_use]
     /// Sets the curve style for edges in the flowchart.
     pub fn curve_style(mut self, style: CurveStyle) -> Self {
         self.curve_style = style;

@@ -5,14 +5,11 @@ mod builder;
 
 use std::fmt::Display;
 
-pub use builder::FlowchartConfigurationAttribute;
+pub use builder::{FlowchartConfigurationAttribute, FlowchartConfigurationBuilder};
 
 use crate::{
-    diagrams::flowchart::{
-        configuration::builder::FlowchartConfigurationBuilder, curve_styles::CurveStyle,
-    },
-    shared::generic_configuration::GenericConfiguration,
-    traits::Configuration,
+    diagrams::flowchart::curve_styles::CurveStyle,
+    shared::generic_configuration::GenericConfiguration, traits::Configuration,
 };
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -33,7 +30,7 @@ impl Display for FlowchartConfiguration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "---")?;
         if let Some(title) = &self.generic.title() {
-            writeln!(f, "title: {}", title)?;
+            writeln!(f, "title: {title}")?;
         }
         writeln!(f, "config:")?;
         writeln!(f, "  flowchart:")?;

@@ -69,7 +69,7 @@ impl Builder for ERNodeBuilder {
 impl NodeBuilder for ERNodeBuilder {
     type Node = ERNode;
 
-    fn id(mut self, id: u32) -> Self {
+    fn id(mut self, id: usize) -> Self {
         self.builder = self.builder.id(id);
         self
     }

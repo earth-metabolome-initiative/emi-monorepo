@@ -186,6 +186,7 @@ molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 multi_ranged = { path = "data_structures/multi_ranged" }
 mermaid = { path = "utils/mermaid" }
+colorsys = "0.7.0"
 
 [workspace.lints.rust]
 missing_docs = "forbid"

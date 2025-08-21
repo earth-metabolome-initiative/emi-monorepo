@@ -34,7 +34,6 @@ where
     >: From<<N::Builder as Builder>::Error>
         + From<<E::Builder as Builder>::Error>
         + From<<C::Builder as Builder>::Error>,
-    Self: Display,
 {
     type Builder = GenericDiagramBuilder<N, E, C>;
     type Node = N;
@@ -93,11 +92,11 @@ impl<Node, Edge, Config: Default> Default for GenericDiagramBuilder<Node, Edge, 
     }
 }
 
-impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration> Into<GenericDiagram<N, E, C>>
-    for GenericDiagramBuilder<N, E, C>
+impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration>
+    From<GenericDiagramBuilder<N, E, C>> for GenericDiagram<N, E, C>
 {
-    fn into(self) -> GenericDiagram<N, E, C> {
-        self.generic_diagram
+    fn from(builder: GenericDiagramBuilder<N, E, C>) -> Self {
+        builder.generic_diagram
     }
 }
 
@@ -120,43 +119,31 @@ where
     type EdgeBuilder = E::Builder;
     type Configuration = C;
     type ConfigurationBuilder = C::Builder;
+    type Error = crate::errors::Error<
+        <Self::NodeBuilder as Builder>::Attribute,
+        <Self::EdgeBuilder as Builder>::Attribute,
+        <Self::ConfigurationBuilder as Builder>::Attribute,
+    >;
 
     fn configuration(
         mut self,
         configuration: Self::ConfigurationBuilder,
-    ) -> Result<
-        Self,
-        crate::errors::Error<
-            <Self::NodeBuilder as Builder>::Attribute,
-            <Self::EdgeBuilder as Builder>::Attribute,
-            <Self::ConfigurationBuilder as Builder>::Attribute,
-        >,
-    > {
+    ) -> Result<Self, Self::Error> {
         self.generic_diagram.configuration = configuration.build()?;
         Ok(self)
     }
 
-    fn edge(
-        &mut self,
-        edge: Self::EdgeBuilder,
-    ) -> Result<
-        Rc<Self::Edge>,
-        crate::errors::Error<
-            <Self::NodeBuilder as Builder>::Attribute,
-            <Self::EdgeBuilder as Builder>::Attribute,
-            <Self::ConfigurationBuilder as Builder>::Attribute,
-        >,
-    > {
+    fn edge(&mut self, edge: Self::EdgeBuilder) -> Result<Rc<Self::Edge>, Self::Error> {
         let edge = edge.build()?;
 
-        if !self.generic_diagram.nodes.contains(&edge.source()) {
+        if !self.generic_diagram.nodes.contains(edge.source()) {
             return Err(crate::errors::EdgeError::SourceNodeNotFound(
                 edge.source().label().to_owned(),
             )
             .into());
         }
 
-        if !self.generic_diagram.nodes.contains(&edge.destination()) {
+        if !self.generic_diagram.nodes.contains(edge.destination()) {
             return Err(crate::errors::EdgeError::DestinationNodeNotFound(
                 edge.destination().label().to_owned(),
             )
@@ -168,26 +155,12 @@ where
         Ok(rc)
     }
 
-    fn node(
-        &mut self,
-        node: Self::NodeBuilder,
-    ) -> Result<
-        Rc<Self::Node>,
-        crate::errors::Error<
-            <Self::NodeBuilder as Builder>::Attribute,
-            <Self::EdgeBuilder as Builder>::Attribute,
-            <Self::ConfigurationBuilder as Builder>::Attribute,
-        >,
-    > {
+    fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error> {
         let number_of_nodes = self.generic_diagram.nodes.len();
         let node: N = {
             use crate::traits::node_builder::NodeBuilder;
-            node.id(number_of_nodes as u32).build()?
+            node.id(number_of_nodes).build()?
         };
-
-        if self.generic_diagram.nodes.iter().any(|n| n.label() == node.label()) {
-            return Err(crate::errors::NodeError::DuplicateNode(node.label().to_owned()).into());
-        }
 
         for class in node.classes() {
             if !self.generic_diagram.style_classes.iter().any(|sc| sc.name() == class.name()) {
@@ -218,17 +191,14 @@ where
         self.generic_diagram.nodes.len()
     }
 
+    fn number_of_edges(&self) -> usize {
+        self.generic_diagram.edges.len()
+    }
+
     fn style_class(
         &mut self,
         style_class: super::StyleClassBuilder,
-    ) -> Result<
-        Rc<StyleClass>,
-        crate::errors::Error<
-            <Self::NodeBuilder as Builder>::Attribute,
-            <Self::EdgeBuilder as Builder>::Attribute,
-            <Self::ConfigurationBuilder as Builder>::Attribute,
-        >,
-    > {
+    ) -> Result<Rc<StyleClass>, Self::Error> {
         let style_class = style_class.build()?;
 
         if self.generic_diagram.style_classes.iter().any(|sc| sc.name() == style_class.name()) {

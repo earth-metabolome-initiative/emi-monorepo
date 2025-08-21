@@ -16,9 +16,11 @@ pub use builder::{FlowchartEdgeAttribute, FlowchartEdgeBuilder};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents an edge in a flowchart diagram, connecting two nodes with various
+/// properties such as styles, classes, and curve styles.
 pub struct FlowchartEdge {
     /// Unique identifier for the edge.
-    id: u32,
+    id: usize,
     /// Underlying generic edge.
     edge: GenericEdge<FlowchartNode>,
     /// Classes associated with the edge, used for styling.
@@ -80,10 +82,12 @@ impl Display for FlowchartEdge {
                 self.right_arrow_shape().as_ref().map_or_else(|| "", |shape| shape.right()),
         )?;
 
-        writeln!(f, "{EDGE_LETTER}{}@{{curve:{}}}", self.id, self.curve_style)?;
+        if self.curve_style != CurveStyle::default() {
+            writeln!(f, "{EDGE_LETTER}{}@{{curve: {}}}", self.id, self.curve_style)?;
+        }
 
         for class in &self.style_classes {
-            writeln!(f, "class {EDGE_LETTER}{} {class};", self.id)?;
+            writeln!(f, "class {EDGE_LETTER}{} {class}", self.id)?;
         }
 
         if !self.style_properties.is_empty() {

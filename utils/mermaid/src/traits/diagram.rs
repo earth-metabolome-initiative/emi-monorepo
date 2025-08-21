@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// Trait representing a Mermaid diagram.
-pub trait Diagram: Display {
+pub trait Diagram {
     /// Type of the associated builder for this diagram.
     type Builder: DiagramBuilder<Diagram = Self, Node = Self::Node, Edge = Self::Edge>;
     /// Type of the node used in the diagram.
