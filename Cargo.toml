@@ -19,6 +19,7 @@ members = [
   "data_retrieval/downloader",
   "web/core_structures",
   "web/core_structures/core_structures_builder",
+  "web/core_structures/core_structures_vis",
   "utils/diesel_migrations_utils",
   "utils/common_traits",
   "utils/inflector",
@@ -135,6 +136,7 @@ functional_properties = { path = "utils/functional_properties" }
 inflector = { path = "utils/inflector" }
 core_structures = { path = "web/core_structures" }
 core_structures_builder = { path = "web/core_structures/core_structures_builder" }
+core_structures_vis = { path = "web/core_structures/core_structures_vis" }
 ws_messages = { path = "web/web_common/ws_messages" }
 iter_utils = { path = "utils/iter_utils" }
 regex = "1.11"
@@ -177,13 +179,14 @@ sophia_api = "0.9.0"
 sophia_sparql_client = "0.9.0"
 fmtastic = "0.2.1"
 byteorder = "1.5.0"
-anyhow = {version="1.0", features=["backtrace"] }
+anyhow = { version = "1.0", features = ["backtrace"] }
 image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 multi_ranged = { path = "data_structures/multi_ranged" }
 mermaid = { path = "utils/mermaid" }
+colorsys = "0.7.0"
 
 [workspace.lints.rust]
 missing_docs = "forbid"

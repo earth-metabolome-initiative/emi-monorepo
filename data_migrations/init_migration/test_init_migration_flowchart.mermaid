@@ -1,0 +1,221 @@
+---
+title: DBGI Plan
+config:
+  flowchart:
+    defaultRenderer: "elk"
+---
+flowchart LR
+classDef procedure_model fill: #ff746c,stroke: #ff1305
+classDef t0 fill: #efa8a8,stroke: #d62727
+classDef t1 fill: #efc0a8,stroke: #d66227
+classDef t2 fill: #efd7a8,stroke: #d69b27
+classDef t3 fill: #efefa8,stroke: #d6d627
+classDef t4 fill: #d7efa8,stroke: #9bd627
+classDef t5 fill: #c0efa8,stroke: #62d627
+classDef t6 fill: #a8efa8,stroke: #27d627
+classDef t7 fill: #a8efc0,stroke: #27d662
+classDef t8 fill: #a8efd7,stroke: #27d69b
+classDef t9 fill: #a8efef,stroke: #27d6d6
+classDef t10 fill: #a8d7ef,stroke: #279bd6
+classDef t11 fill: #a8c0ef,stroke: #2762d6
+classDef t12 fill: #a8a8ef,stroke: #2727d6
+classDef t13 fill: #c0a8ef,stroke: #6227d6
+classDef t14 fill: #d7a8ef,stroke: #9b27d6
+classDef t15 fill: #efa8ef,stroke: #d627d6
+classDef t16 fill: #efa8d7,stroke: #d6279b
+classDef t17 fill: #efa8c0,stroke: #d62762
+subgraph v2 ["`DBGI Collection preparation`"]
+    direction TB
+    v0@{shape: rounded, label: "Ethanol 70 percent"}
+class v0 procedure_model
+    v1@{shape: rounded, label: "Sample extraction solvent"}
+class v1 procedure_model
+end
+subgraph v40 ["`Sample Processing`"]
+    direction TB
+    subgraph v5 ["`Freezing`"]
+    direction LR
+    v3@{shape: lean-r, label: "Polystyrene Box"}
+class v3 t5
+    v4@{shape: lean-r, label: "Freezer -80°C"}
+class v4 t6
+end
+    subgraph v8 ["`Freeze Drying`"]
+    direction LR
+    v6@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v6 t4
+    v7@{shape: lean-r, label: "Freeze dryer"}
+class v7 t7
+end
+    subgraph v11 ["`Falcon Storage`"]
+    direction LR
+    v9@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v9 t4
+    v10@{shape: lean-r, label: "Conical Centrifugal Tube 50ml Rack"}
+class v10 t8
+end
+    subgraph v15 ["`Fractioning`"]
+    direction LR
+    v12@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v12 t9
+    v13@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v13 t4
+    v14@{shape: lean-r, label: "Weighing Scale"}
+class v14 t10
+end
+    subgraph v18 ["`Ball Mill 1`"]
+    direction LR
+    v16@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v16 t9
+    v17@{shape: lean-r, label: "Ball Mill Machine"}
+class v17 t11
+end
+    subgraph v21 ["`Ball Mill 2`"]
+    direction LR
+    v19@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v19 t9
+    v20@{shape: lean-r, label: "Ball Mill Machine"}
+class v20 t11
+end
+    subgraph v24 ["`Centrifuge`"]
+    direction LR
+    v22@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v22 t9
+    v23@{shape: lean-r, label: "Safelock Centrifuge"}
+class v23 t12
+end
+    subgraph v29 ["`Supernatant`"]
+    direction LR
+    v25@{shape: lean-r, label: "Pipette Tip 1ml"}
+class v25 t13
+    v26@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v26 t9
+    v27@{shape: lean-r, label: "Long Term Storage Vial"}
+class v27 t14
+    v28@{shape: lean-r, label: "Pipette 1000µl"}
+class v28 t15
+end
+    subgraph v32 ["`Capping`"]
+    direction LR
+    v30@{shape: lean-r, label: "Sealed Cap for Vial 1.5ml"}
+class v30 t16
+    v31@{shape: lean-r, label: "Long Term Storage Vial"}
+class v31 t14
+end
+    subgraph v35 ["`Long Term Storage Vial Storage`"]
+    direction LR
+    v33@{shape: lean-r, label: "Long Term Storage Vial"}
+class v33 t14
+    v34@{shape: lean-r, label: "Long Term Storage Vial Box"}
+class v34 t17
+end
+    subgraph v37 ["`Dispose of Eppendorf Tube`"]
+    direction LR
+    v36@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v36 t9
+end
+    subgraph v39 ["`Dispose of Pipette Tips`"]
+    direction LR
+    v38@{shape: lean-r, label: "Pipette Tip 1ml"}
+class v38 t13
+end
+end
+v41@{shape: rounded, label: "Positive Ionization LC-MS"}
+class v41 procedure_model
+v42@{shape: rounded, label: "Negative Ionization LC-MS"}
+class v42 procedure_model
+subgraph v56 ["`Organism observation procedure`"]
+    direction TB
+    v43@{shape: rounded, label: "Place Arrow"}
+class v43 procedure_model
+    subgraph v46 ["`Organism in Ecosystem Picture`"]
+    direction LR
+    v44@{shape: lean-r, label: "Phone"}
+class v44 t0
+    v45@{shape: lean-r, label: "Organism"}
+class v45 t1
+end
+    subgraph v49 ["`Organism Picture`"]
+    direction LR
+    v47@{shape: lean-r, label: "Phone"}
+class v47 t0
+    v48@{shape: lean-r, label: "Organism"}
+class v48 t1
+end
+    subgraph v52 ["`Organism Details Picture`"]
+    direction LR
+    v50@{shape: lean-r, label: "Phone"}
+class v50 t0
+    v51@{shape: lean-r, label: "Organism"}
+class v51 t1
+end
+    subgraph v55 ["`Organism Geolocation`"]
+    direction LR
+    v53@{shape: lean-r, label: "Phone"}
+class v53 t0
+    v54@{shape: lean-r, label: "Organism"}
+class v54 t1
+end
+end
+subgraph v69 ["`Part of Organism Collection`"]
+    direction TB
+    v57@{shape: rounded, label: "Wear gloves"}
+class v57 procedure_model
+    v58@{shape: rounded, label: "Sterilize scalpel and gloves"}
+class v58 procedure_model
+    v59@{shape: rounded, label: "Cut part of organism"}
+class v59 procedure_model
+    subgraph v62 ["`Wrap in coffee filter paper`"]
+    direction LR
+    v60@{shape: lean-r, label: "Coffee Filter Wrapper"}
+class v60 t2
+    v61@{shape: lean-r, label: "sample"}
+class v61 t3
+end
+    subgraph v65 ["`Place in conical centrifugal tube`"]
+    direction LR
+    v63@{shape: lean-r, label: "Coffee Filter Wrapper"}
+class v63 t2
+    v64@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v64 t4
+end
+    subgraph v68 ["`Place in storage box`"]
+    direction LR
+    v66@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v66 t4
+    v67@{shape: lean-r, label: "Polystyrene Box"}
+class v67 t5
+end
+end
+subgraph v71 ["`Data Enrichment Procedure`"]
+    direction TB
+    v70@{shape: rounded, label: "Weather Retrieval Procedure"}
+class v70 procedure_model
+end
+v0 e0@---> v1
+v5 e1@---> v8
+v8 e2@---> v11
+v11 e3@---> v15
+v15 e4@---> v18
+v18 e5@---> v21
+v21 e6@---> v24
+v24 e7@---> v29
+v29 e8@---> v37
+v32 e9@---> v35
+v37 e10@---> v39
+v39 e11@---> v32
+v43 e12@---> v46
+v46 e13@---> v49
+v49 e14@---> v52
+v52 e15@---> v55
+v57 e16@---> v58
+v58 e17@---> v59
+v59 e18@---> v62
+v62 e19@---> v65
+v65 e20@---> v68
+v2 e21@---> v56
+v40 e22@---> v41
+v41 e23@---> v42
+v42 e24@---> v71
+v56 e25@---> v69
+v69 e26@---> v40

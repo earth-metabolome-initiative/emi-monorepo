@@ -7,7 +7,7 @@ pub trait Builder: Default {
     /// The type of errors that can occur during building.
     type Error: core::error::Error + From<BuilderError<Self::Attribute>>;
     /// The enumeration of the attributes that can be set.
-    type Attribute;
+    type Attribute: core::fmt::Debug + core::fmt::Display + 'static;
 
     /// Returns whether the builder is complete, meaning all required attributes
     /// have been set.
