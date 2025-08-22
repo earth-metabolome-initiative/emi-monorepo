@@ -52,9 +52,9 @@ impl Color {
     }
 
     /// Returns `n` maximally distinct colors.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `n` - The number of distinct colors to generate.
     /// * `saturation` - The saturation of the colors (0-100).
     /// * `lightness` - The lightness of the colors (0-100).
