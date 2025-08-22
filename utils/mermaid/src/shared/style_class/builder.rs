@@ -62,6 +62,10 @@ impl StyleClassBuilder {
     /// # Arguments
     ///
     /// * `name` - A string slice that holds the name of the style class.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `StyleClassError::EmptyName` if the provided name is empty.
     pub fn name(mut self, name: impl Into<String>) -> Result<Self, StyleClassError> {
         let name = name.into();
 

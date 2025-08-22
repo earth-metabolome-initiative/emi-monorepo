@@ -75,12 +75,14 @@ impl FlowchartEdgeBuilder {
         Ok(self)
     }
 
+    #[must_use]
     /// Sets the curve style for the edge.
     pub fn curve_style(mut self, style: CurveStyle) -> Self {
         self.curve_style = style;
         self
     }
 
+    #[must_use]
     /// Sets the length of the edge.
     pub fn length(mut self, length: u8) -> Self {
         self.length = length;

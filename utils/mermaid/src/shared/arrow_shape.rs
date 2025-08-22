@@ -28,6 +28,7 @@ pub enum ArrowShape {
 }
 
 impl ArrowShape {
+    #[must_use]
     /// Returns the left-oriented arrow shape.
     pub fn left(&self) -> &str {
         match self {
@@ -44,6 +45,7 @@ impl ArrowShape {
         }
     }
 
+    #[must_use]
     /// Returns the right-oriented arrow shape.
     pub fn right(&self) -> &str {
         match self {

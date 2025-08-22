@@ -69,6 +69,7 @@ impl FlowchartNodeBuilder {
         Ok(self)
     }
 
+    #[must_use]
     /// Returns whether the current node builder is a subgraph node.
     pub fn is_subgraph(&self) -> bool {
         !self.subnodes.is_empty()

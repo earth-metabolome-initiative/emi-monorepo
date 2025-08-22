@@ -27,11 +27,12 @@ pub struct StyleClass {
 }
 
 impl StyleClass {
+    #[must_use]
     /// Returns the name of the style class.
     pub fn name(&self) -> &str {
         &self.name
     }
-
+    #[must_use]
     /// Returns the properties of the style class.
     pub fn properties(&self) -> &[StyleProperty] {
         &self.properties

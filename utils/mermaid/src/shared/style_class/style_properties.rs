@@ -38,6 +38,7 @@ pub enum StyleProperty {
 }
 
 impl StyleProperty {
+    #[must_use]
     /// Returns whether the provided style property is of the same type as
     /// `self`.
     pub fn is_same_type(self, other: StyleProperty) -> bool {
