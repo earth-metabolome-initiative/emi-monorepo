@@ -23,12 +23,16 @@ use crate::MermaidDB;
 fn to_mermaid_node(
     root_procedure_model: &ProcedureModel,
     trackable_classes: &HashMap<&ProcedureModelTrackable, Rc<StyleClass>>,
+    procedure_model_class: &Rc<StyleClass>,
     procedure_model: &ProcedureModel,
     builder: &mut FlowchartBuilder,
     parent_direction: Direction,
     conn: &mut PgConnection,
 ) -> Result<Rc<FlowchartNode>, crate::Error> {
-    let mut node_builder = FlowchartNodeBuilder::default().label(&procedure_model.name)?;
+    let mut node_builder = FlowchartNodeBuilder::default()
+        .label(&procedure_model.name)?
+        .style_class(procedure_model_class.clone())
+        .map_err(FlowchartError::from)?;
 
     let current_direction = parent_direction.flip();
     let subprocedures =
@@ -74,6 +78,7 @@ fn to_mermaid_node(
         node_builder = node_builder.subnode(to_mermaid_node(
             root_procedure_model,
             trackable_classes,
+            procedure_model_class,
             &child_procedure,
             builder,
             current_direction,
@@ -120,9 +125,19 @@ impl MermaidDB<PgConnection> for ProcedureModel {
 
         let procedure_trackables =
             ProcedureModelTrackable::from_procedure_model_id(&self.id, conn)?;
-        let colors = Color::maximally_distinct(procedure_trackables.len());
+        let colors = Color::maximally_distinct(procedure_trackables.len(), 70, 80);
         let mut trackable_classes: HashMap<&ProcedureModelTrackable, Rc<StyleClass>> =
             HashMap::with_capacity(procedure_trackables.len());
+
+        let procedure_model_class = builder.style_class(
+            StyleClassBuilder::default()
+                .name("procedure_model")
+                .map_err(FlowchartError::from)?
+                .property(StyleProperty::Fill(Color::pastel_red()))
+                .map_err(FlowchartError::from)?
+                .property(StyleProperty::Stroke(Color::pastel_red().darken(20)))
+                .map_err(FlowchartError::from)?,
+        )?;
 
         for (trackable_index, (trackable, color)) in
             procedure_trackables.iter().zip(colors).enumerate()
@@ -132,6 +147,8 @@ impl MermaidDB<PgConnection> for ProcedureModel {
                     .name(format!("t{}", trackable_index))
                     .map_err(FlowchartError::from)?
                     .property(StyleProperty::Fill(color))
+                    .map_err(FlowchartError::from)?
+                    .property(StyleProperty::Stroke(color.darken(30)))
                     .map_err(FlowchartError::from)?,
             )?;
             trackable_classes.insert(trackable, style_class);
@@ -145,6 +162,7 @@ impl MermaidDB<PgConnection> for ProcedureModel {
             let _node = to_mermaid_node(
                 self,
                 &trackable_classes,
+                &procedure_model_class,
                 &child_procedure,
                 &mut builder,
                 parent_direction,

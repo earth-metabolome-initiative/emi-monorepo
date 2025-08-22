@@ -5,28 +5,31 @@ config:
     defaultRenderer: "elk"
 ---
 flowchart LR
-classDef t0 fill: #efa8a8
-classDef t1 fill: #efc0a8
-classDef t2 fill: #efd7a8
-classDef t3 fill: #efefa8
-classDef t4 fill: #d7efa8
-classDef t5 fill: #c0efa8
-classDef t6 fill: #a8efa8
-classDef t7 fill: #a8efc0
-classDef t8 fill: #a8efd7
-classDef t9 fill: #a8efef
-classDef t10 fill: #a8d7ef
-classDef t11 fill: #a8c0ef
-classDef t12 fill: #a8a8ef
-classDef t13 fill: #c0a8ef
-classDef t14 fill: #d7a8ef
-classDef t15 fill: #efa8ef
-classDef t16 fill: #efa8d7
-classDef t17 fill: #efa8c0
+classDef procedure_model fill: #ff746c,stroke: #ff1305
+classDef t0 fill: #efa8a8,stroke: #d62727
+classDef t1 fill: #efc0a8,stroke: #d66227
+classDef t2 fill: #efd7a8,stroke: #d69b27
+classDef t3 fill: #efefa8,stroke: #d6d627
+classDef t4 fill: #d7efa8,stroke: #9bd627
+classDef t5 fill: #c0efa8,stroke: #62d627
+classDef t6 fill: #a8efa8,stroke: #27d627
+classDef t7 fill: #a8efc0,stroke: #27d662
+classDef t8 fill: #a8efd7,stroke: #27d69b
+classDef t9 fill: #a8efef,stroke: #27d6d6
+classDef t10 fill: #a8d7ef,stroke: #279bd6
+classDef t11 fill: #a8c0ef,stroke: #2762d6
+classDef t12 fill: #a8a8ef,stroke: #2727d6
+classDef t13 fill: #c0a8ef,stroke: #6227d6
+classDef t14 fill: #d7a8ef,stroke: #9b27d6
+classDef t15 fill: #efa8ef,stroke: #d627d6
+classDef t16 fill: #efa8d7,stroke: #d6279b
+classDef t17 fill: #efa8c0,stroke: #d62762
 subgraph v2 ["`DBGI Collection preparation`"]
     direction TB
     v0@{shape: rounded, label: "Ethanol 70 percent"}
+class v0 procedure_model
     v1@{shape: rounded, label: "Sample extraction solvent"}
+class v1 procedure_model
 end
 subgraph v40 ["`Sample Processing`"]
     direction TB
@@ -118,10 +121,13 @@ class v38 t13
 end
 end
 v41@{shape: rounded, label: "Positive Ionization LC-MS"}
+class v41 procedure_model
 v42@{shape: rounded, label: "Negative Ionization LC-MS"}
+class v42 procedure_model
 subgraph v56 ["`Organism observation procedure`"]
     direction TB
     v43@{shape: rounded, label: "Place Arrow"}
+class v43 procedure_model
     subgraph v46 ["`Organism in Ecosystem Picture`"]
     direction LR
     v44@{shape: lean-r, label: "Phone"}
@@ -154,8 +160,11 @@ end
 subgraph v69 ["`Part of Organism Collection`"]
     direction TB
     v57@{shape: rounded, label: "Wear gloves"}
+class v57 procedure_model
     v58@{shape: rounded, label: "Sterilize scalpel and gloves"}
+class v58 procedure_model
     v59@{shape: rounded, label: "Cut part of organism"}
+class v59 procedure_model
     subgraph v62 ["`Wrap in coffee filter paper`"]
     direction LR
     v60@{shape: lean-r, label: "Coffee Filter Wrapper"}
@@ -181,6 +190,7 @@ end
 subgraph v71 ["`Data Enrichment Procedure`"]
     direction TB
     v70@{shape: rounded, label: "Weather Retrieval Procedure"}
+class v70 procedure_model
 end
 v0 e0@---> v1
 v5 e1@---> v8
