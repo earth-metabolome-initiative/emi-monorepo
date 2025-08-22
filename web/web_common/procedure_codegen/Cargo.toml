@@ -1,0 +1,11 @@
+[package]
+name = "procedure_codegen"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+webcodegen.workspace = true
+diesel.workspace = true
+
+[lints]
+workspace = true

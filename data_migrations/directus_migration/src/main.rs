@@ -1,5 +1,4 @@
 mod codegen;
-mod error;
 mod migrations;
 use diesel::{Connection, PgConnection};
 use migrations::{
@@ -29,7 +28,7 @@ const PORTAL_DATABASE_URL: &str = const_format::formatcp!(
 fn transact_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
-) -> Result<(), error::Error> {
+) -> Result<(), anyhow::Error> {
     insert_missing_users(directus_conn, portal_conn)?;
     insert_missing_brands(directus_conn, portal_conn)?;
     insert_missing_instrument_models(directus_conn, portal_conn)?;
@@ -38,7 +37,7 @@ fn transact_migration(
 }
 
 #[tokio::main]
-async fn main() -> Result<(), error::Error> {
+async fn main() -> Result<(), anyhow::Error> {
     let mut directus_conn = PgConnection::establish(DIRECTUS_DATABASE_URL)?;
     let mut portal_conn = PgConnection::establish(PORTAL_DATABASE_URL)?;
 
