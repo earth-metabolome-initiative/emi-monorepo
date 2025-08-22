@@ -4,7 +4,7 @@ use core_structures::User;
 use diesel::PgConnection;
 
 mod dbgi_plan;
-pub use dbgi_plan::DBGI_PLAN;
+pub use dbgi_plan::init_dbgi_plan;
 mod analysis_procedures;
 mod collection_preparation_procedures;
 mod data_enrichment_procedures;

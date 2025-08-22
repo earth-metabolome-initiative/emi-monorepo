@@ -28,7 +28,7 @@ pub const DBGI_PLAN: &str = "DBGI Plan";
 ///
 /// * If the connection fails to insert the procedure model.
 /// * If the procedure model building fails.
-pub(super) fn init_dbgi_plan(
+pub fn init_dbgi_plan(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureModel> {

@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS trackables (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK (must_be_distinct(name, description)),
     CHECK (must_be_distinct_uuid(id, parent_id)),
-    CHECK (must_be_smaller_than_utc(created_at, updated_at))
+    CHECK (must_be_smaller_than_utc(created_at, updated_at)),
+    UNIQUE (id, parent_id)
 );
 CREATE TABLE IF NOT EXISTS trackable_locations (
     id UUID PRIMARY KEY,

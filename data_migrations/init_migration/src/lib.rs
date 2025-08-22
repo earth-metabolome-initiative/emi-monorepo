@@ -11,8 +11,7 @@ mod users;
 
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
-pub use procedure_models::DBGI_PLAN;
-use procedure_models::init_procedure_models;
+pub use procedure_models::init_dbgi_plan;
 use trackables::init_compatibility_rules;
 use users::init_root_user;
 
