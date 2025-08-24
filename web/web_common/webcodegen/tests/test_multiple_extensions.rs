@@ -33,7 +33,7 @@ async fn test_multiple_extensions() {
         .set_output_directory("tests/codegen_multiple_extensions".as_ref())
         .enable_insertable_trait()
         .beautify();
-    let outcome = codegen.generate(&mut conn, &database_name, None);
+    let outcome = codegen.generate(&mut conn, &database_name);
     let network = codegen.table_extension_network().unwrap();
     let dot = network.to_dot();
     std::fs::write("test_multiple_extensions.dot", dot).expect("Failed to write DOT file");

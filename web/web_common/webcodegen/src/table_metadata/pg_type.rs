@@ -8,12 +8,12 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, Type, parse_str};
 
-use super::{PgAttribute, PgEnum, PgExtension, PgSetting, table::RESERVED_RUST_WORDS};
+use super::{PgAttribute, PgEnum, PgExtension, PgSetting};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
     },
-    errors::WebCodeGenError,
+    errors::WebCodeGenError, utils::RESERVED_RUST_WORDS,
 };
 
 /// Constant listing types supporting `Copy`.

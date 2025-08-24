@@ -91,3 +91,5 @@ impl Display for ConstraintError {
         }
     }
 }
+
+impl std::error::Error for ConstraintError {}

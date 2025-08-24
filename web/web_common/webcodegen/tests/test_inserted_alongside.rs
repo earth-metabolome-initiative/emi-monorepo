@@ -98,7 +98,7 @@ async fn test_inserted_alongside() {
     .unwrap();
 
     let outcome = test_inserted_alongside_method(&mut conn, &database_name);
-    let graph = ColumnSameAsNetwork::new(&mut conn, &database_name, None).unwrap();
+    let graph = ColumnSameAsNetwork::new(&mut conn, &database_name).unwrap();
     let to_dot = graph.to_dot(&mut conn).expect("Failed to convert the graph to dot format");
     std::fs::write("test_inserted_alongside.dot", to_dot)
         .expect("Failed to write the graph to a file");

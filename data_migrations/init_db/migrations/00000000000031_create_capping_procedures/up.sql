@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS capping_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.capping_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The container to be capped.
 	container_id UUID NOT NULL REFERENCES volumetric_container_models(id) ON DELETE CASCADE,
 	procedure_container_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,

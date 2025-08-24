@@ -1,10 +1,10 @@
 //! Test to check whether the database can indeed be initialized in the
 //! reference docker and populated with the `init_migration`.
 
-use core_structures::{LoginProvider, ProcedureModel, traits::ProcedureModelDot};
+use core_structures::{LoginProvider, traits::ProcedureModelDot};
 use core_structures_vis::MermaidDB;
 use init_db::init_database;
-use init_migration::{DBGI_PLAN, init_migration};
+use init_migration::{init_dbgi_plan, init_migration, init_root_user};
 use reference_docker::reference_docker_with_connection;
 use web_common_traits::database::BoundedRead;
 
@@ -45,7 +45,9 @@ async fn test_init_migration() {
         }
     }
 
-    let procedure_model = ProcedureModel::from_name(DBGI_PLAN, &mut conn).unwrap();
+    let user = init_root_user(&mut conn).expect("Failed to initialize the root user");
+    let procedure_model =
+        init_dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
 
     let dot = procedure_model
         .to_dot(&mut conn)

@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.aliquoting_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The amount of liters that should be aliquoted.
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	-- Source container from which the aliquot is taken.
@@ -30,9 +30,9 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedure_models (
 	FOREIGN KEY (procedure_aliquoted_into, aliquoted_into) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS aliquoting_procedures (
-	procedure_id UUID PRIMARY KEY REFERENCES procedures(id),
+	procedure_id UUID PRIMARY KEY REFERENCES procedures.procedures(id),
 	-- We enforce that the model of this procedure must be an aliquoting procedure model.
-	procedure_model_id INTEGER NOT NULL REFERENCES aliquoting_procedure_models(procedure_model_id),
+	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.aliquoting_procedure_models(procedure_model_id),
 	-- The identifier of the instrument used for aliquoting.
 	aliquoted_with UUID NOT NULL REFERENCES pipette_models(id),
 	-- The pipette tip used for aliquoting, which must be a pipette tip model.
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedures (
 	aliquoted_container_id UUID NOT NULL REFERENCES volumetric_container_models(id),
 	-- We enforce that the extended `procedure` has indeed the same `procedure_model_id`, making
 	-- sure that the procedure is an aliquoting procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures.procedures(id, procedure_model_id) ON DELETE CASCADE,
 	-- We enforce that there exists a `procedure_trackables` entry for the instrument used in the procedure.
 	FOREIGN KEY (procedure_id, aliquoted_with) REFERENCES procedure_trackables(procedure_id, trackable_id) ON DELETE CASCADE,
 	-- We enforce that there exists a `procedure_trackables` entry for the pipette tip used in the procedure.

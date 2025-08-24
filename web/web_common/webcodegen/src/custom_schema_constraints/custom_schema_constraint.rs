@@ -26,7 +26,6 @@ pub trait CustomTableConstraint {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the catalog to filter the tables by
-    /// * `table_schema` - An optional schema name to filter the tables by
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -36,10 +35,9 @@ pub trait CustomTableConstraint {
     fn check_all(
         &self,
         table_catalog: &str,
-        table_schema: Option<&str>,
         conn: &mut PgConnection,
     ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
+        for table in Table::load_all(conn, table_catalog)? {
             self.check_constraint(conn, &table)?;
         }
         Ok(())
@@ -70,7 +68,6 @@ pub trait CustomColumnConstraint {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the catalog to filter the columns by
-    /// * `table_schema` - An optional schema name to filter the columns by
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -81,10 +78,9 @@ pub trait CustomColumnConstraint {
     fn check_all(
         &self,
         table_catalog: &str,
-        table_schema: Option<&str>,
         conn: &mut PgConnection,
     ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
+        for table in Table::load_all(conn, table_catalog)? {
             for column in table.columns(conn)? {
                 self.check_constraint(conn, &column)?;
             }

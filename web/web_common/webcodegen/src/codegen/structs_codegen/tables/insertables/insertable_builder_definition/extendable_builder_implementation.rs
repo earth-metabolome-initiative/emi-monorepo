@@ -7,6 +7,7 @@ use diesel::PgConnection;
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
+use crate::traits::TableLike;
 
 use crate::{Codegen, Column, Table, errors::WebCodeGenError};
 

@@ -34,7 +34,7 @@ async fn test_user_table() {
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL
-    let all_tables = Table::load_all(&mut conn, &database_name, None).unwrap();
+    let all_tables = Table::load_all(&mut conn, &database_name).unwrap();
     assert!(!all_tables.is_empty());
 
     let _all_columns = Column::load_all(&mut conn);

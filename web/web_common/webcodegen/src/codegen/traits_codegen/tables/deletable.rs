@@ -6,6 +6,7 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
+use crate::traits::TableLike;
 
 use crate::{Codegen, Table, codegen::Syntax};
 

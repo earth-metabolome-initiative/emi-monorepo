@@ -11,13 +11,7 @@ use quote::quote;
 use syn::{Ident, Type, parse_str};
 
 use super::{KeyColumnUsage, PgTrigger};
-use crate::{
-    CheckConstraint, Column, PgIndex, TableConstraint,
-    codegen::{
-        CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
-    },
-    errors::WebCodeGenError,
-};
+use crate::{CheckConstraint, Column, PgIndex, TableConstraint, errors::WebCodeGenError};
 
 #[cached(
     result = true,
@@ -286,19 +280,6 @@ fn same_as_indices(
         .collect())
 }
 
-/// Reserved Rust words that cannot be used as identifiers.
-pub const RESERVED_RUST_WORDS: [&str; 49] = [
-    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
-    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
-    "self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
-    "while", // Future reserved keywords
-    "abstract", "async", "await", "become", "box", "do", "final", "macro", "override", "priv",
-    "try", "typeof", "unsized", "virtual", "yield",
-];
-
-/// Diesel collisions that need to be handled.
-pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
-
 #[derive(
     Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash,
 )]
@@ -354,87 +335,6 @@ impl Table {
     /// Returns whether the table is temporary.
     pub fn is_temporary(&self) -> bool {
         self.table_type == "LOCAL TEMPORARY" || self.table_type == "GLOBAL TEMPORARY"
-    }
-
-    /// Returns the name of the struct converted from the table name.
-    ///
-    /// # Errors
-    ///
-    /// * If the camel case name cannot be generated.
-    ///
-    /// # Returns
-    ///
-    /// A string representing the name of the struct converted from the table
-    /// name.
-    pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
-        crate::utils::struct_name(&self.table_name)
-    }
-
-    /// Returns the Rust Ident of the struct converted from the table name.
-    ///
-    /// # Errors
-    ///
-    /// * If the camel case name cannot be generated.
-    pub fn struct_ident(&self) -> Result<Ident, WebCodeGenError> {
-        let struct_name = self.struct_name()?;
-        if RESERVED_RUST_WORDS.contains(&struct_name.as_str()) {
-            Ok(Ident::new_raw(&struct_name, proc_macro2::Span::call_site()))
-        } else {
-            Ok(Ident::new(&struct_name, proc_macro2::Span::call_site()))
-        }
-    }
-
-    /// Returns the sanitized snake case name of the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    ///
-    /// # Returns
-    ///
-    /// A string representing the sanitized snake case name of the table.
-    pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
-        crate::utils::snake_case_name(&self.table_name)
-    }
-
-    /// Returns whether the table has a sanitized snake case name.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    ///
-    /// # Returns
-    ///
-    /// A boolean indicating whether the table has a sanitized snake case name.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    pub fn has_snake_case_name(&self) -> Result<bool, WebCodeGenError> {
-        let snake_case_name = self.snake_case_name()?;
-        Ok(snake_case_name == self.table_name)
-    }
-
-    /// Returns the sanitized snake case syn Ident of the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    ///
-    /// # Returns
-    ///
-    /// A `Ident` representing the sanitized snake case name of the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
-        let snake_case_name = self.snake_case_name()?;
-        if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
-            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
-        } else {
-            Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
-        }
     }
 
     /// Returns wether a table require authorizations to be viewed
@@ -878,7 +778,6 @@ impl Table {
     ///
     /// * `conn` - The database connection.
     /// * `table_catalog` - The table catalog.
-    /// * `table_schema` - The table schema.
     ///
     /// # Returns
     ///
@@ -890,12 +789,10 @@ impl Table {
     pub fn load_all(
         conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::tables;
         tables::table
             .filter(tables::table_catalog.eq(table_catalog))
-            .filter(tables::table_schema.eq(table_schema.unwrap_or("public")))
             .filter(tables::table_name.ne("__diesel_schema_migrations"))
             .load::<Table>(conn)
     }
@@ -978,7 +875,6 @@ impl Table {
     ///
     /// * `conn` - The database connection.
     /// * `table_catalog` - The table catalog.
-    /// * `table_schema` - The table schema.
     ///
     /// # Returns
     ///
@@ -992,9 +888,8 @@ impl Table {
     pub fn load_all_topologically(
         conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>,
     ) -> Result<Vec<Self>, WebCodeGenError> {
-        let mut tables = Self::load_all(conn, table_catalog, table_schema)?;
+        let mut tables = Self::load_all(conn, table_catalog)?;
 
         let mut table_priority: HashMap<Table, usize> = HashMap::new();
 
@@ -1457,40 +1352,6 @@ impl Table {
             .load::<PgTrigger>(conn)
     }
 
-    /// Returns a the path to the diesel table module.
-    ///
-    /// # Returns
-    ///
-    /// A `syn::Type` representing the path to the diesel table module.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    pub fn import_diesel_path(&self) -> Result<syn::Type, WebCodeGenError> {
-        let table_name = self.snake_case_name()?;
-        Ok(syn::parse_str::<Type>(&format!(
-            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_DIESEL_MODULE}::{CODEGEN_TABLES_PATH}::{table_name}::{table_name}",
-        ))?)
-    }
-
-    /// Returns a the path to the table struct.
-    ///
-    /// # Returns
-    ///
-    /// A `syn::Type` representing the path to the table struct.
-    ///
-    /// # Errors
-    ///
-    /// * If the snake case name cannot be generated.
-    pub fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
-        let table_name = self.snake_case_name()?;
-        Ok(syn::parse_str::<Type>(&format!(
-            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{}::{}",
-            table_name,
-            self.struct_name()?
-        ))?)
-    }
-
     /// Returns whether the table must be inserted alongside ther `other` table
     /// in a composited builder.
     ///
@@ -1632,5 +1493,11 @@ impl Table {
     ) -> Result<bool, WebCodeGenError> {
         Ok(self._must_be_inserted_alongside_with(other, conn)?
             || other._must_be_inserted_alongside_with(self, conn)?)
+    }
+}
+
+impl AsRef<Table> for Table {
+    fn as_ref(&self) -> &Table {
+        self
     }
 }

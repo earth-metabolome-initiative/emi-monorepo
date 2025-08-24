@@ -2,6 +2,7 @@
 //! a table and the most basic traits.
 
 use std::fmt::Debug;
+use crate::traits::TableLike;
 
 use algebra::impls::{CSR2D, SquareCSR2D};
 use diesel::PgConnection;

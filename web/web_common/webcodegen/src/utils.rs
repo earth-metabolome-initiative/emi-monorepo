@@ -6,6 +6,19 @@ use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 
 use crate::errors::WebCodeGenError;
 
+/// Reserved Rust words that cannot be used as identifiers.
+pub const RESERVED_RUST_WORDS: [&str; 49] = [
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
+    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
+    "while", // Future reserved keywords
+    "abstract", "async", "await", "become", "box", "do", "final", "macro", "override", "priv",
+    "try", "typeof", "unsized", "virtual", "yield",
+];
+
+/// Diesel collisions that need to be handled.
+pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
+
 #[cached(
     result = true,
     ty = "UnboundCache<String, String>",

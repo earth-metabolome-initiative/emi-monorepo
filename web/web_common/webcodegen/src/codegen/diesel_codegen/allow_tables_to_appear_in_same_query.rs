@@ -4,6 +4,7 @@ use std::{collections::HashSet, path::Path};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
+use crate::traits::TableLike;
 
 use super::Codegen;
 use crate::Table;

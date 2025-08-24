@@ -1,6 +1,9 @@
-CREATE TABLE IF NOT EXISTS procedures (
+-- Schema for procedure tables
+CREATE SCHEMA IF NOT EXISTS procedures;
+
+CREATE TABLE IF NOT EXISTS procedures.procedures (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id),
+	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id),
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_by INTEGER NOT NULL REFERENCES users(id),
@@ -9,8 +12,8 @@ CREATE TABLE IF NOT EXISTS procedures (
 	UNIQUE (id, procedure_model_id)
 );
 CREATE TABLE IF NOT EXISTS procedure_trackables (
-	procedure_id UUID NOT NULL REFERENCES procedures(id),
-	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id),
+	procedure_id UUID NOT NULL REFERENCES procedures.procedures(id),
+	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id),
 	trackable_id UUID NOT NULL REFERENCES trackables(id),
 	-- We enforce that there must be a procedure model trackable for this trackable.
 	procedure_model_trackable_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id),
@@ -23,7 +26,7 @@ CREATE TABLE IF NOT EXISTS procedure_trackables (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (procedure_id, trackable_id),
 	-- The procedure model must match the procedure model of the procedure.
-	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures.procedures(id, procedure_model_id) ON DELETE CASCADE,
 	-- The procedure model trackable must must be compatible with the procedure model of the procedure.
 	FOREIGN KEY (procedure_model_trackable_id, procedure_model_id) REFERENCES procedure_model_trackables(id, procedure_model_id) ON DELETE CASCADE,
 	-- We check that the ancestor trackable is indeed the one defined in the procedure model trackable.

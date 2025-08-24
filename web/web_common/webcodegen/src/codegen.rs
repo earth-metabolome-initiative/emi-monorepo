@@ -19,21 +19,37 @@ use crate::{
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
+/// Constant defining the codegen directory name.
 pub const CODEGEN_DIRECTORY: &str = "codegen";
+/// Constant defining the diesel codegen module name.
 pub const CODEGEN_DIESEL_MODULE: &str = "diesel_codegen";
+/// Constant defining the structs codegen module name.
 pub const CODEGEN_STRUCTS_MODULE: &str = "structs_codegen";
+/// Constant defining the traits codegen module name.
 pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
+/// Constant defining the submodule for the tables schema.
 pub const CODEGEN_TABLES_PATH: &str = "tables";
+/// Constant defining the submodule for the SQL types.
 pub const CODEGEN_TYPES_PATH: &str = "types";
+/// Constant defining the submodule for the diesel joinable macro.
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
+/// Constant defining the submodule for the Upsertable trait implementations.
 pub const CODEGEN_UPSERTABLES_PATH: &str = "upsertables";
+/// Constant defining the submodule for the Insertable-related trait implementation.
 pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
+/// Constant defining the submodule for the Insertable trait implementations.
 pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
+/// Constant defining the submodule for the foreign-keys-related trait implementations.
 pub const CODEGEN_FOREIGN_KEYS_PATH: &str = "foreign_keys";
+/// Constant defining the submodule for the Foreign trait implementations.
 pub const CODEGEN_FOREIGN_PATH: &str = "foreign";
+/// Constant defining the submodule for the Tabular trait implementations.
 pub const CODEGEN_TABULAR_PATH: &str = "tabular";
+/// Constant defining the submodule for the InsertableVariant trait implementations.
 pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
+/// Constant defining the submodule for the Updatable-related trait implementations.
 pub const CODEGEN_UPDATABLES_PATH: &str = "updatables";
+/// Constant defining the submodule for the Updatable trait implementations.
 pub const CODEGEN_UPDATABLE_PATH: &str = "updatable";
 
 #[derive(Debug, Default)]
@@ -472,7 +488,6 @@ impl<'a> Codegen<'a> {
     ///
     /// * `conn` - A mutable reference to a `PgConnection`.
     /// * `table_catalog` - The name of the table catalog.
-    /// * `table_schema` - The name of the table schema.
     ///
     /// # Errors
     ///
@@ -488,12 +503,11 @@ impl<'a> Codegen<'a> {
         &mut self,
         conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>,
     ) -> Result<TimeTracker, WebCodeGenError> {
         let mut time_tracker = TimeTracker::new("Code generation");
 
         let task = Task::new("Retrieving tables");
-        let mut tables = Table::load_all(conn, table_catalog, table_schema)?
+        let mut tables = Table::load_all(conn, table_catalog)?
             .into_iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .filter(|table| !self.tables_deny_list.contains(&table))

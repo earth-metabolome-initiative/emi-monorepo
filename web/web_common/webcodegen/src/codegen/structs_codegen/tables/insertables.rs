@@ -7,6 +7,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
+use crate::traits::TableLike;
 
 use crate::{
     CheckConstraint, Codegen, Column, Table,

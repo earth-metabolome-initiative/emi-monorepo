@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS supernatant_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.supernatant_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The amount of liters that should be transferred
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	-- The source container from which the supernatant is taken.
@@ -36,10 +36,10 @@ CREATE TABLE IF NOT EXISTS supernatant_procedure_models (
 	) REFERENCES procedure_model_trackables(id, trackable_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS supernatant_procedures (
-	procedure_id UUID PRIMARY KEY REFERENCES procedures(id),
+CREATE TABLE IF NOT EXISTS procedures.supernatant_procedures (
+	procedure_id UUID PRIMARY KEY REFERENCES procedures.procedures(id),
 	-- We enforce that the model of this procedure must be a supernatant procedure model.
-	procedure_model_id INTEGER NOT NULL REFERENCES supernatant_procedure_models(procedure_model_id),
+	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.supernatant_procedure_models(procedure_model_id),
 	-- The source container from which the supernatant is taken.
 	stratified_source UUID NOT NULL REFERENCES volumetric_container_models(id),
 	-- The destination container to which the supernatant is transferred.
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS supernatant_procedures (
 	pipette_tip UUID NOT NULL REFERENCES pipette_tip_models(id),
 	-- We enforce that the extended `procedure` has indeed the same `procedure_model_id`, making
 	-- sure that the procedure is a supernatant procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures(id, procedure_model_id) ON DELETE CASCADE,
+	FOREIGN KEY (procedure_id, procedure_model_id) REFERENCES procedures.procedures(id, procedure_model_id) ON DELETE CASCADE,
 	-- We enforce that there exists a `procedure_trackables` entry for the stratified source in the procedure.
 	FOREIGN KEY (procedure_id, stratified_source) REFERENCES procedure_trackables(procedure_id, trackable_id) ON DELETE CASCADE,
 	-- We enforce that there exists a `procedure_trackables` entry for the supernatant destination in the procedure.

@@ -5,7 +5,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Table, errors::WebCodeGenError};
+use crate::{Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Table {
     fn identifiable_impl(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {

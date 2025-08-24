@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS pouring_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.pouring_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	measured_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	source INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	-- The volumetric container into which the liquid is poured.

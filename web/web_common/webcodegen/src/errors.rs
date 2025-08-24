@@ -1,4 +1,6 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
+use std::fmt::Display;
+
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
@@ -71,7 +73,122 @@ pub enum WebCodeGenError {
     ColumnDoesNotHaveDefaultValue(Box<Column>),
 }
 
-unsafe impl Send for WebCodeGenError {}
+impl Display for WebCodeGenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WebCodeGenError::DieselError(err) => write!(f, "Diesel error: {}", err),
+            WebCodeGenError::MissingTable(table) => write!(f, "Missing table: {}", table),
+            WebCodeGenError::MissingExtension(extension) => {
+                write!(f, "Missing extension: {}", extension)
+            }
+            WebCodeGenError::IllegalTable(table) => write!(f, "Illegal table: {}", table),
+            WebCodeGenError::IllegalRolesTable(table) => {
+                write!(f, "Illegal roles table: {}", table)
+            }
+            WebCodeGenError::ConstraintError(err) => write!(f, "Constraint error: {}", err),
+            WebCodeGenError::SynError(err) => write!(f, "Syn error: {}", err),
+            WebCodeGenError::UnknownColumnType(column) => {
+                write!(
+                    f,
+                    "Unknown column type: `{}.{}` (ID: {})",
+                    column.table_name,
+                    column.column_name,
+                    column.raw_data_type()
+                )
+            }
+            WebCodeGenError::ColumnNotFound(name) => write!(f, "Column not found: {}", name),
+            WebCodeGenError::UnknownDieselPostgresType(ty) => {
+                write!(f, "Unknown Diesel PostgreSQL type: {}", ty)
+            }
+            WebCodeGenError::UnknownPostgresRustType(ty) => {
+                write!(f, "Unknown PostgreSQL Rust type: {}", ty)
+            }
+            WebCodeGenError::UnknownPostgresProc(proc) => {
+                write!(f, "Unknown PostgreSQL procedure: {}", proc)
+            }
+            WebCodeGenError::NotUserDefinedType(ty) => {
+                write!(f, "Type is not user-defined: {}", ty)
+            }
+            WebCodeGenError::MissingBaseType(ty) => {
+                write!(
+                    f,
+                    "Missing base type for type: `{}.{}` (ID: {})",
+                    ty.typnamespace, ty.typname, ty.oid
+                )
+            }
+            WebCodeGenError::SanitizationErrors(errs) => {
+                write!(f, "Sanitization errors: {errs}")
+            }
+            WebCodeGenError::CodeGenerationError(err) => {
+                write!(f, "Code generation error: {}", err)
+            }
+            WebCodeGenError::IllegalTableCodegen(reason, table_name, table) => {
+                write!(
+                    f,
+                    "Illegal table codegen for table `{}`: {}. Table details: {:?}",
+                    table_name, reason, table
+                )
+            }
+            WebCodeGenError::ExcessiveNumberOfColumns(table, count) => {
+                write!(
+                    f,
+                    "Table `{}` has an excessive number of columns: {}",
+                    table.table_name, count
+                )
+            }
+            WebCodeGenError::MissingUpdateAtColumn(table) => {
+                write!(f, "Table `{}` is missing 'updated_at' column", table.table_name)
+            }
+            WebCodeGenError::MissingUpdatedByColumn(table) => {
+                write!(f, "Table `{}` is missing 'updated_by' column", table.table_name)
+            }
+            WebCodeGenError::NoPrimaryKeyColumn(table) => {
+                write!(f, "Table `{}` has no primary key column(s)", table.table_name)
+            }
+            WebCodeGenError::RolesMechanismIncomplete(table) => {
+                write!(f, "Table `{}` has incomplete roles mechanism tables", table.table_name)
+            }
+            WebCodeGenError::IoError(err) => write!(f, "I/O error: {}", err),
+            WebCodeGenError::EmptyTableName(table) => {
+                write!(f, "Table has an empty name: {:?}", table)
+            }
+            WebCodeGenError::EmptyColumnName(column) => {
+                write!(f, "Column has an empty name: {:?}", column)
+            }
+            WebCodeGenError::ParseIntError(err) => write!(f, "Parse int error: {}", err),
+            WebCodeGenError::ParseFloatError(err) => write!(f, "Parse float error: {}", err),
+            WebCodeGenError::ParseBoolError(err) => write!(f, "Parse bool error: {}", err),
+            WebCodeGenError::UnsupportedTypeCasting(target_type, source_type) => {
+                write!(
+                    f,
+                    "Unsupported type casting from `{}` to type: `{}.{}` (ID: {})",
+                    target_type, source_type.typnamespace, source_type.typname, source_type.oid
+                )
+            }
+            WebCodeGenError::ColumnDoesNotHaveDefaultValue(column) => {
+                write!(
+                    f,
+                    "Column `{}.{}` does not have a default value",
+                    column.table_name, column.column_name
+                )
+            }
+        }
+    }
+}
+
+impl core::error::Error for WebCodeGenError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            WebCodeGenError::DieselError(err) => Some(err),
+            WebCodeGenError::ConstraintError(err) => Some(err),
+            WebCodeGenError::SynError(err) => Some(err),
+            WebCodeGenError::SanitizationErrors(err) => Some(err),
+            WebCodeGenError::CodeGenerationError(err) => Some(err),
+            WebCodeGenError::IoError(err) => Some(err),
+            _ => None,
+        }
+    }
+}
 
 #[derive(Debug)]
 /// Error type for code generation.
@@ -92,6 +209,43 @@ pub enum CodeGenerationError {
     CheckConstraintError(CheckConstraintError),
 }
 
+impl Display for CodeGenerationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CodeGenerationError::GenerationDirectoryNotProvided => {
+                write!(f, "Generation directory was not provided")
+            }
+            CodeGenerationError::UserTableNotProvided => {
+                write!(f, "User table was not provided")
+            }
+            CodeGenerationError::ProjectTableNotProvided => {
+                write!(f, "Project table was not provided")
+            }
+            CodeGenerationError::TeamsTableNotProvided => {
+                write!(f, "Teams table was not provided")
+            }
+            CodeGenerationError::TeamMembersTableNotProvided => {
+                write!(f, "Team members table was not provided")
+            }
+            CodeGenerationError::TeamProjectsTableNotProvided => {
+                write!(f, "Team projects table was not provided")
+            }
+            CodeGenerationError::CheckConstraintError(err) => {
+                write!(f, "Check constraint error: {}", err)
+            }
+        }
+    }
+}
+
+impl core::error::Error for CodeGenerationError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            CodeGenerationError::CheckConstraintError(err) => Some(err),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 /// Error type for code generation.
 pub enum CheckConstraintError {
@@ -108,6 +262,56 @@ pub enum CheckConstraintError {
     TopLevelExpressionNotResult(Box<CheckConstraint>),
 }
 
+impl Display for CheckConstraintError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CheckConstraintError::FunctionNotFromProvidedExtensions(proc, constraint) => {
+                write!(
+                    f,
+                    "Function `{}` in check constraint `{}.{}` is not from the provided extensions",
+                    proc.proname, constraint.constraint_schema, constraint.constraint_name
+                )
+            }
+            CheckConstraintError::UnsupportedSyntax(constraint, syntax_error) => {
+                write!(
+                    f,
+                    "Unsupported syntax in check constraint `{}.{}`: {}",
+                    constraint.constraint_schema, constraint.constraint_name, syntax_error
+                )
+            }
+            CheckConstraintError::OperatorsNotSupported => {
+                write!(f, "Some operators are not supported")
+            }
+            CheckConstraintError::NoInvolvedColumns(column, constraint) => {
+                write!(
+                    f,
+                    "Column `{}.{}` is not involved in the check constraint `{}.{}`",
+                    column.table_name,
+                    column.column_name,
+                    constraint.constraint_schema,
+                    constraint.constraint_name
+                )
+            }
+            CheckConstraintError::TopLevelExpressionNotResult(constraint) => {
+                write!(
+                    f,
+                    "Top-level expression in check constraint `{}.{}` cannot be reduced to a Result-returning expression",
+                    constraint.constraint_schema, constraint.constraint_name
+                )
+            }
+        }
+    }
+}
+
+impl core::error::Error for CheckConstraintError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            CheckConstraintError::UnsupportedSyntax(_, syntax_error) => Some(syntax_error),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 /// Error type for unsupported syntax in a check constraint.
 pub enum UnsupportedCheckConstraintErrorSyntax {
@@ -117,6 +321,28 @@ pub enum UnsupportedCheckConstraintErrorSyntax {
     ExpectedSingleScopedColumn(usize),
     /// When a column is expected to be a scoped column but is not.
     ExpectedScopedColumn,
+}
+
+impl Display for UnsupportedCheckConstraintErrorSyntax {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UnsupportedCheckConstraintErrorSyntax::ExpectedNoScopedColumn(count) => {
+                write!(f, "Expected no scoped columns, but found {}", count)
+            }
+            UnsupportedCheckConstraintErrorSyntax::ExpectedSingleScopedColumn(count) => {
+                write!(f, "Expected a single scoped column, but found {}", count)
+            }
+            UnsupportedCheckConstraintErrorSyntax::ExpectedScopedColumn => {
+                write!(f, "Expected a scoped column")
+            }
+        }
+    }
+}
+
+impl core::error::Error for UnsupportedCheckConstraintErrorSyntax {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        None
+    }
 }
 
 impl From<DieselError> for WebCodeGenError {

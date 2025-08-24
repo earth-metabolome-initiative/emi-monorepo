@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS freeze_drying_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.freeze_drying_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.

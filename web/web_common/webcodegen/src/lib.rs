@@ -4,7 +4,7 @@ extern crate proc_macro2;
 extern crate quote;
 extern crate syn;
 
-mod codegen;
+pub mod codegen;
 mod column_same_as_network;
 mod custom_schema_constraints;
 pub mod errors;
@@ -15,8 +15,10 @@ mod syngen;
 mod table_extension_network;
 mod table_metadata;
 mod utils;
+mod traits;
 
 pub use codegen::Codegen;
+pub use traits::{ColumnLike, TableLike};
 pub use column_same_as_network::ColumnSameAsNetwork;
 pub use custom_schema_constraints::{
     CompatibleForeignTypeConstraint, CompulsorySiblingColumnConstraint, ConstraintError,

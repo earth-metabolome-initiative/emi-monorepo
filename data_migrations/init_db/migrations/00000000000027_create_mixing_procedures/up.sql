@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS mixing_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.mixing_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The weighting device used to measure the solid.
 	measured_with UUID NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
 	procedure_measured_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,

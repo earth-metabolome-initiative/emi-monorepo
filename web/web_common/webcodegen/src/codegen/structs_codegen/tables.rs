@@ -7,6 +7,7 @@ use proc_macro2::TokenStream;
 
 use super::Codegen;
 use crate::Table;
+use crate::traits::TableLike;
 
 mod crud;
 mod insertables;

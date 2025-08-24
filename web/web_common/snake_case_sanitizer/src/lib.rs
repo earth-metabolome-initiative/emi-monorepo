@@ -15,6 +15,24 @@ pub enum SanitizationErrors {
     EmptyTerm,
 }
 
+impl std::fmt::Display for SanitizationErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SanitizationErrors::EmptyNeedle => write!(f, "Needle cannot be empty"),
+            SanitizationErrors::EmptyReplacement => write!(f, "Replacement cannot be empty"),
+            SanitizationErrors::DuplicatedNeedle(needle) => {
+                write!(f, "Needle '{}' is duplicated", needle)
+            }
+            SanitizationErrors::OnlyUnderscores => {
+                write!(f, "Term contained only underscores after sanitization")
+            }
+            SanitizationErrors::EmptyTerm => write!(f, "Term was empty"),
+        }
+    }
+}
+
+impl core::error::Error for SanitizationErrors {}
+
 #[derive(Debug, PartialEq, Clone, Default)]
 /// Structs defining the properties of the snake_case_sanitizer.
 pub struct Sanitizer<'a> {

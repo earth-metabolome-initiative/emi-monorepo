@@ -18,7 +18,9 @@ use graph::{
 use proc_macro2::TokenStream;
 use sorted_vec::prelude::SortedVec;
 
-use crate::{CheckConstraint, Column, KeyColumnUsage, Table, errors::WebCodeGenError};
+use crate::{
+    CheckConstraint, Column, KeyColumnUsage, Table, errors::WebCodeGenError, traits::TableLike,
+};
 
 #[derive(Debug, Clone)]
 /// A network of columns that are "extend" each other.
@@ -38,13 +40,11 @@ impl TableExtensionNetwork {
     ///
     /// * `conn`: A mutable reference to a PostgreSQL connection.
     /// * `table_catalog`: The catalog of the table to load columns from.
-    /// * `table_schema`: An optional schema of the table to load columns from.
     pub fn new(
         conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>,
     ) -> Result<Self, WebCodeGenError> {
-        let mut tables = Table::load_all(conn, table_catalog, table_schema)?
+        let mut tables = Table::load_all(conn, table_catalog)?
             .into_iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .collect::<Vec<Table>>();

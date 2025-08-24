@@ -15,7 +15,7 @@ async fn test_codegen_types_impls() {
         .set_output_directory("tests/codegen_types_impls".as_ref())
         .enable_type_impls()
         .beautify()
-        .generate(&mut conn, &database_name, None);
+        .generate(&mut conn, &database_name);
     docker.stop().await.unwrap();
     outcome.unwrap();
 

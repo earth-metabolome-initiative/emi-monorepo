@@ -5,6 +5,7 @@ use std::{
     collections::{HashMap, HashSet},
     path::Path,
 };
+use crate::traits::TableLike;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;

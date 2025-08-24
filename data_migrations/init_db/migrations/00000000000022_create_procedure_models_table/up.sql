@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS procedure_models (
+-- Schema for procedure model tables
+CREATE SCHEMA IF NOT EXISTS procedure_models;
+CREATE TABLE IF NOT EXISTS procedure_models.procedure_models (
 	id SERIAL PRIMARY KEY,
 	name TEXT UNIQUE NOT NULL CHECK (must_be_paragraph(name)),
 	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
@@ -13,8 +15,8 @@ CREATE TABLE IF NOT EXISTS procedure_models (
 	CHECK (must_be_smaller_than_utc(created_at, updated_at))
 );
 CREATE TABLE IF NOT EXISTS parent_procedure_models (
-	parent_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
-	child_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
+	parent_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
+	child_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
 	snoozable BOOLEAN NOT NULL DEFAULT FALSE,
 	copiable BOOLEAN NOT NULL DEFAULT FALSE,
 	repeatable BOOLEAN NOT NULL DEFAULT FALSE,
@@ -33,9 +35,9 @@ CREATE TABLE IF NOT EXISTS parent_procedure_models (
 	)
 );
 CREATE TABLE IF NOT EXISTS next_procedure_models (
-	parent_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
-	current_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
-	successor_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
+	parent_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
+	current_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
+	successor_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (parent_id, current_id, successor_id),
@@ -52,7 +54,7 @@ CREATE TABLE IF NOT EXISTS next_procedure_models (
 CREATE TABLE IF NOT EXISTS procedure_model_trackables (
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
-	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
+	procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
 	trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -66,10 +68,10 @@ CREATE TABLE IF NOT EXISTS procedure_model_trackables (
 CREATE TABLE IF NOT EXISTS shared_procedure_model_trackables (
 	parent_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	parent_trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
-	parent_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
+	parent_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
 	child_id INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,
 	child_trackable_id UUID NOT NULL REFERENCES trackables(id) ON DELETE CASCADE,
-	child_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models(id) ON DELETE CASCADE,
+	child_procedure_model_id INTEGER NOT NULL REFERENCES procedure_models.procedure_models(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (parent_id, child_id),

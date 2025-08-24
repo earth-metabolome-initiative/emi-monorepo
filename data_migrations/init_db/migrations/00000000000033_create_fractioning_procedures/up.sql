@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS fractioning_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.fractioning_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- Expected amount of the fraction to be collected in kilograms.
 	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
 	-- The tolerance percentage of the fraction in kilograms.

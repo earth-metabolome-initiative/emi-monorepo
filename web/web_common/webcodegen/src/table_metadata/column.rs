@@ -13,11 +13,9 @@ pub use default_types::DefaultTypes;
 use super::{
     check_constraint::CheckConstraint,
     pg_type::{COPY_TYPES, EQ_TYPES, HASH_TYPES, ORD_TYPES, PgType, rust_type_str},
-    table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 use crate::{
-    KeyColumnUsage, Table, errors::WebCodeGenError,
-    table_metadata::pg_type::postgres_type_to_diesel,
+    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, utils::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS}, KeyColumnUsage, Table
 };
 
 #[cached(

@@ -40,7 +40,7 @@ fn test_diamond_methods(
         vec![android_devices.clone(), phones.clone()]
     );
 
-    let network = TableExtensionNetwork::new(conn, &database_name, None)?;
+    let network = TableExtensionNetwork::new(conn, &database_name)?;
     let dot = network.to_dot();
     std::fs::write("test_multiple_extensions_diamonds.dot", dot).expect("Failed to write DOT file");
 

@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS photograph_procedure_models (
-	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models(id),
+CREATE TABLE IF NOT EXISTS procedure_models.photograph_procedure_models (
+	procedure_model_id INTEGER PRIMARY KEY REFERENCES procedure_models.procedure_models(id),
 	-- The device used for photograph.
 	photographed_with UUID NOT NULL REFERENCES camera_models(id) ON DELETE CASCADE,
 	procedure_photographed_with INTEGER NOT NULL REFERENCES procedure_model_trackables(id) ON DELETE CASCADE,

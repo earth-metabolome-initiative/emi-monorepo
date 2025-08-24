@@ -6,7 +6,9 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use super::{Column, Table};
-use crate::{PgIndex, ReferentialConstraint, errors::WebCodeGenError};
+use crate::{
+    PgIndex, ReferentialConstraint, errors::WebCodeGenError, traits::TableLike,
+};
 
 #[cached(
     result = true,

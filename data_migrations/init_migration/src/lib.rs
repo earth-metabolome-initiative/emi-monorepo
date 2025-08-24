@@ -13,7 +13,7 @@ pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
 pub use procedure_models::init_dbgi_plan;
 use trackables::init_compatibility_rules;
-use users::init_root_user;
+pub use users::init_root_user;
 
 /// Executes the init migration.
 ///
@@ -29,7 +29,6 @@ pub fn init_migration(conn: &mut PgConnection) -> anyhow::Result<()> {
         let darwin = init_root_user(conn)?;
         init_login_providers(&darwin, conn)?;
         init_compatibility_rules(&darwin, conn)?;
-        init_procedure_models(&darwin, conn)?;
         Ok(())
     })
 }

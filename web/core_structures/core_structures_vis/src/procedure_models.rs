@@ -125,7 +125,7 @@ impl MermaidDB<PgConnection> for ProcedureModel {
 
         let procedure_trackables =
             ProcedureModelTrackable::from_procedure_model_id(&self.id, conn)?;
-        let colors = Color::maximally_distinct(procedure_trackables.len(), 70, 80);
+        let colors = Color::maximally_distinct(procedure_trackables.len() as u16, 70, 80);
         let mut trackable_classes: HashMap<&ProcedureModelTrackable, Rc<StyleClass>> =
             HashMap::with_capacity(procedure_trackables.len());
 
