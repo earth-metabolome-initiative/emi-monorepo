@@ -5,7 +5,7 @@ use numeric_common_traits::prelude::IntoUsize;
 
 use crate::prelude::*;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 /// A symmetric compressed sparse row matrix.
 pub struct SymmetricCSR2D<M: Matrix2D> {
     /// The underlying matrix.

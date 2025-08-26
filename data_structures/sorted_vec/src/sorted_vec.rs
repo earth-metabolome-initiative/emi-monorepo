@@ -8,7 +8,7 @@ use common_traits::transmute::TransmuteFrom;
 
 use crate::error::Error;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a sorted vector and its primary methods.
 pub struct SortedVec<V> {
     vec: Vec<V>,

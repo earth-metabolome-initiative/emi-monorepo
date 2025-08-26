@@ -7,7 +7,7 @@ use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::prelude::*;
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 /// A compressed sparse row matrix.
 pub struct CSR2D<SparseIndex, RowIndex, ColumnIndex> {
     /// The row pointers.

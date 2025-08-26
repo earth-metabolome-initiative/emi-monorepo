@@ -8,7 +8,7 @@ use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, Mon
 #[cfg(feature = "arbitrary")]
 mod arbitrary_impl;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 /// Struct representing a generic graph.
 pub struct GenericGraph<Nodes, Edges> {
     /// The nodes of the graph.
