@@ -6,7 +6,7 @@ use diesel::{
     result::Error as DieselError,
 };
 use proc_macro2::TokenStream;
-use syn::{Ident, Lifetime, Type};
+use syn::{Ident, Type};
 
 mod default_types;
 use cached::proc_macro::cached;
@@ -731,17 +731,6 @@ impl Column {
         } else {
             Ok(Ident::new(&acronym, proc_macro2::Span::call_site()))
         }
-    }
-
-    /// Returns the lifetime ident of the acronym of the column name.
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while generating the lifetime ident
-    pub fn lifetime_acronym_ident(&self) -> Result<Lifetime, WebCodeGenError> {
-        let acronym = self.acronym()?;
-        let lifetime = format!("'{acronym}");
-        Ok(Lifetime::new(&lifetime, proc_macro2::Span::call_site()))
     }
 
     #[must_use]

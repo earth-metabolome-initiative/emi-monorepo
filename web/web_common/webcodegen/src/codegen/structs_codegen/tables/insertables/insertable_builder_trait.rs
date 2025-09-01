@@ -57,10 +57,9 @@ impl Table {
         }
 
         let column_acronym = insertable_column.acronym_ident()?;
-        let lifetime_column_acronym = insertable_column.lifetime_acronym_ident()?;
 
         Ok(Some(quote! {
-            <#lifetime_column_acronym, #column_acronym>
+            <#column_acronym>
         }))
     }
 
@@ -84,8 +83,7 @@ impl Table {
             Ok(quote! { #rust_type })
         } else {
             let column_acronym = insertable_column.acronym_ident()?;
-            let lifetime_column_acronym = insertable_column.lifetime_acronym_ident()?;
-            Ok(quote! { &#lifetime_column_acronym #column_acronym })
+            Ok(quote! { #column_acronym })
         }
     }
 
@@ -101,13 +99,12 @@ impl Table {
         }
 
         let column_acronym = insertable_column.acronym_ident()?;
-        let lifetime_column_acronym = insertable_column.lifetime_acronym_ident()?;
         let argument_type = insertable_column.rust_data_type(conn)?;
 
         Ok(Some(quote! {
             where
-                &#lifetime_column_acronym #column_acronym: TryInto<#argument_type>,
-                validation_errors::SingleFieldError: From<<&#lifetime_column_acronym #column_acronym as TryInto<#argument_type>>::Error>
+                #column_acronym: TryInto<#argument_type>,
+                validation_errors::SingleFieldError: From<<#column_acronym as TryInto<#argument_type>>::Error>
         }))
     }
 

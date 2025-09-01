@@ -92,13 +92,13 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.url` column.
     ///
     /// # Arguments
@@ -117,13 +117,13 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn url<'U, U>(
+    fn url<U>(
         self,
-        url: &'U U,
+        url: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>;
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.country` column.
     ///
     /// # Arguments
@@ -143,13 +143,13 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn country<'C, C>(
+    fn country<C>(
         self,
-        country: &'C C,
+        country: C,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'C C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'C C as TryInto<String>>::Error>;
+        C: TryInto<String>,
+        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.alpha_two_code` column.
     ///
     /// # Arguments
@@ -169,14 +169,14 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::iso_codes::CountryCode`.
     /// * If the provided value does not pass schema-defined validation.
-    fn alpha_two_code<'ATC, ATC>(
+    fn alpha_two_code<ATC>(
         self,
-        alpha_two_code: &'ATC ATC,
+        alpha_two_code: ATC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ATC ATC: TryInto<::iso_codes::CountryCode>,
+        ATC: TryInto<::iso_codes::CountryCode>,
         validation_errors::SingleFieldError:
-            From<<&'ATC ATC as TryInto<::iso_codes::CountryCode>>::Error>;
+            From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>;
     /// Sets the value of the `public.organizations.state_province` column.
     ///
     /// # Arguments
@@ -196,13 +196,13 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn state_province<'SP, SP>(
+    fn state_province<SP>(
         self,
-        state_province: &'SP SP,
+        state_province: SP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SP SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'SP SP as TryInto<Option<String>>>::Error>;
+        SP: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.organizations.domain` column.
     ///
     /// # Arguments
@@ -222,75 +222,75 @@ pub trait OrganizationBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn domain<'D, D>(
+    fn domain<D>(
         self,
-        domain: &'D D,
+        domain: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>;
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
 impl OrganizationBuildable for Option<i16> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttributes;
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn url<'U, U>(
+    fn url<U>(
         self,
-        _url: &'U U,
+        _url: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>,
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn country<'C, C>(
+    fn country<C>(
         self,
-        _country: &'C C,
+        _country: C,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'C C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'C C as TryInto<String>>::Error>,
+        C: TryInto<String>,
+        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn alpha_two_code<'ATC, ATC>(
+    fn alpha_two_code<ATC>(
         self,
-        _alpha_two_code: &'ATC ATC,
+        _alpha_two_code: ATC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ATC ATC: TryInto<::iso_codes::CountryCode>,
+        ATC: TryInto<::iso_codes::CountryCode>,
         validation_errors::SingleFieldError:
-            From<<&'ATC ATC as TryInto<::iso_codes::CountryCode>>::Error>,
+            From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>,
     {
         Ok(self)
     }
-    fn state_province<'SP, SP>(
+    fn state_province<SP>(
         self,
-        _state_province: &'SP SP,
+        _state_province: SP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SP SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'SP SP as TryInto<Option<String>>>::Error>,
+        SP: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
     {
         Ok(self)
     }
-    fn domain<'D, D>(
+    fn domain<D>(
         self,
-        _domain: &'D D,
+        _domain: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -299,13 +299,13 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttributes;
     /// Sets the value of the `public.organizations.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -315,13 +315,13 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.url` column.
-    fn url<'U, U>(
+    fn url<U>(
         mut self,
-        url: &'U U,
+        url: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>,
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         let url = url.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -331,13 +331,13 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.country` column.
-    fn country<'C, C>(
+    fn country<C>(
         mut self,
-        country: &'C C,
+        country: C,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'C C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'C C as TryInto<String>>::Error>,
+        C: TryInto<String>,
+        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>,
     {
         let country = country.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -347,14 +347,14 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.alpha_two_code` column.
-    fn alpha_two_code<'ATC, ATC>(
+    fn alpha_two_code<ATC>(
         mut self,
-        alpha_two_code: &'ATC ATC,
+        alpha_two_code: ATC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ATC ATC: TryInto<::iso_codes::CountryCode>,
+        ATC: TryInto<::iso_codes::CountryCode>,
         validation_errors::SingleFieldError:
-            From<<&'ATC ATC as TryInto<::iso_codes::CountryCode>>::Error>,
+            From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>,
     {
         let alpha_two_code = alpha_two_code.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -364,13 +364,13 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.state_province` column.
-    fn state_province<'SP, SP>(
+    fn state_province<SP>(
         mut self,
-        state_province: &'SP SP,
+        state_province: SP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SP SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'SP SP as TryInto<Option<String>>>::Error>,
+        SP: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
     {
         let state_province = state_province.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -380,13 +380,13 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.domain` column.
-    fn domain<'D, D>(
+    fn domain<D>(
         mut self,
-        domain: &'D D,
+        domain: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let domain = domain.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

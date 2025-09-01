@@ -29,9 +29,10 @@ impl ProcedureTemplate {
         parent_trackable: Option<&ProcedureTemplateAssetModel>,
         conn: &mut PgConnection,
     ) -> Result<Option<ProcedureTemplateAssetModel>, diesel::result::Error> {
-        for shared_trackables in
-            SharedProcedureTemplateAssetModel::from_parent_procedure_template(&self.id, conn)?
-        {
+        for shared_trackables in SharedProcedureTemplateAssetModel::from_parent_procedure_template(
+            &self.procedure_template,
+            conn,
+        )? {
             // First, we check whether the parent-child relationship defined
             // by the `SharedProcedureTemplateAssetModel` matches the provided
             // `ProcedureTemplateAssetModel`. If it does, we return the parent

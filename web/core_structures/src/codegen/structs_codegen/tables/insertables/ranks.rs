@@ -66,13 +66,13 @@ pub trait RankBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.ranks.description` column.
     ///
     /// # Arguments
@@ -92,34 +92,34 @@ pub trait RankBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<'D, D>(
+    fn description<D>(
         self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>;
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
 impl RankBuildable for Option<i16> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableRankAttributes;
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn description<'D, D>(
+    fn description<D>(
         self,
-        _description: &'D D,
+        _description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -128,13 +128,13 @@ impl RankBuildable for InsertableRankBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableRankAttributes;
     /// Sets the value of the `public.ranks.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -144,13 +144,13 @@ impl RankBuildable for InsertableRankBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.ranks.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

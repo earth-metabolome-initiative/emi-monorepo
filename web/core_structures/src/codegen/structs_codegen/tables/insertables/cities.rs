@@ -99,13 +99,13 @@ pub trait CityBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.cities.iso` column.
     ///
     /// # Arguments
@@ -132,13 +132,13 @@ pub trait CityBuildable: std::marker::Sized {
 impl CityBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableCityAttributes;
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -153,13 +153,13 @@ impl CityBuildable for InsertableCityBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableCityAttributes;
     /// Sets the value of the `public.cities.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

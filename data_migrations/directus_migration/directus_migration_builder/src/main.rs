@@ -7,6 +7,7 @@ use webcodegen::{Codegen, Table};
 const DATABASE_NAME: &str = "directus";
 const DATABASE_PASSWORD: &str = "directus_dbgi";
 const DATABASE_USER: &str = "directus";
+const DATABASE_SCHEMA: &str = "public";
 const DATABASE_PORT: u16 = 5434;
 const HOSTNAME: &str = "134.21.20.118";
 const DATABASE_URL: &str = const_format::formatcp!(
@@ -22,7 +23,7 @@ pub async fn main() {
     let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 
     // We write to the target directory the generated structs
-    let curation_data = Table::load(&mut conn, "Curation_Data", None, DATABASE_NAME).unwrap();
+    let curation_data = Table::load(&mut conn, "Curation_Data", DATABASE_SCHEMA, DATABASE_NAME).unwrap();
 
     // Generate the code associated with the database
     Codegen::default()
@@ -30,6 +31,7 @@ pub async fn main() {
         .set_output_directory(out_dir.as_ref())
         .enable_foreign_trait()
         .beautify()
-        .generate(&mut conn, DATABASE_NAME, None)
+        .add_schema(DATABASE_SCHEMA)
+        .generate(&mut conn, DATABASE_NAME)
         .unwrap();
 }

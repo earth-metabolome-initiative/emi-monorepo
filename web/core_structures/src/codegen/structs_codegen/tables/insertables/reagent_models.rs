@@ -145,13 +145,13 @@ pub trait ReagentModelBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn purity<'P, P>(
+    fn purity<P>(
         self,
-        purity: &'P P,
+        purity: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<f32>>::Error>;
+        P: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>;
     /// Sets the value of the `public.reagent_models.cas_code` column.
     ///
     /// # Arguments
@@ -171,13 +171,13 @@ pub trait ReagentModelBuildable:
     /// * If the provided value cannot be converted to the required type
     ///   `::cas_codes::CAS`.
     /// * If the provided value does not pass schema-defined validation.
-    fn cas_code<'CC, CC>(
+    fn cas_code<CC>(
         self,
-        cas_code: &'CC CC,
+        cas_code: CC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CC CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<<&'CC CC as TryInto<::cas_codes::CAS>>::Error>;
+        CC: TryInto<::cas_codes::CAS>,
+        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>;
     /// Sets the value of the `public.reagent_models.molecular_formula` column.
     ///
     /// # Arguments
@@ -197,44 +197,44 @@ pub trait ReagentModelBuildable:
     /// * If the provided value cannot be converted to the required type
     ///   `::molecular_formulas::MolecularFormula`.
     /// * If the provided value does not pass schema-defined validation.
-    fn molecular_formula<'MF, MF>(
+    fn molecular_formula<MF>(
         self,
-        molecular_formula: &'MF MF,
+        molecular_formula: MF,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'MF MF: TryInto<::molecular_formulas::MolecularFormula>,
+        MF: TryInto<::molecular_formulas::MolecularFormula>,
         validation_errors::SingleFieldError:
-            From<<&'MF MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
+            From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
 impl ReagentModelBuildable for Option<i32> {
-    fn purity<'P, P>(
+    fn purity<P>(
         self,
-        _purity: &'P P,
+        _purity: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<f32>>::Error>,
+        P: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn cas_code<'CC, CC>(
+    fn cas_code<CC>(
         self,
-        _cas_code: &'CC CC,
+        _cas_code: CC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CC CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<<&'CC CC as TryInto<::cas_codes::CAS>>::Error>,
+        CC: TryInto<::cas_codes::CAS>,
+        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>,
     {
         Ok(self)
     }
-    fn molecular_formula<'MF, MF>(
+    fn molecular_formula<MF>(
         self,
-        _molecular_formula: &'MF MF,
+        _molecular_formula: MF,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'MF MF: TryInto<::molecular_formulas::MolecularFormula>,
+        MF: TryInto<::molecular_formulas::MolecularFormula>,
         validation_errors::SingleFieldError:
-            From<<&'MF MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>,
+            From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>,
     {
         Ok(self)
     }
@@ -245,13 +245,13 @@ impl<
         >,
 > ReagentModelBuildable for InsertableReagentModelBuilder<AssetModel> {
     ///Sets the value of the `public.reagent_models.purity` column.
-    fn purity<'P, P>(
+    fn purity<P>(
         mut self,
-        purity: &'P P,
+        purity: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<f32>>::Error>,
+        P: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
     {
         let purity = purity
             .try_into()
@@ -279,14 +279,14 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `public.reagent_models.cas_code` column.
-    fn cas_code<'CC, CC>(
+    fn cas_code<CC>(
         mut self,
-        cas_code: &'CC CC,
+        cas_code: CC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CC CC: TryInto<::cas_codes::CAS>,
+        CC: TryInto<::cas_codes::CAS>,
         validation_errors::SingleFieldError: From<
-            <&'CC CC as TryInto<::cas_codes::CAS>>::Error,
+            <CC as TryInto<::cas_codes::CAS>>::Error,
         >,
     {
         let cas_code = cas_code
@@ -299,14 +299,14 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `public.reagent_models.molecular_formula` column.
-    fn molecular_formula<'MF, MF>(
+    fn molecular_formula<MF>(
         mut self,
-        molecular_formula: &'MF MF,
+        molecular_formula: MF,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'MF MF: TryInto<::molecular_formulas::MolecularFormula>,
+        MF: TryInto<::molecular_formulas::MolecularFormula>,
         validation_errors::SingleFieldError: From<
-            <&'MF MF as TryInto<::molecular_formulas::MolecularFormula>>::Error,
+            <MF as TryInto<::molecular_formulas::MolecularFormula>>::Error,
         >,
     {
         let molecular_formula = molecular_formula
@@ -328,15 +328,13 @@ for InsertableReagentModelBuilder<AssetModel> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'N N as TryInto<Option<String>>>::Error,
-        >,
+        N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
                 self.id,
@@ -352,15 +350,13 @@ for InsertableReagentModelBuilder<AssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'D D as TryInto<Option<String>>>::Error,
-        >,
+        D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
                 self.id,
@@ -412,14 +408,14 @@ for InsertableReagentModelBuilder<AssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
@@ -454,14 +450,14 @@ for InsertableReagentModelBuilder<AssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(

@@ -92,13 +92,13 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.icon` column.
     ///
     /// # Arguments
@@ -117,13 +117,13 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.client_id` column.
     ///
     /// # Arguments
@@ -143,13 +143,13 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn client<'CI, CI>(
+    fn client<CI>(
         self,
-        client_id: &'CI CI,
+        client_id: CI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CI CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>;
+        CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.redirect_uri` column.
     ///
     /// # Arguments
@@ -169,13 +169,13 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn redirect_uri<'RU, RU>(
+    fn redirect_uri<RU>(
         self,
-        redirect_uri: &'RU RU,
+        redirect_uri: RU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'RU RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>;
+        RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.oauth_url` column.
     ///
     /// # Arguments
@@ -195,13 +195,13 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn oauth_url<'OU, OU>(
+    fn oauth_url<OU>(
         self,
-        oauth_url: &'OU OU,
+        oauth_url: OU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'OU OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>;
+        OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.scope` column.
     ///
     /// # Arguments
@@ -221,74 +221,74 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn scope<'S, S>(
+    fn scope<S>(
         self,
-        scope: &'S S,
+        scope: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>;
+        S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>;
 }
 impl LoginProviderBuildable for Option<i16> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes;
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        _icon: &'I I,
+        _icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn client<'CI, CI>(
+    fn client<CI>(
         self,
-        _client_id: &'CI CI,
+        _client_id: CI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CI CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>,
+        CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn redirect_uri<'RU, RU>(
+    fn redirect_uri<RU>(
         self,
-        _redirect_uri: &'RU RU,
+        _redirect_uri: RU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'RU RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>,
+        RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn oauth_url<'OU, OU>(
+    fn oauth_url<OU>(
         self,
-        _oauth_url: &'OU OU,
+        _oauth_url: OU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'OU OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>,
+        OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn scope<'S, S>(
+    fn scope<S>(
         self,
-        _scope: &'S S,
+        _scope: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>,
+        S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -297,13 +297,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes;
     /// Sets the value of the `public.login_providers.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -320,13 +320,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.login_providers.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -343,13 +343,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.login_providers.client_id` column.
-    fn client<'CI, CI>(
+    fn client<CI>(
         mut self,
-        client_id: &'CI CI,
+        client_id: CI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CI CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>,
+        CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>,
     {
         let client_id = client_id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -366,13 +366,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.login_providers.redirect_uri` column.
-    fn redirect_uri<'RU, RU>(
+    fn redirect_uri<RU>(
         mut self,
-        redirect_uri: &'RU RU,
+        redirect_uri: RU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'RU RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>,
+        RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>,
     {
         let redirect_uri = redirect_uri.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -382,13 +382,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.login_providers.oauth_url` column.
-    fn oauth_url<'OU, OU>(
+    fn oauth_url<OU>(
         mut self,
-        oauth_url: &'OU OU,
+        oauth_url: OU,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'OU OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>,
+        OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>,
     {
         let oauth_url = oauth_url.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -398,13 +398,13 @@ impl LoginProviderBuildable for InsertableLoginProviderBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.login_providers.scope` column.
-    fn scope<'S, S>(
+    fn scope<S>(
         mut self,
-        scope: &'S S,
+        scope: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>,
+        S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>,
     {
         let scope = scope.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

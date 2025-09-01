@@ -567,13 +567,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttributes;
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
                 self.procedure_template,
@@ -589,13 +589,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
                 self.procedure_template,
@@ -611,13 +611,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
-    fn deprecated<'D, D>(
+    fn deprecated<D>(
         mut self,
-        deprecated: &'D D,
+        deprecated: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<bool>>::Error>,
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
                 self.procedure_template,
@@ -633,13 +633,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
                 self.procedure_template,
@@ -673,14 +673,14 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
@@ -715,14 +715,14 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(

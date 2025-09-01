@@ -139,13 +139,13 @@ pub trait AddressBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn street_name<'SN, SN>(
+    fn street_name<SN>(
         self,
-        street_name: &'SN SN,
+        street_name: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>;
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.street_number` column.
     ///
     /// # Arguments
@@ -165,13 +165,13 @@ pub trait AddressBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn street_number<'SN, SN>(
+    fn street_number<SN>(
         self,
-        street_number: &'SN SN,
+        street_number: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>;
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.postal_code` column.
     ///
     /// # Arguments
@@ -191,13 +191,13 @@ pub trait AddressBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn postal_code<'PC, PC>(
+    fn postal_code<PC>(
         self,
-        postal_code: &'PC PC,
+        postal_code: PC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PC PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>;
+        PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.geolocation` column.
     ///
     /// # Arguments
@@ -217,14 +217,14 @@ pub trait AddressBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `postgis_diesel::types::Point`.
     /// * If the provided value does not pass schema-defined validation.
-    fn geolocation<'G, G>(
+    fn geolocation<G>(
         self,
-        geolocation: &'G G,
+        geolocation: G,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'G G: TryInto<postgis_diesel::types::Point>,
+        G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
-            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>;
+            From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
 }
 impl AddressBuildable for Option<i32> {
     type Attributes =
@@ -235,44 +235,44 @@ impl AddressBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn street_name<'SN, SN>(
+    fn street_name<SN>(
         self,
-        _street_name: &'SN SN,
+        _street_name: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn street_number<'SN, SN>(
+    fn street_number<SN>(
         self,
-        _street_number: &'SN SN,
+        _street_number: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn postal_code<'PC, PC>(
+    fn postal_code<PC>(
         self,
-        _postal_code: &'PC PC,
+        _postal_code: PC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PC PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>,
+        PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn geolocation<'G, G>(
+    fn geolocation<G>(
         self,
-        _geolocation: &'G G,
+        _geolocation: G,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'G G: TryInto<postgis_diesel::types::Point>,
+        G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
-            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>,
+            From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
     {
         Ok(self)
     }
@@ -293,13 +293,13 @@ impl AddressBuildable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.street_name` column.
-    fn street_name<'SN, SN>(
+    fn street_name<SN>(
         mut self,
-        street_name: &'SN SN,
+        street_name: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
     {
         let street_name = street_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -309,13 +309,13 @@ impl AddressBuildable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.street_number` column.
-    fn street_number<'SN, SN>(
+    fn street_number<SN>(
         mut self,
-        street_number: &'SN SN,
+        street_number: SN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'SN SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+        SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
     {
         let street_number = street_number.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -325,13 +325,13 @@ impl AddressBuildable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.postal_code` column.
-    fn postal_code<'PC, PC>(
+    fn postal_code<PC>(
         mut self,
-        postal_code: &'PC PC,
+        postal_code: PC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PC PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>,
+        PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>,
     {
         let postal_code = postal_code.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -341,14 +341,14 @@ impl AddressBuildable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.geolocation` column.
-    fn geolocation<'G, G>(
+    fn geolocation<G>(
         mut self,
-        geolocation: &'G G,
+        geolocation: G,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'G G: TryInto<postgis_diesel::types::Point>,
+        G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
-            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>,
+            From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
     {
         let geolocation = geolocation.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

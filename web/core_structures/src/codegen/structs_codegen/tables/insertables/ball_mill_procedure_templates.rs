@@ -552,13 +552,13 @@ pub trait BallMillProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         self,
-        kelvin: &'K K,
+        kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>;
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.ball_mill_procedure_templates.
     /// kelvin_tolerance_percentage` column.
@@ -580,13 +580,13 @@ pub trait BallMillProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         self,
-        kelvin_tolerance_percentage: &'KTP KTP,
+        kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>;
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.ball_mill_procedure_templates.seconds` column.
     ///
@@ -606,13 +606,13 @@ pub trait BallMillProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn seconds<'S, S>(
+    fn seconds<S>(
         self,
-        seconds: &'S S,
+        seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<f32>>::Error>;
+        S: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.ball_mill_procedure_templates.hertz` column.
     ///
@@ -632,13 +632,13 @@ pub trait BallMillProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn hertz<'H, H>(
+    fn hertz<H>(
         self,
-        hertz: &'H H,
+        hertz: H,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'H H: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'H H as TryInto<f32>>::Error>;
+        H: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<H as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.ball_mill_procedure_templates.bead_model` column.
     ///
@@ -708,13 +708,13 @@ pub trait BallMillProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn number_of_beads<'NOB, NOB>(
+    fn number_of_beads<NOB>(
         self,
-        number_of_beads: &'NOB NOB,
+        number_of_beads: NOB,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'NOB NOB: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<&'NOB NOB as TryInto<i16>>::Error>;
+        NOB: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOB as TryInto<i16>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.ball_mill_procedure_templates.milled_with_model`
     /// column.
@@ -842,43 +842,43 @@ pub trait BallMillProcedureTemplateBuildable:
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl BallMillProcedureTemplateBuildable for Option<i32> {
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         self,
-        _kelvin: &'K K,
+        _kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         self,
-        _kelvin_tolerance_percentage: &'KTP KTP,
+        _kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>,
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn seconds<'S, S>(
+    fn seconds<S>(
         self,
-        _seconds: &'S S,
+        _seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<f32>>::Error>,
+        S: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn hertz<'H, H>(
+    fn hertz<H>(
         self,
-        _hertz: &'H H,
+        _hertz: H,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'H H: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'H H as TryInto<f32>>::Error>,
+        H: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<H as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
@@ -894,13 +894,13 @@ impl BallMillProcedureTemplateBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn number_of_beads<'NOB, NOB>(
+    fn number_of_beads<NOB>(
         self,
-        _number_of_beads: &'NOB NOB,
+        _number_of_beads: NOB,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'NOB NOB: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<&'NOB NOB as TryInto<i16>>::Error>,
+        NOB: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOB as TryInto<i16>>::Error>,
     {
         Ok(self)
     }
@@ -942,13 +942,13 @@ impl<
 > BallMillProcedureTemplateBuildable
 for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.kelvin` column.
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         mut self,
-        kelvin: &'K K,
+        kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kelvin = kelvin
             .try_into()
@@ -967,13 +967,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.kelvin_tolerance_percentage` column.
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         mut self,
-        kelvin_tolerance_percentage: &'KTP KTP,
+        kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>,
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
         let kelvin_tolerance_percentage = kelvin_tolerance_percentage
             .try_into()
@@ -1006,13 +1006,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.seconds` column.
-    fn seconds<'S, S>(
+    fn seconds<S>(
         mut self,
-        seconds: &'S S,
+        seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<f32>>::Error>,
+        S: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>,
     {
         let seconds = seconds
             .try_into()
@@ -1040,13 +1040,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.hertz` column.
-    fn hertz<'H, H>(
+    fn hertz<H>(
         mut self,
-        hertz: &'H H,
+        hertz: H,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'H H: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'H H as TryInto<f32>>::Error>,
+        H: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<H as TryInto<f32>>::Error>,
     {
         let hertz = hertz
             .try_into()
@@ -1106,13 +1106,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.number_of_beads` column.
-    fn number_of_beads<'NOB, NOB>(
+    fn number_of_beads<NOB>(
         mut self,
-        number_of_beads: &'NOB NOB,
+        number_of_beads: NOB,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'NOB NOB: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<&'NOB NOB as TryInto<i16>>::Error>,
+        NOB: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOB as TryInto<i16>>::Error>,
     {
         let number_of_beads = number_of_beads
             .try_into()
@@ -1226,13 +1226,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes;
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
                 self.procedure_template,
@@ -1248,13 +1248,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
                 self.procedure_template,
@@ -1270,13 +1270,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
-    fn deprecated<'D, D>(
+    fn deprecated<D>(
         mut self,
-        deprecated: &'D D,
+        deprecated: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<bool>>::Error>,
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
                 self.procedure_template,
@@ -1292,13 +1292,13 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
                 self.procedure_template,
@@ -1332,14 +1332,14 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
@@ -1374,14 +1374,14 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(

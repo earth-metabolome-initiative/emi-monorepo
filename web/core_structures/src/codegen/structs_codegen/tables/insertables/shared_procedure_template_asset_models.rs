@@ -580,14 +580,14 @@ pub trait SharedProcedureTemplateAssetModelBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl SharedProcedureTemplateAssetModelBuildable
     for InsertableSharedProcedureTemplateAssetModelBuilder
@@ -714,14 +714,14 @@ impl SharedProcedureTemplateAssetModelBuildable
     }
     /// Sets the value of the
     /// `public.shared_procedure_template_asset_models.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

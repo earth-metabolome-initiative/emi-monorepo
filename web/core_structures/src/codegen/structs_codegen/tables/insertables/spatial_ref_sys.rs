@@ -106,13 +106,13 @@ pub trait SpatialRefSyBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn auth_name<'AN, AN>(
+    fn auth_name<AN>(
         self,
-        auth_name: &'AN AN,
+        auth_name: AN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AN AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'AN AN as TryInto<Option<String>>>::Error>;
+        AN: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.auth_srid` column.
     ///
     /// # Arguments
@@ -131,13 +131,13 @@ pub trait SpatialRefSyBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn auth_srid<'AS, AS>(
+    fn auth_srid<AS>(
         self,
-        auth_srid: &'AS AS,
+        auth_srid: AS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AS AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'AS AS as TryInto<Option<i32>>>::Error>;
+        AS: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.srtext` column.
     ///
     /// # Arguments
@@ -157,13 +157,13 @@ pub trait SpatialRefSyBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn srtext<'S, S>(
+    fn srtext<S>(
         self,
-        srtext: &'S S,
+        srtext: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<Option<String>>>::Error>;
+        S: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.proj4text` column.
     ///
     /// # Arguments
@@ -183,13 +183,13 @@ pub trait SpatialRefSyBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn proj4text<'P, P>(
+    fn proj4text<P>(
         self,
-        proj4text: &'P P,
+        proj4text: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<Option<String>>>::Error>;
+        P: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
 }
 impl SpatialRefSyBuildable for Option<i32> {
     type Attributes =
@@ -202,43 +202,43 @@ impl SpatialRefSyBuildable for Option<i32> {
             validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Srid)
         })?))
     }
-    fn auth_name<'AN, AN>(
+    fn auth_name<AN>(
         self,
-        _auth_name: &'AN AN,
+        _auth_name: AN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AN AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'AN AN as TryInto<Option<String>>>::Error>,
+        AN: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
     {
         Ok(self)
     }
-    fn auth_srid<'AS, AS>(
+    fn auth_srid<AS>(
         self,
-        _auth_srid: &'AS AS,
+        _auth_srid: AS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AS AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'AS AS as TryInto<Option<i32>>>::Error>,
+        AS: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
     {
         Ok(self)
     }
-    fn srtext<'S, S>(
+    fn srtext<S>(
         self,
-        _srtext: &'S S,
+        _srtext: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<Option<String>>>::Error>,
+        S: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
     {
         Ok(self)
     }
-    fn proj4text<'P, P>(
+    fn proj4text<P>(
         self,
-        _proj4text: &'P P,
+        _proj4text: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<Option<String>>>::Error>,
+        P: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
     {
         Ok(self)
     }
@@ -259,13 +259,13 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.spatial_ref_sys.auth_name` column.
-    fn auth_name<'AN, AN>(
+    fn auth_name<AN>(
         mut self,
-        auth_name: &'AN AN,
+        auth_name: AN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AN AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'AN AN as TryInto<Option<String>>>::Error>,
+        AN: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
     {
         let auth_name = auth_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -275,13 +275,13 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.spatial_ref_sys.auth_srid` column.
-    fn auth_srid<'AS, AS>(
+    fn auth_srid<AS>(
         mut self,
-        auth_srid: &'AS AS,
+        auth_srid: AS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'AS AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'AS AS as TryInto<Option<i32>>>::Error>,
+        AS: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
     {
         let auth_srid = auth_srid.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -291,13 +291,13 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.spatial_ref_sys.srtext` column.
-    fn srtext<'S, S>(
+    fn srtext<S>(
         mut self,
-        srtext: &'S S,
+        srtext: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<Option<String>>>::Error>,
+        S: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
     {
         let srtext = srtext.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -307,13 +307,13 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.spatial_ref_sys.proj4text` column.
-    fn proj4text<'P, P>(
+    fn proj4text<P>(
         mut self,
-        proj4text: &'P P,
+        proj4text: P,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'P P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<&'P P as TryInto<Option<String>>>::Error>,
+        P: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
     {
         let proj4text = proj4text.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

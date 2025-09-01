@@ -623,13 +623,13 @@ pub trait FractioningProcedureBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         self,
-        kilograms: &'K K,
+        kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>;
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the `procedures.fractioning_procedures.weighed_with`
     /// column.
     ///
@@ -709,13 +709,13 @@ impl FractioningProcedureBuildable for Option<::rosetta_uuid::Uuid> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         self,
-        _kilograms: &'K K,
+        _kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
@@ -874,13 +874,13 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `procedures.fractioning_procedures.kilograms` column.
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         mut self,
-        kilograms: &'K K,
+        kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kilograms = kilograms
             .try_into()
@@ -1007,14 +1007,14 @@ for InsertableFractioningProcedureBuilder<Procedure> {
     }
     #[inline]
     ///Sets the value of the `procedures.procedures.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
@@ -1049,14 +1049,14 @@ for InsertableFractioningProcedureBuilder<Procedure> {
     }
     #[inline]
     ///Sets the value of the `procedures.procedures.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(

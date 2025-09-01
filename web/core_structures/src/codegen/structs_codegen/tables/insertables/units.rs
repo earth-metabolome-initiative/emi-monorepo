@@ -111,13 +111,13 @@ pub trait UnitBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.unit` column.
     ///
     /// # Arguments
@@ -136,13 +136,13 @@ pub trait UnitBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn unit<'U, U>(
+    fn unit<U>(
         self,
-        unit: &'U U,
+        unit: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>;
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.icon` column.
     ///
     /// # Arguments
@@ -161,13 +161,13 @@ pub trait UnitBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.color_id` column.
     ///
     /// # Arguments
@@ -193,33 +193,33 @@ pub trait UnitBuildable: std::marker::Sized {
 impl UnitBuildable for Option<i16> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttributes;
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn unit<'U, U>(
+    fn unit<U>(
         self,
-        _unit: &'U U,
+        _unit: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>,
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        _icon: &'I I,
+        _icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -234,13 +234,13 @@ impl UnitBuildable for InsertableUnitBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttributes;
     /// Sets the value of the `public.units.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -250,13 +250,13 @@ impl UnitBuildable for InsertableUnitBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.units.unit` column.
-    fn unit<'U, U>(
+    fn unit<U>(
         mut self,
-        unit: &'U U,
+        unit: U,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'U U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'U U as TryInto<String>>::Error>,
+        U: TryInto<String>,
+        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         let unit = unit.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -266,13 +266,13 @@ impl UnitBuildable for InsertableUnitBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.units.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

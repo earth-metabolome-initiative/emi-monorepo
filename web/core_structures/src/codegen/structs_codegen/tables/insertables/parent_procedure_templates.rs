@@ -260,13 +260,13 @@ pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn snoozable<'S, S>(
+    fn snoozable<S>(
         self,
-        snoozable: &'S S,
+        snoozable: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<bool>>::Error>;
+        S: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<S as TryInto<bool>>::Error>;
     /// Sets the value of the `public.parent_procedure_templates.copiable`
     /// column.
     ///
@@ -286,13 +286,13 @@ pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn copiable<'C, C>(
+    fn copiable<C>(
         self,
-        copiable: &'C C,
+        copiable: C,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'C C: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'C C as TryInto<bool>>::Error>;
+        C: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<C as TryInto<bool>>::Error>;
     /// Sets the value of the `public.parent_procedure_templates.repeatable`
     /// column.
     ///
@@ -312,13 +312,13 @@ pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn repeatable<'R, R>(
+    fn repeatable<R>(
         self,
-        repeatable: &'R R,
+        repeatable: R,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'R R: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'R R as TryInto<bool>>::Error>;
+        R: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<R as TryInto<bool>>::Error>;
     /// Sets the value of the `public.parent_procedure_templates.skippable`
     /// column.
     ///
@@ -338,13 +338,13 @@ pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn skippable<'S, S>(
+    fn skippable<S>(
         self,
-        skippable: &'S S,
+        skippable: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<bool>>::Error>;
+        S: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<S as TryInto<bool>>::Error>;
     /// Sets the value of the `public.parent_procedure_templates.created_by`
     /// column.
     ///
@@ -388,14 +388,14 @@ pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes;
@@ -453,13 +453,13 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     }
     /// Sets the value of the `public.parent_procedure_templates.snoozable`
     /// column.
-    fn snoozable<'S, S>(
+    fn snoozable<S>(
         mut self,
-        snoozable: &'S S,
+        snoozable: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<bool>>::Error>,
+        S: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<S as TryInto<bool>>::Error>,
     {
         let snoozable = snoozable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -470,13 +470,13 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     }
     /// Sets the value of the `public.parent_procedure_templates.copiable`
     /// column.
-    fn copiable<'C, C>(
+    fn copiable<C>(
         mut self,
-        copiable: &'C C,
+        copiable: C,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'C C: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'C C as TryInto<bool>>::Error>,
+        C: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<C as TryInto<bool>>::Error>,
     {
         let copiable = copiable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -487,13 +487,13 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     }
     /// Sets the value of the `public.parent_procedure_templates.repeatable`
     /// column.
-    fn repeatable<'R, R>(
+    fn repeatable<R>(
         mut self,
-        repeatable: &'R R,
+        repeatable: R,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'R R: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'R R as TryInto<bool>>::Error>,
+        R: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<R as TryInto<bool>>::Error>,
     {
         let repeatable = repeatable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -504,13 +504,13 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     }
     /// Sets the value of the `public.parent_procedure_templates.skippable`
     /// column.
-    fn skippable<'S, S>(
+    fn skippable<S>(
         mut self,
-        skippable: &'S S,
+        skippable: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<bool>>::Error>,
+        S: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<S as TryInto<bool>>::Error>,
     {
         let skippable = skippable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -534,14 +534,14 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     }
     /// Sets the value of the `public.parent_procedure_templates.created_at`
     /// column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

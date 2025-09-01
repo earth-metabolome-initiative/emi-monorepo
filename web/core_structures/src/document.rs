@@ -2,7 +2,10 @@
 use diesel::connection::LoadConnection;
 use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
 
-use crate::{Document, tables::insertables::InsertableDocumentAttributes};
+use crate::{
+    Document, codegen::structs_codegen::tables::insertables::DocumentBuildable,
+    tables::insertables::InsertableDocumentAttributes,
+};
 
 /// Returns the newly created photograph.
 pub fn create_photograph<C: LoadConnection>(

@@ -419,13 +419,13 @@ pub trait FractioningProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         self,
-        kilograms: &'K K,
+        kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>;
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.fractioning_procedure_templates.
     /// tolerance_percentage` column.
@@ -447,13 +447,13 @@ pub trait FractioningProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn tolerance_percentage<'TP, TP>(
+    fn tolerance_percentage<TP>(
         self,
-        tolerance_percentage: &'TP TP,
+        tolerance_percentage: TP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'TP TP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'TP TP as TryInto<f32>>::Error>;
+        TP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.fractioning_procedure_templates.weighed_with_model`
     /// column.
@@ -631,23 +631,23 @@ pub trait FractioningProcedureTemplateBuildable:
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl FractioningProcedureTemplateBuildable for Option<i32> {
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         self,
-        _kilograms: &'K K,
+        _kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn tolerance_percentage<'TP, TP>(
+    fn tolerance_percentage<TP>(
         self,
-        _tolerance_percentage: &'TP TP,
+        _tolerance_percentage: TP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'TP TP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'TP TP as TryInto<f32>>::Error>,
+        TP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
@@ -701,13 +701,13 @@ impl<
 > FractioningProcedureTemplateBuildable
 for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     ///Sets the value of the `procedure_templates.fractioning_procedure_templates.kilograms` column.
-    fn kilograms<'K, K>(
+    fn kilograms<K>(
         mut self,
-        kilograms: &'K K,
+        kilograms: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kilograms = kilograms
             .try_into()
@@ -728,13 +728,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.fractioning_procedure_templates.tolerance_percentage` column.
-    fn tolerance_percentage<'TP, TP>(
+    fn tolerance_percentage<TP>(
         mut self,
-        tolerance_percentage: &'TP TP,
+        tolerance_percentage: TP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'TP TP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'TP TP as TryInto<f32>>::Error>,
+        TP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>,
     {
         let tolerance_percentage = tolerance_percentage
             .try_into()
@@ -891,13 +891,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
                 self.procedure_template,
@@ -913,13 +913,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
                 self.procedure_template,
@@ -935,13 +935,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
-    fn deprecated<'D, D>(
+    fn deprecated<D>(
         mut self,
-        deprecated: &'D D,
+        deprecated: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<bool>>::Error>,
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
                 self.procedure_template,
@@ -957,13 +957,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
                 self.procedure_template,
@@ -997,14 +997,14 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
@@ -1039,14 +1039,14 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(

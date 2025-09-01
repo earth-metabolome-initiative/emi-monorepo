@@ -390,13 +390,13 @@ pub trait FreezingProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         self,
-        kelvin: &'K K,
+        kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>;
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.freezing_procedure_templates.
     /// kelvin_tolerance_percentage` column.
@@ -418,13 +418,13 @@ pub trait FreezingProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         self,
-        kelvin_tolerance_percentage: &'KTP KTP,
+        kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>;
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.freezing_procedure_templates.seconds` column.
     ///
@@ -444,13 +444,13 @@ pub trait FreezingProcedureTemplateBuildable:
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn seconds<'S, S>(
+    fn seconds<S>(
         self,
-        seconds: &'S S,
+        seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<f32>>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<Option<f32>>>::Error>;
+        S: TryInto<Option<f32>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<f32>>>::Error>;
     /// Sets the value of the
     /// `procedure_templates.freezing_procedure_templates.frozen_with_model`
     /// column.
@@ -578,33 +578,33 @@ pub trait FreezingProcedureTemplateBuildable:
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl FreezingProcedureTemplateBuildable for Option<i32> {
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         self,
-        _kelvin: &'K K,
+        _kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         self,
-        _kelvin_tolerance_percentage: &'KTP KTP,
+        _kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>,
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
         Ok(self)
     }
-    fn seconds<'S, S>(
+    fn seconds<S>(
         self,
-        _seconds: &'S S,
+        _seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<f32>>,
-        validation_errors::SingleFieldError: From<<&'S S as TryInto<Option<f32>>>::Error>,
+        S: TryInto<Option<f32>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<f32>>>::Error>,
     {
         Ok(self)
     }
@@ -646,13 +646,13 @@ impl<
 > FreezingProcedureTemplateBuildable
 for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     ///Sets the value of the `procedure_templates.freezing_procedure_templates.kelvin` column.
-    fn kelvin<'K, K>(
+    fn kelvin<K>(
         mut self,
-        kelvin: &'K K,
+        kelvin: K,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'K K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'K K as TryInto<f32>>::Error>,
+        K: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kelvin = kelvin
             .try_into()
@@ -671,13 +671,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.freezing_procedure_templates.kelvin_tolerance_percentage` column.
-    fn kelvin_tolerance_percentage<'KTP, KTP>(
+    fn kelvin_tolerance_percentage<KTP>(
         mut self,
-        kelvin_tolerance_percentage: &'KTP KTP,
+        kelvin_tolerance_percentage: KTP,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'KTP KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<&'KTP KTP as TryInto<f32>>::Error>,
+        KTP: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
         let kelvin_tolerance_percentage = kelvin_tolerance_percentage
             .try_into()
@@ -710,15 +710,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     ///Sets the value of the `procedure_templates.freezing_procedure_templates.seconds` column.
-    fn seconds<'S, S>(
+    fn seconds<S>(
         mut self,
-        seconds: &'S S,
+        seconds: S,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'S S: TryInto<Option<f32>>,
-        validation_errors::SingleFieldError: From<
-            <&'S S as TryInto<Option<f32>>>::Error,
-        >,
+        S: TryInto<Option<f32>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<f32>>>::Error>,
     {
         let seconds = seconds
             .try_into()
@@ -841,13 +839,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureTemplateAttributes;
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
                 self.procedure_template,
@@ -863,13 +861,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
                 self.procedure_template,
@@ -885,13 +883,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
-    fn deprecated<'D, D>(
+    fn deprecated<D>(
         mut self,
-        deprecated: &'D D,
+        deprecated: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<bool>>::Error>,
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
                 self.procedure_template,
@@ -907,13 +905,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
                 self.procedure_template,
@@ -947,14 +945,14 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
@@ -989,14 +987,14 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(

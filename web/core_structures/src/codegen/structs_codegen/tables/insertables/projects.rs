@@ -349,13 +349,13 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.description` column.
     ///
     /// # Arguments
@@ -375,13 +375,13 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<'D, D>(
+    fn description<D>(
         self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>;
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.state_id` column.
     ///
     /// # Arguments
@@ -422,13 +422,13 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.color_id` column.
     ///
     /// # Arguments
@@ -490,13 +490,13 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f64`.
     /// * If the provided value does not pass schema-defined validation.
-    fn budget<'B, B>(
+    fn budget<B>(
         self,
-        budget: &'B B,
+        budget: B,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'B B: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'B B as TryInto<Option<f64>>>::Error>;
+        B: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>;
     /// Sets the value of the `public.projects.expenses` column.
     ///
     /// # Arguments
@@ -515,13 +515,13 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f64`.
     /// * If the provided value does not pass schema-defined validation.
-    fn expenses<'E, E>(
+    fn expenses<E>(
         self,
-        expenses: &'E E,
+        expenses: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<Option<f64>>>::Error>;
+        E: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>;
     /// Sets the value of the `public.projects.created_by` column.
     ///
     /// # Arguments
@@ -563,14 +563,14 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.updated_by` column.
     ///
     /// # Arguments
@@ -612,14 +612,14 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.expected_end_date` column.
     ///
     /// # Arguments
@@ -639,14 +639,14 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn expected_end_date<'EED, EED>(
+    fn expected_end_date<EED>(
         self,
-        expected_end_date: &'EED EED,
+        expected_end_date: EED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'EED EED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        EED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'EED EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.end_date` column.
     ///
     /// # Arguments
@@ -666,14 +666,14 @@ pub trait ProjectBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn end_date<'ED, ED>(
+    fn end_date<ED>(
         self,
-        end_date: &'ED ED,
+        end_date: ED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ED ED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        ED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'ED ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ProjectBuildable for Option<i32> {
     type Attributes =
@@ -686,23 +686,23 @@ impl ProjectBuildable for Option<i32> {
             validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
         })?))
     }
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn description<'D, D>(
+    fn description<D>(
         self,
-        _description: &'D D,
+        _description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -712,13 +712,13 @@ impl ProjectBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn icon<'I, I>(
+    fn icon<I>(
         self,
-        _icon: &'I I,
+        _icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -734,23 +734,23 @@ impl ProjectBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn budget<'B, B>(
+    fn budget<B>(
         self,
-        _budget: &'B B,
+        _budget: B,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'B B: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'B B as TryInto<Option<f64>>>::Error>,
+        B: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
     {
         Ok(self)
     }
-    fn expenses<'E, E>(
+    fn expenses<E>(
         self,
-        _expenses: &'E E,
+        _expenses: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<Option<f64>>>::Error>,
+        E: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
     {
         Ok(self)
     }
@@ -760,14 +760,14 @@ impl ProjectBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        _created_at: &'CA CA,
+        _created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
@@ -777,36 +777,36 @@ impl ProjectBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         self,
-        _updated_at: &'UA UA,
+        _updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
-    fn expected_end_date<'EED, EED>(
+    fn expected_end_date<EED>(
         self,
-        _expected_end_date: &'EED EED,
+        _expected_end_date: EED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'EED EED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        EED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'EED EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
-    fn end_date<'ED, ED>(
+    fn end_date<ED>(
         self,
-        _end_date: &'ED ED,
+        _end_date: ED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ED ED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        ED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'ED ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
@@ -837,13 +837,13 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -870,13 +870,13 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -915,13 +915,13 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.icon` column.
-    fn icon<'I, I>(
+    fn icon<I>(
         mut self,
-        icon: &'I I,
+        icon: I,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'I I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -972,13 +972,13 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.budget` column.
-    fn budget<'B, B>(
+    fn budget<B>(
         mut self,
-        budget: &'B B,
+        budget: B,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'B B: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'B B as TryInto<Option<f64>>>::Error>,
+        B: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
     {
         let budget = budget.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -988,13 +988,13 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.expenses` column.
-    fn expenses<'E, E>(
+    fn expenses<E>(
         mut self,
-        expenses: &'E E,
+        expenses: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<Option<f64>>>::Error>,
+        E: TryInto<Option<f64>>,
+        validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
     {
         let expenses = expenses.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -1033,14 +1033,14 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -1072,14 +1072,14 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -1099,14 +1099,14 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.expected_end_date` column.
-    fn expected_end_date<'EED, EED>(
+    fn expected_end_date<EED>(
         mut self,
-        expected_end_date: &'EED EED,
+        expected_end_date: EED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'EED EED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        EED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'EED EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let expected_end_date = expected_end_date.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -1116,14 +1116,14 @@ impl ProjectBuildable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.end_date` column.
-    fn end_date<'ED, ED>(
+    fn end_date<ED>(
         mut self,
-        end_date: &'ED ED,
+        end_date: ED,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'ED ED: TryInto<::rosetta_timestamp::TimestampUTC>,
+        ED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'ED ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let end_date = end_date.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

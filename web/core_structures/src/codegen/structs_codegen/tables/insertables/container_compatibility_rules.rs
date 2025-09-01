@@ -239,13 +239,13 @@ pub trait ContainerCompatibilityRuleBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn quantity<'Q, Q>(
+    fn quantity<Q>(
         self,
-        quantity: &'Q Q,
+        quantity: Q,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'Q Q: TryInto<Option<i16>>,
-        validation_errors::SingleFieldError: From<<&'Q Q as TryInto<Option<i16>>>::Error>;
+        Q: TryInto<Option<i16>>,
+        validation_errors::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>;
     /// Sets the value of the `public.container_compatibility_rules.created_by`
     /// column.
     ///
@@ -289,14 +289,14 @@ pub trait ContainerCompatibilityRuleBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRuleBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes;
@@ -354,13 +354,13 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
     }
     /// Sets the value of the `public.container_compatibility_rules.quantity`
     /// column.
-    fn quantity<'Q, Q>(
+    fn quantity<Q>(
         mut self,
-        quantity: &'Q Q,
+        quantity: Q,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'Q Q: TryInto<Option<i16>>,
-        validation_errors::SingleFieldError: From<<&'Q Q as TryInto<Option<i16>>>::Error>,
+        Q: TryInto<Option<i16>>,
+        validation_errors::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>,
     {
         let quantity = quantity.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -393,14 +393,14 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
     }
     /// Sets the value of the `public.container_compatibility_rules.created_at`
     /// column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

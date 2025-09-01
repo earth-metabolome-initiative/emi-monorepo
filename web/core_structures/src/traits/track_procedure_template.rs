@@ -9,6 +9,7 @@ use web_common_traits::{
 
 use crate::{
     AssetModel, ProcedureTemplate,
+    codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable,
     tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
 };
 
@@ -30,7 +31,7 @@ where
     /// * If the insertion fails, an `InsertError` is returned.
     fn track<T>(
         &self,
-        trackable: &T,
+        asset_model: &T,
         name: &str,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
@@ -40,13 +41,13 @@ where
     >
     where
         T: ExtensionTable<AssetModel>,
-        for<'a> &'a T: diesel::Identifiable<Id = &'a rosetta_uuid::Uuid>,
+        for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,
     {
         use diesel::Identifiable;
         crate::ProcedureTemplateAssetModel::new()
             .name(name)?
             .procedure_template(*self.id())?
-            .trackable(*trackable.id())?
+            .asset_model(*asset_model.id())?
             .created_by(user.id)?
             .insert(user.id, conn)
     }

@@ -102,13 +102,13 @@ pub trait TemporaryUserBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn email<'E, E>(
+    fn email<E>(
         self,
-        email: &'E E,
+        email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>;
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
     /// Sets the value of the `public.temporary_user.login_provider_id` column.
     ///
     /// # Arguments
@@ -135,13 +135,13 @@ pub trait TemporaryUserBuildable: std::marker::Sized {
 impl TemporaryUserBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
-    fn email<'E, E>(
+    fn email<E>(
         self,
-        _email: &'E E,
+        _email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -156,13 +156,13 @@ impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
     /// Sets the value of the `public.temporary_user.email` column.
-    fn email<'E, E>(
+    fn email<E>(
         mut self,
-        email: &'E E,
+        email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         let email = email.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

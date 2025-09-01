@@ -22,12 +22,12 @@ The slowest task was `Consistency Constraint Checks` which took 2 minutes (96.49
 ### Time Report for Consistency Constraint Checks
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Check constraints in schema 'procedures'` which took a minute (49.09% of all time).
+The slowest task was `Check constraints in schema 'procedures'` which took a minute (50.00% of all time).
 
 | name                                               | time     | percentage | comment |
 |----------------------------------------------------|----------|------------|---------|
 | Check constraints in schema 'public'               | a minute | 44.55%     |         |
-| Check constraints in schema 'procedures'           | a minute | 49.09%     |         |
+| Check constraints in schema 'procedures'           | a minute | 50.00%     |         |
 | Check constraints in schema 'procedure_templates'  | now      | 3.64%      |         |
 | Procedure and procedure template check constraints | now      | 0.00%      |         |
 | Procedure and procedure template asset constraints | now      | 0.91%      |         |
@@ -49,11 +49,11 @@ The slowest task was `Compatible foreign type constraints` which took a minute (
 #### Time Report for Check constraints in schema 'procedures'
 
 The total time spent on all tasks was a minute.
-The slowest task was `Compatible foreign type constraints` which took a minute (100.00% of all time).
+The slowest task was `Compatible foreign type constraints` which took a minute (98.18% of all time).
 
 | name                                     | time     | percentage | comment |
 |------------------------------------------|----------|------------|---------|
-| Compatible foreign type constraints      | a minute | 100.00%    |         |
+| Compatible foreign type constraints      | a minute | 98.18%     |         |
 | Lowercase column and table names         | now      | 0.00%      |         |
 | Standard column names and types          | now      | 0.00%      |         |
 | Not-null constraints on standard columns | now      | 0.00%      |         |

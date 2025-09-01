@@ -9,6 +9,7 @@ use web_common_traits::{
 
 use crate::{
     NextProcedureTemplate, ProcedureTemplate,
+    codegen::structs_codegen::tables::insertables::NextProcedureTemplateBuildable,
     tables::insertables::InsertableNextProcedureTemplateAttributes,
 };
 

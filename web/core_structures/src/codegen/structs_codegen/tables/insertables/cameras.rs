@@ -216,15 +216,13 @@ for InsertableCameraBuilder<PhysicalAsset> {
     }
     #[inline]
     ///Sets the value of the `public.assets.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'N N as TryInto<Option<String>>>::Error,
-        >,
+        N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
                 self.id,
@@ -240,15 +238,13 @@ for InsertableCameraBuilder<PhysicalAsset> {
     }
     #[inline]
     ///Sets the value of the `public.assets.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'D D as TryInto<Option<String>>>::Error,
-        >,
+        D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
                 self.id,
@@ -312,14 +308,14 @@ for InsertableCameraBuilder<PhysicalAsset> {
     }
     #[inline]
     ///Sets the value of the `public.assets.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
@@ -354,14 +350,14 @@ for InsertableCameraBuilder<PhysicalAsset> {
     }
     #[inline]
     ///Sets the value of the `public.assets.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(

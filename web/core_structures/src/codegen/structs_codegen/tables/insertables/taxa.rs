@@ -130,13 +130,13 @@ pub trait TaxonBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.taxa.parent_id` column.
     ///
     /// # Arguments
@@ -154,13 +154,13 @@ pub trait TaxonBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent<'PI, PI>(
+    fn parent<PI>(
         self,
-        parent_id: &'PI PI,
+        parent_id: PI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PI PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>;
+        PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>;
     /// Sets the value of the `public.taxa.rank_id` column.
     ///
     /// # Arguments
@@ -194,23 +194,23 @@ impl TaxonBuildable for Option<i32> {
             validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
         })?))
     }
-    fn name<'N, N>(
+    fn name<N>(
         self,
-        _name: &'N N,
+        _name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn parent<'PI, PI>(
+    fn parent<PI>(
         self,
-        _parent_id: &'PI PI,
+        _parent_id: PI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PI PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>,
+        PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
     {
         Ok(self)
     }
@@ -237,13 +237,13 @@ impl TaxonBuildable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -253,13 +253,13 @@ impl TaxonBuildable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.parent_id` column.
-    fn parent<'PI, PI>(
+    fn parent<PI>(
         mut self,
-        parent_id: &'PI PI,
+        parent_id: PI,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PI PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>,
+        PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
     {
         let parent_id = parent_id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

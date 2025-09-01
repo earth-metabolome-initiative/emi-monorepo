@@ -167,14 +167,14 @@ pub trait CommercialProductBuildable:
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn deprecation_date<'DD, DD>(
+    fn deprecation_date<DD>(
         self,
-        deprecation_date: &'DD DD,
+        deprecation_date: DD,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError:
-            From<<&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>;
+            From<<DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>;
     /// Sets the value of the `public.commercial_products.brand_id` column.
     ///
     /// # Arguments
@@ -199,14 +199,14 @@ pub trait CommercialProductBuildable:
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl CommercialProductBuildable for Option<i32> {
-    fn deprecation_date<'DD, DD>(
+    fn deprecation_date<DD>(
         self,
-        _deprecation_date: &'DD DD,
+        _deprecation_date: DD,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError:
-            From<<&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>,
+            From<<DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>,
     {
         Ok(self)
     }
@@ -223,14 +223,14 @@ impl<
         >,
 > CommercialProductBuildable for InsertableCommercialProductBuilder<PhysicalAssetModel> {
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
-    fn deprecation_date<'DD, DD>(
+    fn deprecation_date<DD>(
         mut self,
-        deprecation_date: &'DD DD,
+        deprecation_date: DD,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError: From<
-            <&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
+            <DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
         >,
     {
         let deprecation_date = deprecation_date
@@ -266,15 +266,13 @@ for InsertableCommercialProductBuilder<PhysicalAssetModel> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'N N as TryInto<Option<String>>>::Error,
-        >,
+        N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
                 self.id,
@@ -290,15 +288,13 @@ for InsertableCommercialProductBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'D D as TryInto<Option<String>>>::Error,
-        >,
+        D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
                 self.id,
@@ -365,14 +361,14 @@ for InsertableCommercialProductBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
@@ -407,14 +403,14 @@ for InsertableCommercialProductBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(

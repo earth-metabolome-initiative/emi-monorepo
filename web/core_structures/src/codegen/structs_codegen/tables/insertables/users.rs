@@ -89,13 +89,13 @@ pub trait UserBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn first_name<'FN, FN>(
+    fn first_name<FN>(
         self,
-        first_name: &'FN FN,
+        first_name: FN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'FN FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'FN FN as TryInto<String>>::Error>;
+        FN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>;
     /// Sets the value of the `public.users.last_name` column.
     ///
     /// # Arguments
@@ -114,13 +114,13 @@ pub trait UserBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn last_name<'LN, LN>(
+    fn last_name<LN>(
         self,
-        last_name: &'LN LN,
+        last_name: LN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'LN LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'LN LN as TryInto<String>>::Error>;
+        LN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>;
     /// Sets the value of the `public.users.created_at` column.
     ///
     /// # Arguments
@@ -140,14 +140,14 @@ pub trait UserBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.users.updated_at` column.
     ///
     /// # Arguments
@@ -167,57 +167,57 @@ pub trait UserBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl UserBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes;
-    fn first_name<'FN, FN>(
+    fn first_name<FN>(
         self,
-        _first_name: &'FN FN,
+        _first_name: FN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'FN FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'FN FN as TryInto<String>>::Error>,
+        FN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn last_name<'LN, LN>(
+    fn last_name<LN>(
         self,
-        _last_name: &'LN LN,
+        _last_name: LN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'LN LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'LN LN as TryInto<String>>::Error>,
+        LN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
     {
         Ok(self)
     }
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        _created_at: &'CA CA,
+        _created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         self,
-        _updated_at: &'UA UA,
+        _updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
@@ -226,13 +226,13 @@ impl UserBuildable for InsertableUserBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes;
     /// Sets the value of the `public.users.first_name` column.
-    fn first_name<'FN, FN>(
+    fn first_name<FN>(
         mut self,
-        first_name: &'FN FN,
+        first_name: FN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'FN FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'FN FN as TryInto<String>>::Error>,
+        FN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
     {
         let first_name = first_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -249,13 +249,13 @@ impl UserBuildable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.last_name` column.
-    fn last_name<'LN, LN>(
+    fn last_name<LN>(
         mut self,
-        last_name: &'LN LN,
+        last_name: LN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'LN LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'LN LN as TryInto<String>>::Error>,
+        LN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
     {
         let last_name = last_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -272,14 +272,14 @@ impl UserBuildable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -299,14 +299,14 @@ impl UserBuildable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

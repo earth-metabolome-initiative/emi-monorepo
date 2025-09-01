@@ -121,13 +121,13 @@ pub trait UserEmailBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn email<'E, E>(
+    fn email<E>(
         self,
-        email: &'E E,
+        email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>;
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
     /// Sets the value of the `public.user_emails.created_by` column.
     ///
     /// # Arguments
@@ -169,14 +169,14 @@ pub trait UserEmailBuildable: std::marker::Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.user_emails.primary_email` column.
     ///
     /// # Arguments
@@ -195,24 +195,24 @@ pub trait UserEmailBuildable: std::marker::Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn primary_email<'PE, PE>(
+    fn primary_email<PE>(
         self,
-        primary_email: &'PE PE,
+        primary_email: PE,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PE PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>;
+        PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
 }
 impl UserEmailBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttributes;
-    fn email<'E, E>(
+    fn email<E>(
         self,
-        _email: &'E E,
+        _email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         Ok(self)
     }
@@ -222,24 +222,24 @@ impl UserEmailBuildable for Option<i32> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         self,
-        _created_at: &'CA CA,
+        _created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         Ok(self)
     }
-    fn primary_email<'PE, PE>(
+    fn primary_email<PE>(
         self,
-        _primary_email: &'PE PE,
+        _primary_email: PE,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PE PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>,
+        PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
     {
         Ok(self)
     }
@@ -248,13 +248,13 @@ impl UserEmailBuildable for InsertableUserEmailBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttributes;
     /// Sets the value of the `public.user_emails.email` column.
-    fn email<'E, E>(
+    fn email<E>(
         mut self,
-        email: &'E E,
+        email: E,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'E E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+        E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         let email = email.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -283,14 +283,14 @@ impl UserEmailBuildable for InsertableUserEmailBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.user_emails.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
-            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
@@ -300,13 +300,13 @@ impl UserEmailBuildable for InsertableUserEmailBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.user_emails.primary_email` column.
-    fn primary_email<'PE, PE>(
+    fn primary_email<PE>(
         mut self,
-        primary_email: &'PE PE,
+        primary_email: PE,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'PE PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>,
+        PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
     {
         let primary_email = primary_email.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)

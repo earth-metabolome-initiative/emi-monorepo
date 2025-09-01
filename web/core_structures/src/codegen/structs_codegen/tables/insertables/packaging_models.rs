@@ -132,15 +132,13 @@ for InsertablePackagingModelBuilder<PhysicalAssetModel> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttributes;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<'N, N>(
+    fn name<N>(
         mut self,
-        name: &'N N,
+        name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'N N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'N N as TryInto<Option<String>>>::Error,
-        >,
+        N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
                 self.id,
@@ -156,15 +154,13 @@ for InsertablePackagingModelBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<'D, D>(
+    fn description<D>(
         mut self,
-        description: &'D D,
+        description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'D D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<
-            <&'D D as TryInto<Option<String>>>::Error,
-        >,
+        D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
                 self.id,
@@ -231,14 +227,14 @@ for InsertablePackagingModelBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<'CA, CA>(
+    fn created_at<CA>(
         mut self,
-        created_at: &'CA CA,
+        created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
@@ -273,14 +269,14 @@ for InsertablePackagingModelBuilder<PhysicalAssetModel> {
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<'UA, UA>(
+    fn updated_at<UA>(
         mut self,
-        updated_at: &'UA UA,
+        updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
-            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
