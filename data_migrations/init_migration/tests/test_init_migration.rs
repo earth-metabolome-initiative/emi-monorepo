@@ -1,7 +1,7 @@
 //! Test to check whether the database can indeed be initialized in the
 //! reference docker and populated with the `init_migration`.
 
-use core_structures::{LoginProvider, traits::ProcedureModelDot};
+use core_structures::{LoginProvider, traits::ProcedureTemplateDot};
 use core_structures_vis::MermaidDB;
 use init_db::init_database;
 use init_migration::{init_dbgi_plan, init_migration, init_root_user};
@@ -23,13 +23,13 @@ async fn test_init_migration() {
     // We initialize the database into the docker container
     if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
         docker.stop().await.expect("Failed to stop the docker container");
-        panic!("Failed to initialize the database: {err:?}");
+        panic!("Failed to initialize the database: {err}");
     }
 
     // We try to populate the DB with the init initialization
     if let Err(err) = init_migration(&mut conn) {
         docker.stop().await.expect("Failed to stop the docker container");
-        panic!("Failed to initialize the database: {err:?}");
+        panic!("Failed to initialize the database: {err}");
     }
 
     match LoginProvider::bounded_read(0, 16, &mut conn) {
@@ -46,16 +46,16 @@ async fn test_init_migration() {
     }
 
     let user = init_root_user(&mut conn).expect("Failed to initialize the root user");
-    let procedure_model =
+    let procedure_template =
         init_dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
 
-    let dot = procedure_model
+    let dot = procedure_template
         .to_dot(&mut conn)
-        .expect("Failed to convert the procedure model to DOT format");
+        .expect("Failed to convert the procedure template to DOT format");
 
-    let flowchart = procedure_model
+    let flowchart = procedure_template
         .to_mermaid(&mut conn)
-        .expect("Failed to convert the procedure model to Mermaid format");
+        .expect("Failed to convert the procedure template to Mermaid format");
     let er = core_structures_vis::trackables_hierarchy(&mut conn)
         .expect("Failed to generate the trackables hierarchy ERD");
 

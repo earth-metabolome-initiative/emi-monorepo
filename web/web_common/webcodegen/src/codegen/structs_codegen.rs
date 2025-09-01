@@ -5,10 +5,9 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
-use crate::traits::TableLike;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Table, traits::TableLike};
 
 mod tables;
 mod types;

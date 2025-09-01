@@ -16,6 +16,7 @@ async fn test_codegen_joinables() {
         .enable_joinables()
         .enable_tables_schema()
         .beautify()
+        .add_schema("public")
         .generate(&mut conn, &database_name)
         .unwrap();
 

@@ -25,44 +25,7 @@ impl diesel::Identifiable for Color {
         self.id
     }
 }
-impl Color {
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::colors::colors;
-        Self::table().filter(colors::name.eq(name)).order_by(colors::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_hexadecimal_value(
-        hexadecimal_value: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::colors::colors;
-        Self::table()
-            .filter(colors::hexadecimal_value.eq(hexadecimal_value))
-            .order_by(colors::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::colors::colors;
-        Self::table()
-            .filter(colors::description.eq(description))
-            .order_by(colors::id.asc())
-            .first::<Self>(conn)
-    }
-}
+impl Color {}
 impl AsRef<Color> for Color {
     fn as_ref(&self) -> &Color {
         self

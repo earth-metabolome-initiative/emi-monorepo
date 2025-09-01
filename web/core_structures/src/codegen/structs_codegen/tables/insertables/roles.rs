@@ -88,24 +88,210 @@ pub struct InsertableRoleBuilder {
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableRoleBuilder {
-    type Attributes = InsertableRoleAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+/// Trait defining setters for attributes of an instance of `Role` or descendant
+/// tables.
+pub trait RoleBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.roles.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.roles.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<'N, N>(
+        self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.roles.description` column.
+    ///
+    /// # Arguments
+    /// * `description`: The value to set for the `public.roles.description`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn description<'D, D>(
+        self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>;
+    /// Sets the value of the `public.roles.icon` column.
+    ///
+    /// # Arguments
+    /// * `icon`: The value to set for the `public.roles.icon` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn icon<'I, I>(
+        self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+    /// Sets the value of the `public.roles.color_id` column.
+    ///
+    /// # Arguments
+    /// * `color_id`: The value to set for the `public.roles.color_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn color(
+        self,
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl RoleBuildable for Option<i16> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableRoleAttributes;
+    fn name<'N, N>(
+        self,
+        _name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn description<'D, D>(
+        self,
+        _description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn icon<'I, I>(
+        self,
+        _icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn color(
+        self,
+        _color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(description) = other.description {
-            self = self.description(description)?;
-        }
-        if let Some(icon) = other.icon {
-            self = self.icon(icon)?;
-        }
-        if let Some(color_id) = other.color_id {
-            self = self.color(color_id)?;
-        }
+        Ok(self)
+    }
+}
+impl RoleBuildable for InsertableRoleBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableRoleAttributes;
+    /// Sets the value of the `public.roles.name` column.
+    fn name<'N, N>(
+        mut self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableRoleAttributes::Name)
+        })?;
+        self.name = Some(name);
+        Ok(self)
+    }
+    /// Sets the value of the `public.roles.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+    {
+        let description = description.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableRoleAttributes::Description)
+        })?;
+        self.description = Some(description);
+        Ok(self)
+    }
+    /// Sets the value of the `public.roles.icon` column.
+    fn icon<'I, I>(
+        mut self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        let icon = icon.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableRoleAttributes::Icon)
+        })?;
+        self.icon = Some(icon);
+        Ok(self)
+    }
+    /// Sets the value of the `public.roles.color_id` column.
+    fn color(
+        mut self,
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let color_id = color_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableRoleAttributes::ColorId)
+        })?;
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -113,68 +299,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRoleBuilder {
     type PrimaryKey = i16;
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.color_id` column from table `roles`.
-    pub fn color(
-        mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>> {
-        self.color_id = Some(color_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.description` column from table `roles`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
-    where
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableRoleAttributes::Description)
-            })?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.icon` column from table `roles`.
-    pub fn icon<Icon>(
-        mut self,
-        icon: Icon,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
-    where
-        Icon: TryInto<String>,
-        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRoleAttributes::Icon)
-        })?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder {
-    /// Sets the value of the `roles.name` column from table `roles`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoleAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRoleAttributes::Name)
-        })?;
-        self.name = Some(name);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRoleBuilder

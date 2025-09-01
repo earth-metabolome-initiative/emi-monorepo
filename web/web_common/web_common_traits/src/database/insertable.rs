@@ -21,26 +21,6 @@ pub trait Insertable {
     }
 }
 
-/// A trait defining a builder which can be extended by a builder of the same
-/// type. This is necessary when there exist for any of several reasons two
-/// instances of the same builder type which at some point need to be merged
-/// together.
-pub trait ExtendableBuilder: Sized {
-    /// The attributes of the builder.
-    type Attributes;
-
-    /// Extends the current builder with another builder of the same type.
-    ///
-    /// # Arguments
-    ///
-    /// * `other` - The other builder to extend the current builder with.
-    ///
-    /// # Errors
-    ///
-    /// * If the extension fails due to a validation error or a build error.
-    fn extend_builder(self, other: Self) -> Result<Self, InsertError<Self::Attributes>>;
-}
-
 /// A trait for Row Builder types which allow for the setting of a primary key
 /// in the insertable variant.
 pub trait SetPrimaryKey {

@@ -1,6 +1,6 @@
 use crate::codegen::diesel_codegen::tables::{
-    spectra_collections::spectra_collections, trackables::trackables,
+    digital_assets::digital_assets, spectra_collections::spectra_collections,
 };
-diesel::allow_tables_to_appear_in_same_query!(spectra_collections, trackables);
-use crate::codegen::diesel_codegen::tables::users::users;
-diesel::allow_tables_to_appear_in_same_query!(spectra_collections, users);
+diesel::allow_tables_to_appear_in_same_query!(spectra_collections, digital_assets);
+use crate::codegen::diesel_codegen::tables::assets::assets;
+diesel::allow_tables_to_appear_in_same_query!(spectra_collections, assets);

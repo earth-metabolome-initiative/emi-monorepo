@@ -13,7 +13,11 @@ impl std::fmt::Display for ProcedureError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ProcedureError::NotAProcedureTable(table) => {
-                write!(f, "Table '{}' is not a valid procedure table", table.table_name)
+                write!(
+                    f,
+                    "Table `{}.{}` is not a valid procedure table",
+                    table.table_schema, table.table_name
+                )
             }
         }
     }

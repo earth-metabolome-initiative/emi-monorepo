@@ -4,7 +4,6 @@
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
-use crate::traits::TableLike;
 
 use crate::{
     Table,
@@ -12,6 +11,7 @@ use crate::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
+    traits::TableLike,
 };
 
 impl Table {

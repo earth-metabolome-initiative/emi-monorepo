@@ -16,6 +16,24 @@ impl core::fmt::Display for InsertablePhoneModelExtensionAttributes {
         }
     }
 }
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes>
+    for InsertablePhoneModelExtensionAttributes
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+    ) -> Self {
+        Self::CameraModel(attribute)
+    }
+}
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+> for InsertablePhoneModelExtensionAttributes {
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+    ) -> Self {
+        Self::PositioningDeviceModel(attribute)
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertablePhoneModelAttributes {
@@ -47,7 +65,7 @@ impl core::fmt::Display for InsertablePhoneModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePhoneModel {
-    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) id: i32,
 }
 impl InsertablePhoneModel {
     pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
@@ -120,400 +138,268 @@ impl InsertablePhoneModel {
 pub struct InsertablePhoneModelBuilder<
     CameraModel
         = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+            >,
         >,
     PositioningDeviceModel
         = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelBuilder<
-            Option<::rosetta_uuid::Uuid>,
+            Option<i32>,
         >,
 > {
     pub(crate) phone_models_camera: CameraModel,
     pub(crate) phone_models_positioning: PositioningDeviceModel,
 }
-impl<CameraModel, PositioningDeviceModel> web_common_traits::database::ExtendableBuilder
-for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
-where
-    CameraModel: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
-    >,
-    PositioningDeviceModel: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
-    >,
+/// Trait defining setters for attributes of an instance of `PhoneModel` or
+/// descendant tables.
+pub trait PhoneModelBuildable:
+    crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable
+    + crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable
 {
-    type Attributes = InsertablePhoneModelAttributes;
-    fn extend_builder(
+}
+impl PhoneModelBuildable for Option<i32> {}
+impl<
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        >,
+    PositioningDeviceModel: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        >,
+> PhoneModelBuildable
+for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {}
+impl<
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        >,
+    PositioningDeviceModel: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+    #[inline]
+    ///Sets the value of the `public.asset_models.name` column.
+    fn name<'N, N>(
         mut self,
-        other: Self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'N N as TryInto<Option<String>>>::Error,
+        >,
+    {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+                self.phone_models_camera,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'D D as TryInto<Option<String>>>::Error,
+        >,
+    {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+                self.phone_models_camera,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.parent_model_id` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`asset_models`"]
+    ///    v0@{shape: rounded, label: "parent_model_id"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`physical_asset_models`"]
+    ///    v1@{shape: rounded, label: "parent_model_id"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v3 --->|"`extends`"| v2
+    ///```
+    fn parent_model(
+        self,
+        parent_model_id: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.phone_models_camera = self
-            .phone_models_camera
-            .extend_builder(other.phone_models_camera)
-            .map_err(|err| {
-                err.into_field_name(|attribute| InsertablePhoneModelAttributes::Extension(
-                    InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                ))
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+            self,
+            parent_model_id,
+        )
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_by` column.
+    fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+                self.phone_models_camera,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+                self.phone_models_camera,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_by` column.
+    fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+                self.phone_models_camera,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+                self.phone_models_camera,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
             })?;
         Ok(self)
     }
 }
+impl<
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        >,
+    PositioningDeviceModel: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable
+for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {}
+impl<
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        >,
+    PositioningDeviceModel: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {
+    #[inline]
+    ///Sets the value of the `public.physical_asset_models.parent_model_id` column.
+    fn parent_model(
+        mut self,
+        parent_model_id: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+                self.phone_models_camera,
+                parent_model_id,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        >,
+    PositioningDeviceModel: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable
+for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {}
 impl<CameraModel, PositioningDeviceModel> web_common_traits::prelude::SetPrimaryKey
     for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
 where
-    CameraModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
-    PositioningDeviceModel:
-        web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+    CameraModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+    PositioningDeviceModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
 {
-    type PrimaryKey = ::rosetta_uuid::Uuid;
+    type PrimaryKey = i32;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
         self.phone_models_camera = self.phone_models_camera.set_primary_key(primary_key);
         self.phone_models_positioning = self.phone_models_positioning.set_primary_key(primary_key);
         self
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `phone_models`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.created_at(created_at).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
-    /// columns from table `phone_models`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera = self
-            .phone_models_camera
-            .created_at_and_updated_at(created_at, updated_at)
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `phone_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.created_by(created_by).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.description` column from table
-    /// `phone_models`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        Description: TryInto<Option<String>>,
-        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.description(description).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.id` column from table `phone_models`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera = self.phone_models_camera.id(id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertablePhoneModelAttributes::Extension(
-                    InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.name` column from table
-    /// `phone_models`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        Name: TryInto<Option<String>>,
-        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera = self.phone_models_camera.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertablePhoneModelAttributes::Extension(
-                    InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.name`, `trackables.description`
-    /// columns from table `phone_models`.
-    pub fn name_and_description<Name, Description>(
-        mut self,
-        name: Name,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.name_and_description(name, description).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `phone_models`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    {
-        self.phone_models_camera = self.phone_models_camera.parent(parent_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertablePhoneModelAttributes::Extension(
-                    InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
-    /// from table `phone_models`.
-    pub fn parent_and_id<Id>(
-        mut self,
-        parent_id: ::rosetta_uuid::Uuid,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.parent_and_id(parent_id, id).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.photograph_id` column from table
-    /// `phone_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.photograph(photograph_id).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.updated_at` column from table
-    /// `phone_models`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.updated_at(updated_at).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl<PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-        PositioningDeviceModel,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `phone_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertablePhoneModelAttributes>>
-    {
-        self.phone_models_camera =
-            self.phone_models_camera.updated_by(updated_by).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertablePhoneModelAttributes::Extension(
-                        InsertablePhoneModelExtensionAttributes::CameraModel(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
     }
 }
 impl<CameraModel, PositioningDeviceModel, C> web_common_traits::database::TryInsertGeneric<C>
@@ -525,10 +411,8 @@ where
             Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
             Error = web_common_traits::database::InsertError<InsertablePhoneModelAttributes>,
         >,
-    CameraModel:
-        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
-    PositioningDeviceModel:
-        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = InsertablePhoneModelAttributes;
     fn is_complete(&self) -> bool {

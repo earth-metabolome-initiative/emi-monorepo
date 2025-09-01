@@ -21,6 +21,8 @@ impl IsForeignKeyConstraint {
 }
 
 impl CustomColumnConstraint for IsForeignKeyConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         conn: &mut PgConnection,

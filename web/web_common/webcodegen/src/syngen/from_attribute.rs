@@ -1,11 +1,118 @@
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::traits::TableLike;
 
-use crate::{Column, Table, errors::WebCodeGenError};
+use crate::{Column, Table, errors::WebCodeGenError, traits::TableLike};
 
-impl crate::Table {
+type FromMethods = Vec<(Vec<Table>, Vec<Column>, bool, Option<TokenStream>)>;
+
+impl Table {
+    fn ancestral_from_attributes(
+        &self,
+        root_table: &Table,
+        conn: &mut PgConnection,
+    ) -> Result<FromMethods, WebCodeGenError> {
+        let mut ancestral_from_attributes: FromMethods = Vec::new();
+        let extension_tables = self.extension_tables(conn)?;
+
+        let primary_key_idents = root_table.primary_key_idents(conn)?;
+        let root_table_ident = root_table.snake_case_ident()?;
+
+        // First, we process the first-level extension tables to cover
+        for extension_table in &extension_tables {
+            let extension_table_ident = extension_table.snake_case_ident()?;
+            let extension_primary_key_idents = extension_table.primary_key_idents(conn)?;
+
+            let join_clause =
+                primary_key_idents.iter().zip(extension_primary_key_idents.iter()).try_fold(
+                    TokenStream::new(),
+                    |acc: TokenStream, (root_primary_key_ident, extension_primary_key_ident)| {
+                        Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
+                            quote! {
+                                #root_table_ident::#root_primary_key_ident
+                                    .eq(#extension_table_ident::#extension_primary_key_ident)
+                            }
+                        } else {
+                            quote! {
+                                #acc.and(
+                                    #root_table_ident::#root_primary_key_ident
+                                        .eq(#extension_table_ident::#extension_primary_key_ident)
+                                )
+                            }
+                        })
+                    },
+                )?;
+
+            let join_clause = quote! {
+                #extension_table_ident::table.on(
+                    #join_clause
+                )
+            };
+
+            for index in extension_table.unique_indices(conn)? {
+                if index.is_primary_key() {
+                    continue;
+                }
+
+                let columns = index.columns(conn)?;
+
+                if columns.len() == 1 {
+                    continue;
+                }
+
+                ancestral_from_attributes.push((
+                    vec![root_table.clone(), extension_table.clone()],
+                    columns,
+                    true,
+                    Some(join_clause.clone()),
+                ));
+            }
+
+            for column in extension_table.columns(conn)? {
+                // If the column is a UNIQUE index or a foreign key, skip it, as
+                // the method generation is already taken care of elsewhere.
+                if column.is_unique(conn)? || !column.supports_eq(conn)? {
+                    continue;
+                }
+
+                ancestral_from_attributes.push((
+                    vec![root_table.clone(), extension_table.clone()],
+                    vec![column],
+                    false,
+                    Some(join_clause.clone()),
+                ));
+            }
+
+            for foreign_key_constraint in extension_table.foreign_keys(conn)? {
+                let columns = foreign_key_constraint.columns(conn)?;
+
+                // The foreign keys which are either a single column or part
+                // of a unique constraints are already covered by other methods.
+                if columns.len() == 1
+                    || foreign_key_constraint.is_foreign_unique_key(conn)?.is_some()
+                {
+                    continue;
+                }
+
+                ancestral_from_attributes.push((
+                    vec![root_table.clone(), extension_table.clone()],
+                    columns,
+                    false,
+                    Some(join_clause.clone()),
+                ));
+            }
+        }
+
+        // Secondly, we recursively call this method on the extension tables
+        // to cover the higher-level extension tables.
+        for extension_table in extension_tables {
+            ancestral_from_attributes
+                .extend(extension_table.ancestral_from_attributes(root_table, conn)?);
+        }
+
+        Ok(ancestral_from_attributes)
+    }
+
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::type_complexity)]
     /// Generate the `from_{x}` methods for the attributes of the struct
@@ -13,15 +120,8 @@ impl crate::Table {
     ///
     /// # Arguments
     ///
+    /// * `table` - The table corresponding to the struct.
     /// * `conn` - The Diesel connection to the database.
-    ///
-    /// # Implementation details
-    ///
-    /// Since the foreign key methods from the [`Foreign`] trait and the `load`
-    /// method from the [`Loadable`] trait cover all foreign keys and the
-    /// primary keys, we only need to implement the methods relative to
-    /// UNIQUE indices that do not refer to neither those columns, even if
-    /// they are UNIQUE indices.
     ///
     /// # Errors
     ///
@@ -31,11 +131,9 @@ impl crate::Table {
         let struct_name = self.struct_ident()?;
         let table_ident = self.snake_case_ident()?;
         let mut from_attributes = TokenStream::new();
-        let primary_key_columns = self.primary_key_columns(conn)?;
-        let mut from_methods: Vec<(Vec<Table>, Vec<Column>, bool, Option<TokenStream>)> =
-            Vec::new();
+        let mut from_methods: FromMethods = Vec::new();
         let primary_key_order_by = self
-            .primary_key_identifiers(conn)?
+            .primary_key_idents(conn)?
             .into_iter()
             .map(|column_ident| {
                 quote! {
@@ -54,18 +152,6 @@ impl crate::Table {
             }
         };
 
-        for index in self.unique_indices(conn)? {
-            if index.is_primary_key() {
-                continue;
-            }
-
-            let columns = index.columns(conn)?;
-
-            from_methods.push((vec![self.clone()], columns, true, None));
-        }
-
-        let mut same_as_constraints = Vec::new();
-
         for column in self.columns(conn)? {
             // If the column is a UNIQUE index skip it, as
             // the method generation is already taken care of elsewhere.
@@ -73,8 +159,21 @@ impl crate::Table {
                 continue;
             }
 
-            same_as_constraints.extend(column.same_as_columns(conn)?);
             from_methods.push((vec![self.clone()], vec![column], false, None));
+        }
+
+        for index in self.unique_indices(conn)? {
+            if index.is_primary_key() {
+                continue;
+            }
+
+            let columns = index.columns(conn)?;
+
+            if columns.len() == 1 {
+                continue;
+            }
+
+            from_methods.push((vec![self.clone()], columns, true, None));
         }
 
         for foreign_key_constraint in self.foreign_keys(conn)? {
@@ -89,89 +188,29 @@ impl crate::Table {
             from_methods.push((vec![self.clone()], columns, false, None));
         }
 
-        for extension_table in self.ancestral_extension_tables(conn)? {
-            let extension_table_ident = extension_table.snake_case_ident()?;
-            let extension_primary_key = extension_table.primary_key_columns(conn)?.pop().unwrap();
-            let primary_key_ident = primary_key_columns[0].snake_case_ident()?;
-            let extension_primary_key_ident = extension_primary_key.snake_case_ident()?;
+        let extension_tables = self.ancestral_extension_tables(conn)?;
 
-            let join_clause = quote! {
-                #extension_table_ident::table.on(
-                    #table_ident::#primary_key_ident
-                        .eq(#extension_table_ident::#extension_primary_key_ident)
-                )
-            };
-
-            for index in extension_table.unique_indices(conn)? {
-                if index.is_primary_key() {
-                    continue;
-                }
-
-                let columns = index.columns(conn)?;
-
-                if columns.len() == 1 && same_as_constraints.iter().any(|c| c == &columns[0]) {
-                    continue;
-                }
-
-                from_methods.push((
-                    vec![self.clone(), extension_table.clone()],
-                    columns,
-                    true,
-                    Some(join_clause.clone()),
-                ));
-            }
-
-            for column in extension_table.columns(conn)? {
-                // If the column is a UNIQUE index or a foreign key, skip it, as
-                // the method generation is already taken care of elsewhere.
-                if column.is_unique(conn)? || !column.supports_eq(conn)? {
-                    continue;
-                }
-
-                // If the column appears in the same-as constraints,
-                // we skip it, as the method generation is already taken care of elsewhere.
-                if same_as_constraints.iter().any(|c| c == &column) {
-                    continue;
-                }
-
-                from_methods.push((
-                    vec![self.clone(), extension_table.clone()],
-                    vec![column],
-                    false,
-                    Some(join_clause.clone()),
-                ));
-            }
-
-            for foreign_key_constraint in extension_table.foreign_keys(conn)? {
-                let columns = foreign_key_constraint.columns(conn)?;
-
-                // The foreign keys which are either a single column or part
-                // of a unique constraints are already covered by other methods.
-                if columns.len() == 1 {
-                    continue;
-                }
-
-                from_methods.push((
-                    vec![self.clone(), extension_table.clone()],
-                    columns,
-                    false,
-                    Some(join_clause.clone()),
-                ));
-            }
+        if !extension_tables.is_empty() {
+            from_methods.extend(self.ancestral_from_attributes(self, conn)?);
         }
 
+        let mut method_names = std::collections::HashSet::new();
+
         for (tables, columns, is_unique, join_clause) in from_methods {
-            let method_ident = syn::Ident::new(
-                &format!(
-                    "from_{}",
-                    columns
-                        .iter()
-                        .map(Column::snake_case_name)
-                        .collect::<Result<Vec<String>, _>>()?
-                        .join("_and_")
-                ),
-                struct_name.span(),
+            let method_name = &format!(
+                "from_{}",
+                columns
+                    .iter()
+                    .map(Column::snake_case_name)
+                    .collect::<Result<Vec<String>, _>>()?
+                    .join("_and_")
             );
+
+            if !method_names.insert(method_name.clone()) {
+                continue;
+            }
+
+            let method_ident = syn::Ident::new(method_name, struct_name.span());
 
             let mut additional_imports = tables
                 .iter()

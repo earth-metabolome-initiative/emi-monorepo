@@ -93,16 +93,6 @@ impl Brand {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::brands::brands;
-        Self::table().filter(brands::name.eq(name)).order_by(brands::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,

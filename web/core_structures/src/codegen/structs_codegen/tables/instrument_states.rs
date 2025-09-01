@@ -61,58 +61,6 @@ impl InstrumentState {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
-        Self::table()
-            .filter(instrument_states::name.eq(name))
-            .order_by(instrument_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
-        Self::table()
-            .filter(instrument_states::description.eq(description))
-            .order_by(instrument_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_icon(
-        icon: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
-        Self::table()
-            .filter(instrument_states::icon.eq(icon))
-            .order_by(instrument_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
-        Self::table()
-            .filter(instrument_states::color_id.eq(color_id))
-            .order_by(instrument_states::id.asc())
-            .first::<Self>(conn)
-    }
 }
 impl AsRef<InstrumentState> for InstrumentState {
     fn as_ref(&self) -> &InstrumentState {

@@ -108,18 +108,81 @@ pub struct InsertableTeamProjectBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) project_id: Option<i32>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableTeamProjectBuilder {
-    type Attributes = InsertableTeamProjectAttributes;
-    fn extend_builder(
+/// Trait defining setters for attributes of an instance of `TeamProject` or
+/// descendant tables.
+pub trait TeamProjectBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.team_projects.team_id` column.
+    ///
+    /// # Arguments
+    /// * `team_id`: The value to set for the `public.team_projects.team_id`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn team(
+        self,
+        team_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.team_projects.project_id` column.
+    ///
+    /// # Arguments
+    /// * `project_id`: The value to set for the
+    ///   `public.team_projects.project_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn project(
+        self,
+        project_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl TeamProjectBuildable for InsertableTeamProjectBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttributes;
+    /// Sets the value of the `public.team_projects.team_id` column.
+    fn team(
         mut self,
-        other: Self,
+        team_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(team_id) = other.team_id {
-            self = self.team(team_id)?;
-        }
-        if let Some(project_id) = other.project_id {
-            self = self.project(project_id)?;
-        }
+        let team_id = team_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamProjectAttributes::TeamId)
+        })?;
+        self.team_id = Some(team_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.team_projects.project_id` column.
+    fn project(
+        mut self,
+        project_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let project_id = project_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamProjectAttributes::ProjectId)
+        })?;
+        self.project_id = Some(project_id);
         Ok(self)
     }
 }
@@ -127,30 +190,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamProjectBuilder 
     type PrimaryKey = (i32, i32);
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
-    /// Sets the value of the `team_projects.project_id` column from table
-    /// `team_projects`.
-    pub fn project(
-        mut self,
-        project_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
-    {
-        self.project_id = Some(project_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder {
-    /// Sets the value of the `team_projects.team_id` column from table
-    /// `team_projects`.
-    pub fn team(
-        mut self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamProjectAttributes>>
-    {
-        self.team_id = Some(team_id);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamProjectBuilder

@@ -23,21 +23,7 @@ impl diesel::Identifiable for Country {
         self.iso
     }
 }
-impl Country {
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::countries::countries;
-        Self::table()
-            .filter(countries::name.eq(name))
-            .order_by(countries::iso.asc())
-            .first::<Self>(conn)
-    }
-}
+impl Country {}
 impl AsRef<Country> for Country {
     fn as_ref(&self) -> &Country {
         self

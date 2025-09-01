@@ -13,7 +13,7 @@
     table_name = crate::codegen::diesel_codegen::tables::volumetric_container_models::volumetric_container_models
 )]
 pub struct VolumetricContainerModel {
-    pub id: ::rosetta_uuid::Uuid,
+    pub id: i32,
     pub liters: f32,
 }
 impl web_common_traits::prelude::TableName for VolumetricContainerModel {
@@ -21,22 +21,30 @@ impl web_common_traits::prelude::TableName for VolumetricContainerModel {
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     > for VolumetricContainerModel
 where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     > for VolumetricContainerModel
 where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for VolumetricContainerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for VolumetricContainerModel {
-    type Id = ::rosetta_uuid::Uuid;
+    type Id = i32;
     fn id(self) -> Self::Id {
         self.id
     }
@@ -75,21 +83,48 @@ impl VolumetricContainerModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
+    pub fn from_parent_model_id(
+        parent_model_id: &i32,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
             ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
             associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            physical_asset_models::physical_asset_models,
+            volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::name.eq(name))
+            .inner_join(
+                physical_asset_models::table
+                    .on(volumetric_container_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model_id.eq(parent_model_id))
+            .order_by(volumetric_container_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_id_and_id(
+        parent_model_id: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
+        };
+        Self::table()
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
@@ -105,51 +140,13 @@ impl VolumetricContainerModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::description.eq(description))
-            .order_by(volumetric_container_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photograph_id(
-        photograph_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(volumetric_container_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::parent_id.eq(parent_id))
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::description.eq(description))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -165,11 +162,13 @@ impl VolumetricContainerModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::created_by.eq(created_by))
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::created_by.eq(created_by))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -185,11 +184,13 @@ impl VolumetricContainerModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::created_at.eq(created_at))
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::created_at.eq(created_at))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -205,11 +206,13 @@ impl VolumetricContainerModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::updated_by.eq(updated_by))
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::updated_by.eq(updated_by))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -225,11 +228,13 @@ impl VolumetricContainerModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            trackables::trackables, volumetric_container_models::volumetric_container_models,
+            asset_models::asset_models, volumetric_container_models::volumetric_container_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(volumetric_container_models::id.eq(trackables::id)))
-            .filter(trackables::updated_at.eq(updated_at))
+            .inner_join(
+                asset_models::table.on(volumetric_container_models::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::updated_at.eq(updated_at))
             .order_by(volumetric_container_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -18,10 +18,7 @@ where
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
     C: diesel::connection::LoadConnection,
-    ContainerModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
+    ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel;

@@ -7,9 +7,8 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, parse_quote};
-use crate::traits::TableLike;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Table, traits::TableLike};
 
 const ATTRIBUTE_TRAITS: &[(&str, &str, bool)] = &[("Described", "description", true)];
 

@@ -4,9 +4,8 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
-use crate::traits::TableLike;
 
-use crate::{Table, errors::WebCodeGenError};
+use crate::{Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Table {
     /// Returns the Syn `TokenStream` for the diesel schema definition for the

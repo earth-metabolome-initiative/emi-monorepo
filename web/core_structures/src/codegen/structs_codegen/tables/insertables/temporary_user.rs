@@ -78,40 +78,95 @@ pub struct InsertableTemporaryUserBuilder {
     pub(crate) email: Option<String>,
     pub(crate) login_provider_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableTemporaryUserBuilder {
-    type Attributes = InsertableTemporaryUserAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+/// Trait defining setters for attributes of an instance of `TemporaryUser` or
+/// descendant tables.
+pub trait TemporaryUserBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.temporary_user.email` column.
+    ///
+    /// # Arguments
+    /// * `email`: The value to set for the `public.temporary_user.email`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn email<'E, E>(
+        self,
+        email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>;
+    /// Sets the value of the `public.temporary_user.login_provider_id` column.
+    ///
+    /// # Arguments
+    /// * `login_provider_id`: The value to set for the
+    ///   `public.temporary_user.login_provider_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn login_provider(
+        self,
+        login_provider_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl TemporaryUserBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
+    fn email<'E, E>(
+        self,
+        _email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn login_provider(
+        self,
+        _login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(email) = other.email {
-            self = self.email(email)?;
-        }
-        if let Some(login_provider_id) = other.login_provider_id {
-            self = self.login_provider(login_provider_id)?;
-        }
         Ok(self)
     }
 }
-impl web_common_traits::prelude::SetPrimaryKey for InsertableTemporaryUserBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder {
-    /// Sets the value of the `temporary_user.email` column from table
-    /// `temporary_user`.
-    pub fn email<Email>(
+impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
+    /// Sets the value of the `public.temporary_user.email` column.
+    fn email<'E, E>(
         mut self,
-        email: Email,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>>
+        email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        Email: TryInto<String>,
-        <Email as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
     {
-        let email = email.try_into().map_err(|err: <Email as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableTemporaryUserAttributes::Email)
+        let email = email.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTemporaryUserAttributes::Email)
         })?;
         pgrx_validation::must_be_email(email.as_ref())
             .map_err(|e| {
@@ -123,17 +178,23 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUs
         self.email = Some(email);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder {
-    /// Sets the value of the `temporary_user.login_provider_id` column from
-    /// table `temporary_user`.
-    pub fn login_provider(
+    /// Sets the value of the `public.temporary_user.login_provider_id` column.
+    fn login_provider(
         mut self,
         login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>>
-    {
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let login_provider_id = login_provider_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTemporaryUserAttributes::LoginProviderId)
+        })?;
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableTemporaryUserBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTemporaryUserBuilder

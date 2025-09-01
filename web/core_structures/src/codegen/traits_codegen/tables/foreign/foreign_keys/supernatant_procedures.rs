@@ -4,32 +4,29 @@ pub struct SupernatantProcedureForeignKeys {
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
-    pub procedure_model: Option<
-        crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+    >,
+    pub foreign_procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub foreign_procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub stratified_source: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
     pub supernatant_destination: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
     pub transferred_with: Option<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        crate::codegen::structs_codegen::tables::pipettes::Pipette,
     >,
-    pub pipette_tip: Option<
+    pub pipette_tip_model: Option<
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     >,
-    pub supernatant_procedures_procedure_id_stratified_source_fkey: Option<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-    >,
-    pub supernatant_procedures_procedure_id_supernatant_destinatio_fkey: Option<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-    >,
-    pub supernatant_procedures_procedure_id_transferred_with_fkey: Option<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-    >,
-    pub supernatant_procedures_procedure_id_pipette_tip_fkey: Option<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+    pub supernatant_procedures_procedure_pipette_tip_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -42,73 +39,63 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.foreign_procedure_template,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
-                self.procedure_id,
+                self.foreign_procedure,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureModel(
-                self.procedure_model_id,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.stratified_source,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.supernatant_destination,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Pipette(
                 self.transferred_with,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
-                self.pipette_tip,
+                self.pipette_tip_model,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable((
-                self.procedure_id,
-                self.stratified_source,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable((
-                self.procedure_id,
-                self.supernatant_destination,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable((
-                self.procedure_id,
-                self.transferred_with,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTrackable((
-                self.procedure_id,
-                self.pipette_tip,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset((
+                self.procedure,
+                self.pipette_tip_model,
             )),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_model.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.foreign_procedure_template.is_some()
+            && foreign_keys.foreign_procedure.is_some()
             && foreign_keys.stratified_source.is_some()
             && foreign_keys.supernatant_destination.is_some()
             && foreign_keys.transferred_with.is_some()
-            && foreign_keys.pipette_tip.is_some()
-            && foreign_keys.supernatant_procedures_procedure_id_stratified_source_fkey.is_some()
-            && foreign_keys
-                .supernatant_procedures_procedure_id_supernatant_destinatio_fkey
-                .is_some()
-            && foreign_keys.supernatant_procedures_procedure_id_transferred_with_fkey.is_some()
-            && foreign_keys.supernatant_procedures_procedure_id_pipette_tip_fkey.is_some()
+            && foreign_keys.pipette_tip_model.is_some()
+            && foreign_keys.supernatant_procedures_procedure_pipette_tip_model_fkey.is_some()
     }
     fn update(
         &self,
@@ -119,182 +106,166 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PipetteModel(pipette_models),
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.transferred_with == pipette_models.id {
-                    foreign_keys.transferred_with = Some(pipette_models);
+                if self.foreign_procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.foreign_procedure_template = Some(procedure_templates);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::PipetteModel(pipette_models),
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.transferred_with == pipette_models.id {
+                if self.foreign_procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.foreign_procedure_template = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SupernatantProcedureTemplate(
+                    supernatant_procedure_templates,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_template == supernatant_procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = Some(supernatant_procedure_templates);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SupernatantProcedureTemplate(
+                    supernatant_procedure_templates,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_template == supernatant_procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure == procedures.procedure {
+                    foreign_keys.procedure = Some(procedures);
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = Some(procedures);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure == procedures.procedure {
+                    foreign_keys.procedure = None;
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.pipette_tip_model == pipette_tip_models.id {
+                    foreign_keys.pipette_tip_model = Some(pipette_tip_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.pipette_tip_model == pipette_tip_models.id {
+                    foreign_keys.pipette_tip_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Pipette(pipettes),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.transferred_with == pipettes.id {
+                    foreign_keys.transferred_with = Some(pipettes);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Pipette(pipettes),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.transferred_with == pipettes.id {
                     foreign_keys.transferred_with = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.pipette_tip == pipette_tip_models.id {
-                    foreign_keys.pipette_tip = Some(pipette_tip_models);
+                if self.procedure == procedure_assets.procedure
+                    && self.pipette_tip_model == procedure_assets.asset_model
+                {
+                    foreign_keys.supernatant_procedures_procedure_pipette_tip_model_fkey =
+                        Some(procedure_assets);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.pipette_tip == pipette_tip_models.id {
-                    foreign_keys.pipette_tip = None;
+                if self.procedure == procedure_assets.procedure
+                    && self.pipette_tip_model == procedure_assets.asset_model
+                {
+                    foreign_keys.supernatant_procedures_procedure_pipette_tip_model_fkey = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTrackable(procedure_trackables),
+                crate::codegen::tables::row::Row::VolumetricContainer(volumetric_containers),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.stratified_source == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_stratified_source_fkey =
-                        Some(procedure_trackables);
+                if self.stratified_source == volumetric_containers.id {
+                    foreign_keys.stratified_source = Some(volumetric_containers);
                     updated = true;
                 }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.supernatant_destination == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_supernatant_destinatio_fkey =
-                        Some(procedure_trackables);
-                    updated = true;
-                }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.transferred_with == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_transferred_with_fkey =
-                        Some(procedure_trackables);
-                    updated = true;
-                }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.pipette_tip == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_pipette_tip_fkey =
-                        Some(procedure_trackables);
+                if self.supernatant_destination == volumetric_containers.id {
+                    foreign_keys.supernatant_destination = Some(volumetric_containers);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTrackable(procedure_trackables),
+                crate::codegen::tables::row::Row::VolumetricContainer(volumetric_containers),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.stratified_source == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_stratified_source_fkey = None;
-                    updated = true;
-                }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.supernatant_destination == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_supernatant_destinatio_fkey =
-                        None;
-                    updated = true;
-                }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.transferred_with == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_transferred_with_fkey = None;
-                    updated = true;
-                }
-                if self.procedure_id == procedure_trackables.procedure_id
-                    && self.pipette_tip == procedure_trackables.trackable_id
-                {
-                    foreign_keys.supernatant_procedures_procedure_id_pipette_tip_fkey = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_id == procedures.id {
-                    foreign_keys.procedure = Some(procedures);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_id == procedures.id {
-                    foreign_keys.procedure = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::SupernatantProcedureModel(
-                    supernatant_procedure_models,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_model_id == supernatant_procedure_models.procedure_model_id {
-                    foreign_keys.procedure_model = Some(supernatant_procedure_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::SupernatantProcedureModel(
-                    supernatant_procedure_models,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_model_id == supernatant_procedure_models.procedure_model_id {
-                    foreign_keys.procedure_model = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::VolumetricContainerModel(
-                    volumetric_container_models,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.stratified_source == volumetric_container_models.id {
-                    foreign_keys.stratified_source = Some(volumetric_container_models);
-                    updated = true;
-                }
-                if self.supernatant_destination == volumetric_container_models.id {
-                    foreign_keys.supernatant_destination = Some(volumetric_container_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::VolumetricContainerModel(
-                    volumetric_container_models,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.stratified_source == volumetric_container_models.id {
+                if self.stratified_source == volumetric_containers.id {
                     foreign_keys.stratified_source = None;
                     updated = true;
                 }
-                if self.supernatant_destination == volumetric_container_models.id {
+                if self.supernatant_destination == volumetric_containers.id {
                     foreign_keys.supernatant_destination = None;
                     updated = true;
                 }

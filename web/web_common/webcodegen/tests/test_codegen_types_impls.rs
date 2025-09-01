@@ -15,6 +15,7 @@ async fn test_codegen_types_impls() {
         .set_output_directory("tests/codegen_types_impls".as_ref())
         .enable_type_impls()
         .beautify()
+        .add_schema("public")
         .generate(&mut conn, &database_name);
     docker.stop().await.unwrap();
     outcome.unwrap();

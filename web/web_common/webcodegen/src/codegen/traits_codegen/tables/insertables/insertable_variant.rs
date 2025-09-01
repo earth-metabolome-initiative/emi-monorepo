@@ -5,14 +5,13 @@ use std::{
     collections::{HashMap, HashSet},
     path::Path,
 };
-use crate::traits::TableLike;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Codegen, Column, Table, errors::WebCodeGenError};
+use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     /// Returns the implementation of the `TryInsert` trait for the insertable
@@ -227,7 +226,7 @@ impl Codegen<'_> {
                         #column_ident: self.#column_ident
                     }
                 } else {
-                    if !column.is_part_of_extension_primary_key(conn)?.is_some()
+                    if column.is_part_of_extension_primary_key(conn)?.is_none()
                         && column.requires_partial_builder(conn)?.is_none()
                     {
                         let camel_cased_column_ident = column.camel_case_ident()?;
@@ -353,6 +352,7 @@ impl Codegen<'_> {
         }
 
         let mut grouped_same_as_columns = grouped_same_as_columns.into_iter().collect::<Vec<_>>();
+        let mut maybe_mut = None;
 
         grouped_same_as_columns.sort_unstable();
 
@@ -361,20 +361,25 @@ impl Codegen<'_> {
         for (local_column, same_as_columns) in grouped_same_as_columns {
             let mut completion_assignments: Vec<TokenStream> = Vec::new();
             let camel_cased_column_ident = local_column.camel_case_ident()?;
+            let local_column_ident = local_column.snake_case_ident()?;
             for (primary_key_column, associated_foreign_column) in same_as_columns {
                 let primary_key_column_ident = primary_key_column.snake_case_ident()?;
                 let associated_foreign_column_ident = associated_foreign_column.getter_ident()?;
+                let foreign_table = associated_foreign_column.table(conn)?;
+                let foreign_table_builder_trait = foreign_table.builder_trait_ty()?;
+                maybe_mut = Some(quote! {mut});
                 completion_assignments.push(quote! {
-                    .#associated_foreign_column_ident(#primary_key_column_ident)
-                    .map_err(|err| {
+                    self.#local_column_ident = #foreign_table_builder_trait::#associated_foreign_column_ident(
+                        self.#local_column_ident,
+                        #primary_key_column_ident
+                    ).map_err(|err| {
                         err.into_field_name(#insertable_enum::#camel_cased_column_ident)
-                    })?
+                    })?;
                 });
             }
-            let local_column_ident = local_column.snake_case_ident()?;
             dependant_tables_completion.push(quote! {
+                #(#completion_assignments)*
                 let #local_column_ident = self.#local_column_ident
-                    #(#completion_assignments)*
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
                         err.into_field_name(#insertable_enum::#camel_cased_column_ident)
@@ -397,7 +402,7 @@ impl Codegen<'_> {
         Ok((
             quote! {
                 fn try_insert(
-                    self,
+                    #maybe_mut self,
                     #user_id_ident: #user_id_type,
                     #conn_ident: &mut C
                 ) -> Result<

@@ -8,41 +8,42 @@ use std::collections::HashMap;
 use diesel::PgConnection;
 use diesel_migrations_utils::prelude::MigrationDirectory;
 use utils::*;
-use webcodegen::{ColumnSameAsNetwork, Table, errors::WebCodeGenError};
+use webcodegen::{Table, errors::WebCodeGenError};
 
 fn test_inserted_alongside_method(
     conn: &mut PgConnection,
     database_name: &str,
 ) -> Result<(), WebCodeGenError> {
-    let trackables = Table::load(conn, "trackables", None, database_name)
+    let trackables = Table::load(conn, "trackables", "public", database_name)
         .expect("Failed to load the trackables table");
-    let procedure_models = Table::load(conn, "procedure_models", None, database_name)
-        .expect("Failed to load the procedure_models table");
-    let trackable_procedure_models =
-        Table::load(conn, "trackable_procedure_models", None, database_name)
-            .expect("Failed to load the trackable_procedure_models table");
-    let weighing_procedure_models =
-        Table::load(conn, "weighing_procedure_models", None, database_name)
-            .expect("Failed to load the weighing_procedure_models table");
-    let freezing_procedure_models =
-        Table::load(conn, "freezing_procedure_models", None, database_name)
-            .expect("Failed to load the freezing_procedure_models table");
-    let weighing_devices = Table::load(conn, "weighing_devices", None, database_name)
+    let procedure_templates = Table::load(conn, "procedure_templates", "public", database_name)
+        .expect("Failed to load the procedure_templates table");
+    let trackable_procedure_templates =
+        Table::load(conn, "trackable_procedure_templates", "public", database_name)
+            .expect("Failed to load the trackable_procedure_templates table");
+    let weighing_procedure_templates =
+        Table::load(conn, "weighing_procedure_templates", "public", database_name)
+            .expect("Failed to load the weighing_procedure_templates table");
+    let freezing_procedure_templates =
+        Table::load(conn, "freezing_procedure_templates", "public", database_name)
+            .expect("Failed to load the freezing_procedure_templates table");
+    let weighing_devices = Table::load(conn, "weighing_devices", "public", database_name)
         .expect("Failed to load the weighing_devices table");
-    let specialized_weighing_procedure_models =
-        Table::load(conn, "specialized_weighing_procedure_models", None, database_name)
-            .expect("Failed to load the specialized_weighing_procedure_models table");
+    let specialized_weighing_procedure_templates =
+        Table::load(conn, "specialized_weighing_procedure_templates", "public", database_name)
+            .expect("Failed to load the specialized_weighing_procedure_templates table");
 
     let mut expected_outcomes: HashMap<(&Table, &Table), bool> = HashMap::new();
-    expected_outcomes.insert((&weighing_procedure_models, &procedure_models), true);
-    expected_outcomes.insert((&weighing_procedure_models, &trackable_procedure_models), true);
-    expected_outcomes.insert((&freezing_procedure_models, &procedure_models), true);
-    expected_outcomes.insert((&freezing_procedure_models, &trackable_procedure_models), true);
+    expected_outcomes.insert((&weighing_procedure_templates, &procedure_templates), true);
+    expected_outcomes.insert((&weighing_procedure_templates, &trackable_procedure_templates), true);
+    expected_outcomes.insert((&freezing_procedure_templates, &procedure_templates), true);
+    expected_outcomes.insert((&freezing_procedure_templates, &trackable_procedure_templates), true);
     expected_outcomes
-        .insert((&specialized_weighing_procedure_models, &weighing_procedure_models), true);
+        .insert((&specialized_weighing_procedure_templates, &weighing_procedure_templates), true);
     expected_outcomes
-        .insert((&specialized_weighing_procedure_models, &trackable_procedure_models), true);
-    expected_outcomes.insert((&specialized_weighing_procedure_models, &procedure_models), true);
+        .insert((&specialized_weighing_procedure_templates, &trackable_procedure_templates), true);
+    expected_outcomes
+        .insert((&specialized_weighing_procedure_templates, &procedure_templates), true);
     expected_outcomes.insert((&weighing_devices, &trackables), true);
 
     // We symmetrize the expected outcomes for easier comparison
@@ -52,21 +53,21 @@ fn test_inserted_alongside_method(
 
     for left in [
         &trackables,
-        &procedure_models,
-        &trackable_procedure_models,
-        &weighing_procedure_models,
-        &freezing_procedure_models,
+        &procedure_templates,
+        &trackable_procedure_templates,
+        &weighing_procedure_templates,
+        &freezing_procedure_templates,
         &weighing_devices,
-        &specialized_weighing_procedure_models,
+        &specialized_weighing_procedure_templates,
     ] {
         for right in [
             &trackables,
-            &procedure_models,
-            &trackable_procedure_models,
-            &weighing_procedure_models,
-            &freezing_procedure_models,
+            &procedure_templates,
+            &trackable_procedure_templates,
+            &weighing_procedure_templates,
+            &freezing_procedure_templates,
             &weighing_devices,
-            &specialized_weighing_procedure_models,
+            &specialized_weighing_procedure_templates,
         ] {
             if left == right {
                 continue;
@@ -98,11 +99,6 @@ async fn test_inserted_alongside() {
     .unwrap();
 
     let outcome = test_inserted_alongside_method(&mut conn, &database_name);
-    let graph = ColumnSameAsNetwork::new(&mut conn, &database_name).unwrap();
-    let to_dot = graph.to_dot(&mut conn).expect("Failed to convert the graph to dot format");
-    std::fs::write("test_inserted_alongside.dot", to_dot)
-        .expect("Failed to write the graph to a file");
-
     docker.stop().await.unwrap();
     outcome.expect("Failed to test the inserted alongside method");
 }

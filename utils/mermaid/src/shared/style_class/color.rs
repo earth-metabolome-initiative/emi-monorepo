@@ -44,7 +44,19 @@ impl Color {
     #[must_use]
     /// Returns a new pastel red color.
     pub fn pastel_red() -> Self {
-        Color { red: 255, green: 116, blue: 108 }
+        Color { red: 240, green: 116, blue: 108 }
+    }
+
+    #[must_use]
+    /// Returns a new pastel blue color.
+    pub fn pastel_blue() -> Self {
+        Color { red: 108, green: 116, blue: 240 }
+    }
+
+    #[must_use]
+    /// Returns a new pastel cyan color.
+    pub fn pastel_cyan() -> Self {
+        Color { red: 167, green: 239, blue: 240 }
     }
 
     #[must_use]

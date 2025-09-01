@@ -160,7 +160,7 @@ impl TableConstraint {
     ///
     /// * If an error occurs while querying the database
     pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
-        Table::load(conn, &self.table_name, Some(&self.table_schema), &self.table_catalog)
+        Table::load(conn, &self.table_name, &self.table_schema, &self.table_catalog)
     }
 
     /// Load all the constraints for a given table

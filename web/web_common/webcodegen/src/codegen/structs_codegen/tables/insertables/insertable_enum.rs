@@ -4,7 +4,6 @@
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
-use crate::traits::TableLike;
 
 use crate::{
     Codegen, Column, Table,
@@ -12,6 +11,7 @@ use crate::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
+    traits::TableLike,
 };
 
 impl Table {
@@ -136,6 +136,7 @@ impl Table {
         let insertable_extension_enum = self.insertable_extension_enum_ident()?;
         let mut display_insertable_extension_enum_variants = Vec::new();
         let mut insertable_extension_enum_variants = Vec::new();
+        let mut from_implementations = Vec::new();
 
         for extension_table in extension_tables {
             let struct_ident = extension_table.struct_ident()?;
@@ -145,6 +146,13 @@ impl Table {
             });
             insertable_extension_enum_variants.push(quote::quote! {
                 #struct_ident(#extension_table_enum_ty)
+            });
+            from_implementations.push(quote::quote! {
+                impl From<#extension_table_enum_ty> for #insertable_extension_enum {
+                    fn from(attribute: #extension_table_enum_ty) -> Self {
+                        Self::#struct_ident(attribute)
+                    }
+                }
             });
         }
 
@@ -162,6 +170,8 @@ impl Table {
                     }
                 }
             }
+
+            #(#from_implementations)*
         }))
     }
 

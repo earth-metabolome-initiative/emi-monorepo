@@ -4,11 +4,11 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 use syn::Ident;
-use crate::traits::TableLike;
 
 use crate::{
     Codegen, Table,
     codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    traits::TableLike,
 };
 
 impl Codegen<'_> {

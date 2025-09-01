@@ -42,18 +42,18 @@ where
         _user_id: i32,
         _conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let id = self
-            .id
+        let procedure = self
+            .procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
                 ),
             )?;
-        let procedure_model_id = self
-            .procedure_model_id
+        let procedure_template = self
+            .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::ProcedureModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::ProcedureTemplate,
                 ),
             )?;
         let created_by = self
@@ -85,8 +85,8 @@ where
                 ),
             )?;
         Ok(Self::InsertableVariant {
-            id,
-            procedure_model_id,
+            procedure,
+            procedure_template,
             created_by,
             created_at,
             updated_by,

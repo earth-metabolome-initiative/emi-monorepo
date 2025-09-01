@@ -6,8 +6,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::Table;
-use crate::traits::TableLike;
+use crate::{Table, traits::TableLike};
 
 mod crud;
 mod insertables;

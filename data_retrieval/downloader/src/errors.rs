@@ -1,5 +1,9 @@
 //! Submodule defining the possible errors encountered during a download task.
-use std::{convert::Infallible, fmt::Debug, io::Error as IoError};
+use std::{
+    convert::Infallible,
+    fmt::{Debug, Display},
+    io::Error as IoError,
+};
 
 use reqwest::Error as ReqwestError;
 use url::{ParseError, Url};
@@ -16,6 +20,17 @@ pub enum DownloaderError {
     IoError(IoError),
     /// When there is an error with the request.
     ZipError(ZipError),
+}
+
+impl Display for DownloaderError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::DownloaderConfig(err) => write!(f, "Downloader configuration error: {err:?}"),
+            Self::RequestError(err) => write!(f, "Request error: {err}"),
+            Self::IoError(err) => write!(f, "IO error: {err}"),
+            Self::ZipError(err) => write!(f, "Zip error: {err}"),
+        }
+    }
 }
 
 impl From<DownloaderConfig> for DownloaderError {

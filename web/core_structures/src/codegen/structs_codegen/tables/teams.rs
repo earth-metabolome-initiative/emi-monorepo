@@ -46,7 +46,7 @@ where
     type SqlType = diesel::sql_types::Integer;
 }
 impl web_common_traits::prelude::Descendant<Team> for Team {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.parent_team_id.as_ref()
     }
 }
@@ -220,16 +220,6 @@ impl Team {
             conn,
         )
         .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::teams::teams;
-        Self::table().filter(teams::name.eq(name)).order_by(teams::id.asc()).first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

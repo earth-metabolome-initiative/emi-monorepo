@@ -25,6 +25,7 @@ cached.workspace = true
 graph.workspace = true
 sorted_vec.workspace = true
 algebra.workspace = true
+mermaid.workspace = true
 
 [dev-dependencies]
 reference_docker.workspace = true

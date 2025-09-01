@@ -12,8 +12,8 @@ pub struct ProcedureCodegenBuilder<'a> {
     generate_enum: bool,
     /// Whether to generate the procedure impls.
     generate_procedure_impls: bool,
-    /// Whether to generate the procedure model impls.
-    generate_procedure_model_impls: bool,
+    /// Whether to generate the procedure template impls.
+    generate_procedure_template_impls: bool,
     /// Whether to generate the procedure initializer impls.
     generate_procedure_initializer_impls: bool,
     /// Whether to beautify the generated code.
@@ -38,9 +38,9 @@ impl<'a> ProcedureCodegenBuilder<'a> {
     }
 
     #[must_use]
-    /// Sets whether to generate the procedure model impls.
-    pub fn generate_procedure_model_impls(mut self) -> Self {
-        self.generate_procedure_model_impls = true;
+    /// Sets whether to generate the procedure template impls.
+    pub fn generate_procedure_template_impls(mut self) -> Self {
+        self.generate_procedure_template_impls = true;
         self
     }
 
@@ -71,7 +71,7 @@ impl<'a> ProcedureCodegenBuilder<'a> {
 pub enum ProcedureCodegenAttribute {
     GenerateEnum,
     GenerateProcedureImpls,
-    GenerateProcedureModelImpls,
+    GenerateProcedureTemplateImpls,
     GenerateProcedureInitializerImpls,
     Beautify,
     OutputDirectory,
@@ -84,8 +84,8 @@ impl Display for ProcedureCodegenAttribute {
             ProcedureCodegenAttribute::GenerateProcedureImpls => {
                 write!(f, "generate_procedure_impls")
             }
-            ProcedureCodegenAttribute::GenerateProcedureModelImpls => {
-                write!(f, "generate_procedure_model_impls")
+            ProcedureCodegenAttribute::GenerateProcedureTemplateImpls => {
+                write!(f, "generate_procedure_template_impls")
             }
             ProcedureCodegenAttribute::GenerateProcedureInitializerImpls => {
                 write!(f, "generate_procedure_initializer_impls")
@@ -138,7 +138,7 @@ impl<'a> Builder for ProcedureCodegenBuilder<'a> {
         Ok(ProcedureCodegen {
             generate_enum: self.generate_enum,
             generate_procedure_impls: self.generate_procedure_impls,
-            generate_procedure_model_impls: self.generate_procedure_model_impls,
+            generate_procedure_template_impls: self.generate_procedure_template_impls,
             generate_procedure_initializer_impls: self.generate_procedure_initializer_impls,
             beautify: self.beautify,
             output_directory: self

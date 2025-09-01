@@ -277,210 +277,376 @@ impl Default for InsertableTeamBuilder {
         }
     }
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableTeamBuilder {
-    type Attributes = InsertableTeamAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        match (other.id, other.parent_team_id) {
-            (Some(id), Some(parent_team_id)) => {
-                self = self.id_and_parent_team(id, parent_team_id)?;
-            }
-            (None, Some(parent_team_id)) => {
-                self = self.parent_team(Some(parent_team_id))?;
-            }
-            (Some(id), None) => {
-                self = self.id(id)?;
-            }
-            (None, None) => {}
-        }
-        match (other.created_at, other.updated_at) {
-            (Some(created_at), Some(updated_at)) => {
-                self = self.created_at_and_updated_at(created_at, updated_at)?;
-            }
-            (None, Some(updated_at)) => {
-                self = self.updated_at(updated_at)?;
-            }
-            (Some(created_at), None) => {
-                self = self.created_at(created_at)?;
-            }
-            (None, None) => {}
-        }
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(description) = other.description {
-            self = self.description(description)?;
-        }
-        if let Some(icon) = other.icon {
-            self = self.icon(icon)?;
-        }
-        if let Some(color_id) = other.color_id {
-            self = self.color(color_id)?;
-        }
-        if let Some(state_id) = other.state_id {
-            self = self.state(state_id)?;
-        }
-        if let Some(created_by) = other.created_by {
-            self = self.created_by(created_by)?;
-        }
-        if let Some(updated_by) = other.updated_by {
-            self = self.updated_by(updated_by)?;
-        }
-        Ok(self)
-    }
-}
-impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.color_id` column from table `teams`.
-    pub fn color(
-        mut self,
+/// Trait defining setters for attributes of an instance of `Team` or descendant
+/// tables.
+pub trait TeamBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.teams.id` column.
+    ///
+    /// # Arguments
+    /// * `id`: The value to set for the `public.teams.id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn id(
+        self,
+        id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.teams.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<'N, N>(
+        self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.teams.description` column.
+    ///
+    /// # Arguments
+    /// * `description`: The value to set for the `public.teams.description`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn description<'D, D>(
+        self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>;
+    /// Sets the value of the `public.teams.icon` column.
+    ///
+    /// # Arguments
+    /// * `icon`: The value to set for the `public.teams.icon` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn icon<'I, I>(
+        self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+    /// Sets the value of the `public.teams.color_id` column.
+    ///
+    /// # Arguments
+    /// * `color_id`: The value to set for the `public.teams.color_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn color(
+        self,
         color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
-        self.color_id = Some(color_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.created_at` column from table `teams`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableTeamAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
-                        )
-                })?;
-        }
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.created_at`, `teams.updated_at` columns
-    /// from table `teams`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableTeamAttributes::CreatedAt)
-            },
-        )?;
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableTeamAttributes::UpdatedAt)
-            },
-        )?;
-        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-            .map_err(|e| {
-                e
-                    .rename_fields(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
-                    )
-            })?;
-        self.created_at = Some(created_at);
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.created_by` column from table `teams`.
-    pub fn created_by(
-        mut self,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.state_id` column.
+    ///
+    /// # Arguments
+    /// * `state_id`: The value to set for the `public.teams.state_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn state(
+        self,
+        state_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.parent_team_id` column.
+    ///
+    /// # Arguments
+    /// * `parent_team_id`: The value to set for the
+    ///   `public.teams.parent_team_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn parent_team(
+        self,
+        parent_team_id: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.created_by` column.
+    ///
+    /// # Arguments
+    /// * `created_by`: The value to set for the `public.teams.created_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_by(
+        self,
         created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.created_at` column.
+    ///
+    /// # Arguments
+    /// * `created_at`: The value to set for the `public.teams.created_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_at<'CA, CA>(
+        self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+    /// Sets the value of the `public.teams.updated_by` column.
+    ///
+    /// # Arguments
+    /// * `updated_by`: The value to set for the `public.teams.updated_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_by(
+        self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.teams.updated_at` column.
+    ///
+    /// # Arguments
+    /// * `updated_at`: The value to set for the `public.teams.updated_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_at<'UA, UA>(
+        self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+}
+impl TeamBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes;
+    fn id(
+        self,
+        id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(Some(id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
+        })?))
+    }
+    fn name<'N, N>(
+        self,
+        _name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn description<'D, D>(
+        self,
+        _description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn icon<'I, I>(
+        self,
+        _icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn color(
+        self,
+        _color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn state(
+        self,
+        _state_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn parent_team(
+        self,
+        _parent_team_id: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn created_by(
+        self,
+        _created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn created_at<'CA, CA>(
+        self,
+        _created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        Ok(self)
+    }
+    fn updated_by(
+        self,
+        _updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn updated_at<'UA, UA>(
+        self,
+        _updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
         Ok(self)
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.description` column from table `teams`.
-    pub fn description<Description>(
+impl TeamBuildable for InsertableTeamBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes;
+    /// Sets the value of the `public.teams.id` column.
+    fn id(
         mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableTeamAttributes::Description)
-            })?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.icon` column from table `teams`.
-    pub fn icon<Icon>(
-        mut self,
-        icon: Icon,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        Icon: TryInto<String>,
-        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableTeamAttributes::Icon)
-        })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Icon,
-                    )
-            })?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.id` column from table `teams`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        Id: TryInto<i32>,
-        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamAttributes::Id)
+        id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let id = id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::Id)
         })?;
         if let Some(parent_team_id) = self.parent_team_id {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id)
@@ -495,47 +661,18 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
         self.id = Some(id);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.id`, `teams.parent_team_id` columns from
-    /// table `teams`.
-    pub fn id_and_parent_team<Id>(
+    /// Sets the value of the `public.teams.name` column.
+    fn name<'N, N>(
         mut self,
-        id: Id,
-        parent_team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        Id: TryInto<i32>,
-        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
     {
-        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTeamAttributes::Id)
-        })?;
-        pgrx_validation::must_be_distinct_i32(parent_team_id, id)
-            .map_err(|e| {
-                e
-                    .rename_fields(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
-                    )
-            })?;
-        self.id = Some(id);
-        self.parent_team_id = Some(parent_team_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.name` column from table `teams`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableTeamAttributes::Name)
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
@@ -547,13 +684,78 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
         self.name = Some(name);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.parent_team_id` column from table `teams`.
-    pub fn parent_team(
+    /// Sets the value of the `public.teams.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+    {
+        let description = description.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::Description)
+        })?;
+        self.description = Some(description);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.icon` column.
+    fn icon<'I, I>(
+        mut self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        let icon = icon.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::Icon)
+        })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Icon,
+                    )
+            })?;
+        self.icon = Some(icon);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.color_id` column.
+    fn color(
+        mut self,
+        color_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let color_id = color_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::ColorId)
+        })?;
+        self.color_id = Some(color_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.state_id` column.
+    fn state(
+        mut self,
+        state_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let state_id = state_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::StateId)
+        })?;
+        self.state_id = Some(state_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.parent_team_id` column.
+    fn parent_team(
         mut self,
         parent_team_id: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let parent_team_id = parent_team_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::ParentTeamId)
+        })?;
         if let (Some(id), Some(parent_team_id)) = (self.id, parent_team_id) {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id)
                 .map_err(|e| {
@@ -567,33 +769,88 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
         self.parent_team_id = parent_team_id;
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.state_id` column from table `teams`.
-    pub fn state(
+    /// Sets the value of the `public.teams.created_by` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "created_by"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "updated_by"}
+    /// class v1 directly-involved-column
+    /// ```
+    fn created_by(
         mut self,
-        state_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
-        self.state_id = Some(state_id);
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self = self.updated_by(created_by)?;
+        let created_by = created_by.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::CreatedBy)
+        })?;
+        self.created_by = Some(created_by);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.updated_at` column from table `teams`.
-    pub fn updated_at<UpdatedAt>(
+    /// Sets the value of the `public.teams.created_at` column.
+    fn created_at<'CA, CA>(
         mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>>
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableTeamAttributes::UpdatedAt)
-            },
-        )?;
+        let created_at = created_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::CreatedAt)
+        })?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                        )
+                })?;
+        }
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.updated_by` column.
+    fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let updated_by = updated_by.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::UpdatedBy)
+        })?;
+        self.updated_by = Some(updated_by);
+        Ok(self)
+    }
+    /// Sets the value of the `public.teams.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        let updated_at = updated_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTeamAttributes::UpdatedAt)
+        })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
@@ -608,14 +865,10 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
         Ok(self)
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder {
-    /// Sets the value of the `teams.updated_by` column from table `teams`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamAttributes>> {
-        self.updated_by = Some(updated_by);
-        Ok(self)
+impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamBuilder

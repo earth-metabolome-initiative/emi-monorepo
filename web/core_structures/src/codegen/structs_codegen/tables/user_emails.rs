@@ -60,55 +60,6 @@ impl UserEmail {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_email(
-        email: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(user_emails::email.eq(email))
-            .order_by(user_emails::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_email_and_created_by(
-        email: &str,
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(user_emails::email.eq(email).and(user_emails::created_by.eq(created_by)))
-            .order_by(user_emails::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by_and_primary_email(
-        created_by: &i32,
-        primary_email: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(
-                user_emails::created_by
-                    .eq(created_by)
-                    .and(user_emails::primary_email.eq(primary_email)),
-            )
-            .order_by(user_emails::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,
@@ -146,6 +97,42 @@ impl UserEmail {
             .filter(user_emails::primary_email.eq(primary_email))
             .order_by(user_emails::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_email_and_created_by(
+        email: &str,
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::email.eq(email).and(user_emails::created_by.eq(created_by)))
+            .order_by(user_emails::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by_and_primary_email(
+        created_by: &i32,
+        primary_email: &bool,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(
+                user_emails::created_by
+                    .eq(created_by)
+                    .and(user_emails::primary_email.eq(primary_email)),
+            )
+            .order_by(user_emails::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<UserEmail> for UserEmail {

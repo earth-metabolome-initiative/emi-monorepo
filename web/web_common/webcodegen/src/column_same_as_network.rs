@@ -21,7 +21,7 @@ use sorted_vec::prelude::SortedVec;
 
 use crate::{Column, Table, errors::WebCodeGenError};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 /// A network of columns that are "same as" each other.
 pub struct ColumnSameAsNetwork {
     /// The directed graph representing the "same as" relationships between
@@ -36,24 +36,9 @@ pub struct ColumnSameAsNetwork {
 }
 
 impl ColumnSameAsNetwork {
-    /// Creates a new `ColumnSameAsNetwork` from a PostgreSQL connection.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
-    /// * `table_catalog`: The catalog of the table to load columns from.
-    pub fn new(
-        conn: &mut PgConnection,
-        table_catalog: &str,
-    ) -> Result<Self, WebCodeGenError> {
-        let mut tables = Table::load_all(conn, table_catalog)?
-            .into_iter()
-            .filter(|table| !(table.is_temporary() || table.is_view()))
-            .collect::<Vec<Table>>();
-
-        tables.sort_unstable();
-
-        Self::from_tables(conn, &tables)
+    /// Returns an iterator over all columns in the network.
+    pub fn columns(&self) -> impl Iterator<Item = Column> {
+        self.same_as_graph.nodes()
     }
 
     /// Creates a new `ColumnSameAsNetwork` from a PostgreSQL connection.
@@ -74,32 +59,39 @@ impl ColumnSameAsNetwork {
 
         let columns = SortedVec::try_from(columns).expect("Columns should be sorted and unique");
 
-        let mut edges = columns
-            .iter()
-            .enumerate()
-            .filter_map(|(src_id, column)| {
-                let same_as_edges: Vec<(usize, usize)> = column
-                    .same_as_columns(conn)
-                    .ok()?
-                    .into_iter()
-                    .filter_map(|same_as_column| {
-                        let dst_id = columns.binary_search(&same_as_column).ok()?;
-                        Some((src_id, dst_id))
-                    })
-                    .collect();
-                Some(same_as_edges)
-            })
-            .flatten()
-            .collect::<Vec<(usize, usize)>>();
+        let mut node_tuples = Vec::new();
+        let mut undirected_node_tuples = Vec::new();
 
-        edges.sort_unstable();
-        edges.dedup();
+        for (src_id, column) in columns.iter().enumerate() {
+            for same_as_column in column.same_as_columns(conn)? {
+                if let Ok(dst_id) = columns.binary_search(&same_as_column) {
+                    node_tuples.push((src_id, dst_id));
+                    undirected_node_tuples.push(if src_id < dst_id {
+                        (src_id, dst_id)
+                    } else {
+                        (dst_id, src_id)
+                    });
+                }
+            }
+        }
+
+        node_tuples.sort_unstable();
+        undirected_node_tuples.sort_unstable();
 
         let edges = DiEdgesBuilder::default()
             .expected_shape(columns.len())
-            .edges(edges)
+            .edges(node_tuples.clone())
             .build()
             .expect("Failed to build edges for the column same-as network");
+
+        let undirected_edges = UndiEdgesBuilder::default()
+            .expected_shape(columns.len())
+            .edges(undirected_node_tuples)
+            .build()
+            .expect(&format!(
+                "Failed to build undirected edges for the column same-as network with {} columns",
+                columns.len()
+            ));
 
         let same_as_graph: GenericGraph<
             SortedVec<Column>,
@@ -109,6 +101,13 @@ impl ColumnSameAsNetwork {
             .edges(edges.clone())
             .build()
             .expect("Failed to build the column same-as network graph");
+
+        let undirected_edges_same_as_graph: UndiGraph<Column> =
+            GenericMonoplexMonopartiteGraphBuilder::default()
+                .nodes(columns.clone())
+                .edges(undirected_edges)
+                .build()
+                .expect("Failed to build the column same-as network graph");
 
         let transposed_edges = edges.transpose();
 
@@ -120,38 +119,25 @@ impl ColumnSameAsNetwork {
 
         let mut missing_edges: Vec<(usize, usize)> = Vec::new();
 
-        for src_id in same_as_graph.node_ids() {
-            for dst_id in same_as_graph.successors_set(src_id) {
-                if same_as_graph.has_successor(src_id, dst_id)
-                    || same_as_graph.has_successor(dst_id, src_id)
+        for src_id in undirected_edges_same_as_graph.node_ids() {
+            let src_column = &undirected_edges_same_as_graph.nodes_vocabulary()[src_id];
+            let src_table = src_column.table(conn)?;
+            for dst_id in undirected_edges_same_as_graph.successors_set(src_id) {
+                if undirected_edges_same_as_graph.has_successor(src_id, dst_id)
+                    || undirected_edges_same_as_graph.has_successor(dst_id, src_id)
                 {
                     continue;
                 }
 
-                let src_column = &same_as_graph.nodes_vocabulary()[src_id];
-                let dst_column = &same_as_graph.nodes_vocabulary()[dst_id];
-
-                let src_table = src_column.table(conn)?;
+                let dst_column = &undirected_edges_same_as_graph.nodes_vocabulary()[dst_id];
                 let dst_table = dst_column.table(conn)?;
-
-                if src_table == dst_table {
-                    // If both columns are in the same table, we do not need to infer an edge.
-                    continue;
-                }
-
-                let src_ancestral_extension_tables = src_table.ancestral_extension_tables(conn)?;
-                let dst_ancestral_extension_tables = dst_table.ancestral_extension_tables(conn)?;
-
-                // If the `src_table` is an extension of the `dst_table`, or vice versa,
-                // we do not need to infer an edge.
-                if src_ancestral_extension_tables.contains(&dst_table)
-                    || dst_ancestral_extension_tables.contains(&src_table)
-                {
-                    continue;
-                }
 
                 // We check whether the two tables must be inserted together.
                 if !src_table.must_be_inserted_alongside_with(&dst_table, conn)? {
+                    continue;
+                }
+
+                if src_table == dst_table {
                     continue;
                 }
 
@@ -269,23 +255,35 @@ impl ColumnSameAsNetwork {
     /// * `source_table`: The column for which to find same-as columns.
     /// * `target_table`: The target table to which the same-as columns should
     ///   belong.
+    /// * `starting_from`: An optional column from which to start the search, if
+    ///   any.
+    /// * `passing_through`: A column that must be passed through in the same-as
+    ///   relationship.
     ///
     /// # Errors
     ///
     /// * Returns an error if there is an issue with the database connection.
-    pub fn same_as_columns(
+    pub(crate) fn same_as_columns(
         &self,
         source_table: &Table,
         target_table: &Table,
+        starting_from: Option<&Column>,
         passing_through: &Column,
         conn: &mut PgConnection,
     ) -> Result<Vec<(&Column, &Column)>, WebCodeGenError> {
-        Ok(self
+        let mut valid_traffic_nodes: Vec<usize> = Vec::new();
+        let mut same_as_columns = self
             .same_as_graph
             .sparse_coordinates()
-            .filter_map(move |(src_id, dst_id)| {
+            .filter_map(|(src_id, dst_id)| {
                 let src_column = self.same_as_graph.nodes_vocabulary().get(src_id)?;
                 let dst_column = self.same_as_graph.nodes_vocabulary().get(dst_id)?;
+
+                if let Some(starting_from) = starting_from {
+                    if src_column != starting_from {
+                        return None;
+                    }
+                }
 
                 if src_column.table_name != source_table.table_name
                     || src_column.table_schema != source_table.table_schema
@@ -308,53 +306,135 @@ impl ColumnSameAsNetwork {
                         continue;
                     }
 
+                    valid_traffic_nodes.push(dst_id);
                     return Some((src_column, dst_column));
                 }
 
                 None
             })
-            .collect())
-    }
+            .collect::<Vec<(&Column, &Column)>>();
 
-    /// Returns the inferred same-as columns associated to the given column and
-    /// target table.
-    ///
-    /// # Arguments
-    ///
-    /// * `column`: The column for which to find inferred same-as columns.
-    /// * `target_table`: The target table to which the inferred same-as columns
-    ///   should belong.
-    ///
-    /// # Errors
-    ///
-    /// * Returns an error if there is an issue with the database connection.
-    pub fn inferred_same_as_columns(
-        &self,
-        source_table: &Table,
-        target_table: &Table,
-        passing_through: &Column,
-    ) -> Vec<(&Column, &Column)> {
-        let Ok(passing_through_id) =
-            self.inferred_same_as_graph.nodes_vocabulary().binary_search(passing_through)
-        else {
-            return Vec::new();
-        };
-        self.inferred_same_as_graph
+        let inferred_same_as_edges = self
+            .inferred_same_as_graph
             .sparse_coordinates()
             .filter_map(|(src_id, dst_id)| {
                 let src_column = self.inferred_same_as_graph.nodes_vocabulary().get(src_id)?;
                 let dst_column = self.inferred_same_as_graph.nodes_vocabulary().get(dst_id)?;
+
+                if let Some(starting_from) = starting_from {
+                    if src_column != starting_from {
+                        return None;
+                    }
+                }
+
                 if src_column.table_name == source_table.table_name
                     && src_column.table_schema == source_table.table_schema
                     && dst_column.table_name == target_table.table_name
                     && dst_column.table_schema == target_table.table_schema
-                    && self.same_as_graph.is_reachable_through(src_id, dst_id, passing_through_id)
+                    && valid_traffic_nodes.iter().any(|traffic_node_id| {
+                        self.same_as_graph.is_reachable_through(src_id, dst_id, *traffic_node_id)
+                    })
                 {
                     Some((src_column, dst_column))
                 } else {
                     None
                 }
             })
-            .collect()
+            .collect::<Vec<(&Column, &Column)>>();
+
+        same_as_columns.extend(inferred_same_as_edges);
+
+        // We check that the provided column and the same-as columns have shared
+        // ancestors. If they have not, the same-as graph is in an illegal state.
+        for (left, right) in same_as_columns.iter() {
+            if !left.has_compatible_data_type(&right, conn)? {
+                panic!(
+                    "The column {left} is in a same-as relationship with column {right}, but the two columns do not share any ancestor. This indicates an illegal state in the same-as network.",
+                );
+            }
+        }
+
+        Ok(same_as_columns)
+    }
+
+    /// Returns the same-as columns associated with the provided table and
+    /// its ancestors, passing through the primary key of the source table.
+    ///
+    /// # Arguments
+    ///
+    /// * `source_table`: The table for which to find same-as columns in its
+    ///   ancestors.
+    /// * `starting_from`: An optional column from which to start the search, if
+    ///  any.
+    /// * `filter_ancestors`: If true, filters out columns that are already
+    ///   handled by more distant ancestors.
+    /// * `conn`: A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if there is an issue with the database connection.
+    ///
+    /// # Panics
+    ///
+    /// * If the current table has a composite primary key, as this is not
+    ///   supported in extension hierarchies.
+    pub(crate) fn ancestral_same_as_columns(
+        &self,
+        table: &Table,
+        starting_from: Option<&Column>,
+        filter_ancestors: bool,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(&Column, &Column)>, WebCodeGenError> {
+        let primary_key_columns = table.primary_key_columns(conn)?;
+        if primary_key_columns.len() != 1 {
+            panic!(
+                "Table {table} with composite primary keys are not supported in extension hierarchies"
+            );
+        }
+        let primary_key_column = &primary_key_columns[0];
+
+        let mut same_as_columns = Vec::new();
+
+        // We identify the same-as columns in the ancestors, of which we
+        // determine in particular the destination nodes. Such nodes
+        // are then filtered from the set we return, as they are already
+        // handled in the ancestors and should not be duplicated.
+        let mut destination_columns_handled_by_ancestors: Vec<&Column> = Vec::new();
+
+        if filter_ancestors {
+            for ancestor in table.ancestral_extension_tables(conn)? {
+                let primary_key_columns = ancestor.primary_key_columns(conn)?;
+                if primary_key_columns.len() != 1 {
+                    panic!(
+                        "Table {ancestor} with composite primary keys are not supported in extension hierarchies"
+                    );
+                }
+                let primary_key_column = &primary_key_columns[0];
+                for ancestor2 in ancestor.ancestral_extension_tables(conn)? {
+                    let ancestor_same_as_columns = self.same_as_columns(
+                        &ancestor,
+                        &ancestor2,
+                        None,
+                        primary_key_column,
+                        conn,
+                    )?;
+                    for (_, dst_column) in ancestor_same_as_columns {
+                        destination_columns_handled_by_ancestors.push(dst_column);
+                    }
+                }
+            }
+        }
+
+        for ancestor in table.ancestral_extension_tables(conn)? {
+            same_as_columns.extend(
+                self.same_as_columns(table, &ancestor, starting_from, primary_key_column, conn)?
+                    .into_iter()
+                    .filter(|(_, dst_column)| {
+                        !destination_columns_handled_by_ancestors.contains(dst_column)
+                    }),
+            );
+        }
+
+        Ok(same_as_columns)
     }
 }

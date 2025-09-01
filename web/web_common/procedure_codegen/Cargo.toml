@@ -12,6 +12,7 @@ syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
 prettyplease.workspace = true
+sqlparser.workspace = true
 
 [lints]
 workspace = true

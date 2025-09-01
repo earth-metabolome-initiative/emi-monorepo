@@ -8,9 +8,8 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 use strum::IntoEnumIterator;
-use crate::traits::TableLike;
 
-use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError};
+use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     #[allow(clippy::too_many_lines)]

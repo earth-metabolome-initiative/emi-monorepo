@@ -4,7 +4,7 @@ mod builder;
 mod enum_codegen;
 mod procedure_impls;
 mod procedure_initializer_impls;
-mod procedure_model_impls;
+mod procedure_template_impls;
 use std::{fs::OpenOptions, io::Write, path::Path};
 
 pub use builder::ProcedureCodegenBuilder;
@@ -21,8 +21,9 @@ use crate::errors::Error;
 pub const PROCEDURE_ENUM_MODULE: &str = "procedure_enum";
 /// Constant defining the module name for procedure trait implementations.
 pub const PROCEDURE_TRAIT_IMPL_MODULE: &str = "procedures";
-/// Constant defining the module name for procedure model trait implementations.
-pub const PROCEDURE_MODEL_TRAIT_IMPL_MODULE: &str = "procedure_models";
+/// Constant defining the module name for procedure template trait
+/// implementations.
+pub const PROCEDURE_TEMPLATE_TRAIT_IMPL_MODULE: &str = "procedure_templates";
 
 #[derive(Debug, Clone)]
 /// Main struct for the procedure code generation.
@@ -31,8 +32,8 @@ pub struct ProcedureCodegen<'a> {
     generate_enum: bool,
     /// Whether to generate the procedure impls.
     generate_procedure_impls: bool,
-    /// Whether to generate the procedure model impls.
-    generate_procedure_model_impls: bool,
+    /// Whether to generate the procedure template impls.
+    generate_procedure_template_impls: bool,
     /// Whether to generate the procedure initializer impls.
     generate_procedure_initializer_impls: bool,
     /// Whether to beautify the generated code.
@@ -90,11 +91,10 @@ impl<'a> ProcedureCodegen<'a> {
 
         if self.generate_enum {
             let task = Task::new("Enum Codegen");
-            self.enum_codegen(
-                structs_directory.join(PROCEDURE_ENUM_MODULE).as_path(),
-                table_catalog,
-                conn,
-            )?;
+            // We create the procedure enum subdirectory.
+            let subdirectory = structs_directory.join(PROCEDURE_ENUM_MODULE);
+            std::fs::create_dir_all(&subdirectory)?;
+            self.enum_codegen(subdirectory.as_path(), table_catalog, conn)?;
             let module_ident =
                 syn::Ident::new(PROCEDURE_ENUM_MODULE, proc_macro2::Span::call_site());
             extended_structs_module.extend(quote! {
@@ -104,11 +104,11 @@ impl<'a> ProcedureCodegen<'a> {
         }
         if self.generate_procedure_impls {
             let task = Task::new("Procedure Impl Codegen");
-            self.procedure_impls(
-                traits_directory.join(PROCEDURE_TRAIT_IMPL_MODULE).as_path(),
-                table_catalog,
-                conn,
-            )?;
+            // We create the procedure impls subdirectory.
+            let subdirectory = traits_directory.join(PROCEDURE_TRAIT_IMPL_MODULE);
+            std::fs::create_dir_all(&subdirectory)?;
+
+            self.procedure_impls(subdirectory.as_path(), table_catalog, conn)?;
             let module_ident =
                 syn::Ident::new(PROCEDURE_TRAIT_IMPL_MODULE, proc_macro2::Span::call_site());
             extended_traits_module.extend(quote::quote! {
@@ -116,20 +116,26 @@ impl<'a> ProcedureCodegen<'a> {
             });
             time_tracker.add_completed_task(task);
         }
-        if self.generate_procedure_model_impls {
-            let task = Task::new("Procedure Model Impl Codegen");
-            self.procedure_model_impls(traits_directory.as_path(), table_catalog, conn)?;
-            let module_ident =
-                syn::Ident::new(PROCEDURE_MODEL_TRAIT_IMPL_MODULE, proc_macro2::Span::call_site());
+        if self.generate_procedure_template_impls {
+            let task = Task::new("procedure template Impl Codegen");
+            // We create the procedure template impls subdirectory.
+            let subdirectory = traits_directory.join(PROCEDURE_TEMPLATE_TRAIT_IMPL_MODULE);
+            std::fs::create_dir_all(&subdirectory)?;
+
+            self.procedure_template_impls(subdirectory.as_path(), table_catalog, conn)?;
+            let module_ident = syn::Ident::new(
+                PROCEDURE_TEMPLATE_TRAIT_IMPL_MODULE,
+                proc_macro2::Span::call_site(),
+            );
             extended_traits_module.extend(quote::quote! {
                 mod #module_ident;
             });
             time_tracker.add_completed_task(task);
         }
         if self.generate_procedure_initializer_impls {
-            let task = Task::new("Procedure Initializer Impl Codegen");
+            // We create the procedure initializer impls subdirectory.
+            todo!("Consider creating a separate subdirectory for procedure initializers?");
             self.procedure_initializer_impls(traits_directory.as_path(), conn)?;
-            time_tracker.add_completed_task(task);
         }
 
         // We extend the traits module with the generated code by appending to the file.

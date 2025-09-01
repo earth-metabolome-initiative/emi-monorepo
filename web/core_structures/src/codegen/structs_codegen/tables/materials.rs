@@ -59,58 +59,6 @@ impl Material {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::materials::materials;
-        Self::table()
-            .filter(materials::name.eq(name))
-            .order_by(materials::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::materials::materials;
-        Self::table()
-            .filter(materials::description.eq(description))
-            .order_by(materials::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_icon(
-        icon: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::materials::materials;
-        Self::table()
-            .filter(materials::icon.eq(icon))
-            .order_by(materials::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::materials::materials;
-        Self::table()
-            .filter(materials::color_id.eq(color_id))
-            .order_by(materials::id.asc())
-            .first::<Self>(conn)
-    }
 }
 impl AsRef<Material> for Material {
     fn as_ref(&self) -> &Material {

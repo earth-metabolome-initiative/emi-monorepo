@@ -6,9 +6,8 @@ use std::collections::HashSet;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::traits::TableLike;
 
-use crate::{Codegen, Table, errors::WebCodeGenError};
+use crate::{Codegen, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     /// Returns the implementation of the `TryInsertGeneric` trait for the

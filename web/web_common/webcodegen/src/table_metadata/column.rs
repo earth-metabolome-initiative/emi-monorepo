@@ -1,10 +1,12 @@
+use std::fmt::Display;
+
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
     Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
     result::Error as DieselError,
 };
 use proc_macro2::TokenStream;
-use syn::{Ident, Type};
+use syn::{Ident, Lifetime, Type};
 
 mod default_types;
 use cached::proc_macro::cached;
@@ -15,13 +17,13 @@ use super::{
     pg_type::{COPY_TYPES, EQ_TYPES, HASH_TYPES, ORD_TYPES, PgType, rust_type_str},
 };
 use crate::{
-    errors::WebCodeGenError, table_metadata::pg_type::postgres_type_to_diesel, utils::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS}, KeyColumnUsage, Table
+    KeyColumnUsage, Table,
+    errors::WebCodeGenError,
+    table_metadata::pg_type::postgres_type_to_diesel,
+    utils::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 
-#[cached(
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
-)]
+#[cached(key = "String", convert = r#"{ format!("{column}") }"#)]
 fn is_foreign_key_on_delete_cascade(column: &Column, conn: &mut PgConnection) -> bool {
     use crate::schema::{key_column_usage, referential_constraints};
     key_column_usage::table
@@ -47,11 +49,7 @@ fn is_foreign_key_on_delete_cascade(column: &Column, conn: &mut PgConnection) ->
         .is_ok()
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn foreign_keys(
     column: &Column,
     conn: &mut PgConnection,
@@ -102,11 +100,17 @@ fn foreign_keys(
             .load::<KeyColumnUsage>(conn)
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn table(column: &Column, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+    use crate::schema::tables;
+    tables::table
+        .filter(tables::table_name.eq(&column.table_name))
+        .filter(tables::table_schema.eq(&column.table_schema))
+        .filter(tables::table_catalog.eq(&column.table_catalog))
+        .first::<Table>(conn)
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn geometry(
     column: &Column,
     conn: &mut PgConnection,
@@ -121,11 +125,7 @@ fn geometry(
         .optional()
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn geography(
     column: &Column,
     conn: &mut PgConnection,
@@ -140,11 +140,7 @@ fn geography(
         .optional()
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}-{}", column.table_catalog, column.table_schema, column.table_name, column.column_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn requires_partial_builder(
     column: &Column,
     conn: &mut PgConnection,
@@ -175,6 +171,11 @@ fn requires_partial_builder(
         if foreign_key.is_local_primary_key(conn)? {
             // If the foreign key is a local primary key, this column does not
             // require a partial builder.
+            continue;
+        }
+        if !foreign_key.includes_local_primary_key(conn)? {
+            // If the foreign key does not include the local primary key, this
+            // column does not require a partial builder.
             continue;
         }
         let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
@@ -243,6 +244,26 @@ fn requires_partial_builder(
     Ok(found_foreign_key)
 }
 
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn str_rust_data_type(column: &Column, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
+    if let Ok(Some(geometry)) = column.geometry(conn) {
+        return Ok(geometry.str_rust_type().to_owned());
+    }
+    if let Ok(Some(geography)) = column.geography(conn) {
+        return Ok(geography.str_rust_type().to_owned());
+    }
+    match rust_type_str(column.data_type_str(conn)?, conn) {
+        Ok(s) => Ok(s.to_string()),
+        Err(error) => {
+            if column.has_custom_type() {
+                Ok(PgType::from_name(column.data_type_str(conn)?, conn)?.camelcased_name())
+            } else {
+                Err(error)
+            }
+        }
+    }
+}
+
 /// Struct defining the `information_schema.columns` table.
 #[derive(
     Queryable, QueryableByName, Selectable, PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Hash,
@@ -307,6 +328,12 @@ pub struct Column {
     pub generation_expression: Option<String>,
     /// Indicates if the column is updatable ("YES" or "NO")
     pub is_updatable: String,
+}
+
+impl Display for Column {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`{}.{}.{}`", self.table_schema, self.table_name, self.column_name)
+    }
 }
 
 impl AsRef<Column> for Column {
@@ -493,22 +520,7 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     pub fn str_rust_data_type(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        if let Ok(Some(geometry)) = self.geometry(conn) {
-            return Ok(geometry.str_rust_type().to_owned());
-        }
-        if let Ok(Some(geography)) = self.geography(conn) {
-            return Ok(geography.str_rust_type().to_owned());
-        }
-        match rust_type_str(self.data_type_str(conn)?, conn) {
-            Ok(s) => Ok(s.to_string()),
-            Err(error) => {
-                if self.has_custom_type() {
-                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name())
-                } else {
-                    Err(error)
-                }
-            }
-        }
+        str_rust_data_type(self, conn)
     }
 
     /// Returns whether the column is compatible with the provided column
@@ -522,12 +534,43 @@ impl Column {
     ///
     /// * If an error occurs while querying the database
     /// * If the underlying data type of the column is not compatible
+    ///
+    /// # Implementative details
+    ///
+    /// The two columns are considered compatible if their data type is the
+    /// same, and if they have shared ancestors.
     pub fn has_compatible_data_type(
         &self,
         column: &Column,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(self.str_rust_data_type(conn)? == column.str_rust_data_type(conn)?)
+        if self.str_rust_data_type(conn)? != column.str_rust_data_type(conn)? {
+            return Ok(false);
+        }
+
+        let mut local_referenced_tables = self.referenced_by_foreign_keys(conn)?;
+        let mut other_referenced_tables = column.referenced_by_foreign_keys(conn)?;
+
+        if local_referenced_tables.is_empty() && other_referenced_tables.is_empty() {
+            // If both columns are not foreign keys, they are compatible.
+            return Ok(true);
+        }
+
+        // We determine the set of ancestors of the referenced tables.
+        let local_referenced_ancestors = local_referenced_tables
+            .iter()
+            .flat_map(|table| table.ancestral_extension_tables(conn).unwrap_or_default())
+            .collect::<Vec<_>>();
+        let other_referenced_ancestors = other_referenced_tables
+            .iter()
+            .flat_map(|table| table.ancestral_extension_tables(conn).unwrap_or_default())
+            .collect::<Vec<_>>();
+
+        // We extend the referenced tables with their ancestors.
+        local_referenced_tables.extend(local_referenced_ancestors);
+        other_referenced_tables.extend(other_referenced_ancestors);
+
+        Ok(local_referenced_tables.iter().any(|table| other_referenced_tables.contains(table)))
     }
 
     /// Returns the rust type of the column
@@ -662,6 +705,45 @@ impl Column {
         }
     }
 
+    /// Returns the uppercased acronym of the column name.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while generating the acronym
+    pub fn acronym(&self) -> Result<String, WebCodeGenError> {
+        let camel_cased_name = self.snake_case_name()?;
+        Ok(camel_cased_name
+            .split('_')
+            .filter_map(|s| s.chars().next())
+            .map(|c| c.to_ascii_uppercase())
+            .collect())
+    }
+
+    /// Returns the uppercased acronym syn Ident of the column name.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while generating the acronym
+    pub fn acronym_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let acronym = self.acronym()?;
+        if RESERVED_RUST_WORDS.contains(&acronym.as_str()) {
+            Ok(Ident::new_raw(&acronym, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&acronym, proc_macro2::Span::call_site()))
+        }
+    }
+
+    /// Returns the lifetime ident of the acronym of the column name.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while generating the lifetime ident
+    pub fn lifetime_acronym_ident(&self) -> Result<Lifetime, WebCodeGenError> {
+        let acronym = self.acronym()?;
+        let lifetime = format!("'{acronym}");
+        Ok(Lifetime::new(&lifetime, proc_macro2::Span::call_site()))
+    }
+
     #[must_use]
     /// Returns whether the column has a custom type
     pub fn has_custom_type(&self) -> bool {
@@ -683,14 +765,8 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, WebCodeGenError> {
-        use crate::schema::tables;
-        tables::table
-            .filter(tables::table_name.eq(&self.table_name))
-            .filter(tables::table_schema.eq(&self.table_schema))
-            .filter(tables::table_catalog.eq(&self.table_catalog))
-            .first::<Table>(conn)
-            .map_err(WebCodeGenError::from)
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+        table(self, conn)
     }
 
     /// Returns whether the column is part of a single-column unique constraint.
@@ -859,6 +935,12 @@ impl Column {
     /// Returns whether the column is a UUID
     pub fn is_uuid(&self) -> bool {
         self.data_type == "uuid"
+    }
+
+    #[must_use]
+    /// Returns whether the column has a uuid-generator.
+    pub fn has_uuid_generator(&self) -> bool {
+        self.column_default.as_ref().is_some_and(|d| d == "gen_random_uuid()")
     }
 
     #[must_use]
@@ -1226,6 +1308,21 @@ impl Column {
         Ok(primary_key_columns.contains(self))
     }
 
+    /// Returns whether the column coincides with the table primary key.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn)?;
+        let primary_key_columns = table.primary_key_columns(conn)?;
+        Ok(primary_key_columns.len() == 1 && primary_key_columns.contains(self))
+    }
+
     /// Returns whether the column is part of an extension primary key
     /// constraint.
     ///
@@ -1272,6 +1369,25 @@ impl Column {
         requires_partial_builder(self, conn)
     }
 
+    /// Returns whether the column is a foreign primary key.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn is_foreign_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .any(|key| key.is_foreign_primary_key(conn).unwrap_or(false)))
+    }
+
     /// Returns the `same-as` UNIQUE constraints for the column, if any.
     ///
     /// # Arguments
@@ -1315,6 +1431,177 @@ impl Column {
             .collect())
     }
 
+    /// Returns the ancestral same-as constraints for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn ancestral_same_as_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .filter(|foreign_key| {
+                foreign_key
+                    .is_ancestral_same_as_constraint(conn)
+                    .map(|index| index.is_some())
+                    .unwrap_or(false)
+            })
+            .collect())
+    }
+
+    /// Returns the associated same-as constraints for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn associated_same_as_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        let mut associated_same_as_constraints = Vec::new();
+
+        for foreign_key in self.foreign_keys(conn)? {
+            if foreign_key.is_associated_same_as_constraint(conn)?.is_none() {
+                continue;
+            }
+
+            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
+                continue;
+            };
+
+            let mut found_foreign_primary_key = false;
+            for inner_foreign_key in self.foreign_keys(conn)? {
+                let Some(inner_foreign_table) = inner_foreign_key.foreign_table(conn)? else {
+                    continue;
+                };
+
+                if foreign_table == inner_foreign_table
+                    && inner_foreign_key.is_foreign_primary_key(conn)?
+                {
+                    found_foreign_primary_key = true;
+                    break;
+                }
+            }
+
+            if found_foreign_primary_key {
+                continue;
+            }
+
+            associated_same_as_constraints.push(foreign_key);
+        }
+
+        Ok(associated_same_as_constraints)
+    }
+
+    /// Returns the ancestral same-as columns for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn ancestral_same_as_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        Ok(self
+            .ancestral_same_as_constraints(conn)?
+            .into_iter()
+            .map(|constraint| {
+                let local_columns = constraint.columns(conn)?;
+                let foreign_columns = constraint.foreign_columns(conn)?;
+                Ok(local_columns
+                    .iter()
+                    .zip(foreign_columns)
+                    .filter_map(|(local_column, foreign_column)| {
+                        if local_column == self { Some(foreign_column.clone()) } else { None }
+                    })
+                    .next()
+                    .unwrap())
+            })
+            .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+    }
+
+    /// Returns the associated same-as columns for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn associated_same_as_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        Ok(self
+            .associated_same_as_constraints(conn)?
+            .into_iter()
+            .map(|constraint| {
+                let local_columns = constraint.columns(conn)?;
+                let foreign_columns = constraint.foreign_columns(conn)?;
+                Ok(local_columns
+                    .iter()
+                    .zip(foreign_columns)
+                    .filter_map(|(local_column, foreign_column)| {
+                        if local_column == self { Some(foreign_column.clone()) } else { None }
+                    })
+                    .next()
+                    .unwrap())
+            })
+            .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+    }
+
+    /// Returns the normal and inferred ancestral same-as constraints for the
+    /// column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn all_ancestral_same_as_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Self>, WebCodeGenError> {
+        let mut ancestral_same_as_columns = self.ancestral_same_as_columns(conn)?;
+
+        let table = self.table(conn)?;
+        for ancestor in table.ancestral_extension_tables(conn)? {
+            for ancestor_column in ancestor.columns(conn)? {
+                let ancestor_same_as_columns =
+                    ancestor_column.all_ancestral_same_as_columns(conn)?;
+                for same_as_column in &ancestor_same_as_columns {
+                    if ancestral_same_as_columns.contains(&same_as_column) {
+                        ancestral_same_as_columns.extend(ancestor_same_as_columns);
+                        break;
+                    }
+                }
+            }
+        }
+
+        ancestral_same_as_columns.sort_unstable();
+        ancestral_same_as_columns.dedup();
+
+        Ok(ancestral_same_as_columns)
+    }
+
     /// Returns the `same-as` foreign columns associated with the current
     /// column.
     ///
@@ -1331,25 +1618,79 @@ impl Column {
     /// See method `same_as_constraints` for the definition of `same-as`
     /// constraints.
     pub fn same_as_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        let mut same_as_columns: Vec<Column> = self
-            .same_as_constraints(conn)?
-            .into_iter()
-            .filter_map(|same_as_constraint| {
-                let columns = same_as_constraint.columns(conn).ok()?;
-                let filter_columns = same_as_constraint.foreign_columns(conn).ok()?;
-                columns
-                    .iter()
-                    .zip(filter_columns)
-                    .filter_map(
-                        |(local_column, foreign_column)| {
-                            if local_column == self { Some(foreign_column) } else { None }
-                        },
-                    )
-                    .next()
-            })
-            .collect();
+        if self.is_part_of_primary_key(conn)? {
+            return Ok(vec![]);
+        }
+
+        let mut same_as_columns = self.ancestral_same_as_columns(conn)?;
+        same_as_columns.extend(self.associated_same_as_columns(conn)?);
+
         same_as_columns.sort_unstable();
         same_as_columns.dedup();
         Ok(same_as_columns)
+    }
+
+    /// Returns the set of unique tables that are referenced by foreign keys
+    /// associated to the current column where the current column is a primary
+    /// key in the foreign table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn referenced_by_foreign_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Table>, WebCodeGenError> {
+        let mut referenced_tables = Vec::new();
+
+        if self.is_primary_key(conn)? {
+            let table = self.table(conn)?;
+            referenced_tables.push(table);
+        }
+
+        for key in self.foreign_keys(conn)? {
+            if key.is_foreign_primary_key(conn)? {
+                let Some(foreign_table) = key.foreign_table(conn)? else {
+                    continue;
+                };
+                referenced_tables.push(foreign_table);
+            }
+        }
+
+        referenced_tables.sort_unstable();
+        referenced_tables.dedup();
+
+        Ok(referenced_tables)
+    }
+
+    /// Returns whether the current column is ancestrally same-as the provided
+    /// column.
+    ///
+    /// # Implementative details
+    ///
+    /// A column is ancestrally same-as another column if:
+    ///
+    /// - The two columns are linked by a same-as constraint or inferred to be.
+    /// - The same-as constraint includes the primary key of the table of the
+    ///   current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other column to compare with
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn is_ancestrally_same_as(
+        &self,
+        other: &Column,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        self.all_ancestral_same_as_columns(conn).map(|columns| columns.contains(other))
     }
 }

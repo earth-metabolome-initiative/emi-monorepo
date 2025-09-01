@@ -11,6 +11,8 @@ use crate::{
 pub struct LowercaseTableConstraint;
 
 impl CustomTableConstraint for LowercaseTableConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         _conn: &mut PgConnection,

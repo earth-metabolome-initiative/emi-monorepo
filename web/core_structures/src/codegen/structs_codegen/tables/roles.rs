@@ -59,52 +59,6 @@ impl Role {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::roles::roles;
-        Self::table().filter(roles::name.eq(name)).order_by(roles::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::roles::roles;
-        Self::table()
-            .filter(roles::description.eq(description))
-            .order_by(roles::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_icon(
-        icon: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::roles::roles;
-        Self::table().filter(roles::icon.eq(icon)).order_by(roles::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::roles::roles;
-        Self::table()
-            .filter(roles::color_id.eq(color_id))
-            .order_by(roles::id.asc())
-            .first::<Self>(conn)
-    }
 }
 impl AsRef<Role> for Role {
     fn as_ref(&self) -> &Role {

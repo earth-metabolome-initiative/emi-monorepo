@@ -14,16 +14,18 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(stratified_source.ne(excluded(stratified_source)))
                     .or(supernatant_destination.ne(excluded(supernatant_destination)))
                     .or(transferred_with.ne(excluded(transferred_with)))
-                    .or(pipette_tip.ne(excluded(pipette_tip))),
+                    .or(pipette_tip_model.ne(excluded(pipette_tip_model))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -45,16 +47,18 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(stratified_source.ne(excluded(stratified_source)))
                     .or(supernatant_destination.ne(excluded(supernatant_destination)))
                     .or(transferred_with.ne(excluded(transferred_with)))
-                    .or(pipette_tip.ne(excluded(pipette_tip))),
+                    .or(pipette_tip_model.ne(excluded(pipette_tip_model))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

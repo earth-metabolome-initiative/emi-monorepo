@@ -6,9 +6,8 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use syn::Ident;
-use crate::traits::TableLike;
 
-use crate::{Codegen, Column, KeyColumnUsage, Table, errors::WebCodeGenError};
+use crate::{Codegen, Column, KeyColumnUsage, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     /// Returns the identifier for the struct which implements the `ForeignKeys`

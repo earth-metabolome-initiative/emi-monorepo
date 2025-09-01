@@ -6,9 +6,7 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use super::{Column, Table};
-use crate::{
-    PgIndex, ReferentialConstraint, errors::WebCodeGenError, traits::TableLike,
-};
+use crate::{PgIndex, ReferentialConstraint, errors::WebCodeGenError, traits::TableLike};
 
 #[cached(
     result = true,
@@ -167,7 +165,9 @@ fn foreign_table(
 /// about columns that are constrained by a unique or primary key constraint.
 ///
 /// For more details, see [`PostgreSQL`](https://www.postgresql.org/docs/current/infoschema-key-column-usage.html)
-#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Ord, PartialOrd, Clone, Hash,
+)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
     /// The name of the database that contains the constraint.
@@ -218,7 +218,7 @@ impl KeyColumnUsage {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    pub fn is_on_delete_cascade(
+    pub fn has_on_delete_cascade(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
@@ -427,7 +427,10 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_foreign_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub fn is_foreign_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
 
         if let Some(foreign_table) = foreign_table {
@@ -456,6 +459,26 @@ impl KeyColumnUsage {
         let primary_keys = table.primary_key_columns(conn)?;
         let columns = self.columns(conn)?;
         Ok(primary_keys == columns)
+    }
+
+    /// Returns whether the key column usage includes the local primary key
+    /// columns
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn includes_local_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        let table = self.table(conn)?;
+        let primary_keys = table.primary_key_columns(conn)?;
+        let columns = self.columns(conn)?;
+        Ok(primary_keys.iter().all(|pk| columns.contains(pk)))
     }
 
     /// Returns whether the key column usage refers to a foreign unique key
@@ -680,5 +703,67 @@ impl KeyColumnUsage {
             // Otherwise, we return None
             Ok(None)
         }
+    }
+
+    /// Returns whether this key column usage is an ancestral same-as
+    /// constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_ancestral_same_as_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
+        if !self.includes_local_primary_key(conn)? {
+            return Ok(None);
+        }
+
+        let Some(foreign_table) = self.foreign_table(conn)? else {
+            return Ok(None);
+        };
+
+        let table = self.table(conn)?;
+
+        if !table.is_extending(&foreign_table, conn)? {
+            return Ok(None);
+        }
+
+        self.is_same_as_constraint(conn)
+    }
+
+    /// Returns whether this key column usage is an associated same-as
+    /// constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_associated_same_as_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
+        if self.includes_local_primary_key(conn)? {
+            return Ok(None);
+        }
+
+        let Some(foreign_table) = self.foreign_table(conn)? else {
+            return Ok(None);
+        };
+
+        let table = self.table(conn)?;
+
+        if table.is_extending(&foreign_table, conn)? {
+            return Ok(None);
+        }
+
+        self.is_same_as_constraint(conn)
     }
 }

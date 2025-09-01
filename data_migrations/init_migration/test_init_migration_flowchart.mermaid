@@ -5,7 +5,7 @@ config:
     defaultRenderer: "elk"
 ---
 flowchart LR
-classDef procedure_model fill: #ff746c,stroke: #ff1305
+classDef procedure_template fill: #ff746c,stroke: #ff1305
 classDef t0 fill: #efa8a8,stroke: #d62727
 classDef t1 fill: #efc0a8,stroke: #d66227
 classDef t2 fill: #efd7a8,stroke: #d69b27
@@ -27,9 +27,9 @@ classDef t17 fill: #efa8c0,stroke: #d62762
 subgraph v2 ["`DBGI Collection preparation`"]
     direction TB
     v0@{shape: rounded, label: "Ethanol 70 percent"}
-class v0 procedure_model
+class v0 procedure_template
     v1@{shape: rounded, label: "Sample extraction solvent"}
-class v1 procedure_model
+class v1 procedure_template
 end
 subgraph v40 ["`Sample Processing`"]
     direction TB
@@ -121,13 +121,13 @@ class v38 t13
 end
 end
 v41@{shape: rounded, label: "Positive Ionization LC-MS"}
-class v41 procedure_model
+class v41 procedure_template
 v42@{shape: rounded, label: "Negative Ionization LC-MS"}
-class v42 procedure_model
+class v42 procedure_template
 subgraph v56 ["`Organism observation procedure`"]
     direction TB
     v43@{shape: rounded, label: "Place Arrow"}
-class v43 procedure_model
+class v43 procedure_template
     subgraph v46 ["`Organism in Ecosystem Picture`"]
     direction LR
     v44@{shape: lean-r, label: "Phone"}
@@ -160,11 +160,11 @@ end
 subgraph v69 ["`Part of Organism Collection`"]
     direction TB
     v57@{shape: rounded, label: "Wear gloves"}
-class v57 procedure_model
+class v57 procedure_template
     v58@{shape: rounded, label: "Sterilize scalpel and gloves"}
-class v58 procedure_model
+class v58 procedure_template
     v59@{shape: rounded, label: "Cut part of organism"}
-class v59 procedure_model
+class v59 procedure_template
     subgraph v62 ["`Wrap in coffee filter paper`"]
     direction LR
     v60@{shape: lean-r, label: "Coffee Filter Wrapper"}
@@ -190,7 +190,7 @@ end
 subgraph v71 ["`Data Enrichment Procedure`"]
     direction TB
     v70@{shape: rounded, label: "Weather Retrieval Procedure"}
-class v70 procedure_model
+class v70 procedure_template
 end
 v0 e0@---> v1
 v5 e1@---> v8

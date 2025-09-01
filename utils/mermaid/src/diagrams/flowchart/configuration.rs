@@ -9,7 +9,8 @@ pub use builder::{FlowchartConfigurationAttribute, FlowchartConfigurationBuilder
 
 use crate::{
     diagrams::flowchart::curve_styles::CurveStyle,
-    shared::generic_configuration::GenericConfiguration, traits::Configuration,
+    shared::{Renderer, generic_configuration::GenericConfiguration},
+    traits::Configuration,
 };
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -28,13 +29,18 @@ pub struct FlowchartConfiguration {
 
 impl Display for FlowchartConfiguration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.generic.title().is_none() && self.renderer() == &Renderer::default() {
+            return Ok(());
+        }
         writeln!(f, "---")?;
         if let Some(title) = &self.generic.title() {
             writeln!(f, "title: {title}")?;
         }
-        writeln!(f, "config:")?;
-        writeln!(f, "  flowchart:")?;
-        writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
+        if self.renderer() != &Renderer::default() {
+            writeln!(f, "config:")?;
+            writeln!(f, "  flowchart:")?;
+            writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
+        }
         writeln!(f, "---")?;
 
         Ok(())

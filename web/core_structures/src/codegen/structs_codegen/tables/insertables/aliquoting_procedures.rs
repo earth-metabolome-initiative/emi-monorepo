@@ -10,28 +10,43 @@ impl core::fmt::Display for InsertableAliquotingProcedureExtensionAttributes {
         }
     }
 }
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
+    for InsertableAliquotingProcedureExtensionAttributes
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    ) -> Self {
+        Self::Procedure(attribute)
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableAliquotingProcedureAttributes {
     Extension(InsertableAliquotingProcedureExtensionAttributes),
-    ProcedureId,
-    ProcedureModelId,
+    Procedure,
+    ProcedureTemplate,
+    ForeignProcedureTemplate,
+    ForeignProcedure,
     AliquotedWith,
-    PipetteTip,
-    AliquotedContainerId,
+    PipetteTipModel,
+    AliquotedFrom,
 }
 impl core::str::FromStr for InsertableAliquotingProcedureAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ProcedureModelId" => Ok(Self::ProcedureModelId),
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
+            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
+            "ForeignProcedure" => Ok(Self::ForeignProcedure),
             "AliquotedWith" => Ok(Self::AliquotedWith),
-            "PipetteTip" => Ok(Self::PipetteTip),
-            "AliquotedContainerId" => Ok(Self::AliquotedContainerId),
-            "procedure_model_id" => Ok(Self::ProcedureModelId),
+            "PipetteTipModel" => Ok(Self::PipetteTipModel),
+            "AliquotedFrom" => Ok(Self::AliquotedFrom),
+            "procedure_template" => Ok(Self::ProcedureTemplate),
+            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
+            "foreign_procedure" => Ok(Self::ForeignProcedure),
             "aliquoted_with" => Ok(Self::AliquotedWith),
-            "pipette_tip" => Ok(Self::PipetteTip),
-            "aliquoted_container_id" => Ok(Self::AliquotedContainerId),
+            "pipette_tip_model" => Ok(Self::PipetteTipModel),
+            "aliquoted_from" => Ok(Self::AliquotedFrom),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -40,11 +55,13 @@ impl core::fmt::Display for InsertableAliquotingProcedureAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::ProcedureId => write!(f, "procedure_id"),
-            Self::ProcedureModelId => write!(f, "procedure_model_id"),
+            Self::Procedure => write!(f, "procedure"),
+            Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
+            Self::ForeignProcedure => write!(f, "foreign_procedure"),
             Self::AliquotedWith => write!(f, "aliquoted_with"),
-            Self::PipetteTip => write!(f, "pipette_tip"),
-            Self::AliquotedContainerId => write!(f, "aliquoted_container_id"),
+            Self::PipetteTipModel => write!(f, "pipette_tip_model"),
+            Self::AliquotedFrom => write!(f, "aliquoted_from"),
         }
     }
 }
@@ -57,11 +74,13 @@ impl core::fmt::Display for InsertableAliquotingProcedureAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAliquotingProcedure {
-    pub(crate) procedure_id: ::rosetta_uuid::Uuid,
-    pub(crate) procedure_model_id: i32,
+    pub(crate) procedure: ::rosetta_uuid::Uuid,
+    pub(crate) procedure_template: i32,
+    pub(crate) foreign_procedure_template: i32,
+    pub(crate) foreign_procedure: ::rosetta_uuid::Uuid,
     pub(crate) aliquoted_with: ::rosetta_uuid::Uuid,
-    pub(crate) pipette_tip: ::rosetta_uuid::Uuid,
-    pub(crate) aliquoted_container_id: ::rosetta_uuid::Uuid,
+    pub(crate) pipette_tip_model: i32,
+    pub(crate) aliquoted_from: ::rosetta_uuid::Uuid,
 }
 impl InsertableAliquotingProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
@@ -91,39 +110,103 @@ impl InsertableAliquotingProcedure {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.procedure_id,
+                self.procedure,
             ),
             conn,
         )
     }
-    pub fn procedure_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+            crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::table(),
-                self.procedure_model_id,
+                crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table(),
+                self.procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.foreign_procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn foreign_procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                self.foreign_procedure,
             ),
             conn,
         )
@@ -132,35 +215,35 @@ impl InsertableAliquotingProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        crate::codegen::structs_codegen::tables::pipettes::Pipette,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::pipettes::Pipette: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+            crate::codegen::structs_codegen::tables::pipettes::Pipette,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::table(),
+                crate::codegen::structs_codegen::tables::pipettes::Pipette::table(),
                 self.aliquoted_with,
             ),
             conn,
         )
     }
-    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -188,144 +271,124 @@ impl InsertableAliquotingProcedure {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
                 ),
-                self.pipette_tip,
+                self.pipette_tip_model,
             ),
             conn,
         )
     }
-    pub fn aliquoted_container<C: diesel::connection::LoadConnection>(
+    pub fn aliquoted_from<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+            crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.aliquoted_container_id,
+                crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::table(),
+                self.aliquoted_from,
             ),
             conn,
         )
     }
-    pub fn aliquoting_procedures_procedure_id_aliquoted_with_fkey<
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn aliquoting_procedures_procedure_pipette_tip_model_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.aliquoted_with),
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                (self.procedure, self.pipette_tip_model),
             ),
             conn,
         )
     }
-    pub fn aliquoting_procedures_procedure_id_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_foreign_procedure_aliquoted_from_fkey(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.pipette_tip),
-            ),
-            conn,
-        )
-    }
-    pub fn aliquoting_procedures_procedure_id_aliquoted_container_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.aliquoted_container_id),
-            ),
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.foreign_procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_from),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -333,46 +396,493 @@ impl InsertableAliquotingProcedure {
 pub struct InsertableAliquotingProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
 > {
-    pub(crate) procedure_model_id: Option<i32>,
+    pub(crate) procedure_template: Option<i32>,
+    pub(crate) foreign_procedure_template: Option<i32>,
+    pub(crate) foreign_procedure: Option<::rosetta_uuid::Uuid>,
     pub(crate) aliquoted_with: Option<::rosetta_uuid::Uuid>,
-    pub(crate) pipette_tip: Option<::rosetta_uuid::Uuid>,
-    pub(crate) aliquoted_container_id: Option<::rosetta_uuid::Uuid>,
+    pub(crate) pipette_tip_model: Option<i32>,
+    pub(crate) aliquoted_from: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure: Procedure,
 }
-impl<Procedure> web_common_traits::database::ExtendableBuilder
-for InsertableAliquotingProcedureBuilder<Procedure>
-where
-    Procedure: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
-    >,
+/// Trait defining setters for attributes of an instance of
+/// `AliquotingProcedure` or descendant tables.
+pub trait AliquotingProcedureBuildable:
+    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    type Attributes = InsertableAliquotingProcedureAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+    /// Sets the value of the
+    /// `procedures.aliquoting_procedures.procedure_template` column.
+    ///
+    /// # Arguments
+    /// * `procedure_template`: The value to set for the
+    ///   `procedures.aliquoting_procedures.procedure_template` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template(
+        self,
+        procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    ///
+    /// # Arguments
+    /// * `foreign_procedure_template`: The value to set for the
+    ///   `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn foreign_procedure_template(
+        self,
+        foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedures.aliquoting_procedures.foreign_procedure` column.
+    ///
+    /// # Arguments
+    /// * `foreign_procedure`: The value to set for the
+    ///   `procedures.aliquoting_procedures.foreign_procedure` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn foreign_procedure(
+        self,
+        foreign_procedure: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `procedures.aliquoting_procedures.aliquoted_with`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `aliquoted_with`: The value to set for the
+    ///   `procedures.aliquoting_procedures.aliquoted_with` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn aliquoted_with(
+        self,
+        aliquoted_with: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedures.aliquoting_procedures.pipette_tip_model` column.
+    ///
+    /// # Arguments
+    /// * `pipette_tip_model`: The value to set for the
+    ///   `procedures.aliquoting_procedures.pipette_tip_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn pipette_tip_model(
+        self,
+        pipette_tip_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `procedures.aliquoting_procedures.aliquoted_from`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `aliquoted_from`: The value to set for the
+    ///   `procedures.aliquoting_procedures.aliquoted_from` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn aliquoted_from(
+        self,
+        aliquoted_from: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl AliquotingProcedureBuildable for Option<::rosetta_uuid::Uuid> {
+    fn procedure_template(
+        self,
+        _procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn foreign_procedure_template(
+        self,
+        _foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn foreign_procedure(
+        self,
+        _foreign_procedure: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn aliquoted_with(
+        self,
+        _aliquoted_with: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn pipette_tip_model(
+        self,
+        _pipette_tip_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn aliquoted_from(
+        self,
+        _aliquoted_from: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+}
+impl<
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        >,
+> AliquotingProcedureBuildable for InsertableAliquotingProcedureBuilder<Procedure> {
+    ///Sets the value of the `procedures.aliquoting_procedures.procedure_template` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`aliquoting_procedures`"]
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v1
+    ///v2 --->|"`extends`"| v3
+    ///```
+    fn procedure_template(
+        mut self,
+        procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let procedure_template = procedure_template
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableAliquotingProcedureAttributes::ProcedureTemplate,
+                    )
+            })?;
         self.procedure = self
             .procedure
-            .extend_builder(other.procedure)
+            .procedure_template(procedure_template)
             .map_err(|err| {
-                err.into_field_name(|attribute| InsertableAliquotingProcedureAttributes::Extension(
-                    InsertableAliquotingProcedureExtensionAttributes::Procedure(
-                        attribute,
-                    ),
+                err.into_field_name(|attribute| Self::Attributes::Extension(
+                    attribute.into(),
                 ))
             })?;
-        if let Some(procedure_model_id) = other.procedure_model_id {
-            self = self.procedure_model(procedure_model_id)?;
+        if let Some(foreign_procedure_template) = self.foreign_procedure_template {
+            pgrx_validation::must_be_distinct_i32(
+                    procedure_template,
+                    foreign_procedure_template,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedureTemplate,
+                        )
+                })?;
         }
-        if let Some(aliquoted_with) = other.aliquoted_with {
-            self = self.aliquoted_with(aliquoted_with)?;
+        self.procedure_template = Some(procedure_template);
+        Ok(self)
+    }
+    ///Sets the value of the `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    fn foreign_procedure_template(
+        mut self,
+        foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let foreign_procedure_template = foreign_procedure_template
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableAliquotingProcedureAttributes::ForeignProcedureTemplate,
+                    )
+            })?;
+        if let Some(procedure_template) = self.procedure_template {
+            pgrx_validation::must_be_distinct_i32(
+                    procedure_template,
+                    foreign_procedure_template,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedureTemplate,
+                        )
+                })?;
         }
-        if let Some(pipette_tip) = other.pipette_tip {
-            self = self.pipette_tip(pipette_tip)?;
-        }
-        if let Some(aliquoted_container_id) = other.aliquoted_container_id {
-            self = self.aliquoted_container(aliquoted_container_id)?;
-        }
+        self.foreign_procedure_template = Some(foreign_procedure_template);
+        Ok(self)
+    }
+    ///Sets the value of the `procedures.aliquoting_procedures.foreign_procedure` column.
+    fn foreign_procedure(
+        mut self,
+        foreign_procedure: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let foreign_procedure = foreign_procedure
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableAliquotingProcedureAttributes::ForeignProcedure,
+                    )
+            })?;
+        self.foreign_procedure = Some(foreign_procedure);
+        Ok(self)
+    }
+    ///Sets the value of the `procedures.aliquoting_procedures.aliquoted_with` column.
+    fn aliquoted_with(
+        mut self,
+        aliquoted_with: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let aliquoted_with = aliquoted_with
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(InsertableAliquotingProcedureAttributes::AliquotedWith)
+            })?;
+        self.aliquoted_with = Some(aliquoted_with);
+        Ok(self)
+    }
+    ///Sets the value of the `procedures.aliquoting_procedures.pipette_tip_model` column.
+    fn pipette_tip_model(
+        mut self,
+        pipette_tip_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let pipette_tip_model = pipette_tip_model
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableAliquotingProcedureAttributes::PipetteTipModel,
+                    )
+            })?;
+        self.pipette_tip_model = Some(pipette_tip_model);
+        Ok(self)
+    }
+    ///Sets the value of the `procedures.aliquoting_procedures.aliquoted_from` column.
+    fn aliquoted_from(
+        mut self,
+        aliquoted_from: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let aliquoted_from = aliquoted_from
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(InsertableAliquotingProcedureAttributes::AliquotedFrom)
+            })?;
+        self.aliquoted_from = Some(aliquoted_from);
+        Ok(self)
+    }
+}
+impl<
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
+for InsertableAliquotingProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes;
+    #[inline]
+    ///Sets the value of the `procedures.procedures.procedure` column.
+    fn procedure(
+        mut self,
+        procedure: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure(
+                self.procedure,
+                procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`aliquoting_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v3 ["`procedures`"]
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    ///class v0 column-of-interest
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v2 --->|"`extends`"| v3
+    ///```
+    fn procedure_template(
+        self,
+        procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        <Self as AliquotingProcedureBuildable>::procedure_template(
+            self,
+            procedure_template,
+        )
+    }
+    #[inline]
+    ///Sets the value of the `procedures.procedures.created_by` column.
+    fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_by(
+                self.procedure,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedures.procedures.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
+                self.procedure,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedures.procedures.updated_by` column.
+    fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_by(
+                self.procedure,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedures.procedures.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(
+                self.procedure,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
 }
@@ -385,219 +895,6 @@ where
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
         self.procedure = self.procedure.set_primary_key(primary_key);
         self
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `aliquoting_procedures.aliquoted_container_id`
-    /// column from table `aliquoting_procedures`.
-    pub fn aliquoted_container(
-        mut self,
-        aliquoted_container_id: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.aliquoted_container_id = Some(aliquoted_container_id);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `aliquoting_procedures.aliquoted_with` column from
-    /// table `aliquoting_procedures`.
-    pub fn aliquoted_with(
-        mut self,
-        aliquoted_with: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.aliquoted_with = Some(aliquoted_with);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `aliquoting_procedures.pipette_tip` column from
-    /// table `aliquoting_procedures`.
-    pub fn pipette_tip(
-        mut self,
-        pipette_tip: ::rosetta_uuid::Uuid,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.pipette_tip = Some(pipette_tip);
-        Ok(self)
-    }
-}
-impl<Procedure>
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        Procedure,
-    >
-{
-    /// Sets the value of the `aliquoting_procedures.procedure_model_id` column
-    /// from table `aliquoting_procedures`.
-    pub fn procedure_model(
-        mut self,
-        procedure_model_id: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.procedure_model_id = Some(procedure_model_id);
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_at` column from table
-    /// `aliquoting_procedures`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    >
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure = self.procedure.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureAttributes::Extension(
-                    InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_at`, `procedures.updated_at`
-    /// columns from table `aliquoting_procedures`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    >
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure =
-            self.procedure.created_at_and_updated_at(created_at, updated_at).map_err(|e| {
-                e.into_field_name(|attribute| {
-                    InsertableAliquotingProcedureAttributes::Extension(
-                        InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
-                    )
-                })
-            })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.created_by` column from table
-    /// `aliquoting_procedures`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.procedure = self.procedure.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureAttributes::Extension(
-                    InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.updated_at` column from table
-    /// `aliquoting_procedures`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    >
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.procedure = self.procedure.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureAttributes::Extension(
-                    InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    >
-{
-    /// Sets the value of the `procedures.updated_by` column from table
-    /// `aliquoting_procedures`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableAliquotingProcedureAttributes>,
-    > {
-        self.procedure = self.procedure.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableAliquotingProcedureAttributes::Extension(
-                    InsertableAliquotingProcedureExtensionAttributes::Procedure(attribute),
-                )
-            })
-        })?;
-        Ok(self)
     }
 }
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
@@ -618,9 +915,10 @@ where
 {
     type Attributes = InsertableAliquotingProcedureAttributes;
     fn is_complete(&self) -> bool {
-        self.procedure.is_complete() && self.procedure_model_id.is_some()
-            && self.aliquoted_with.is_some() && self.pipette_tip.is_some()
-            && self.aliquoted_container_id.is_some()
+        self.procedure.is_complete() && self.procedure_template.is_some()
+            && self.foreign_procedure_template.is_some()
+            && self.foreign_procedure.is_some() && self.aliquoted_with.is_some()
+            && self.pipette_tip_model.is_some() && self.aliquoted_from.is_some()
     }
     fn mint_primary_key(
         self,

@@ -1,0 +1,23 @@
+//! Submodule defining DB constraints for procedure and procedure template
+//! tables.
+
+mod asset_foreign_keys;
+mod asset_models_foreign_keys;
+mod procedure_assets_foreign_keys;
+mod procedure_primary_key;
+mod procedure_template_asset_models_foreign_keys;
+mod procedure_template_primary_key;
+mod procedure_to_procedure_template_foreign_key;
+mod uncharacterized_asset_models;
+mod uncharacterized_assets;
+mod unused_foreign_procedure_template;
+pub use asset_foreign_keys::AssetForeignKeysConstraint;
+pub use asset_models_foreign_keys::AssetModelsForeignKeysConstraint;
+pub use procedure_assets_foreign_keys::ProcedureAssetsForeignKeysConstraint;
+pub use procedure_primary_key::ProcedurePrimaryKeyConstraint;
+pub use procedure_template_asset_models_foreign_keys::ProcedureTemplateAssetModelsForeignKeysConstraint;
+pub use procedure_template_primary_key::ProcedureTemplatePrimaryKeyConstraint;
+pub use procedure_to_procedure_template_foreign_key::ProcedureToProcedureTemplateForeignKeyConstraint;
+pub use uncharacterized_asset_models::UncharacterizedAssetModelsConstraint;
+pub use uncharacterized_assets::UncharacterizedAssetsConstraint;
+pub use unused_foreign_procedure_template::UnusedForeignProcedureTemplateConstraint;

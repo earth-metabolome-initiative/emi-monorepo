@@ -1,13 +1,24 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableOrganismExtensionAttributes {
-    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+    PhysicalAsset(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    ),
 }
 impl core::fmt::Display for InsertableOrganismExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Trackable(e) => write!(f, "{e}"),
+            Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes>
+    for InsertableOrganismExtensionAttributes
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    ) -> Self {
+        Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
@@ -16,13 +27,13 @@ pub enum InsertableOrganismAttributes {
     Extension(InsertableOrganismExtensionAttributes),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes>
     for InsertableOrganismAttributes
 {
     fn from(
-        trackables: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
+        physical_assets: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
     ) -> Self {
-        Self::Extension(InsertableOrganismExtensionAttributes::Trackable(trackables))
+        Self::Extension(InsertableOrganismExtensionAttributes::PhysicalAsset(physical_assets))
     }
 }
 impl core::str::FromStr for InsertableOrganismAttributes {
@@ -55,29 +66,29 @@ impl InsertableOrganism {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
+            crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
                 self.id,
             ),
             conn,
@@ -87,36 +98,245 @@ impl InsertableOrganism {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismBuilder<
-    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    PhysicalAsset
+        = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
+        >,
 > {
-    pub(crate) id: Trackable,
+    pub(crate) id: PhysicalAsset,
 }
-impl<Trackable> web_common_traits::database::ExtendableBuilder
-for InsertableOrganismBuilder<Trackable>
-where
-    Trackable: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    >,
+/// Trait defining setters for attributes of an instance of `Organism` or
+/// descendant tables.
+pub trait OrganismBuildable:
+    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
 {
-    type Attributes = InsertableOrganismAttributes;
-    fn extend_builder(
+}
+impl OrganismBuildable for Option<::rosetta_uuid::Uuid> {}
+impl<
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        >,
+> OrganismBuildable for InsertableOrganismBuilder<PhysicalAsset> {}
+impl<
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+for InsertableOrganismBuilder<PhysicalAsset> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttributes;
+    #[inline]
+    ///Sets the value of the `public.assets.id` column.
+    fn id(
         mut self,
-        other: Self,
+        id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = self
-            .id
-            .extend_builder(other.id)
-            .map_err(|err| {
-                err.into_field_name(|attribute| InsertableOrganismAttributes::Extension(
-                    InsertableOrganismExtensionAttributes::Trackable(attribute),
-                ))
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+                self.id,
+                id,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.name` column.
+    fn name<'N, N>(
+        mut self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'N N as TryInto<Option<String>>>::Error,
+        >,
+    {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+                self.id,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'D D as TryInto<Option<String>>>::Error,
+        >,
+    {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+                self.id,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.model_id` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`assets`"]
+    ///    v0@{shape: rounded, label: "model_id"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`physical_assets`"]
+    ///    v1@{shape: rounded, label: "model_id"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v3 --->|"`extends`"| v2
+    ///```
+    fn model(
+        self,
+        model_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+            self,
+            model_id,
+        )
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.created_by` column.
+    fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+                self.id,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+                self.id,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.updated_by` column.
+    fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+                self.id,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+                self.id,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
             })?;
         Ok(self)
     }
 }
-impl<Trackable> web_common_traits::prelude::SetPrimaryKey for InsertableOrganismBuilder<Trackable>
+impl<
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
+for InsertableOrganismBuilder<PhysicalAsset> {
+    #[inline]
+    ///Sets the value of the `public.physical_assets.model_id` column.
+    fn model(
+        mut self,
+        model_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+                self.id,
+                model_id,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<PhysicalAsset> web_common_traits::prelude::SetPrimaryKey
+    for InsertableOrganismBuilder<PhysicalAsset>
 where
-    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+    PhysicalAsset: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type PrimaryKey = ::rosetta_uuid::Uuid;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
@@ -124,237 +344,8 @@ where
         self
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `organisms`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
-    /// columns from table `organisms`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .created_at_and_updated_at(created_at, updated_at)
-            .map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `organisms`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>> {
-        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.description` column from table
-    /// `organisms`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        Description: TryInto<Option<String>>,
-        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.id` column from table `organisms`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name` column from table `organisms`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        Name: TryInto<Option<String>>,
-        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name`, `trackables.description`
-    /// columns from table `organisms`.
-    pub fn name_and_description<Name, Description>(
-        mut self,
-        name: Name,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .name_and_description(name, description)
-            .map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `organisms`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>> {
-        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
-    /// from table `organisms`.
-    pub fn parent_and_id<Id>(
-        mut self,
-        parent_id: ::rosetta_uuid::Uuid,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id =
-            self.id.parent_and_id(parent_id, id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.photograph_id` column from table
-    /// `organisms`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>> {
-        self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_at` column from table
-    /// `organisms`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `organisms`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableOrganismAttributes>> {
-        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableOrganismBuilder<Trackable>
+impl<PhysicalAsset, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableOrganismBuilder<PhysicalAsset>
 where
     Self: web_common_traits::database::InsertableVariant<
             C,
@@ -362,7 +353,8 @@ where
             Row = crate::codegen::structs_codegen::tables::organisms::Organism,
             Error = web_common_traits::database::InsertError<InsertableOrganismAttributes>,
         >,
-    Trackable: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    PhysicalAsset:
+        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = InsertableOrganismAttributes;
     fn is_complete(&self) -> bool {

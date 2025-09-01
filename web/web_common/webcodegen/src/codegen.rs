@@ -35,19 +35,23 @@ pub const CODEGEN_TYPES_PATH: &str = "types";
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
 /// Constant defining the submodule for the Upsertable trait implementations.
 pub const CODEGEN_UPSERTABLES_PATH: &str = "upsertables";
-/// Constant defining the submodule for the Insertable-related trait implementation.
+/// Constant defining the submodule for the Insertable-related trait
+/// implementation.
 pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
 /// Constant defining the submodule for the Insertable trait implementations.
 pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
-/// Constant defining the submodule for the foreign-keys-related trait implementations.
+/// Constant defining the submodule for the foreign-keys-related trait
+/// implementations.
 pub const CODEGEN_FOREIGN_KEYS_PATH: &str = "foreign_keys";
 /// Constant defining the submodule for the Foreign trait implementations.
 pub const CODEGEN_FOREIGN_PATH: &str = "foreign";
 /// Constant defining the submodule for the Tabular trait implementations.
 pub const CODEGEN_TABULAR_PATH: &str = "tabular";
-/// Constant defining the submodule for the InsertableVariant trait implementations.
+/// Constant defining the submodule for the InsertableVariant trait
+/// implementations.
 pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
-/// Constant defining the submodule for the Updatable-related trait implementations.
+/// Constant defining the submodule for the Updatable-related trait
+/// implementations.
 pub const CODEGEN_UPDATABLES_PATH: &str = "updatables";
 /// Constant defining the submodule for the Updatable trait implementations.
 pub const CODEGEN_UPDATABLE_PATH: &str = "updatable";
@@ -121,6 +125,8 @@ pub struct Codegen<'a> {
     column_same_as_network: Option<ColumnSameAsNetwork>,
     /// Graph representing the "extend" relationships between tables.
     table_extension_network: Option<TableExtensionNetwork>,
+    /// The list of schemas to load tables from.
+    schemas: Vec<&'a str>,
 }
 
 impl<'a> Codegen<'a> {
@@ -156,6 +162,13 @@ impl<'a> Codegen<'a> {
     /// Sets to generate the derive traits for the `yew` framework.
     pub fn enable_yew(mut self) -> Self {
         self.enable_yew = true;
+        self
+    }
+
+    #[must_use]
+    /// Adds a new schema to load tables from.
+    pub fn add_schema(mut self, schema: &'a str) -> Self {
+        self.schemas.push(schema);
         self
     }
 
@@ -506,12 +519,21 @@ impl<'a> Codegen<'a> {
     ) -> Result<TimeTracker, WebCodeGenError> {
         let mut time_tracker = TimeTracker::new("Code generation");
 
+        if self.schemas.is_empty() {
+            return Err(WebCodeGenError::NoSchemaProvided);
+        }
+
         let task = Task::new("Retrieving tables");
-        let mut tables = Table::load_all(conn, table_catalog)?
-            .into_iter()
-            .filter(|table| !(table.is_temporary() || table.is_view()))
-            .filter(|table| !self.tables_deny_list.contains(&table))
-            .collect::<Vec<Table>>();
+        let mut tables = Vec::new();
+
+        for schema in &self.schemas {
+            let schema_tables = Table::load_all(conn, table_catalog, schema)?
+                .into_iter()
+                .filter(|table| !(table.is_temporary() || table.is_view()))
+                .filter(|table| !self.tables_deny_list.contains(&table))
+                .collect::<Vec<Table>>();
+            tables.extend(schema_tables);
+        }
 
         tables.sort_unstable();
 
@@ -567,5 +589,44 @@ impl<'a> Codegen<'a> {
         std::fs::write(&codegen_module, codegen_module_impl)?;
 
         Ok(time_tracker)
+    }
+
+    /// Prints the same-as network as a DOT file.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// * `output_path` - The path to the output DOT file.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the same-as network cannot be converted to DOT.
+    /// * Returns an error if the output file cannot be written.
+    pub fn print_same_as_network(
+        &mut self,
+        conn: &mut PgConnection,
+        table_catalog: &str,
+        output_path: &str,
+    ) -> Result<(), WebCodeGenError> {
+        if self.column_same_as_network.is_none() {
+            let mut tables = Vec::new();
+
+            for schema in &self.schemas {
+                let schema_tables = Table::load_all(conn, table_catalog, schema)?
+                    .into_iter()
+                    .filter(|table| !(table.is_temporary() || table.is_view()))
+                    .filter(|table| !self.tables_deny_list.contains(&table))
+                    .collect::<Vec<Table>>();
+                tables.extend(schema_tables);
+            }
+
+            tables.sort_unstable();
+            self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
+        }
+
+        let dot = self.column_same_as_network.as_ref().unwrap().to_dot(conn)?;
+        std::fs::write(output_path, dot)?;
+
+        Ok(())
     }
 }

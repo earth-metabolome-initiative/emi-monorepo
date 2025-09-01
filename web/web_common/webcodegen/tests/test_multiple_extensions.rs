@@ -16,13 +16,13 @@ async fn test_multiple_extensions() {
     .await
     .unwrap();
 
-    let users = Table::load(&mut conn, "users", None, &database_name)
+    let users = Table::load(&mut conn, "users", "public", &database_name)
         .expect("Failed to load `users` table");
-    let projects = Table::load(&mut conn, "projects", None, &database_name)
+    let projects = Table::load(&mut conn, "projects", "public", &database_name)
         .expect("Failed to load `projects` table");
-    let team_members = Table::load(&mut conn, "team_members", None, &database_name)
+    let team_members = Table::load(&mut conn, "team_members", "public", &database_name)
         .expect("Failed to load `team_members` table");
-    let team_projects = Table::load(&mut conn, "team_projects", None, &database_name)
+    let team_projects = Table::load(&mut conn, "team_projects", "public", &database_name)
         .expect("Failed to load `team_projects` table");
 
     let mut codegen = Codegen::default()
@@ -32,7 +32,8 @@ async fn test_multiple_extensions() {
         .team_projects(&team_projects)
         .set_output_directory("tests/codegen_multiple_extensions".as_ref())
         .enable_insertable_trait()
-        .beautify();
+        .beautify()
+        .add_schema("public");
     let outcome = codegen.generate(&mut conn, &database_name);
     let network = codegen.table_extension_network().unwrap();
     let dot = network.to_dot();

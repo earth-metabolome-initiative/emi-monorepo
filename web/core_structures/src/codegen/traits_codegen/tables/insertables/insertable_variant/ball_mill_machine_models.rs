@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    Trackable,
+    PhysicalAssetModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-    Trackable,
+    PhysicalAssetModel,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -18,9 +18,9 @@ where
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     >,
     C: diesel::connection::LoadConnection,
-    Trackable: web_common_traits::database::TryInsertGeneric<
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel;
@@ -54,8 +54,8 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelExtensionAttributes::Trackable(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelExtensionAttributes::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
                     ),
                 ))
             })?;

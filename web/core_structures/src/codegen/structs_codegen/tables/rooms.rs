@@ -129,16 +129,6 @@ impl Room {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_qrcode(
-        qrcode: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table().filter(rooms::qrcode.eq(qrcode)).order_by(rooms::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,

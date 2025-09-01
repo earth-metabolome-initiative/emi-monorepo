@@ -1,13 +1,24 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableCommercialProductExtensionAttributes {
-    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+    PhysicalAssetModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    ),
 }
 impl core::fmt::Display for InsertableCommercialProductExtensionAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Trackable(e) => write!(f, "{e}"),
+            Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
+    }
+}
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+> for InsertableCommercialProductExtensionAttributes {
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    ) -> Self {
+        Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
@@ -49,7 +60,7 @@ impl core::fmt::Display for InsertableCommercialProductAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialProduct {
-    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) id: i32,
     pub(crate) deprecation_date: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) brand_id: i32,
 }
@@ -58,29 +69,29 @@ impl InsertableCommercialProduct {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
+            crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
+                crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::table(),
                 self.id,
             ),
             conn,
@@ -122,400 +133,341 @@ impl InsertableCommercialProduct {
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialProductBuilder<
-    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+    PhysicalAssetModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+        >,
 > {
     pub(crate) deprecation_date: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) brand_id: Option<i32>,
-    pub(crate) id: Trackable,
+    pub(crate) id: PhysicalAssetModel,
 }
-impl<Trackable> web_common_traits::database::ExtendableBuilder
-for InsertableCommercialProductBuilder<Trackable>
-where
-    Trackable: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    >,
+/// Trait defining setters for attributes of an instance of `CommercialProduct`
+/// or descendant tables.
+pub trait CommercialProductBuildable:
+    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
 {
-    type Attributes = InsertableCommercialProductAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = self
-            .id
-            .extend_builder(other.id)
-            .map_err(|err| {
-                err.into_field_name(|attribute| InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                ))
-            })?;
-        if let Some(deprecation_date) = other.deprecation_date {
-            self = self.deprecation_date(Some(deprecation_date))?;
-        }
-        if let Some(brand_id) = other.brand_id {
-            self = self.brand(brand_id)?;
-        }
-        Ok(self)
-    }
-}
-impl<Trackable> web_common_traits::prelude::SetPrimaryKey
-    for InsertableCommercialProductBuilder<Trackable>
-where
-    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
-{
-    type PrimaryKey = ::rosetta_uuid::Uuid;
-    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
-        self.id = self.id.set_primary_key(primary_key);
-        self
-    }
-}
-impl<Trackable>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        Trackable,
-    >
-{
-    /// Sets the value of the `commercial_products.brand_id` column from table
-    /// `commercial_products`.
-    pub fn brand(
-        mut self,
-        brand_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    {
-        self.brand_id = Some(brand_id);
-        Ok(self)
-    }
-}
-impl<Trackable>
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        Trackable,
-    >
-{
-    /// Sets the value of the `commercial_products.deprecation_date` column from
-    /// table `commercial_products`.
-    pub fn deprecation_date<DeprecationDate>(
-        mut self,
-        deprecation_date: DeprecationDate,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
+    /// Sets the value of the `public.commercial_products.deprecation_date`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `deprecation_date`: The value to set for the
+    ///   `public.commercial_products.deprecation_date` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn deprecation_date<'DD, DD>(
+        self,
+        deprecation_date: &'DD DD,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        DeprecationDate: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        <DeprecationDate as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        validation_errors::SingleFieldError:
+            From<<&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>;
+    /// Sets the value of the `public.commercial_products.brand_id` column.
+    ///
+    /// # Arguments
+    /// * `brand_id`: The value to set for the
+    ///   `public.commercial_products.brand_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn brand(
+        self,
+        brand_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl CommercialProductBuildable for Option<i32> {
+    fn deprecation_date<'DD, DD>(
+        self,
+        _deprecation_date: &'DD DD,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        validation_errors::SingleFieldError:
+            From<<&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>,
+    {
+        Ok(self)
+    }
+    fn brand(
+        self,
+        _brand_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+}
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        >,
+> CommercialProductBuildable for InsertableCommercialProductBuilder<PhysicalAssetModel> {
+    ///Sets the value of the `public.commercial_products.deprecation_date` column.
+    fn deprecation_date<'DD, DD>(
+        mut self,
+        deprecation_date: &'DD DD,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'DD DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
+        validation_errors::SingleFieldError: From<
+            <&'DD DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
+        >,
     {
         let deprecation_date = deprecation_date
             .try_into()
-            .map_err(|
-                err: <DeprecationDate as TryInto<
-                    Option<::rosetta_timestamp::TimestampUTC>,
-                >>::Error|
-            {
-                Into::into(err)
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
                     .rename_field(InsertableCommercialProductAttributes::DeprecationDate)
             })?;
         self.deprecation_date = deprecation_date;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `commercial_products`.
-    pub fn created_at<CreatedAt>(
+    ///Sets the value of the `public.commercial_products.brand_id` column.
+    fn brand(
         mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.created_at(created_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
+        brand_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let brand_id = brand_id
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(InsertableCommercialProductAttributes::BrandId)
+            })?;
+        self.brand_id = Some(brand_id);
         Ok(self)
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
-    /// columns from table `commercial_products`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+for InsertableCommercialProductBuilder<PhysicalAssetModel> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes;
+    #[inline]
+    ///Sets the value of the `public.asset_models.name` column.
+    fn name<'N, N>(
         mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        &'N N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'N N as TryInto<Option<String>>>::Error,
+        >,
     {
-        self.id = self.id.created_at_and_updated_at(created_at, updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+                self.id,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `commercial_products`.
-    pub fn created_by(
+    #[inline]
+    ///Sets the value of the `public.asset_models.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<
+            <&'D D as TryInto<Option<String>>>::Error,
+        >,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+                self.id,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.parent_model_id` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`asset_models`"]
+    ///    v0@{shape: rounded, label: "parent_model_id"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`physical_asset_models`"]
+    ///    v1@{shape: rounded, label: "parent_model_id"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v3 --->|"`extends`"| v2
+    ///```
+    fn parent_model(
+        self,
+        parent_model_id: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+            self,
+            parent_model_id,
+        )
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_by` column.
+    fn created_by(
         mut self,
         created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    {
-        self.id = self.id.created_by(created_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        self = self.updated_by(created_by)?;
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+                self.id,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.description` column from table
-    /// `commercial_products`.
-    pub fn description<Description>(
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_at` column.
+    fn created_at<'CA, CA>(
         mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        Description: TryInto<Option<String>>,
-        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        self.id = self.id.description(description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+                self.id,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.id` column from table
-    /// `commercial_products`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.id(id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name` column from table
-    /// `commercial_products`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        Name: TryInto<Option<String>>,
-        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.name(name).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name`, `trackables.description`
-    /// columns from table `commercial_products`.
-    pub fn name_and_description<Name, Description>(
-        mut self,
-        name: Name,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.name_and_description(name, description).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `commercial_products`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    {
-        self.id = self.id.parent(parent_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
-    /// from table `commercial_products`.
-    pub fn parent_and_id<Id>(
-        mut self,
-        parent_id: ::rosetta_uuid::Uuid,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.parent_and_id(parent_id, id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.photograph_id` column from table
-    /// `commercial_products`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    {
-        self.id = self.id.photograph(photograph_id).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_at` column from table
-    /// `commercial_products`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.updated_at(updated_at).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `commercial_products`.
-    pub fn updated_by(
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_by` column.
+    fn updated_by(
         mut self,
         updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCommercialProductAttributes>>
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+                self.id,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        self.id = self.id.updated_by(updated_by).map_err(|e| {
-            e.into_field_name(|attribute| {
-                InsertableCommercialProductAttributes::Extension(
-                    InsertableCommercialProductExtensionAttributes::Trackable(attribute),
-                )
-            })
-        })?;
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+                self.id,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
 }
-impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialProductBuilder<Trackable>
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+for InsertableCommercialProductBuilder<PhysicalAssetModel> {
+    #[inline]
+    ///Sets the value of the `public.physical_asset_models.parent_model_id` column.
+    fn parent_model(
+        mut self,
+        parent_model_id: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+                self.id,
+                parent_model_id,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<PhysicalAssetModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableCommercialProductBuilder<PhysicalAssetModel>
+where
+    PhysicalAssetModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
+        self
+    }
+}
+impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableCommercialProductBuilder<PhysicalAssetModel>
 where
     Self: web_common_traits::database::InsertableVariant<
             C,
@@ -523,7 +475,7 @@ where
             Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
             Error = web_common_traits::database::InsertError<InsertableCommercialProductAttributes>,
         >,
-    Trackable: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = InsertableCommercialProductAttributes;
     fn is_complete(&self) -> bool {

@@ -15,6 +15,7 @@ async fn test_codegen_tables_crud_traits() {
         .set_output_directory("tests/codegen_tables_crud_traits".as_ref())
         .enable_crud_operations()
         .beautify()
+        .add_schema("public")
         .generate(&mut conn, &database_name);
     docker.stop().await.unwrap();
     outcome.unwrap();

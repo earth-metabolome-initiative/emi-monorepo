@@ -60,26 +60,6 @@ impl Unit {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::units::units;
-        Self::table().filter(units::name.eq(name)).order_by(units::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_unit(
-        unit: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::units::units;
-        Self::table().filter(units::unit.eq(unit)).order_by(units::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_icon(
         icon: &str,
         conn: &mut diesel::PgConnection,

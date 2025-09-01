@@ -4,11 +4,10 @@
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::traits::TableLike;
 
-use crate::{Codegen, Column, Table, errors::WebCodeGenError};
+mod generate_builder_trait_option_impl;
 
-mod extendable_builder_implementation;
+use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     pub(super) fn generate_insertable_builder_definition(
@@ -26,6 +25,8 @@ impl Codegen<'_> {
             .table_extension_network()
             .unwrap()
             .generics_for_table_builder_implementation(table)?;
+        let extension_network = self.table_extension_network().expect("Extension network exists");
+        let same_as_network = self.column_same_as_network().expect("Same as network exists");
 
         let has_default_types = insertable_columns.iter().any(Column::has_default);
         let mut derives = vec![quote::quote!(Clone), quote::quote!(Debug)];
@@ -121,8 +122,18 @@ impl Codegen<'_> {
             }),
         );
 
-        let extendable_builder_impl =
-            self.generate_extendable_builder_implementation(table, conn)?;
+        let builder_trait_definition = table.generate_builder_trait(conn)?;
+        let builder_trait_option_impl = if table.has_composite_primary_key(conn)? {
+            TokenStream::new()
+        } else {
+            table.generate_builder_trait_option_impl(conn)?
+        };
+        let builder_trait_impls = table.generate_builder_trait_impl_for_ancestral_tables(
+            extension_network,
+            same_as_network,
+            conn,
+            self.check_constraints_extensions.as_slice(),
+        )?;
 
         Ok(quote! {
             #[derive(#(#derives),*)]
@@ -132,7 +143,10 @@ impl Codegen<'_> {
             }
 
             #insertable_builder_default_impl
-            #extendable_builder_impl
+
+            #builder_trait_definition
+            #builder_trait_option_impl
+            #(#builder_trait_impls)*
         })
     }
 }

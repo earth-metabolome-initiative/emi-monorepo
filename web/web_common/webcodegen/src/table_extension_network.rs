@@ -1,6 +1,6 @@
 //! Submodule defining the network of same-as columns.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use ::graph::{
     prelude::{Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder},
@@ -18,9 +18,7 @@ use graph::{
 use proc_macro2::TokenStream;
 use sorted_vec::prelude::SortedVec;
 
-use crate::{
-    CheckConstraint, Column, KeyColumnUsage, Table, errors::WebCodeGenError, traits::TableLike,
-};
+use crate::{Column, KeyColumnUsage, Table, errors::WebCodeGenError, traits::TableLike};
 
 #[derive(Debug, Clone)]
 /// A network of columns that are "extend" each other.
@@ -40,28 +38,8 @@ impl TableExtensionNetwork {
     ///
     /// * `conn`: A mutable reference to a PostgreSQL connection.
     /// * `table_catalog`: The catalog of the table to load columns from.
-    pub fn new(
-        conn: &mut PgConnection,
-        table_catalog: &str,
-    ) -> Result<Self, WebCodeGenError> {
-        let mut tables = Table::load_all(conn, table_catalog)?
-            .into_iter()
-            .filter(|table| !(table.is_temporary() || table.is_view()))
-            .collect::<Vec<Table>>();
-
-        tables.sort_unstable();
-
-        Self::from_tables(conn, tables)
-    }
-
-    /// Creates a new `TableExtensionNetwork` from a PostgreSQL connection.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
-    /// * `table_catalog`: The catalog of the table to load columns from.
     /// * `table_schema`: An optional schema of the table to load columns from.
-    pub fn from_tables(
+    pub(crate) fn from_tables(
         conn: &mut PgConnection,
         tables: Vec<Table>,
     ) -> Result<Self, WebCodeGenError> {
@@ -196,7 +174,7 @@ impl TableExtensionNetwork {
     /// A `diamond bottom` is a table that sits at the bottom of an extension
     /// DAG, and has two or more parents which then join into a single table
     /// at the top, which we call the `diamond top`.
-    pub fn is_diamond_bottom(&self, table: &Table) -> Option<&Table> {
+    pub(crate) fn is_diamond_bottom(&self, table: &Table) -> Option<&Table> {
         let table_id = self
             .extension_graph
             .nodes_vocabulary()
@@ -249,7 +227,7 @@ impl TableExtensionNetwork {
     /// # Implementation details
     ///
     /// See the documentation for `is_diamond_bottom`.
-    pub fn is_diamond_top(&self, table: &Table) -> bool {
+    pub(crate) fn is_diamond_top(&self, table: &Table) -> bool {
         // A node is a diamond top if it has a descendant that is a diamond bottom
         // with this table as its diamond top.
         let table_id = self
@@ -281,7 +259,7 @@ impl TableExtensionNetwork {
     ///
     /// Other than the definitions for `is_diamond_bottom` and `is_diamond_top`,
     /// a table is a diamond side if its parent is a `diamong top`.
-    pub fn is_diamond_side(&self, table: &Table) -> bool {
+    pub(crate) fn is_diamond_side(&self, table: &Table) -> bool {
         let table_id = self
             .extension_graph
             .nodes_vocabulary()
@@ -296,156 +274,6 @@ impl TableExtensionNetwork {
                 .expect("Failed to get extended table");
             self.is_diamond_top(extended_table)
         })
-    }
-
-    /// Returns the columns associated with the ancestors of the current table.
-    ///
-    /// # Arguments
-    ///
-    /// * `table`: A reference to the table to generate generics for.
-    /// * `covered_successors`: A mutable reference to a hashmap that tracks
-    ///   whether an ancestor extended by the current table has already been
-    ///   covered by a predecessor.
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
-    ///
-    /// # Implementation details
-    ///
-    /// The columns from the ancestors which are covered by same-as
-    /// relationships with columns in the descendant tables are removed as
-    /// they should be handled fully by the descendant setter methods via
-    /// the same-as relationships.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the generics cannot be generated.
-    pub fn ancestors_columns<'a>(
-        &'a self,
-        table: &'a Table,
-        covered_successors: &mut HashSet<usize>,
-        conn: &mut PgConnection,
-    ) -> Result<HashMap<&'a Table, Vec<Column>>, WebCodeGenError> {
-        let table_id = self
-            .extension_graph
-            .nodes_vocabulary()
-            .binary_search(table)
-            .expect("Failed to get node ID for the table");
-
-        let columns = table.columns(conn)?;
-        let same_as_columns = columns
-            .iter()
-            .flat_map(|column| column.same_as_columns(conn).unwrap_or_default().into_iter())
-            .collect::<Vec<_>>();
-
-        let mut ancestors_columns = HashMap::new();
-
-        self.extension_graph.successors(table_id).for_each(|extended_table_id| {
-            let extended_table = self
-                .extension_graph
-                .nodes_vocabulary()
-                .get(extended_table_id)
-                .expect("Failed to get extended table");
-            // If the extended table is already covered, its generic
-            // parameters will be the primary key of the table, otherwise
-            // we recursively determine it as the builder type with its own
-            // generics.
-            if covered_successors.insert(extended_table_id) {
-                let ancestor_columns = self
-                    .ancestors_columns(extended_table, covered_successors, conn)
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(|(ancestor_table, columns)| {
-                        (
-                            ancestor_table,
-                            columns
-                                .into_iter()
-                                .filter(|column| {
-                                    // We filter out both the columns that are part of the
-                                    // same-as
-                                    // relationships with the current table, as those values
-                                    // will be
-                                    // handled by the descendant setter methods.
-                                    !same_as_columns.contains(column)
-                                })
-                                .collect::<Vec<_>>(),
-                        )
-                    })
-                    .collect::<HashMap<_, _>>();
-
-                ancestors_columns.insert(
-                    extended_table,
-                    ancestor_columns.values().flat_map(|columns| columns.iter().cloned()).collect(),
-                );
-            }
-        });
-
-        ancestors_columns.insert(table, table.insertable_columns(conn, false)?);
-
-        Ok(ancestors_columns)
-    }
-
-    /// Returns the check constraints associated with the ancestors of the
-    /// current table.
-    ///
-    /// # Arguments
-    ///
-    /// * `table`: A reference to the table to generate generics for.
-    /// * `covered_successors`: A mutable reference to a hashmap that tracks
-    ///   whether an ancestor extended by the current table has already been
-    ///   covered by a predecessor.
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
-    ///
-    /// # Implementation details
-    ///
-    /// The check constraints from the ancestors which are covered by same-as
-    /// relationships with check constraints in the descendant tables are
-    /// removed as they should be handled fully by the descendant setter
-    /// methods via the same-as relationships.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the generics cannot be generated.
-    pub fn ancestors_check_constraints<'a>(
-        &'a self,
-        table: &'a Table,
-        covered_successors: &mut HashSet<usize>,
-        conn: &mut PgConnection,
-    ) -> Result<HashMap<&'a Table, Vec<CheckConstraint>>, WebCodeGenError> {
-        let table_id = self
-            .extension_graph
-            .nodes_vocabulary()
-            .binary_search(table)
-            .expect("Failed to get node ID for the table");
-
-        let mut ancestors_check_constraints = HashMap::new();
-
-        self.extension_graph.successors(table_id).for_each(|extended_table_id| {
-            let extended_table = self
-                .extension_graph
-                .nodes_vocabulary()
-                .get(extended_table_id)
-                .expect("Failed to get extended table");
-            // If the extended table is already covered, its generic
-            // parameters will be the primary key of the table, otherwise
-            // we recursively determine it as the builder type with its own
-            // generics.
-            if covered_successors.insert(extended_table_id) {
-                let ancestor_check_constraints = self
-                    .ancestors_check_constraints(extended_table, covered_successors, conn)
-                    .unwrap_or_default();
-
-                ancestors_check_constraints.insert(
-                    extended_table,
-                    ancestor_check_constraints
-                        .values()
-                        .flat_map(|check_constraint| check_constraint.iter().cloned())
-                        .collect(),
-                );
-            }
-        });
-
-        ancestors_check_constraints.insert(table, table.check_constraints(conn)?);
-
-        Ok(ancestors_check_constraints)
     }
 
     /// Returns the generics with the expected default values for the provided
@@ -520,7 +348,7 @@ impl TableExtensionNetwork {
     /// # Errors
     ///
     /// Returns an error if the generics cannot be generated.
-    pub fn generics_for_table_builder_definition(
+    pub(crate) fn generics_for_table_builder_definition(
         &self,
         table: &Table,
         conn: &mut PgConnection,
@@ -570,21 +398,6 @@ impl TableExtensionNetwork {
         }))
     }
 
-    /// Returns the number of immediate ancestors of the provided `table`.
-    ///
-    /// # Arguments
-    ///
-    /// * `table`: A reference to the table to check.
-    pub fn number_of_extended_tables(&self, table: &Table) -> usize {
-        let table_id = self
-            .extension_graph
-            .nodes_vocabulary()
-            .binary_search(table)
-            .expect("Failed to get node ID for the table");
-
-        self.extension_graph.out_degree(table_id)
-    }
-
     /// Returns the generics for the table builder implementation.
     ///
     /// # Arguments
@@ -594,7 +407,7 @@ impl TableExtensionNetwork {
     /// # Errors
     ///
     /// Returns an error if the generics cannot be generated.
-    pub fn generics_for_table_builder_implementation(
+    pub(crate) fn generics_for_table_builder_implementation(
         &self,
         table: &Table,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
@@ -631,55 +444,6 @@ impl TableExtensionNetwork {
         Ok(Some(quote::quote! {
             <#(#generics),*>
         }))
-    }
-
-    /// Returns the path of extensions to get from the provided `table` to the
-    /// provided `column`.
-    ///
-    /// # Arguments
-    ///
-    /// * `table`: A reference to the table to start from.
-    /// * `column`: A reference to the column to find the path to.
-    pub(crate) fn extension_tree(
-        &self,
-        table: &Table,
-        columns: &[Column],
-    ) -> GenericGraph<&'_ SortedVec<Table>, SquareCSR2D<CSR2D<usize, usize, usize>>> {
-        let paths = columns
-            .iter()
-            .filter_map(|column| self.extension_path(table, column))
-            .map(|mut path| {
-                path.insert(0, table);
-                path
-            })
-            .collect::<Vec<_>>();
-
-        let mut edges = paths
-            .iter()
-            .flat_map(|path| {
-                path.iter().zip(path.iter().skip(1)).map(|(src, dst)| {
-                    (
-                        self.extension_graph.nodes_vocabulary().binary_search(src).unwrap(),
-                        self.extension_graph.nodes_vocabulary().binary_search(dst).unwrap(),
-                    )
-                })
-            })
-            .collect::<Vec<_>>();
-
-        edges.sort_unstable();
-        edges.dedup();
-
-        GenericMonoplexMonopartiteGraphBuilder::default()
-            .nodes(self.extension_graph.nodes_vocabulary())
-            .edges(
-                DiEdgesBuilder::default()
-                    .expected_shape(self.extension_graph.number_of_nodes())
-                    .edges(edges)
-                    .build()
-                    .expect("Failed to build edges for the column same-as network"),
-            )
-            .build()
-            .expect("Failed to build the extension tree graph")
     }
 
     /// Returns the path of extensions to get from the provided `table` to the
@@ -790,7 +554,7 @@ impl TableExtensionNetwork {
     /// # Arguments
     ///
     /// * `table`: A reference to the table to find the extension tables for.
-    pub fn extension_tables(&self, table: &Table) -> Vec<&Table> {
+    pub(crate) fn extension_tables(&self, table: &Table) -> Vec<&Table> {
         let table_id = self
             .extension_graph
             .nodes_vocabulary()
@@ -822,7 +586,7 @@ impl TableExtensionNetwork {
     /// based on the position of their foreign tables in the list of
     /// extension tables, ensuring that the foreign keys are returned in
     /// the same order as the extension tables.
-    pub fn extension_foreign_keys(
+    pub(crate) fn extension_foreign_keys(
         &self,
         table: &Table,
         conn: &mut PgConnection,

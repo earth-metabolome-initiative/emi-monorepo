@@ -98,78 +98,167 @@ impl Default for InsertableUserEmailBuilder {
         }
     }
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableUserEmailBuilder {
-    type Attributes = InsertableUserEmailAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(email) = other.email {
-            self = self.email(email)?;
-        }
-        if let Some(created_by) = other.created_by {
-            self = self.created_by(created_by)?;
-        }
-        if let Some(created_at) = other.created_at {
-            self = self.created_at(created_at)?;
-        }
-        if let Some(primary_email) = other.primary_email {
-            self = self.primary_email(primary_email)?;
-        }
-        Ok(self)
-    }
-}
-impl web_common_traits::prelude::SetPrimaryKey for InsertableUserEmailBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.created_at` column from table
-    /// `user_emails`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>>
+/// Trait defining setters for attributes of an instance of `UserEmail` or
+/// descendant tables.
+pub trait UserEmailBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.user_emails.email` column.
+    ///
+    /// # Arguments
+    /// * `email`: The value to set for the `public.user_emails.email` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn email<'E, E>(
+        self,
+        email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableUserEmailAttributes::CreatedAt)
-            },
-        )?;
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.created_by` column from table
-    /// `user_emails`.
-    pub fn created_by(
-        mut self,
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>;
+    /// Sets the value of the `public.user_emails.created_by` column.
+    ///
+    /// # Arguments
+    /// * `created_by`: The value to set for the `public.user_emails.created_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_by(
+        self,
         created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>> {
-        self.created_by = Some(created_by);
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.user_emails.created_at` column.
+    ///
+    /// # Arguments
+    /// * `created_at`: The value to set for the `public.user_emails.created_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_at<'CA, CA>(
+        self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+    /// Sets the value of the `public.user_emails.primary_email` column.
+    ///
+    /// # Arguments
+    /// * `primary_email`: The value to set for the
+    ///   `public.user_emails.primary_email` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `bool`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn primary_email<'PE, PE>(
+        self,
+        primary_email: &'PE PE,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PE PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>;
+}
+impl UserEmailBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttributes;
+    fn email<'E, E>(
+        self,
+        _email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn created_by(
+        self,
+        _created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn created_at<'CA, CA>(
+        self,
+        _created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        Ok(self)
+    }
+    fn primary_email<'PE, PE>(
+        self,
+        _primary_email: &'PE PE,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PE PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>,
+    {
         Ok(self)
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.email` column from table
-    /// `user_emails`.
-    pub fn email<Email>(
+impl UserEmailBuildable for InsertableUserEmailBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttributes;
+    /// Sets the value of the `public.user_emails.email` column.
+    fn email<'E, E>(
         mut self,
-        email: Email,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>>
+        email: &'E E,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        Email: TryInto<String>,
-        <Email as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'E E: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'E E as TryInto<String>>::Error>,
     {
-        let email = email.try_into().map_err(|err: <Email as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableUserEmailAttributes::Email)
+        let email = email.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserEmailAttributes::Email)
         })?;
         pgrx_validation::must_be_email(email.as_ref())
             .map_err(|e| {
@@ -181,24 +270,56 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBu
         self.email = Some(email);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder {
-    /// Sets the value of the `user_emails.primary_email` column from table
-    /// `user_emails`.
-    pub fn primary_email<PrimaryEmail>(
+    /// Sets the value of the `public.user_emails.created_by` column.
+    fn created_by(
         mut self,
-        primary_email: PrimaryEmail,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserEmailAttributes>>
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let created_by = created_by.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserEmailAttributes::CreatedBy)
+        })?;
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+    /// Sets the value of the `public.user_emails.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        PrimaryEmail: TryInto<bool>,
-        <PrimaryEmail as TryInto<bool>>::Error: Into<validation_errors::SingleFieldError>,
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
-        let primary_email =
-            primary_email.try_into().map_err(|err: <PrimaryEmail as TryInto<bool>>::Error| {
-                Into::into(err).rename_field(InsertableUserEmailAttributes::PrimaryEmail)
-            })?;
+        let created_at = created_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserEmailAttributes::CreatedAt)
+        })?;
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+    /// Sets the value of the `public.user_emails.primary_email` column.
+    fn primary_email<'PE, PE>(
+        mut self,
+        primary_email: &'PE PE,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PE PE: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<&'PE PE as TryInto<bool>>::Error>,
+    {
+        let primary_email = primary_email.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserEmailAttributes::PrimaryEmail)
+        })?;
         self.primary_email = Some(primary_email);
         Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableUserEmailBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserEmailBuilder

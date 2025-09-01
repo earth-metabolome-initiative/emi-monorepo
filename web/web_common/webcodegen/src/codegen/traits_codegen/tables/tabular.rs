@@ -7,9 +7,11 @@ use std::path::Path;
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::traits::TableLike;
 
-use crate::codegen::{Codegen, Table};
+use crate::{
+    codegen::{Codegen, Table},
+    traits::TableLike,
+};
 
 impl Codegen<'_> {
     /// Generates the [`Tabular`](web_common_traits::prelude::Tabular) traits

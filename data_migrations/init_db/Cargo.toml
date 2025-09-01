@@ -9,6 +9,9 @@ diesel = { workspace = true, features = ["postgres"] }
 csqlv = { workspace = true, features = ["diesel", "iso_codes"] }
 diesel_migrations_utils.workspace = true
 webcodegen.workspace = true
+procedure_codegen.workspace = true
+time_requirements.workspace = true
+anyhow.workspace = true
 
 [dev-dependencies]
 tokio.workspace = true

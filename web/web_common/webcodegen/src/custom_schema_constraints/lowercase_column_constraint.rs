@@ -11,6 +11,8 @@ use crate::{
 pub struct LowercaseColumnConstraint;
 
 impl CustomColumnConstraint for LowercaseColumnConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         _conn: &mut PgConnection,

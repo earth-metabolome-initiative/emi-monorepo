@@ -4,10 +4,9 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
-use crate::traits::TableLike;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Table, traits::TableLike};
 
 impl Codegen<'_> {
     /// Generate implementations of the `table` diesel macro.

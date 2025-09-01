@@ -13,7 +13,8 @@ use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
     },
-    errors::WebCodeGenError, utils::RESERVED_RUST_WORDS,
+    errors::WebCodeGenError,
+    utils::RESERVED_RUST_WORDS,
 };
 
 /// Constant listing types supporting `Copy`.

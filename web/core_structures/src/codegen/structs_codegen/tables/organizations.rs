@@ -32,32 +32,6 @@ impl diesel::Identifiable for Organization {
 }
 impl Organization {
     #[cfg(feature = "postgres")]
-    pub fn from_url(
-        url: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organizations::organizations;
-        Self::table()
-            .filter(organizations::url.eq(url))
-            .order_by(organizations::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_domain(
-        domain: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organizations::organizations;
-        Self::table()
-            .filter(organizations::domain.eq(domain))
-            .order_by(organizations::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,

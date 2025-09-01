@@ -24,31 +24,7 @@ impl diesel::Identifiable for Rank {
         self.id
     }
 }
-impl Rank {
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::ranks::ranks;
-        Self::table().filter(ranks::name.eq(name)).order_by(ranks::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::ranks::ranks;
-        Self::table()
-            .filter(ranks::description.eq(description))
-            .order_by(ranks::id.asc())
-            .first::<Self>(conn)
-    }
-}
+impl Rank {}
 impl AsRef<Rank> for Rank {
     fn as_ref(&self) -> &Rank {
         self

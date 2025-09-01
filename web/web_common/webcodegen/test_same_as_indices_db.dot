@@ -1,0 +1,56 @@
+digraph ColumnSameAsNetwork {
+graph [
+            fontname="Helvetica",
+            fontsize=12,
+            bgcolor=white,
+            splines=true,
+            nodesep=0.6,
+            concentrate=true,
+            compound=true,
+        ];
+node [shape=box, style=rounded, fontname="Helvetica"];
+edge [fontname="Helvetica"];
+subgraph cluster_cousins {
+  C2 [color="blue", fillcolor="#ffffff", label="cousins\ngrandchild_model_id"];
+  C3 [color="blue", fillcolor="#ffffff", label="cousins\nid"];
+  label="cousins";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_grandchildren {
+  C4 [color="blue", fillcolor="#ffffff", label="grandchildren\ngrandchild_model_id"];
+  C5 [color="blue", fillcolor="#ffffff", label="grandchildren\nid"];
+  label="grandchildren";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_great_grandchildren {
+  C6 [color="blue", fillcolor="#ffffff", label="great_grandchildren\ngreat_grandchild_model_id"];
+  C7 [color="blue", fillcolor="#ffffff", label="great_grandchildren\nid"];
+  label="great_grandchildren";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_roots {
+  C8 [color="blue", fillcolor="#ffffff", label="roots\nid"];
+  C9 [color="blue", fillcolor="#ffffff", label="roots\nmodel_id"];
+  label="roots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_children {
+  C0 [color="blue", fillcolor="#ffffff", label="children\nchild_model_id"];
+  C1 [color="blue", fillcolor="#ffffff", label="children\nid"];
+  label="children";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+  C0 -> C9 [color="green", label="same as"];
+  C2 -> C9 [color="green", label="same as"];
+  C4 -> C9 [color="green", label="same as"];
+  C6 -> C9 [color="green", label="same as"];
+  C0 -> C2 [dir="both", color="red", label="inferred", style=dashed];
+  C0 -> C4 [dir="both", color="red", label="inferred", style=dashed];
+  C0 -> C6 [dir="both", color="red", label="inferred", style=dashed];
+  C4 -> C6 [dir="both", color="red", label="inferred", style=dashed];
+}

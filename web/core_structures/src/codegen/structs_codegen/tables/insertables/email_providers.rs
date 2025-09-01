@@ -108,18 +108,81 @@ pub struct InsertableEmailProviderBuilder {
     pub(crate) email_id: Option<i32>,
     pub(crate) login_provider_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableEmailProviderBuilder {
-    type Attributes = InsertableEmailProviderAttributes;
-    fn extend_builder(
+/// Trait defining setters for attributes of an instance of `EmailProvider` or
+/// descendant tables.
+pub trait EmailProviderBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.email_providers.email_id` column.
+    ///
+    /// # Arguments
+    /// * `email_id`: The value to set for the `public.email_providers.email_id`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn email(
+        self,
+        email_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.email_providers.login_provider_id` column.
+    ///
+    /// # Arguments
+    /// * `login_provider_id`: The value to set for the
+    ///   `public.email_providers.login_provider_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn login_provider(
+        self,
+        login_provider_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl EmailProviderBuildable for InsertableEmailProviderBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttributes;
+    /// Sets the value of the `public.email_providers.email_id` column.
+    fn email(
         mut self,
-        other: Self,
+        email_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(email_id) = other.email_id {
-            self = self.email(email_id)?;
-        }
-        if let Some(login_provider_id) = other.login_provider_id {
-            self = self.login_provider(login_provider_id)?;
-        }
+        let email_id = email_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableEmailProviderAttributes::EmailId)
+        })?;
+        self.email_id = Some(email_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.email_providers.login_provider_id` column.
+    fn login_provider(
+        mut self,
+        login_provider_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let login_provider_id = login_provider_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableEmailProviderAttributes::LoginProviderId)
+        })?;
+        self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }
 }
@@ -127,30 +190,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableEmailProviderBuilde
     type PrimaryKey = (i32, i16);
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder {
-    /// Sets the value of the `email_providers.email_id` column from table
-    /// `email_providers`.
-    pub fn email(
-        mut self,
-        email_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
-    {
-        self.email_id = Some(email_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder {
-    /// Sets the value of the `email_providers.login_provider_id` column from
-    /// table `email_providers`.
-    pub fn login_provider(
-        mut self,
-        login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableEmailProviderAttributes>>
-    {
-        self.login_provider_id = Some(login_provider_id);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableEmailProviderBuilder

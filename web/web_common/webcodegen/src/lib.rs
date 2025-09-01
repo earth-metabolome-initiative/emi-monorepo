@@ -14,17 +14,17 @@ mod sql_functions;
 mod syngen;
 mod table_extension_network;
 mod table_metadata;
-mod utils;
 mod traits;
+mod utils;
 
 pub use codegen::Codegen;
-pub use traits::{ColumnLike, TableLike};
 pub use column_same_as_network::ColumnSameAsNetwork;
 pub use custom_schema_constraints::{
-    CompatibleForeignTypeConstraint, CompulsorySiblingColumnConstraint, ConstraintError,
-    CustomColumnConstraint, CustomTableConstraint, HasSpecificTypeConstraint,
-    IsForeignKeyConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
-    NotNullColumnConstraint,
+    CompatibleForeignTypeConstraint, ConstraintError, CustomColumnConstraint,
+    CustomTableConstraint, DuplicatedCheckConstraint, DuplicatedUniqueIndexConstraint,
+    HasSpecificTypeConstraint, IsForeignKeyConstraint, LowercaseColumnConstraint,
+    LowercaseTableConstraint, NotNullColumnConstraint, SameAsConstraintMustNotCascade,
+    WordDeprecationConstraint,
 };
 pub use postgis::{GeographyColumn, GeometryColumn};
 pub use table_extension_network::TableExtensionNetwork;
@@ -33,3 +33,4 @@ pub use table_metadata::{
     KeyColumnUsage, PGClass, PgAttribute, PgDepend, PgEnum, PgExtension, PgIndex, PgProc,
     PgSetting, PgStatStatement, PgType, ReferentialConstraint, Table, TableConstraint,
 };
+pub use traits::{ColumnLike, TableLike};

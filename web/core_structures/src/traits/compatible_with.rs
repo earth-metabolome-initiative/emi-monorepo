@@ -1,6 +1,6 @@
 #![cfg(feature = "postgres")]
 
-//! Submodule defining the `AppendProcedureModel` trait.
+//! Submodule defining the `AppendProcedureTemplate` trait.
 
 use rosetta_uuid::Uuid;
 use web_common_traits::{
@@ -9,12 +9,12 @@ use web_common_traits::{
 };
 
 use crate::{
-    CompatibilityRule, Trackable, tables::insertables::InsertableCompatibilityRuleAttributes,
+    AssetModel, CompatibilityRule, tables::insertables::InsertableCompatibilityRuleAttributes,
 };
 
 /// Trait defining the methods for managing parent-child relationships in
-/// procedure models.
-pub trait CompatibleWith: ExtensionTable<Trackable>
+/// procedure templates.
+pub trait CompatibleWith: ExtensionTable<AssetModel>
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a Uuid>,
 {
@@ -40,12 +40,12 @@ where
         conn: &mut diesel::PgConnection,
     ) -> Result<CompatibilityRule, InsertError<InsertableCompatibilityRuleAttributes>>
     where
-        T: ExtensionTable<Trackable>,
+        T: ExtensionTable<AssetModel>,
         for<'a> &'a T: diesel::Identifiable<Id = &'a Uuid>,
     {
         use diesel::Identifiable;
 
-        // Then, we create a new NextProcedureModel entry linking the parent
+        // Then, we create a new NextProcedureTemplate entry linking the parent
         // procedure to the new child procedure.
         CompatibilityRule::new()
             .left_trackable(*self.id())?
@@ -79,12 +79,12 @@ where
         conn: &mut diesel::PgConnection,
     ) -> Result<CompatibilityRule, InsertError<InsertableCompatibilityRuleAttributes>>
     where
-        T: ExtensionTable<Trackable>,
+        T: ExtensionTable<AssetModel>,
         for<'a> &'a T: diesel::Identifiable<Id = &'a Uuid>,
     {
         use diesel::Identifiable;
 
-        // Then, we create a new NextProcedureModel entry linking the parent
+        // Then, we create a new NextProcedureTemplate entry linking the parent
         // procedure to the new child procedure.
         CompatibilityRule::new()
             .left_trackable(*self.id())?
@@ -97,7 +97,7 @@ where
 
 impl<T> CompatibleWith for T
 where
-    T: ExtensionTable<Trackable>,
+    T: ExtensionTable<AssetModel>,
     for<'a> &'a T: diesel::Identifiable<Id = &'a Uuid>,
 {
 }

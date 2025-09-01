@@ -137,58 +137,252 @@ impl Default for InsertableBrandBuilder {
         }
     }
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableBrandBuilder {
-    type Attributes = InsertableBrandAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+/// Trait defining setters for attributes of an instance of `Brand` or
+/// descendant tables.
+pub trait BrandBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.brands.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.brands.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<'N, N>(
+        self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.brands.created_by` column.
+    ///
+    /// # Arguments
+    /// * `created_by`: The value to set for the `public.brands.created_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_by(
+        self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.brands.created_at` column.
+    ///
+    /// # Arguments
+    /// * `created_at`: The value to set for the `public.brands.created_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_at<'CA, CA>(
+        self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+    /// Sets the value of the `public.brands.updated_by` column.
+    ///
+    /// # Arguments
+    /// * `updated_by`: The value to set for the `public.brands.updated_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_by(
+        self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.brands.updated_at` column.
+    ///
+    /// # Arguments
+    /// * `updated_at`: The value to set for the `public.brands.updated_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_at<'UA, UA>(
+        self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+}
+impl BrandBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes;
+    fn name<'N, N>(
+        self,
+        _name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn created_by(
+        self,
+        _created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        match (other.created_at, other.updated_at) {
-            (Some(created_at), Some(updated_at)) => {
-                self = self.created_at_and_updated_at(created_at, updated_at)?;
-            }
-            (None, Some(updated_at)) => {
-                self = self.updated_at(updated_at)?;
-            }
-            (Some(created_at), None) => {
-                self = self.created_at(created_at)?;
-            }
-            (None, None) => {}
-        }
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(created_by) = other.created_by {
-            self = self.created_by(created_by)?;
-        }
-        if let Some(updated_by) = other.updated_by {
-            self = self.updated_by(updated_by)?;
-        }
+        Ok(self)
+    }
+    fn created_at<'CA, CA>(
+        self,
+        _created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        Ok(self)
+    }
+    fn updated_by(
+        self,
+        _updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn updated_at<'UA, UA>(
+        self,
+        _updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
         Ok(self)
     }
 }
-impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.created_at` column from table `brands`.
-    pub fn created_at<CreatedAt>(
+impl BrandBuildable for InsertableBrandBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes;
+    /// Sets the value of the `public.brands.name` column.
+    fn name<'N, N>(
         mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
     {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableBrandAttributes::CreatedAt)
-            },
-        )?;
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBrandAttributes::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::Name,
+                    )
+            })?;
+        self.name = Some(name);
+        Ok(self)
+    }
+    /// Sets the value of the `public.brands.created_by` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "created_by"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "updated_by"}
+    /// class v1 directly-involved-column
+    /// ```
+    fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self = self.updated_by(created_by)?;
+        let created_by = created_by.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBrandAttributes::CreatedBy)
+        })?;
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+    /// Sets the value of the `public.brands.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        let created_at = created_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBrandAttributes::CreatedAt)
+        })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
@@ -202,97 +396,32 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilde
         self.created_at = Some(created_at);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.created_at`, `brands.updated_at` columns
-    /// from table `brands`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
+    /// Sets the value of the `public.brands.updated_by` column.
+    fn updated_by(
         mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableBrandAttributes::CreatedAt)
-            },
-        )?;
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableBrandAttributes::UpdatedAt)
-            },
-        )?;
-        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-            .map_err(|e| {
-                e
-                    .rename_fields(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
-                    )
-            })?;
-        self.created_at = Some(created_at);
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.created_by` column from table `brands`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.name` column from table `brands`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableBrandAttributes::Name)
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let updated_by = updated_by.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBrandAttributes::UpdatedBy)
         })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::Name,
-                    )
-            })?;
-        self.name = Some(name);
+        self.updated_by = Some(updated_by);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.updated_at` column from table `brands`.
-    pub fn updated_at<UpdatedAt>(
+    /// Sets the value of the `public.brands.updated_at` column.
+    fn updated_at<'UA, UA>(
         mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>>
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableBrandAttributes::UpdatedAt)
-            },
-        )?;
+        let updated_at = updated_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBrandAttributes::UpdatedAt)
+        })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
@@ -307,14 +436,10 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilde
         Ok(self)
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder {
-    /// Sets the value of the `brands.updated_by` column from table `brands`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableBrandAttributes>> {
-        self.updated_by = Some(updated_by);
-        Ok(self)
+impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableBrandBuilder

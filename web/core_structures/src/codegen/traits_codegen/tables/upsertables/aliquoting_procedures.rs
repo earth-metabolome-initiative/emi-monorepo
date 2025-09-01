@@ -14,15 +14,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
-                    .or(pipette_tip.ne(excluded(pipette_tip)))
-                    .or(aliquoted_container_id.ne(excluded(aliquoted_container_id))),
+                    .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
+                    .or(aliquoted_from.ne(excluded(aliquoted_from))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -44,15 +46,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
-                    .or(pipette_tip.ne(excluded(pipette_tip)))
-                    .or(aliquoted_container_id.ne(excluded(aliquoted_container_id))),
+                    .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
+                    .or(aliquoted_from.ne(excluded(aliquoted_from))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

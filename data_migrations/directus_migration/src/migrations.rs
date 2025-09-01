@@ -1,7 +1,7 @@
 //! Submodule providing the methods for all of the directus migrations.
 
 mod utils;
-use core_structures::{ProcedureModel, tables::insertables::InsertableProcedureModelBuilder};
+use core_structures::{ProcedureTemplate, tables::insertables::InsertableProcedureTemplateBuilder};
 pub(crate) use utils::{get_room, get_user};
 mod insert_missing_brands;
 pub use insert_missing_brands::insert_missing_brands;

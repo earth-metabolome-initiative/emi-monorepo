@@ -1,0 +1,810 @@
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableCappingProcedureTemplateExtensionAttributes {
+    ProcedureTemplate(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ),
+}
+impl core::fmt::Display for InsertableCappingProcedureTemplateExtensionAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::ProcedureTemplate(e) => write!(f, "{e}"),
+        }
+    }
+}
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    > for InsertableCappingProcedureTemplateExtensionAttributes
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ) -> Self {
+        Self::ProcedureTemplate(attribute)
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum InsertableCappingProcedureTemplateAttributes {
+    Extension(InsertableCappingProcedureTemplateExtensionAttributes),
+    ProcedureTemplate,
+    ContainerModel,
+    ForeignProcedureTemplate,
+    ProcedureTemplateContainerModel,
+    CappedWithModel,
+    ProcedureTemplateCappedWithModel,
+}
+impl core::str::FromStr for InsertableCappingProcedureTemplateAttributes {
+    type Err = web_common_traits::database::InsertError<Self>;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ContainerModel" => Ok(Self::ContainerModel),
+            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
+            "ProcedureTemplateContainerModel" => Ok(Self::ProcedureTemplateContainerModel),
+            "CappedWithModel" => Ok(Self::CappedWithModel),
+            "ProcedureTemplateCappedWithModel" => Ok(Self::ProcedureTemplateCappedWithModel),
+            "container_model" => Ok(Self::ContainerModel),
+            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
+            "procedure_template_container_model" => Ok(Self::ProcedureTemplateContainerModel),
+            "capped_with_model" => Ok(Self::CappedWithModel),
+            "procedure_template_capped_with_model" => Ok(Self::ProcedureTemplateCappedWithModel),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
+    }
+}
+impl core::fmt::Display for InsertableCappingProcedureTemplateAttributes {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::ContainerModel => write!(f, "container_model"),
+            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
+            Self::ProcedureTemplateContainerModel => {
+                write!(f, "procedure_template_container_model")
+            }
+            Self::CappedWithModel => write!(f, "capped_with_model"),
+            Self::ProcedureTemplateCappedWithModel => {
+                write!(f, "procedure_template_capped_with_model")
+            }
+        }
+    }
+}
+#[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
+#[cfg_attr(
+    any(feature = "postgres", feature = "sqlite"),
+    diesel(
+        table_name = crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates
+    )
+)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct InsertableCappingProcedureTemplate {
+    pub(crate) procedure_template: i32,
+    pub(crate) container_model: i32,
+    pub(crate) foreign_procedure_template: i32,
+    pub(crate) procedure_template_container_model: i32,
+    pub(crate) capped_with_model: i32,
+    pub(crate) procedure_template_capped_with_model: i32,
+}
+impl InsertableCappingProcedureTemplate {
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.container_model,
+            ),
+            conn,
+        )
+    }
+    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.foreign_procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template_container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_container_model,
+            ),
+            conn,
+        )
+    }
+    pub fn capped_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::caps_models::CapsModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::caps_models::CapsModel::table(),
+                self.capped_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template_capped_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_capped_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn capping_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::table(),
+                (self.container_model, self.capped_with_model),
+            ),
+            conn,
+        )
+    }
+}
+#[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct InsertableCappingProcedureTemplateBuilder<
+    ProcedureTemplate
+        = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
+> {
+    pub(crate) container_model: Option<i32>,
+    pub(crate) foreign_procedure_template: Option<i32>,
+    pub(crate) procedure_template_container_model: Option<i32>,
+    pub(crate) capped_with_model: Option<i32>,
+    pub(crate) procedure_template_capped_with_model: Option<i32>,
+    pub(crate) procedure_template: ProcedureTemplate,
+}
+/// Trait defining setters for attributes of an instance of
+/// `CappingProcedureTemplate` or descendant tables.
+pub trait CappingProcedureTemplateBuildable:
+    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+{
+    /// Sets the value of the
+    /// `procedure_templates.capping_procedure_templates.container_model`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `container_model`: The value to set for the
+    ///   `procedure_templates.capping_procedure_templates.container_model`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn container_model(
+        self,
+        container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedure_templates.capping_procedure_templates.
+    /// foreign_procedure_template` column.
+    ///
+    /// # Arguments
+    /// * `foreign_procedure_template`: The value to set for the
+    ///   `procedure_templates.capping_procedure_templates.
+    ///   foreign_procedure_template` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn foreign_procedure_template(
+        self,
+        foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedure_templates.capping_procedure_templates.
+    /// procedure_template_container_model` column.
+    ///
+    /// # Arguments
+    /// * `procedure_template_container_model`: The value to set for the
+    ///   `procedure_templates.capping_procedure_templates.
+    ///   procedure_template_container_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template_container_model(
+        self,
+        procedure_template_container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedure_templates.capping_procedure_templates.capped_with_model`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `capped_with_model`: The value to set for the
+    ///   `procedure_templates.capping_procedure_templates.capped_with_model`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn capped_with_model(
+        self,
+        capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `procedure_templates.capping_procedure_templates.
+    /// procedure_template_capped_with_model` column.
+    ///
+    /// # Arguments
+    /// * `procedure_template_capped_with_model`: The value to set for the
+    ///   `procedure_templates.capping_procedure_templates.
+    ///   procedure_template_capped_with_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template_capped_with_model(
+        self,
+        procedure_template_capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl CappingProcedureTemplateBuildable for Option<i32> {
+    fn container_model(
+        self,
+        _container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn foreign_procedure_template(
+        self,
+        _foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn procedure_template_container_model(
+        self,
+        _procedure_template_container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn capped_with_model(
+        self,
+        _capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+    fn procedure_template_capped_with_model(
+        self,
+        _procedure_template_capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+}
+impl<
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        >,
+> CappingProcedureTemplateBuildable
+for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
+    ///Sets the value of the `procedure_templates.capping_procedure_templates.container_model` column.
+    fn container_model(
+        mut self,
+        container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let container_model = container_model
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableCappingProcedureTemplateAttributes::ContainerModel,
+                    )
+            })?;
+        self.container_model = Some(container_model);
+        Ok(self)
+    }
+    ///Sets the value of the `procedure_templates.capping_procedure_templates.foreign_procedure_template` column.
+    fn foreign_procedure_template(
+        mut self,
+        foreign_procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let foreign_procedure_template = foreign_procedure_template
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableCappingProcedureTemplateAttributes::ForeignProcedureTemplate,
+                    )
+            })?;
+        self.foreign_procedure_template = Some(foreign_procedure_template);
+        Ok(self)
+    }
+    ///Sets the value of the `procedure_templates.capping_procedure_templates.procedure_template_container_model` column.
+    fn procedure_template_container_model(
+        mut self,
+        procedure_template_container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let procedure_template_container_model = procedure_template_container_model
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableCappingProcedureTemplateAttributes::ProcedureTemplateContainerModel,
+                    )
+            })?;
+        self.procedure_template_container_model = Some(
+            procedure_template_container_model,
+        );
+        Ok(self)
+    }
+    ///Sets the value of the `procedure_templates.capping_procedure_templates.capped_with_model` column.
+    fn capped_with_model(
+        mut self,
+        capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let capped_with_model = capped_with_model
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableCappingProcedureTemplateAttributes::CappedWithModel,
+                    )
+            })?;
+        self.capped_with_model = Some(capped_with_model);
+        Ok(self)
+    }
+    ///Sets the value of the `procedure_templates.capping_procedure_templates.procedure_template_capped_with_model` column.
+    fn procedure_template_capped_with_model(
+        mut self,
+        procedure_template_capped_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let procedure_template_capped_with_model = procedure_template_capped_with_model
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(
+                        InsertableCappingProcedureTemplateAttributes::ProcedureTemplateCappedWithModel,
+                    )
+            })?;
+        self.procedure_template_capped_with_model = Some(
+            procedure_template_capped_with_model,
+        );
+        Ok(self)
+    }
+}
+impl<
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttributes;
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    fn name<'N, N>(
+        mut self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+                self.procedure_template,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    fn description<'D, D>(
+        mut self,
+        description: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+                self.procedure_template,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    fn deprecated<'D, D>(
+        mut self,
+        deprecated: &'D D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'D D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<&'D D as TryInto<bool>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+                self.procedure_template,
+                deprecated,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    fn icon<'I, I>(
+        mut self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+                self.procedure_template,
+                icon,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    fn created_by(
+        mut self,
+        created_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+                self.procedure_template,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    fn created_at<'CA, CA>(
+        mut self,
+        created_at: &'CA CA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CA CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'CA CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+                self.procedure_template,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    fn updated_by(
+        mut self,
+        updated_by: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+                self.procedure_template,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    fn updated_at<'UA, UA>(
+        mut self,
+        updated_at: &'UA UA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'UA UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <&'UA UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+                self.procedure_template,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey
+    for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.procedure_template = self.procedure_template.set_primary_key(primary_key);
+        self
+    }
+}
+impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        Error = web_common_traits::database::InsertError<
+            InsertableCappingProcedureTemplateAttributes,
+        >,
+    >,
+    ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+{
+    type Attributes = InsertableCappingProcedureTemplateAttributes;
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete() && self.container_model.is_some()
+            && self.foreign_procedure_template.is_some()
+            && self.procedure_template_container_model.is_some()
+            && self.capped_with_model.is_some()
+            && self.procedure_template_capped_with_model.is_some()
+    }
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
+        use diesel::Identifiable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable: crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate = self
+            .insert(user_id, conn)?;
+        Ok(insertable.id())
+    }
+}

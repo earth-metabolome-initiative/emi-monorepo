@@ -8,11 +8,11 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(id))]
+#[diesel(primary_key(procedure))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::procedures::procedures)]
 pub struct Procedure {
-    pub id: ::rosetta_uuid::Uuid,
-    pub procedure_model_id: i32,
+    pub procedure: ::rosetta_uuid::Uuid,
+    pub procedure_template: i32,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -21,45 +21,41 @@ pub struct Procedure {
 impl web_common_traits::prelude::TableName for Procedure {
     const TABLE_NAME: &'static str = "procedures";
 }
-impl web_common_traits::prelude::ExtensionTable<Self> for Procedure where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
-{
-}
 impl diesel::Identifiable for Procedure {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
-        self.id
+        self.procedure
     }
 }
 impl Procedure {
-    pub fn procedure_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel::table(),
-                self.procedure_model_id,
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.procedure_template,
             ),
             conn,
         )
@@ -129,34 +125,16 @@ impl Procedure {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_model_id_and_id(
-        procedure_model_id: &i32,
-        id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::procedures::procedures;
-        Self::table()
-            .filter(
-                procedures::procedure_model_id.eq(procedure_model_id).and(procedures::id.eq(id)),
-            )
-            .order_by(procedures::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_model_id(
-        procedure_model_id: &i32,
+    pub fn from_procedure_template(
+        procedure_template: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
-            .filter(procedures::procedure_model_id.eq(procedure_model_id))
-            .order_by(procedures::id.asc())
+            .filter(procedures::procedure_template.eq(procedure_template))
+            .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -169,7 +147,7 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::created_by.eq(created_by))
-            .order_by(procedures::id.asc())
+            .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -182,7 +160,7 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::created_at.eq(created_at))
-            .order_by(procedures::id.asc())
+            .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -195,7 +173,7 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::updated_by.eq(updated_by))
-            .order_by(procedures::id.asc())
+            .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -208,8 +186,28 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::updated_at.eq(updated_at))
-            .order_by(procedures::id.asc())
+            .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure(
+        procedure_template: &i32,
+        procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(
+                procedures::procedure_template
+                    .eq(procedure_template)
+                    .and(procedures::procedure.eq(procedure)),
+            )
+            .order_by(procedures::procedure.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<Procedure> for Procedure {

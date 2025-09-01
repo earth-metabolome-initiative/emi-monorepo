@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    Trackable,
+    PhysicalAssetModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
-    Trackable,
+    PhysicalAssetModel,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -18,9 +18,14 @@ where
         crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
     >,
     C: diesel::connection::LoadConnection,
-    Trackable: web_common_traits::database::TryInsertGeneric<
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        PrimaryKey = i32,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot;
@@ -68,8 +73,8 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotExtensionAttributes::Trackable(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotExtensionAttributes::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
                     ),
                 ))
             })?;

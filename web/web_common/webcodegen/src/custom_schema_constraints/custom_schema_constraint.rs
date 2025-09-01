@@ -1,9 +1,12 @@
 use diesel::PgConnection;
 
-use crate::{Column, Table, errors::WebCodeGenError};
+use crate::{Column, Table};
 
 /// A trait for custom table constraints
 pub trait CustomTableConstraint {
+    /// The error type for the constraint
+    type Error: From<diesel::result::Error>;
+
     /// Check the table constraint
     ///
     /// # Arguments
@@ -15,17 +18,14 @@ pub trait CustomTableConstraint {
     ///
     /// * If the constraint check fails
     /// * If the database query fails
-    fn check_constraint(
-        &self,
-        conn: &mut PgConnection,
-        table: &Table,
-    ) -> Result<(), WebCodeGenError>;
+    fn check_constraint(&self, conn: &mut PgConnection, table: &Table) -> Result<(), Self::Error>;
 
     /// Check the table constraint on all tables in the database
     ///
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the catalog to filter the tables by
+    /// * `table_schema` - The name of the schema to filter the tables by
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -35,9 +35,10 @@ pub trait CustomTableConstraint {
     fn check_all(
         &self,
         table_catalog: &str,
+        table_schema: &str,
         conn: &mut PgConnection,
-    ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog)? {
+    ) -> Result<(), Self::Error> {
+        for table in Table::load_all(conn, table_catalog, table_schema)? {
             self.check_constraint(conn, &table)?;
         }
         Ok(())
@@ -46,6 +47,9 @@ pub trait CustomTableConstraint {
 
 /// A trait for custom column constraints
 pub trait CustomColumnConstraint {
+    /// The error type for the constraint
+    type Error: From<diesel::result::Error>;
+
     /// Check the column constraint
     ///
     /// # Arguments
@@ -57,17 +61,15 @@ pub trait CustomColumnConstraint {
     ///
     /// * If the constraint check fails
     /// * If the database query fails
-    fn check_constraint(
-        &self,
-        conn: &mut PgConnection,
-        column: &Column,
-    ) -> Result<(), WebCodeGenError>;
+    fn check_constraint(&self, conn: &mut PgConnection, column: &Column)
+    -> Result<(), Self::Error>;
 
     /// Runs the check on all of the columns in the database.
     ///
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the catalog to filter the columns by
+    /// * `table_schema` - The name of the schema to filter the columns by
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -78,9 +80,10 @@ pub trait CustomColumnConstraint {
     fn check_all(
         &self,
         table_catalog: &str,
+        table_schema: &str,
         conn: &mut PgConnection,
-    ) -> Result<(), WebCodeGenError> {
-        for table in Table::load_all(conn, table_catalog)? {
+    ) -> Result<(), Self::Error> {
+        for table in Table::load_all(conn, table_catalog, table_schema)? {
             for column in table.columns(conn)? {
                 self.check_constraint(conn, &column)?;
             }

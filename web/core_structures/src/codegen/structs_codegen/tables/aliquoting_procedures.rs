@@ -8,16 +8,18 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(procedure_id))]
+#[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures
 )]
 pub struct AliquotingProcedure {
-    pub procedure_id: ::rosetta_uuid::Uuid,
-    pub procedure_model_id: i32,
+    pub procedure: ::rosetta_uuid::Uuid,
+    pub procedure_template: i32,
+    pub foreign_procedure_template: i32,
+    pub foreign_procedure: ::rosetta_uuid::Uuid,
     pub aliquoted_with: ::rosetta_uuid::Uuid,
-    pub pipette_tip: ::rosetta_uuid::Uuid,
-    pub aliquoted_container_id: ::rosetta_uuid::Uuid,
+    pub pipette_tip_model: i32,
+    pub aliquoted_from: ::rosetta_uuid::Uuid,
 }
 impl web_common_traits::prelude::TableName for AliquotingProcedure {
     const TABLE_NAME: &'static str = "aliquoting_procedures";
@@ -33,7 +35,7 @@ where
 impl diesel::Identifiable for AliquotingProcedure {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
-        self.procedure_id
+        self.procedure
     }
 }
 impl AliquotingProcedure {
@@ -64,39 +66,103 @@ impl AliquotingProcedure {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.procedure_id,
+                self.procedure,
             ),
             conn,
         )
     }
-    pub fn procedure_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+            crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel::table(),
-                self.procedure_model_id,
+                crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table(),
+                self.procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.foreign_procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn foreign_procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                self.foreign_procedure,
             ),
             conn,
         )
@@ -105,35 +171,35 @@ impl AliquotingProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        crate::codegen::structs_codegen::tables::pipettes::Pipette,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::pipettes::Pipette: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_models::PipetteModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::pipettes::Pipette as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+            crate::codegen::structs_codegen::tables::pipettes::Pipette,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::table(),
+                crate::codegen::structs_codegen::tables::pipettes::Pipette::table(),
                 self.aliquoted_with,
             ),
             conn,
         )
     }
-    pub fn pipette_tip<C: diesel::connection::LoadConnection>(
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -161,156 +227,164 @@ impl AliquotingProcedure {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
                 ),
-                self.pipette_tip,
+                self.pipette_tip_model,
             ),
             conn,
         )
     }
-    pub fn aliquoted_container<C: diesel::connection::LoadConnection>(
+    pub fn aliquoted_from<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+            crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.aliquoted_container_id,
-            ),
-            conn,
-        )
-    }
-    pub fn aliquoting_procedures_procedure_id_aliquoted_with_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.aliquoted_with),
-            ),
-            conn,
-        )
-    }
-    pub fn aliquoting_procedures_procedure_id_pipette_tip_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.pipette_tip),
-            ),
-            conn,
-        )
-    }
-    pub fn aliquoting_procedures_procedure_id_aliquoted_container_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable::table(),
-                (self.procedure_id, self.aliquoted_container_id),
+                crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::table(),
+                self.aliquoted_from,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_model_id(
-        procedure_model_id: &i32,
+    pub fn aliquoting_procedures_procedure_aliquoted_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn aliquoting_procedures_procedure_pipette_tip_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                (self.procedure, self.pipette_tip_model),
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_foreign_procedure_aliquoted_from_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.foreign_procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_from),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
-            .filter(aliquoting_procedures::procedure_model_id.eq(procedure_model_id))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .filter(aliquoting_procedures::procedure_template.eq(procedure_template))
+            .order_by(aliquoting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_foreign_procedure_template(
+        foreign_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
+        Self::table()
+            .filter(
+                aliquoting_procedures::foreign_procedure_template.eq(foreign_procedure_template),
+            )
+            .order_by(aliquoting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_foreign_procedure(
+        foreign_procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
+        Self::table()
+            .filter(aliquoting_procedures::foreign_procedure.eq(foreign_procedure))
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -323,39 +397,39 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(aliquoting_procedures::aliquoted_with.eq(aliquoted_with))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_pipette_tip(
-        pipette_tip: &::rosetta_uuid::Uuid,
+    pub fn from_pipette_tip_model(
+        pipette_tip_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
-            .filter(aliquoting_procedures::pipette_tip.eq(pipette_tip))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .filter(aliquoting_procedures::pipette_tip_model.eq(pipette_tip_model))
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_aliquoted_container_id(
-        aliquoted_container_id: &::rosetta_uuid::Uuid,
+    pub fn from_aliquoted_from(
+        aliquoted_from: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
-            .filter(aliquoting_procedures::aliquoted_container_id.eq(aliquoted_container_id))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .filter(aliquoting_procedures::aliquoted_from.eq(aliquoted_from))
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_id_and_procedure_model_id(
-        procedure_id: &::rosetta_uuid::Uuid,
-        procedure_model_id: &i32,
+    pub fn from_procedure_and_procedure_template(
+        procedure: &::rosetta_uuid::Uuid,
+        procedure_template: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -365,16 +439,16 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_id
-                    .eq(procedure_id)
-                    .and(aliquoting_procedures::procedure_model_id.eq(procedure_model_id)),
+                aliquoting_procedures::procedure
+                    .eq(procedure)
+                    .and(aliquoting_procedures::procedure_template.eq(procedure_template)),
             )
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_id_and_aliquoted_with(
-        procedure_id: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_and_aliquoted_with(
+        procedure: &::rosetta_uuid::Uuid,
         aliquoted_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -385,17 +459,17 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_id
-                    .eq(procedure_id)
+                aliquoting_procedures::procedure
+                    .eq(procedure)
                     .and(aliquoting_procedures::aliquoted_with.eq(aliquoted_with)),
             )
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_id_and_pipette_tip(
-        procedure_id: &::rosetta_uuid::Uuid,
-        pipette_tip: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_and_pipette_tip_model(
+        procedure: &::rosetta_uuid::Uuid,
+        pipette_tip_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -405,17 +479,17 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_id
-                    .eq(procedure_id)
-                    .and(aliquoting_procedures::pipette_tip.eq(pipette_tip)),
+                aliquoting_procedures::procedure
+                    .eq(procedure)
+                    .and(aliquoting_procedures::pipette_tip_model.eq(pipette_tip_model)),
             )
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_id_and_aliquoted_container_id(
-        procedure_id: &::rosetta_uuid::Uuid,
-        aliquoted_container_id: &::rosetta_uuid::Uuid,
+    pub fn from_foreign_procedure_and_aliquoted_from(
+        foreign_procedure: &::rosetta_uuid::Uuid,
+        aliquoted_from: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -425,17 +499,53 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_id
-                    .eq(procedure_id)
-                    .and(aliquoting_procedures::aliquoted_container_id.eq(aliquoted_container_id)),
+                aliquoting_procedures::foreign_procedure
+                    .eq(foreign_procedure)
+                    .and(aliquoting_procedures::aliquoted_from.eq(aliquoted_from)),
             )
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_model_id_and_id(
-        procedure_model_id: &i32,
-        id: &::rosetta_uuid::Uuid,
+    pub fn from_foreign_procedure_and_foreign_procedure_template(
+        foreign_procedure: &::rosetta_uuid::Uuid,
+        foreign_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
+        Self::table()
+            .filter(aliquoting_procedures::foreign_procedure.eq(foreign_procedure).and(
+                aliquoting_procedures::foreign_procedure_template.eq(foreign_procedure_template),
+            ))
+            .order_by(aliquoting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_foreign_procedure_template(
+        procedure_template: &i32,
+        foreign_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
+        Self::table()
+            .filter(aliquoting_procedures::procedure_template.eq(procedure_template).and(
+                aliquoting_procedures::foreign_procedure_template.eq(foreign_procedure_template),
+            ))
+            .order_by(aliquoting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure(
+        procedure_template: &i32,
+        procedure: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -448,12 +558,14 @@ impl AliquotingProcedure {
         };
         Self::table()
             .inner_join(
-                procedures::table.on(aliquoting_procedures::procedure_id.eq(procedures::id)),
+                procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(
-                procedures::procedure_model_id.eq(procedure_model_id).and(procedures::id.eq(id)),
+                procedures::procedure_template
+                    .eq(procedure_template)
+                    .and(procedures::procedure.eq(procedure)),
             )
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
     }
@@ -472,10 +584,10 @@ impl AliquotingProcedure {
         };
         Self::table()
             .inner_join(
-                procedures::table.on(aliquoting_procedures::procedure_id.eq(procedures::id)),
+                procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::created_by.eq(created_by))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -494,10 +606,10 @@ impl AliquotingProcedure {
         };
         Self::table()
             .inner_join(
-                procedures::table.on(aliquoting_procedures::procedure_id.eq(procedures::id)),
+                procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::created_at.eq(created_at))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -516,10 +628,10 @@ impl AliquotingProcedure {
         };
         Self::table()
             .inner_join(
-                procedures::table.on(aliquoting_procedures::procedure_id.eq(procedures::id)),
+                procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::updated_by.eq(updated_by))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -538,10 +650,10 @@ impl AliquotingProcedure {
         };
         Self::table()
             .inner_join(
-                procedures::table.on(aliquoting_procedures::procedure_id.eq(procedures::id)),
+                procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::updated_at.eq(updated_at))
-            .order_by(aliquoting_procedures::procedure_id.asc())
+            .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }

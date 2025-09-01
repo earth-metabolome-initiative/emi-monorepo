@@ -54,11 +54,25 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let procedure_model_id = self
-            .procedure_model_id
+        let procedure_template = self
+            .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::ProcedureModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::ProcedureTemplate,
+                ),
+            )?;
+        let foreign_procedure_template = self
+            .foreign_procedure_template
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::ForeignProcedureTemplate,
+                ),
+            )?;
+        let foreign_procedure = self
+            .foreign_procedure
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::ForeignProcedure,
                 ),
             )?;
         let stratified_source = self
@@ -82,30 +96,32 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::TransferredWith,
                 ),
             )?;
-        let pipette_tip = self
-            .pipette_tip
+        let pipette_tip_model = self
+            .pipette_tip_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::PipetteTip,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::PipetteTipModel,
                 ),
             )?;
-        let procedure_id = self
+        let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureAttributes::Extension(
                     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
                     ),
                 ))
             })?;
         Ok(Self::InsertableVariant {
-            procedure_id,
-            procedure_model_id,
+            procedure,
+            procedure_template,
+            foreign_procedure_template,
+            foreign_procedure,
             stratified_source,
             supernatant_destination,
             transferred_with,
-            pipette_tip,
+            pipette_tip_model,
         })
     }
 }

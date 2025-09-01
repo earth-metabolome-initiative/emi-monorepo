@@ -4,5 +4,7 @@ use crate::codegen::diesel_codegen::tables::{
 diesel::allow_tables_to_appear_in_same_query!(phone_models, camera_models);
 use crate::codegen::diesel_codegen::tables::positioning_device_models::positioning_device_models;
 diesel::allow_tables_to_appear_in_same_query!(phone_models, positioning_device_models);
-use crate::codegen::diesel_codegen::tables::trackables::trackables;
-diesel::allow_tables_to_appear_in_same_query!(phone_models, trackables);
+use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
+diesel::allow_tables_to_appear_in_same_query!(phone_models, asset_models);
+use crate::codegen::diesel_codegen::tables::physical_asset_models::physical_asset_models;
+diesel::allow_tables_to_appear_in_same_query!(phone_models, physical_asset_models);

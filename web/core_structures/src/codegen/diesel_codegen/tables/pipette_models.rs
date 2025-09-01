@@ -1,3 +1,3 @@
 diesel::table! {
-    pipette_models(id) { id -> ::rosetta_uuid::diesel_impls::Uuid }
+    pipette_models(id) { id -> diesel::sql_types::Integer }
 }

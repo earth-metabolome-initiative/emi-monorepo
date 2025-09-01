@@ -1,71 +1,120 @@
 mod addresses;
-mod aliquoting_procedure_models;
+mod aliquoting_procedure_templates;
 mod aliquoting_procedures;
+mod asset_compatibility_rules;
+mod asset_model_ancestors;
+mod asset_models;
+mod assets;
 mod ball_mill_machine_models;
-mod ball_mill_procedure_models;
-mod binary_question_procedure_models;
+mod ball_mill_machines;
+mod ball_mill_procedure_templates;
+mod ball_mill_procedures;
+mod beads_models;
 mod brands;
 mod camera_models;
-mod capping_procedure_models;
+mod cameras;
+mod capping_procedure_templates;
+mod capping_procedures;
+mod caps_models;
 mod centrifuge_models;
-mod centrifuge_procedure_models;
+mod centrifuge_procedure_templates;
+mod centrifuge_procedures;
+mod centrifuges;
 mod cities;
 mod colors;
+mod commercial_ball_mill_machine_lots;
+mod commercial_ball_mill_machine_models;
+mod commercial_beads_lots;
+mod commercial_beads_models;
+mod commercial_camera_lots;
+mod commercial_camera_models;
+mod commercial_centrifuge_lots;
+mod commercial_centrifuge_models;
+mod commercial_freeze_dryer_lots;
+mod commercial_freeze_dryer_models;
+mod commercial_freezer_lots;
+mod commercial_freezer_models;
+mod commercial_packaging_lots;
+mod commercial_packaging_models;
+mod commercial_pipette_lots;
+mod commercial_pipette_models;
+mod commercial_pipette_tip_lots;
+mod commercial_pipette_tip_models;
+mod commercial_positioning_device_lots;
+mod commercial_positioning_device_models;
 mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagents;
-mod compatibility_rules;
+mod commercial_volume_measuring_device_lots;
+mod commercial_volume_measuring_device_models;
+mod commercial_weighing_device_lots;
+mod commercial_weighing_device_models;
+mod container_compatibility_rules;
 mod container_models;
 mod containers;
 mod countries;
-mod disposal_procedure_models;
+mod digital_asset_models;
+mod digital_assets;
+mod disposal_procedure_templates;
+mod disposal_procedures;
 mod documents;
 mod email_providers;
-mod fractioning_procedure_models;
-mod freeze_drier_models;
-mod freeze_drying_procedure_models;
+mod fractioning_procedure_templates;
+mod fractioning_procedures;
+mod freeze_dryer_models;
+mod freeze_dryers;
+mod freeze_drying_procedure_templates;
+mod freeze_drying_procedures;
 mod freezer_models;
-mod freezing_procedure_models;
+mod freezers;
+mod freezing_procedure_templates;
+mod freezing_procedures;
 mod from_row;
-mod geolocation_procedure_models;
+mod geolocation_procedure_templates;
+mod geolocation_procedures;
 mod instrument_states;
 mod login_providers;
 mod materials;
-mod mixing_procedure_models;
-mod next_procedure_models;
+mod next_procedure_templates;
 mod observation_subjects;
 mod organism_taxa;
 mod organisms;
 mod organizations;
-mod packaging_procedure_models;
-mod parent_procedure_models;
+mod packaging_models;
+mod packaging_procedure_templates;
+mod packaging_procedures;
+mod parent_procedure_templates;
 mod permanence_categories;
 mod phone_models;
-mod photograph_procedure_models;
+mod photograph_procedure_templates;
+mod photograph_procedures;
+mod physical_asset_models;
+mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
-mod placing_procedure_models;
+mod pipettes;
 mod positioning_device_models;
-mod pouring_procedure_models;
-mod procedure_model_trackables;
-mod procedure_models;
-mod procedure_trackables;
+mod positioning_devices;
+mod pouring_procedure_templates;
+mod pouring_procedures;
+mod procedure_assets;
+mod procedure_template_asset_models;
+mod procedure_templates;
 mod procedures;
-mod processables;
 mod project_states;
 mod projects;
 mod ranks;
 mod read_dispatch;
-mod reagents;
+mod reagent_models;
 mod roles;
 mod rooms;
 mod sample_states;
-mod shared_procedure_model_trackables;
+mod shared_procedure_template_asset_models;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
-mod storage_procedure_models;
-mod supernatant_procedure_models;
+mod storage_procedure_templates;
+mod storage_procedures;
+mod supernatant_procedure_templates;
 mod supernatant_procedures;
 mod tabular;
 mod taxa;
@@ -74,90 +123,241 @@ mod team_projects;
 mod team_states;
 mod teams;
 mod temporary_user;
-mod trackable_ancestors;
-mod trackable_locations;
-mod trackables;
 mod units;
 mod user_emails;
 mod user_organizations;
 mod users;
+mod volume_measuring_device_models;
+mod volume_measuring_devices;
 mod volumetric_container_models;
-mod volumetric_processables;
+mod volumetric_containers;
 mod weighing_device_models;
-mod weighing_procedure_models;
+mod weighing_devices;
+mod weighing_procedure_templates;
 mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Row {
-    Address(crate::codegen::structs_codegen::tables::addresses::Address),
-    AliquotingProcedureModel(
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+    AliquotingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
+    ),
+    BallMillProcedureTemplate(
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+    ),
+    CappingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+    ),
+    CentrifugeProcedureTemplate(
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+    ),
+    DisposalProcedureTemplate(
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+    ),
+    FractioningProcedureTemplate(
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+    ),
+    FreezeDryingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+    ),
+    FreezingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
+    ),
+    GeolocationProcedureTemplate(
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+    ),
+    PackagingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+    ),
+    PhotographProcedureTemplate(
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
+    ),
+    PouringProcedureTemplate(
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+    ),
+    ProcedureTemplate(
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    ),
+    StorageProcedureTemplate(
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+    ),
+    SupernatantProcedureTemplate(
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+    ),
+    WeighingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
     ),
     AliquotingProcedure(
         crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
     ),
+    BallMillProcedure(
+        crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
+    ),
+    CappingProcedure(
+        crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
+    ),
+    CentrifugeProcedure(
+        crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+    ),
+    DisposalProcedure(
+        crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
+    ),
+    FractioningProcedure(
+        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+    ),
+    FreezeDryingProcedure(
+        crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
+    ),
+    FreezingProcedure(
+        crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
+    ),
+    GeolocationProcedure(
+        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    ),
+    PackagingProcedure(
+        crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
+    ),
+    PhotographProcedure(
+        crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
+    ),
+    PouringProcedure(
+        crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+    ),
+    Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
+    StorageProcedure(
+        crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
+    ),
+    SupernatantProcedure(
+        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+    ),
+    WeighingProcedure(
+        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+    ),
+    Address(crate::codegen::structs_codegen::tables::addresses::Address),
+    AssetCompatibilityRule(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    ),
+    AssetModelAncestor(
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    ),
+    AssetModel(crate::codegen::structs_codegen::tables::asset_models::AssetModel),
+    Asset(crate::codegen::structs_codegen::tables::assets::Asset),
     BallMillMachineModel(
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     ),
-    BallMillProcedureModel(
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
+    BallMillMachine(
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
     ),
-    BinaryQuestionProcedureModel(
-        crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel,
-    ),
+    BeadsModel(crate::codegen::structs_codegen::tables::beads_models::BeadsModel),
     Brand(crate::codegen::structs_codegen::tables::brands::Brand),
     CameraModel(crate::codegen::structs_codegen::tables::camera_models::CameraModel),
-    CappingProcedureModel(
-        crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
-    ),
+    Camera(crate::codegen::structs_codegen::tables::cameras::Camera),
+    CapsModel(crate::codegen::structs_codegen::tables::caps_models::CapsModel),
     CentrifugeModel(
         crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
     ),
-    CentrifugeProcedureModel(
-        crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
-    ),
+    Centrifuge(crate::codegen::structs_codegen::tables::centrifuges::Centrifuge),
     City(crate::codegen::structs_codegen::tables::cities::City),
     Color(crate::codegen::structs_codegen::tables::colors::Color),
+    CommercialBallMillMachineLot(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+    ),
+    CommercialBallMillMachineModel(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+    ),
+    CommercialBeadsLot(
+        crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot,
+    ),
+    CommercialBeadsModel(
+        crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel,
+    ),
+    CommercialCameraLot(
+        crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
+    ),
+    CommercialCameraModel(
+        crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+    ),
+    CommercialCentrifugeLot(
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+    ),
+    CommercialCentrifugeModel(
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+    ),
+    CommercialFreezeDryerLot(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+    ),
+    CommercialFreezeDryerModel(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel,
+    ),
+    CommercialFreezerLot(
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+    ),
+    CommercialFreezerModel(
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+    ),
+    CommercialPackagingLot(
+        crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
+    ),
+    CommercialPackagingModel(
+        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+    ),
+    CommercialPipetteLot(
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+    ),
+    CommercialPipetteModel(
+        crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
+    ),
+    CommercialPipetteTipLot(
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+    ),
+    CommercialPipetteTipModel(
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
+    ),
+    CommercialPositioningDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
+    ),
+    CommercialPositioningDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+    ),
     CommercialProductLot(
         crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
     ),
     CommercialProduct(
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     ),
-    CommercialReagent(
-        crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
+    CommercialVolumeMeasuringDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
     ),
-    CompatibilityRule(
-        crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+    CommercialVolumeMeasuringDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+    ),
+    CommercialWeighingDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+    ),
+    CommercialWeighingDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
+    ),
+    ContainerCompatibilityRule(
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
     ),
     ContainerModel(
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ),
     Container(crate::codegen::structs_codegen::tables::containers::Container),
     Country(crate::codegen::structs_codegen::tables::countries::Country),
-    DisposalProcedureModel(
-        crate::codegen::structs_codegen::tables::disposal_procedure_models::DisposalProcedureModel,
+    DigitalAssetModel(
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
     ),
+    DigitalAsset(crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset),
     Document(crate::codegen::structs_codegen::tables::documents::Document),
     EmailProvider(
         crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
     ),
-    FractioningProcedureModel(
-        crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
+    FreezeDryerModel(
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
     ),
-    FreezeDrierModel(
-        crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
-    ),
-    FreezeDryingProcedureModel(
-        crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
-    ),
+    FreezeDryer(crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer),
     FreezerModel(crate::codegen::structs_codegen::tables::freezer_models::FreezerModel),
-    FreezingProcedureModel(
-        crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
-    ),
-    GeolocationProcedureModel(
-        crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
-    ),
+    Freezer(crate::codegen::structs_codegen::tables::freezers::Freezer),
     InstrumentState(
         crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
     ),
@@ -165,11 +365,8 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
     ),
     Material(crate::codegen::structs_codegen::tables::materials::Material),
-    MixingProcedureModel(
-        crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel,
-    ),
-    NextProcedureModel(
-        crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
+    NextProcedureTemplate(
+        crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
     ),
     ObservationSubject(
         crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
@@ -177,66 +374,53 @@ pub enum Row {
     OrganismTaxon(crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon),
     Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
     Organization(crate::codegen::structs_codegen::tables::organizations::Organization),
-    PackagingProcedureModel(
-        crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel,
+    PackagingModel(
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
     ),
-    ParentProcedureModel(
-        crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
+    ParentProcedureTemplate(
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
     ),
     PermanenceCategory(
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ),
     PhoneModel(crate::codegen::structs_codegen::tables::phone_models::PhoneModel),
-    PhotographProcedureModel(
-        crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
+    PhysicalAssetModel(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    ),
+    PhysicalAsset(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
     ),
     PipetteModel(crate::codegen::structs_codegen::tables::pipette_models::PipetteModel),
     PipetteTipModel(
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     ),
-    PlacingProcedureModel(
-        crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel,
-    ),
+    Pipette(crate::codegen::structs_codegen::tables::pipettes::Pipette),
     PositioningDeviceModel(
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     ),
-    PouringProcedureModel(
-        crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel,
+    PositioningDevice(
+        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
     ),
-    ProcedureModelTrackable(
-        crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+    ProcedureAsset(
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     ),
-    ProcedureModel(
-        crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel,
+    ProcedureTemplateAssetModel(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     ),
-    ProcedureTrackable(
-        crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
-    ),
-    Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
-    Processable(crate::codegen::structs_codegen::tables::processables::Processable),
     ProjectState(crate::codegen::structs_codegen::tables::project_states::ProjectState),
     Project(crate::codegen::structs_codegen::tables::projects::Project),
     Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
-    Reagent(crate::codegen::structs_codegen::tables::reagents::Reagent),
+    ReagentModel(crate::codegen::structs_codegen::tables::reagent_models::ReagentModel),
     Role(crate::codegen::structs_codegen::tables::roles::Role),
     Room(crate::codegen::structs_codegen::tables::rooms::Room),
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
-    SharedProcedureModelTrackable(
-        crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable,
+    SharedProcedureTemplateAssetModel(
+        crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel,
     ),
     SpatialRefSy(crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy),
     Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
     SpectraCollection(
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-    ),
-    StorageProcedureModel(
-        crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
-    ),
-    SupernatantProcedureModel(
-        crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
-    ),
-    SupernatantProcedure(
-        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
     ),
     Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
     TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
@@ -246,33 +430,29 @@ pub enum Row {
     TemporaryUser(
         crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
     ),
-    TrackableAncestor(
-        crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
-    ),
-    TrackableLocation(
-        crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
-    ),
-    Trackable(crate::codegen::structs_codegen::tables::trackables::Trackable),
     Unit(crate::codegen::structs_codegen::tables::units::Unit),
     UserEmail(crate::codegen::structs_codegen::tables::user_emails::UserEmail),
     UserOrganization(
         crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
     ),
     User(crate::codegen::structs_codegen::tables::users::User),
+    VolumeMeasuringDeviceModel(
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+    ),
+    VolumeMeasuringDevice(
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    ),
     VolumetricContainerModel(
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     ),
-    VolumetricProcessable(
-        crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+    VolumetricContainer(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     ),
     WeighingDeviceModel(
         crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
     ),
-    WeighingProcedureModel(
-        crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
-    ),
-    WeighingProcedure(
-        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+    WeighingDevice(
+        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
     ),
 }
 impl Row {
@@ -284,81 +464,229 @@ impl Row {
     ) -> Result<Option<Row>, diesel::result::Error> {
         use web_common_traits::database::Upsertable;
         Ok(match self {
-            Row::Address(addresses) => addresses.upsert(conn)?.map(Row::from),
-            Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
-                aliquoting_procedure_models.upsert(conn)?.map(Row::from)
+            Row::AliquotingProcedureTemplate(aliquoting_procedure_templates) => {
+                aliquoting_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
+                ball_mill_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::CappingProcedureTemplate(capping_procedure_templates) => {
+                capping_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
+                centrifuge_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::DisposalProcedureTemplate(disposal_procedure_templates) => {
+                disposal_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
+                fractioning_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
+                freeze_drying_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::FreezingProcedureTemplate(freezing_procedure_templates) => {
+                freezing_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
+                geolocation_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::PackagingProcedureTemplate(packaging_procedure_templates) => {
+                packaging_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
+                photograph_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::PouringProcedureTemplate(pouring_procedure_templates) => {
+                pouring_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::ProcedureTemplate(procedure_templates) => {
+                procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::StorageProcedureTemplate(storage_procedure_templates) => {
+                storage_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
+                supernatant_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::WeighingProcedureTemplate(weighing_procedure_templates) => {
+                weighing_procedure_templates.upsert(conn)?.map(Row::from)
             }
             Row::AliquotingProcedure(aliquoting_procedures) => {
                 aliquoting_procedures.upsert(conn)?.map(Row::from)
             }
+            Row::BallMillProcedure(ball_mill_procedures) => {
+                ball_mill_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::CappingProcedure(capping_procedures) => {
+                capping_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::CentrifugeProcedure(centrifuge_procedures) => {
+                centrifuge_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::DisposalProcedure(disposal_procedures) => {
+                disposal_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::FreezeDryingProcedure(freeze_drying_procedures) => {
+                freeze_drying_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::FreezingProcedure(freezing_procedures) => {
+                freezing_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::GeolocationProcedure(geolocation_procedures) => {
+                geolocation_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::PackagingProcedure(packaging_procedures) => {
+                packaging_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::PhotographProcedure(photograph_procedures) => {
+                photograph_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::PouringProcedure(pouring_procedures) => {
+                pouring_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::Procedure(procedures) => procedures.upsert(conn)?.map(Row::from),
+            Row::StorageProcedure(storage_procedures) => {
+                storage_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::WeighingProcedure(weighing_procedures) => {
+                weighing_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::Address(addresses) => addresses.upsert(conn)?.map(Row::from),
+            Row::AssetCompatibilityRule(asset_compatibility_rules) => {
+                asset_compatibility_rules.upsert(conn)?.map(Row::from)
+            }
+            Row::AssetModelAncestor(asset_model_ancestors) => {
+                asset_model_ancestors.upsert(conn)?.map(Row::from)
+            }
+            Row::AssetModel(asset_models) => asset_models.upsert(conn)?.map(Row::from),
+            Row::Asset(assets) => assets.upsert(conn)?.map(Row::from),
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.upsert(conn)?.map(Row::from)
             }
-            Row::BallMillProcedureModel(ball_mill_procedure_models) => {
-                ball_mill_procedure_models.upsert(conn)?.map(Row::from)
+            Row::BallMillMachine(ball_mill_machines) => {
+                ball_mill_machines.upsert(conn)?.map(Row::from)
             }
-            Row::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
-                binary_question_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::BeadsModel(beads_models) => beads_models.upsert(conn)?.map(Row::from),
             Row::Brand(brands) => brands.upsert(conn)?.map(Row::from),
             Row::CameraModel(camera_models) => camera_models.upsert(conn)?.map(Row::from),
-            Row::CappingProcedureModel(capping_procedure_models) => {
-                capping_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::Camera(cameras) => cameras.upsert(conn)?.map(Row::from),
+            Row::CapsModel(caps_models) => caps_models.upsert(conn)?.map(Row::from),
             Row::CentrifugeModel(centrifuge_models) => {
                 centrifuge_models.upsert(conn)?.map(Row::from)
             }
-            Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
-                centrifuge_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::Centrifuge(centrifuges) => centrifuges.upsert(conn)?.map(Row::from),
             Row::City(cities) => cities.upsert(conn)?.map(Row::from),
             Row::Color(colors) => colors.upsert(conn)?.map(Row::from),
+            Row::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
+                commercial_ball_mill_machine_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
+                commercial_ball_mill_machine_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialBeadsLot(commercial_beads_lots) => {
+                commercial_beads_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialBeadsModel(commercial_beads_models) => {
+                commercial_beads_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialCameraLot(commercial_camera_lots) => {
+                commercial_camera_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialCameraModel(commercial_camera_models) => {
+                commercial_camera_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
+                commercial_centrifuge_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialCentrifugeModel(commercial_centrifuge_models) => {
+                commercial_centrifuge_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialFreezeDryerLot(commercial_freeze_dryer_lots) => {
+                commercial_freeze_dryer_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialFreezeDryerModel(commercial_freeze_dryer_models) => {
+                commercial_freeze_dryer_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialFreezerLot(commercial_freezer_lots) => {
+                commercial_freezer_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialFreezerModel(commercial_freezer_models) => {
+                commercial_freezer_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPackagingLot(commercial_packaging_lots) => {
+                commercial_packaging_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPackagingModel(commercial_packaging_models) => {
+                commercial_packaging_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPipetteLot(commercial_pipette_lots) => {
+                commercial_pipette_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPipetteModel(commercial_pipette_models) => {
+                commercial_pipette_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPipetteTipLot(commercial_pipette_tip_lots) => {
+                commercial_pipette_tip_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPipetteTipModel(commercial_pipette_tip_models) => {
+                commercial_pipette_tip_models.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPositioningDeviceLot(commercial_positioning_device_lots) => {
+                commercial_positioning_device_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialPositioningDeviceModel(commercial_positioning_device_models) => {
+                commercial_positioning_device_models.upsert(conn)?.map(Row::from)
+            }
             Row::CommercialProductLot(commercial_product_lots) => {
                 commercial_product_lots.upsert(conn)?.map(Row::from)
             }
             Row::CommercialProduct(commercial_products) => {
                 commercial_products.upsert(conn)?.map(Row::from)
             }
-            Row::CommercialReagent(commercial_reagents) => {
-                commercial_reagents.upsert(conn)?.map(Row::from)
+            Row::CommercialVolumeMeasuringDeviceLot(commercial_volume_measuring_device_lots) => {
+                commercial_volume_measuring_device_lots.upsert(conn)?.map(Row::from)
             }
-            Row::CompatibilityRule(compatibility_rules) => {
-                compatibility_rules.upsert(conn)?.map(Row::from)
+            Row::CommercialVolumeMeasuringDeviceModel(
+                commercial_volume_measuring_device_models,
+            ) => commercial_volume_measuring_device_models.upsert(conn)?.map(Row::from),
+            Row::CommercialWeighingDeviceLot(commercial_weighing_device_lots) => {
+                commercial_weighing_device_lots.upsert(conn)?.map(Row::from)
+            }
+            Row::CommercialWeighingDeviceModel(commercial_weighing_device_models) => {
+                commercial_weighing_device_models.upsert(conn)?.map(Row::from)
+            }
+            Row::ContainerCompatibilityRule(container_compatibility_rules) => {
+                container_compatibility_rules.upsert(conn)?.map(Row::from)
             }
             Row::ContainerModel(container_models) => container_models.upsert(conn)?.map(Row::from),
             Row::Container(containers) => containers.upsert(conn)?.map(Row::from),
             Row::Country(countries) => countries.upsert(conn)?.map(Row::from),
-            Row::DisposalProcedureModel(disposal_procedure_models) => {
-                disposal_procedure_models.upsert(conn)?.map(Row::from)
+            Row::DigitalAssetModel(digital_asset_models) => {
+                digital_asset_models.upsert(conn)?.map(Row::from)
             }
+            Row::DigitalAsset(digital_assets) => digital_assets.upsert(conn)?.map(Row::from),
             Row::Document(documents) => documents.upsert(conn)?.map(Row::from),
             Row::EmailProvider(email_providers) => email_providers.upsert(conn)?.map(Row::from),
-            Row::FractioningProcedureModel(fractioning_procedure_models) => {
-                fractioning_procedure_models.upsert(conn)?.map(Row::from)
+            Row::FreezeDryerModel(freeze_dryer_models) => {
+                freeze_dryer_models.upsert(conn)?.map(Row::from)
             }
-            Row::FreezeDrierModel(freeze_drier_models) => {
-                freeze_drier_models.upsert(conn)?.map(Row::from)
-            }
-            Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
-                freeze_drying_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::FreezeDryer(freeze_dryers) => freeze_dryers.upsert(conn)?.map(Row::from),
             Row::FreezerModel(freezer_models) => freezer_models.upsert(conn)?.map(Row::from),
-            Row::FreezingProcedureModel(freezing_procedure_models) => {
-                freezing_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::GeolocationProcedureModel(geolocation_procedure_models) => {
-                geolocation_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::Freezer(freezers) => freezers.upsert(conn)?.map(Row::from),
             Row::InstrumentState(instrument_states) => {
                 instrument_states.upsert(conn)?.map(Row::from)
             }
             Row::LoginProvider(login_providers) => login_providers.upsert(conn)?.map(Row::from),
             Row::Material(materials) => materials.upsert(conn)?.map(Row::from),
-            Row::MixingProcedureModel(mixing_procedure_models) => {
-                mixing_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::NextProcedureModel(next_procedure_models) => {
-                next_procedure_models.upsert(conn)?.map(Row::from)
+            Row::NextProcedureTemplate(next_procedure_templates) => {
+                next_procedure_templates.upsert(conn)?.map(Row::from)
             }
             Row::ObservationSubject(observation_subjects) => {
                 observation_subjects.upsert(conn)?.map(Row::from)
@@ -366,64 +694,47 @@ impl Row {
             Row::OrganismTaxon(organism_taxa) => organism_taxa.upsert(conn)?.map(Row::from),
             Row::Organism(organisms) => organisms.upsert(conn)?.map(Row::from),
             Row::Organization(organizations) => organizations.upsert(conn)?.map(Row::from),
-            Row::PackagingProcedureModel(packaging_procedure_models) => {
-                packaging_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::ParentProcedureModel(parent_procedure_models) => {
-                parent_procedure_models.upsert(conn)?.map(Row::from)
+            Row::PackagingModel(packaging_models) => packaging_models.upsert(conn)?.map(Row::from),
+            Row::ParentProcedureTemplate(parent_procedure_templates) => {
+                parent_procedure_templates.upsert(conn)?.map(Row::from)
             }
             Row::PermanenceCategory(permanence_categories) => {
                 permanence_categories.upsert(conn)?.map(Row::from)
             }
             Row::PhoneModel(phone_models) => phone_models.upsert(conn)?.map(Row::from),
-            Row::PhotographProcedureModel(photograph_procedure_models) => {
-                photograph_procedure_models.upsert(conn)?.map(Row::from)
+            Row::PhysicalAssetModel(physical_asset_models) => {
+                physical_asset_models.upsert(conn)?.map(Row::from)
             }
+            Row::PhysicalAsset(physical_assets) => physical_assets.upsert(conn)?.map(Row::from),
             Row::PipetteModel(pipette_models) => pipette_models.upsert(conn)?.map(Row::from),
             Row::PipetteTipModel(pipette_tip_models) => {
                 pipette_tip_models.upsert(conn)?.map(Row::from)
             }
-            Row::PlacingProcedureModel(placing_procedure_models) => {
-                placing_procedure_models.upsert(conn)?.map(Row::from)
-            }
+            Row::Pipette(pipettes) => pipettes.upsert(conn)?.map(Row::from),
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.upsert(conn)?.map(Row::from)
             }
-            Row::PouringProcedureModel(pouring_procedure_models) => {
-                pouring_procedure_models.upsert(conn)?.map(Row::from)
+            Row::PositioningDevice(positioning_devices) => {
+                positioning_devices.upsert(conn)?.map(Row::from)
             }
-            Row::ProcedureModelTrackable(procedure_model_trackables) => {
-                procedure_model_trackables.upsert(conn)?.map(Row::from)
+            Row::ProcedureAsset(procedure_assets) => procedure_assets.upsert(conn)?.map(Row::from),
+            Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
+                procedure_template_asset_models.upsert(conn)?.map(Row::from)
             }
-            Row::ProcedureModel(procedure_models) => procedure_models.upsert(conn)?.map(Row::from),
-            Row::ProcedureTrackable(procedure_trackables) => {
-                procedure_trackables.upsert(conn)?.map(Row::from)
-            }
-            Row::Procedure(procedures) => procedures.upsert(conn)?.map(Row::from),
-            Row::Processable(processables) => processables.upsert(conn)?.map(Row::from),
             Row::ProjectState(project_states) => project_states.upsert(conn)?.map(Row::from),
             Row::Project(projects) => projects.upsert(conn)?.map(Row::from),
             Row::Rank(ranks) => ranks.upsert(conn)?.map(Row::from),
-            Row::Reagent(reagents) => reagents.upsert(conn)?.map(Row::from),
+            Row::ReagentModel(reagent_models) => reagent_models.upsert(conn)?.map(Row::from),
             Row::Role(roles) => roles.upsert(conn)?.map(Row::from),
             Row::Room(rooms) => rooms.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
-            Row::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
-                shared_procedure_model_trackables.upsert(conn)?.map(Row::from)
+            Row::SharedProcedureTemplateAssetModel(shared_procedure_template_asset_models) => {
+                shared_procedure_template_asset_models.upsert(conn)?.map(Row::from)
             }
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.upsert(conn)?.map(Row::from),
             Row::Spectrum(spectra) => spectra.upsert(conn)?.map(Row::from),
             Row::SpectraCollection(spectra_collections) => {
                 spectra_collections.upsert(conn)?.map(Row::from)
-            }
-            Row::StorageProcedureModel(storage_procedure_models) => {
-                storage_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::SupernatantProcedureModel(supernatant_procedure_models) => {
-                supernatant_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::SupernatantProcedure(supernatant_procedures) => {
-                supernatant_procedures.upsert(conn)?.map(Row::from)
             }
             Row::Taxon(taxa) => taxa.upsert(conn)?.map(Row::from),
             Row::TeamMember(team_members) => team_members.upsert(conn)?.map(Row::from),
@@ -431,34 +742,28 @@ impl Row {
             Row::TeamState(team_states) => team_states.upsert(conn)?.map(Row::from),
             Row::Team(teams) => teams.upsert(conn)?.map(Row::from),
             Row::TemporaryUser(temporary_user) => temporary_user.upsert(conn)?.map(Row::from),
-            Row::TrackableAncestor(trackable_ancestors) => {
-                trackable_ancestors.upsert(conn)?.map(Row::from)
-            }
-            Row::TrackableLocation(trackable_locations) => {
-                trackable_locations.upsert(conn)?.map(Row::from)
-            }
-            Row::Trackable(trackables) => trackables.upsert(conn)?.map(Row::from),
             Row::Unit(units) => units.upsert(conn)?.map(Row::from),
             Row::UserEmail(user_emails) => user_emails.upsert(conn)?.map(Row::from),
             Row::UserOrganization(user_organizations) => {
                 user_organizations.upsert(conn)?.map(Row::from)
             }
             Row::User(users) => users.upsert(conn)?.map(Row::from),
+            Row::VolumeMeasuringDeviceModel(volume_measuring_device_models) => {
+                volume_measuring_device_models.upsert(conn)?.map(Row::from)
+            }
+            Row::VolumeMeasuringDevice(volume_measuring_devices) => {
+                volume_measuring_devices.upsert(conn)?.map(Row::from)
+            }
             Row::VolumetricContainerModel(volumetric_container_models) => {
                 volumetric_container_models.upsert(conn)?.map(Row::from)
             }
-            Row::VolumetricProcessable(volumetric_processables) => {
-                volumetric_processables.upsert(conn)?.map(Row::from)
+            Row::VolumetricContainer(volumetric_containers) => {
+                volumetric_containers.upsert(conn)?.map(Row::from)
             }
             Row::WeighingDeviceModel(weighing_device_models) => {
                 weighing_device_models.upsert(conn)?.map(Row::from)
             }
-            Row::WeighingProcedureModel(weighing_procedure_models) => {
-                weighing_procedure_models.upsert(conn)?.map(Row::from)
-            }
-            Row::WeighingProcedure(weighing_procedures) => {
-                weighing_procedures.upsert(conn)?.map(Row::from)
-            }
+            Row::WeighingDevice(weighing_devices) => weighing_devices.upsert(conn)?.map(Row::from),
         })
     }
 }
@@ -466,147 +771,250 @@ impl web_common_traits::prelude::Row for Row {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         match self {
-            Row::Address(addresses) => addresses.primary_key(),
-            Row::AliquotingProcedureModel(aliquoting_procedure_models) => {
-                aliquoting_procedure_models.primary_key()
+            Row::AliquotingProcedureTemplate(aliquoting_procedure_templates) => {
+                aliquoting_procedure_templates.primary_key()
+            }
+            Row::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
+                ball_mill_procedure_templates.primary_key()
+            }
+            Row::CappingProcedureTemplate(capping_procedure_templates) => {
+                capping_procedure_templates.primary_key()
+            }
+            Row::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
+                centrifuge_procedure_templates.primary_key()
+            }
+            Row::DisposalProcedureTemplate(disposal_procedure_templates) => {
+                disposal_procedure_templates.primary_key()
+            }
+            Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
+                fractioning_procedure_templates.primary_key()
+            }
+            Row::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
+                freeze_drying_procedure_templates.primary_key()
+            }
+            Row::FreezingProcedureTemplate(freezing_procedure_templates) => {
+                freezing_procedure_templates.primary_key()
+            }
+            Row::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
+                geolocation_procedure_templates.primary_key()
+            }
+            Row::PackagingProcedureTemplate(packaging_procedure_templates) => {
+                packaging_procedure_templates.primary_key()
+            }
+            Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
+                photograph_procedure_templates.primary_key()
+            }
+            Row::PouringProcedureTemplate(pouring_procedure_templates) => {
+                pouring_procedure_templates.primary_key()
+            }
+            Row::ProcedureTemplate(procedure_templates) => procedure_templates.primary_key(),
+            Row::StorageProcedureTemplate(storage_procedure_templates) => {
+                storage_procedure_templates.primary_key()
+            }
+            Row::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
+                supernatant_procedure_templates.primary_key()
+            }
+            Row::WeighingProcedureTemplate(weighing_procedure_templates) => {
+                weighing_procedure_templates.primary_key()
             }
             Row::AliquotingProcedure(aliquoting_procedures) => aliquoting_procedures.primary_key(),
+            Row::BallMillProcedure(ball_mill_procedures) => ball_mill_procedures.primary_key(),
+            Row::CappingProcedure(capping_procedures) => capping_procedures.primary_key(),
+            Row::CentrifugeProcedure(centrifuge_procedures) => centrifuge_procedures.primary_key(),
+            Row::DisposalProcedure(disposal_procedures) => disposal_procedures.primary_key(),
+            Row::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures.primary_key()
+            }
+            Row::FreezeDryingProcedure(freeze_drying_procedures) => {
+                freeze_drying_procedures.primary_key()
+            }
+            Row::FreezingProcedure(freezing_procedures) => freezing_procedures.primary_key(),
+            Row::GeolocationProcedure(geolocation_procedures) => {
+                geolocation_procedures.primary_key()
+            }
+            Row::PackagingProcedure(packaging_procedures) => packaging_procedures.primary_key(),
+            Row::PhotographProcedure(photograph_procedures) => photograph_procedures.primary_key(),
+            Row::PouringProcedure(pouring_procedures) => pouring_procedures.primary_key(),
+            Row::Procedure(procedures) => procedures.primary_key(),
+            Row::StorageProcedure(storage_procedures) => storage_procedures.primary_key(),
+            Row::SupernatantProcedure(supernatant_procedures) => {
+                supernatant_procedures.primary_key()
+            }
+            Row::WeighingProcedure(weighing_procedures) => weighing_procedures.primary_key(),
+            Row::Address(addresses) => addresses.primary_key(),
+            Row::AssetCompatibilityRule(asset_compatibility_rules) => {
+                asset_compatibility_rules.primary_key()
+            }
+            Row::AssetModelAncestor(asset_model_ancestors) => asset_model_ancestors.primary_key(),
+            Row::AssetModel(asset_models) => asset_models.primary_key(),
+            Row::Asset(assets) => assets.primary_key(),
             Row::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_key()
             }
-            Row::BallMillProcedureModel(ball_mill_procedure_models) => {
-                ball_mill_procedure_models.primary_key()
-            }
-            Row::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
-                binary_question_procedure_models.primary_key()
-            }
+            Row::BallMillMachine(ball_mill_machines) => ball_mill_machines.primary_key(),
+            Row::BeadsModel(beads_models) => beads_models.primary_key(),
             Row::Brand(brands) => brands.primary_key(),
             Row::CameraModel(camera_models) => camera_models.primary_key(),
-            Row::CappingProcedureModel(capping_procedure_models) => {
-                capping_procedure_models.primary_key()
-            }
+            Row::Camera(cameras) => cameras.primary_key(),
+            Row::CapsModel(caps_models) => caps_models.primary_key(),
             Row::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_key(),
-            Row::CentrifugeProcedureModel(centrifuge_procedure_models) => {
-                centrifuge_procedure_models.primary_key()
-            }
+            Row::Centrifuge(centrifuges) => centrifuges.primary_key(),
             Row::City(cities) => cities.primary_key(),
             Row::Color(colors) => colors.primary_key(),
+            Row::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
+                commercial_ball_mill_machine_lots.primary_key()
+            }
+            Row::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
+                commercial_ball_mill_machine_models.primary_key()
+            }
+            Row::CommercialBeadsLot(commercial_beads_lots) => commercial_beads_lots.primary_key(),
+            Row::CommercialBeadsModel(commercial_beads_models) => {
+                commercial_beads_models.primary_key()
+            }
+            Row::CommercialCameraLot(commercial_camera_lots) => {
+                commercial_camera_lots.primary_key()
+            }
+            Row::CommercialCameraModel(commercial_camera_models) => {
+                commercial_camera_models.primary_key()
+            }
+            Row::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
+                commercial_centrifuge_lots.primary_key()
+            }
+            Row::CommercialCentrifugeModel(commercial_centrifuge_models) => {
+                commercial_centrifuge_models.primary_key()
+            }
+            Row::CommercialFreezeDryerLot(commercial_freeze_dryer_lots) => {
+                commercial_freeze_dryer_lots.primary_key()
+            }
+            Row::CommercialFreezeDryerModel(commercial_freeze_dryer_models) => {
+                commercial_freeze_dryer_models.primary_key()
+            }
+            Row::CommercialFreezerLot(commercial_freezer_lots) => {
+                commercial_freezer_lots.primary_key()
+            }
+            Row::CommercialFreezerModel(commercial_freezer_models) => {
+                commercial_freezer_models.primary_key()
+            }
+            Row::CommercialPackagingLot(commercial_packaging_lots) => {
+                commercial_packaging_lots.primary_key()
+            }
+            Row::CommercialPackagingModel(commercial_packaging_models) => {
+                commercial_packaging_models.primary_key()
+            }
+            Row::CommercialPipetteLot(commercial_pipette_lots) => {
+                commercial_pipette_lots.primary_key()
+            }
+            Row::CommercialPipetteModel(commercial_pipette_models) => {
+                commercial_pipette_models.primary_key()
+            }
+            Row::CommercialPipetteTipLot(commercial_pipette_tip_lots) => {
+                commercial_pipette_tip_lots.primary_key()
+            }
+            Row::CommercialPipetteTipModel(commercial_pipette_tip_models) => {
+                commercial_pipette_tip_models.primary_key()
+            }
+            Row::CommercialPositioningDeviceLot(commercial_positioning_device_lots) => {
+                commercial_positioning_device_lots.primary_key()
+            }
+            Row::CommercialPositioningDeviceModel(commercial_positioning_device_models) => {
+                commercial_positioning_device_models.primary_key()
+            }
             Row::CommercialProductLot(commercial_product_lots) => {
                 commercial_product_lots.primary_key()
             }
             Row::CommercialProduct(commercial_products) => commercial_products.primary_key(),
-            Row::CommercialReagent(commercial_reagents) => commercial_reagents.primary_key(),
-            Row::CompatibilityRule(compatibility_rules) => compatibility_rules.primary_key(),
+            Row::CommercialVolumeMeasuringDeviceLot(commercial_volume_measuring_device_lots) => {
+                commercial_volume_measuring_device_lots.primary_key()
+            }
+            Row::CommercialVolumeMeasuringDeviceModel(
+                commercial_volume_measuring_device_models,
+            ) => commercial_volume_measuring_device_models.primary_key(),
+            Row::CommercialWeighingDeviceLot(commercial_weighing_device_lots) => {
+                commercial_weighing_device_lots.primary_key()
+            }
+            Row::CommercialWeighingDeviceModel(commercial_weighing_device_models) => {
+                commercial_weighing_device_models.primary_key()
+            }
+            Row::ContainerCompatibilityRule(container_compatibility_rules) => {
+                container_compatibility_rules.primary_key()
+            }
             Row::ContainerModel(container_models) => container_models.primary_key(),
             Row::Container(containers) => containers.primary_key(),
             Row::Country(countries) => countries.primary_key(),
-            Row::DisposalProcedureModel(disposal_procedure_models) => {
-                disposal_procedure_models.primary_key()
-            }
+            Row::DigitalAssetModel(digital_asset_models) => digital_asset_models.primary_key(),
+            Row::DigitalAsset(digital_assets) => digital_assets.primary_key(),
             Row::Document(documents) => documents.primary_key(),
             Row::EmailProvider(email_providers) => email_providers.primary_key(),
-            Row::FractioningProcedureModel(fractioning_procedure_models) => {
-                fractioning_procedure_models.primary_key()
-            }
-            Row::FreezeDrierModel(freeze_drier_models) => freeze_drier_models.primary_key(),
-            Row::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
-                freeze_drying_procedure_models.primary_key()
-            }
+            Row::FreezeDryerModel(freeze_dryer_models) => freeze_dryer_models.primary_key(),
+            Row::FreezeDryer(freeze_dryers) => freeze_dryers.primary_key(),
             Row::FreezerModel(freezer_models) => freezer_models.primary_key(),
-            Row::FreezingProcedureModel(freezing_procedure_models) => {
-                freezing_procedure_models.primary_key()
-            }
-            Row::GeolocationProcedureModel(geolocation_procedure_models) => {
-                geolocation_procedure_models.primary_key()
-            }
+            Row::Freezer(freezers) => freezers.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
             Row::Material(materials) => materials.primary_key(),
-            Row::MixingProcedureModel(mixing_procedure_models) => {
-                mixing_procedure_models.primary_key()
+            Row::NextProcedureTemplate(next_procedure_templates) => {
+                next_procedure_templates.primary_key()
             }
-            Row::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_key(),
             Row::ObservationSubject(observation_subjects) => observation_subjects.primary_key(),
             Row::OrganismTaxon(organism_taxa) => organism_taxa.primary_key(),
             Row::Organism(organisms) => organisms.primary_key(),
             Row::Organization(organizations) => organizations.primary_key(),
-            Row::PackagingProcedureModel(packaging_procedure_models) => {
-                packaging_procedure_models.primary_key()
-            }
-            Row::ParentProcedureModel(parent_procedure_models) => {
-                parent_procedure_models.primary_key()
+            Row::PackagingModel(packaging_models) => packaging_models.primary_key(),
+            Row::ParentProcedureTemplate(parent_procedure_templates) => {
+                parent_procedure_templates.primary_key()
             }
             Row::PermanenceCategory(permanence_categories) => permanence_categories.primary_key(),
             Row::PhoneModel(phone_models) => phone_models.primary_key(),
-            Row::PhotographProcedureModel(photograph_procedure_models) => {
-                photograph_procedure_models.primary_key()
-            }
+            Row::PhysicalAssetModel(physical_asset_models) => physical_asset_models.primary_key(),
+            Row::PhysicalAsset(physical_assets) => physical_assets.primary_key(),
             Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
             Row::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_key(),
-            Row::PlacingProcedureModel(placing_procedure_models) => {
-                placing_procedure_models.primary_key()
-            }
+            Row::Pipette(pipettes) => pipettes.primary_key(),
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_key()
             }
-            Row::PouringProcedureModel(pouring_procedure_models) => {
-                pouring_procedure_models.primary_key()
+            Row::PositioningDevice(positioning_devices) => positioning_devices.primary_key(),
+            Row::ProcedureAsset(procedure_assets) => procedure_assets.primary_key(),
+            Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
+                procedure_template_asset_models.primary_key()
             }
-            Row::ProcedureModelTrackable(procedure_model_trackables) => {
-                procedure_model_trackables.primary_key()
-            }
-            Row::ProcedureModel(procedure_models) => procedure_models.primary_key(),
-            Row::ProcedureTrackable(procedure_trackables) => procedure_trackables.primary_key(),
-            Row::Procedure(procedures) => procedures.primary_key(),
-            Row::Processable(processables) => processables.primary_key(),
             Row::ProjectState(project_states) => project_states.primary_key(),
             Row::Project(projects) => projects.primary_key(),
             Row::Rank(ranks) => ranks.primary_key(),
-            Row::Reagent(reagents) => reagents.primary_key(),
+            Row::ReagentModel(reagent_models) => reagent_models.primary_key(),
             Row::Role(roles) => roles.primary_key(),
             Row::Room(rooms) => rooms.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),
-            Row::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
-                shared_procedure_model_trackables.primary_key()
+            Row::SharedProcedureTemplateAssetModel(shared_procedure_template_asset_models) => {
+                shared_procedure_template_asset_models.primary_key()
             }
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_key(),
             Row::Spectrum(spectra) => spectra.primary_key(),
             Row::SpectraCollection(spectra_collections) => spectra_collections.primary_key(),
-            Row::StorageProcedureModel(storage_procedure_models) => {
-                storage_procedure_models.primary_key()
-            }
-            Row::SupernatantProcedureModel(supernatant_procedure_models) => {
-                supernatant_procedure_models.primary_key()
-            }
-            Row::SupernatantProcedure(supernatant_procedures) => {
-                supernatant_procedures.primary_key()
-            }
             Row::Taxon(taxa) => taxa.primary_key(),
             Row::TeamMember(team_members) => team_members.primary_key(),
             Row::TeamProject(team_projects) => team_projects.primary_key(),
             Row::TeamState(team_states) => team_states.primary_key(),
             Row::Team(teams) => teams.primary_key(),
             Row::TemporaryUser(temporary_user) => temporary_user.primary_key(),
-            Row::TrackableAncestor(trackable_ancestors) => trackable_ancestors.primary_key(),
-            Row::TrackableLocation(trackable_locations) => trackable_locations.primary_key(),
-            Row::Trackable(trackables) => trackables.primary_key(),
             Row::Unit(units) => units.primary_key(),
             Row::UserEmail(user_emails) => user_emails.primary_key(),
             Row::UserOrganization(user_organizations) => user_organizations.primary_key(),
             Row::User(users) => users.primary_key(),
+            Row::VolumeMeasuringDeviceModel(volume_measuring_device_models) => {
+                volume_measuring_device_models.primary_key()
+            }
+            Row::VolumeMeasuringDevice(volume_measuring_devices) => {
+                volume_measuring_devices.primary_key()
+            }
             Row::VolumetricContainerModel(volumetric_container_models) => {
                 volumetric_container_models.primary_key()
             }
-            Row::VolumetricProcessable(volumetric_processables) => {
-                volumetric_processables.primary_key()
-            }
+            Row::VolumetricContainer(volumetric_containers) => volumetric_containers.primary_key(),
             Row::WeighingDeviceModel(weighing_device_models) => {
                 weighing_device_models.primary_key()
             }
-            Row::WeighingProcedureModel(weighing_procedure_models) => {
-                weighing_procedure_models.primary_key()
-            }
-            Row::WeighingProcedure(weighing_procedures) => weighing_procedures.primary_key(),
+            Row::WeighingDevice(weighing_devices) => weighing_devices.primary_key(),
         }
     }
 }

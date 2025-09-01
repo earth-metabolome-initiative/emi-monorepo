@@ -86,24 +86,198 @@ pub struct InsertableTaxonBuilder {
     pub(crate) parent_id: Option<i32>,
     pub(crate) rank_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableTaxonBuilder {
-    type Attributes = InsertableTaxonAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+/// Trait defining setters for attributes of an instance of `Taxon` or
+/// descendant tables.
+pub trait TaxonBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.taxa.id` column.
+    ///
+    /// # Arguments
+    /// * `id`: The value to set for the `public.taxa.id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn id(
+        self,
+        id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.taxa.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.taxa.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<'N, N>(
+        self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.taxa.parent_id` column.
+    ///
+    /// # Arguments
+    /// * `parent_id`: The value to set for the `public.taxa.parent_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn parent<'PI, PI>(
+        self,
+        parent_id: &'PI PI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PI PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>;
+    /// Sets the value of the `public.taxa.rank_id` column.
+    ///
+    /// # Arguments
+    /// * `rank_id`: The value to set for the `public.taxa.rank_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn rank(
+        self,
+        rank_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl TaxonBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes;
+    fn id(
+        self,
+        id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(id) = other.id {
-            self = self.id(id)?;
-        }
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(parent_id) = other.parent_id {
-            self = self.parent(Some(parent_id))?;
-        }
-        if let Some(rank_id) = other.rank_id {
-            self = self.rank(rank_id)?;
-        }
+        Ok(Some(id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
+        })?))
+    }
+    fn name<'N, N>(
+        self,
+        _name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn parent<'PI, PI>(
+        self,
+        _parent_id: &'PI PI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PI PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>,
+    {
+        Ok(self)
+    }
+    fn rank(
+        self,
+        _rank_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        Ok(self)
+    }
+}
+impl TaxonBuildable for InsertableTaxonBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes;
+    /// Sets the value of the `public.taxa.id` column.
+    fn id(
+        mut self,
+        id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let id = id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTaxonAttributes::Id)
+        })?;
+        self.id = Some(id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.taxa.name` column.
+    fn name<'N, N>(
+        mut self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTaxonAttributes::Name)
+        })?;
+        self.name = Some(name);
+        Ok(self)
+    }
+    /// Sets the value of the `public.taxa.parent_id` column.
+    fn parent<'PI, PI>(
+        mut self,
+        parent_id: &'PI PI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PI PI: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<&'PI PI as TryInto<Option<i32>>>::Error>,
+    {
+        let parent_id = parent_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTaxonAttributes::ParentId)
+        })?;
+        self.parent_id = parent_id;
+        Ok(self)
+    }
+    /// Sets the value of the `public.taxa.rank_id` column.
+    fn rank(
+        mut self,
+        rank_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let rank_id = rank_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableTaxonAttributes::RankId)
+        })?;
+        self.rank_id = Some(rank_id);
         Ok(self)
     }
 }
@@ -111,68 +285,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTaxonBuilder {
     type PrimaryKey = i32;
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
-    /// Sets the value of the `taxa.id` column from table `taxa`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
-    where
-        Id: TryInto<i32>,
-        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableTaxonAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
-    /// Sets the value of the `taxa.name` column from table `taxa`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableTaxonAttributes::Name)
-        })?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
-    /// Sets the value of the `taxa.parent_id` column from table `taxa`.
-    pub fn parent<ParentId>(
-        mut self,
-        parent_id: ParentId,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>>
-    where
-        ParentId: TryInto<Option<i32>>,
-        <ParentId as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let parent_id =
-            parent_id.try_into().map_err(|err: <ParentId as TryInto<Option<i32>>>::Error| {
-                Into::into(err).rename_field(InsertableTaxonAttributes::ParentId)
-            })?;
-        self.parent_id = parent_id;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder {
-    /// Sets the value of the `taxa.rank_id` column from table `taxa`.
-    pub fn rank(
-        mut self,
-        rank_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTaxonAttributes>> {
-        self.rank_id = Some(rank_id);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTaxonBuilder

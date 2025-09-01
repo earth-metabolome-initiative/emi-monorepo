@@ -12,7 +12,7 @@ async fn test_key_column_usage() {
         setup_database_with_default_migrations("test_key_column_usage").await.unwrap();
 
     let composite_user_profiles =
-        match Table::load(&mut conn, "composite_user_profiles", Some("public"), &database_name) {
+        match Table::load(&mut conn, "composite_user_profiles", "public", &database_name) {
             Ok(table) => table,
             Err(err) => {
                 docker.stop().await.unwrap();
@@ -20,16 +20,16 @@ async fn test_key_column_usage() {
             }
         };
 
-    let composite_users =
-        match Table::load(&mut conn, "composite_users", Some("public"), &database_name) {
-            Ok(table) => table,
-            Err(err) => {
-                docker.stop().await.unwrap();
-                panic!("Error loading composite_users: {err}");
-            }
-        };
+    let composite_users = match Table::load(&mut conn, "composite_users", "public", &database_name)
+    {
+        Ok(table) => table,
+        Err(err) => {
+            docker.stop().await.unwrap();
+            panic!("Error loading composite_users: {err}");
+        }
+    };
 
-    let users = match Table::load(&mut conn, "users", Some("public"), &database_name) {
+    let users = match Table::load(&mut conn, "users", "public", &database_name) {
         Ok(table) => table,
         Err(err) => {
             docker.stop().await.unwrap();

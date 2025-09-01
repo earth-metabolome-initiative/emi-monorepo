@@ -54,11 +54,25 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let procedure_model_id = self
-            .procedure_model_id
+        let procedure_template = self
+            .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ProcedureModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ProcedureTemplate,
+                ),
+            )?;
+        let foreign_procedure_template = self
+            .foreign_procedure_template
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedureTemplate,
+                ),
+            )?;
+        let foreign_procedure = self
+            .foreign_procedure
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedure,
                 ),
             )?;
         let aliquoted_with = self
@@ -68,36 +82,38 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::AliquotedWith,
                 ),
             )?;
-        let pipette_tip = self
-            .pipette_tip
+        let pipette_tip_model = self
+            .pipette_tip_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::PipetteTip,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::PipetteTipModel,
                 ),
             )?;
-        let aliquoted_container_id = self
-            .aliquoted_container_id
+        let aliquoted_from = self
+            .aliquoted_from
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::AliquotedContainerId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::AliquotedFrom,
                 ),
             )?;
-        let procedure_id = self
+        let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::Extension(
                     crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
                     ),
                 ))
             })?;
         Ok(Self::InsertableVariant {
-            procedure_id,
-            procedure_model_id,
+            procedure,
+            procedure_template,
+            foreign_procedure_template,
+            foreign_procedure,
             aliquoted_with,
-            pipette_tip,
-            aliquoted_container_id,
+            pipette_tip_model,
+            aliquoted_from,
         })
     }
 }

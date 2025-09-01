@@ -29,22 +29,35 @@ impl<'a> ProcedureCodegen<'a> {
         table_catalog: &str,
         conn: &mut PgConnection,
     ) -> Result<(), crate::errors::Error> {
+        let mut submodules = Vec::new();
         for procedure in Procedure::load_all(table_catalog, conn)? {
             let procedure_name = procedure.snake_case_name()?;
+            let procedure_ident = procedure.snake_case_ident()?;
             let procedure_type = procedure.import_struct_path()?;
             let submodule = root.join(procedure_name).with_extension("rs");
-            let procedure_model = procedure.procedure_model(conn)?;
-            let procedure_model_type = procedure_model.import_struct_path()?;
+            let procedure_template = procedure.procedure_template(conn)?;
+            let procedure_template_type = procedure_template.import_struct_path()?;
+            submodules.push(quote! {
+                mod #procedure_ident;
+            });
 
             std::fs::write(
                 submodule,
                 self.beautify_code(&quote! {
-                    impl Procedure for #procedure_type {
-                        type Model = #procedure_model_type;
+                    impl web_common_traits::prelude::Procedure for #procedure_type {
+                        type Model = #procedure_template_type;
                     }
                 })?,
             )?;
         }
+
+        let submodule_path = root.with_extension("rs");
+        std::fs::write(
+            submodule_path,
+            self.beautify_code(&quote! {
+                #(#submodules)*
+            })?,
+        )?;
 
         Ok(())
     }

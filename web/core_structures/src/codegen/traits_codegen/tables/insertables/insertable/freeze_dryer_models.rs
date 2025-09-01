@@ -1,0 +1,8 @@
+impl web_common_traits::database::Insertable
+    for crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel
+{
+    type InsertableBuilder =
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelBuilder;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModel;
+}

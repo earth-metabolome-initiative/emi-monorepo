@@ -69,103 +69,245 @@ pub struct InsertableLoginProviderBuilder {
     pub(crate) oauth_url: Option<String>,
     pub(crate) scope: Option<String>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableLoginProviderBuilder {
-    type Attributes = InsertableLoginProviderAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(icon) = other.icon {
-            self = self.icon(icon)?;
-        }
-        if let Some(client_id) = other.client_id {
-            self = self.client(client_id)?;
-        }
-        if let Some(redirect_uri) = other.redirect_uri {
-            self = self.redirect_uri(redirect_uri)?;
-        }
-        if let Some(oauth_url) = other.oauth_url {
-            self = self.oauth_url(oauth_url)?;
-        }
-        if let Some(scope) = other.scope {
-            self = self.scope(scope)?;
-        }
+/// Trait defining setters for attributes of an instance of `LoginProvider` or
+/// descendant tables.
+pub trait LoginProviderBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.login_providers.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.login_providers.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<'N, N>(
+        self,
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.login_providers.icon` column.
+    ///
+    /// # Arguments
+    /// * `icon`: The value to set for the `public.login_providers.icon` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn icon<'I, I>(
+        self,
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>;
+    /// Sets the value of the `public.login_providers.client_id` column.
+    ///
+    /// # Arguments
+    /// * `client_id`: The value to set for the
+    ///   `public.login_providers.client_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn client<'CI, CI>(
+        self,
+        client_id: &'CI CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CI CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>;
+    /// Sets the value of the `public.login_providers.redirect_uri` column.
+    ///
+    /// # Arguments
+    /// * `redirect_uri`: The value to set for the
+    ///   `public.login_providers.redirect_uri` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn redirect_uri<'RU, RU>(
+        self,
+        redirect_uri: &'RU RU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'RU RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>;
+    /// Sets the value of the `public.login_providers.oauth_url` column.
+    ///
+    /// # Arguments
+    /// * `oauth_url`: The value to set for the
+    ///   `public.login_providers.oauth_url` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn oauth_url<'OU, OU>(
+        self,
+        oauth_url: &'OU OU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'OU OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>;
+    /// Sets the value of the `public.login_providers.scope` column.
+    ///
+    /// # Arguments
+    /// * `scope`: The value to set for the `public.login_providers.scope`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn scope<'S, S>(
+        self,
+        scope: &'S S,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'S S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>;
+}
+impl LoginProviderBuildable for Option<i16> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes;
+    fn name<'N, N>(
+        self,
+        _name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn icon<'I, I>(
+        self,
+        _icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn client<'CI, CI>(
+        self,
+        _client_id: &'CI CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'CI CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn redirect_uri<'RU, RU>(
+        self,
+        _redirect_uri: &'RU RU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'RU RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn oauth_url<'OU, OU>(
+        self,
+        _oauth_url: &'OU OU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'OU OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn scope<'S, S>(
+        self,
+        _scope: &'S S,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'S S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>,
+    {
         Ok(self)
     }
 }
-impl web_common_traits::prelude::SetPrimaryKey for InsertableLoginProviderBuilder {
-    type PrimaryKey = i16;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.client_id` column from table
-    /// `login_providers`.
-    pub fn client<ClientId>(
+impl LoginProviderBuildable for InsertableLoginProviderBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes;
+    /// Sets the value of the `public.login_providers.name` column.
+    fn name<'N, N>(
         mut self,
-        client_id: ClientId,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
+        name: &'N N,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        ClientId: TryInto<String>,
-        <ClientId as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'N N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'N N as TryInto<String>>::Error>,
     {
-        let client_id =
-            client_id.try_into().map_err(|err: <ClientId as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableLoginProviderAttributes::ClientId)
-            })?;
-        pgrx_validation::must_be_paragraph(client_id.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::ClientId,
-                    )
-            })?;
-        self.client_id = Some(client_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.icon` column from table
-    /// `login_providers`.
-    pub fn icon<Icon>(
-        mut self,
-        icon: Icon,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
-    where
-        Icon: TryInto<String>,
-        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableLoginProviderAttributes::Icon)
-        })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::Icon,
-                    )
-            })?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.name` column from table
-    /// `login_providers`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableLoginProviderAttributes::Name)
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
@@ -177,58 +319,96 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
         self.name = Some(name);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.oauth_url` column from table
-    /// `login_providers`.
-    pub fn oauth_url<OauthUrl>(
+    /// Sets the value of the `public.login_providers.icon` column.
+    fn icon<'I, I>(
         mut self,
-        oauth_url: OauthUrl,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
+        icon: &'I I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        OauthUrl: TryInto<String>,
-        <OauthUrl as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'I I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'I I as TryInto<String>>::Error>,
     {
-        let oauth_url =
-            oauth_url.try_into().map_err(|err: <OauthUrl as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableLoginProviderAttributes::OauthUrl)
+        let icon = icon.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::Icon)
+        })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::Icon,
+                    )
             })?;
-        self.oauth_url = Some(oauth_url);
+        self.icon = Some(icon);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.redirect_uri` column from table
-    /// `login_providers`.
-    pub fn redirect_uri<RedirectUri>(
+    /// Sets the value of the `public.login_providers.client_id` column.
+    fn client<'CI, CI>(
         mut self,
-        redirect_uri: RedirectUri,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
+        client_id: &'CI CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        RedirectUri: TryInto<String>,
-        <RedirectUri as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'CI CI: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'CI CI as TryInto<String>>::Error>,
     {
-        let redirect_uri =
-            redirect_uri.try_into().map_err(|err: <RedirectUri as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableLoginProviderAttributes::RedirectUri)
+        let client_id = client_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::ClientId)
+        })?;
+        pgrx_validation::must_be_paragraph(client_id.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes::ClientId,
+                    )
             })?;
+        self.client_id = Some(client_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.login_providers.redirect_uri` column.
+    fn redirect_uri<'RU, RU>(
+        mut self,
+        redirect_uri: &'RU RU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'RU RU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'RU RU as TryInto<String>>::Error>,
+    {
+        let redirect_uri = redirect_uri.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::RedirectUri)
+        })?;
         self.redirect_uri = Some(redirect_uri);
         Ok(self)
     }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder {
-    /// Sets the value of the `login_providers.scope` column from table
-    /// `login_providers`.
-    pub fn scope<Scope>(
+    /// Sets the value of the `public.login_providers.oauth_url` column.
+    fn oauth_url<'OU, OU>(
         mut self,
-        scope: Scope,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableLoginProviderAttributes>>
+        oauth_url: &'OU OU,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        Scope: TryInto<String>,
-        <Scope as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        &'OU OU: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'OU OU as TryInto<String>>::Error>,
     {
-        let scope = scope.try_into().map_err(|err: <Scope as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableLoginProviderAttributes::Scope)
+        let oauth_url = oauth_url.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::OauthUrl)
+        })?;
+        self.oauth_url = Some(oauth_url);
+        Ok(self)
+    }
+    /// Sets the value of the `public.login_providers.scope` column.
+    fn scope<'S, S>(
+        mut self,
+        scope: &'S S,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'S S: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'S S as TryInto<String>>::Error>,
+    {
+        let scope = scope.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableLoginProviderAttributes::Scope)
         })?;
         pgrx_validation::must_be_paragraph(scope.as_ref())
             .map_err(|e| {
@@ -239,6 +419,12 @@ impl crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvid
             })?;
         self.scope = Some(scope);
         Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableLoginProviderBuilder {
+    type PrimaryKey = i16;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableLoginProviderBuilder

@@ -1,24 +1,24 @@
-//! Submodule providing traits relative to procedure models, procedures, and
+//! Submodule providing traits relative to procedure templates, procedures, and
 //! associated builders.
 
 use crate::prelude::Insertable;
 
-/// Trait defining a procedure model.
-pub trait ProcedureModel {
+/// Trait defining a procedure template.
+pub trait ProcedureTemplate {
     /// Associated procedure type.
     type Procedure: Procedure<Model = Self>;
 }
 
 /// Trait defining a procedure.
 pub trait Procedure: Insertable {
-    /// Associated procedure model type.
-    type Model: ProcedureModel<Procedure = Self>;
+    /// Associated procedure template type.
+    type Model: ProcedureTemplate<Procedure = Self>;
 }
 
 /// Trait defining a procedure builder.
-pub trait ProcedureInitializer<C>: ProcedureModel {
-    /// Root procedure model type.
-    type Root: ProcedureModel;
+pub trait ProcedureInitializer<C>: ProcedureTemplate {
+    /// Root procedure template type.
+    type Root: ProcedureTemplate;
     /// Expected error type.
     type Error;
 
@@ -26,7 +26,7 @@ pub trait ProcedureInitializer<C>: ProcedureModel {
     ///
     /// # Arguments
     ///
-    /// * `root` - The root procedure model from which to determine shared
+    /// * `root` - The root procedure template from which to determine shared
     ///   trackables.
     /// * `conn` - A mutable reference to a database connection.
     ///

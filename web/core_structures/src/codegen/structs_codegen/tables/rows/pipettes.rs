@@ -1,0 +1,19 @@
+impl From<crate::codegen::structs_codegen::tables::pipettes::Pipette> for super::Rows {
+    fn from(value: crate::codegen::structs_codegen::tables::pipettes::Pipette) -> Self {
+        Self::from(vec![value])
+    }
+}
+impl From<Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>> for super::Rows {
+    fn from(value: Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>) -> Self {
+        super::Rows::Pipette(value)
+    }
+}
+impl TryFrom<super::Rows> for Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette> {
+    type Error = std::convert::Infallible;
+    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+        match value {
+            super::Rows::Pipette(v) => Ok(v),
+            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+        }
+    }
+}

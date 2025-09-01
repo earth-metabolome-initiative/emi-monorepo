@@ -18,7 +18,7 @@ async fn test_init_db() {
     // We initialize the database into the docker container
     if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
         docker.stop().await.expect("Failed to stop the docker container");
-        panic!("Failed to initialize the database: {err:?}");
+        panic!("Failed to initialize the database: {err}");
     }
 
     for extension in ["pgrx_validation", "iso_codes"] {

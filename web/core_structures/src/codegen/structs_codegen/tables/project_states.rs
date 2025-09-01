@@ -61,58 +61,6 @@ impl ProjectState {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::project_states::project_states;
-        Self::table()
-            .filter(project_states::name.eq(name))
-            .order_by(project_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_description(
-        description: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::project_states::project_states;
-        Self::table()
-            .filter(project_states::description.eq(description))
-            .order_by(project_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_icon(
-        icon: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::project_states::project_states;
-        Self::table()
-            .filter(project_states::icon.eq(icon))
-            .order_by(project_states::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::project_states::project_states;
-        Self::table()
-            .filter(project_states::color_id.eq(color_id))
-            .order_by(project_states::id.asc())
-            .first::<Self>(conn)
-    }
 }
 impl AsRef<ProjectState> for ProjectState {
     fn as_ref(&self) -> &ProjectState {

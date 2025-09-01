@@ -4,10 +4,10 @@ use std::path::Path;
 use common_traits::builder::Builder;
 use diesel::PgConnection;
 use init_db::init_database;
-use procedure_codegen::ProcedureCodegen;
+use procedure_codegen::{PROCEDURE_TEMPLATES_SCHEMA, PROCEDURES_SCHEMA, ProcedureCodegen};
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
-use webcodegen::{Codegen, ColumnSameAsNetwork, PgExtension, Table, errors::WebCodeGenError};
+use webcodegen::{Codegen, PgExtension, PgStatStatement, Table, errors::WebCodeGenError};
 
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
@@ -15,11 +15,11 @@ pub(crate) const DATABASE_PORT: u16 = 17032;
 fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow::Error> {
     // Generate the code associated with the database
     let out_dir = Path::new("../src");
-    let users = Table::load(conn, "users", None, DATABASE_NAME)?;
-    let projects = Table::load(conn, "projects", None, DATABASE_NAME)?;
-    let teams = Table::load(conn, "teams", None, DATABASE_NAME)?;
-    let team_members = Table::load(conn, "team_members", None, DATABASE_NAME)?;
-    let team_projects = Table::load(conn, "team_projects", None, DATABASE_NAME)?;
+    let users = Table::load(conn, "users", "public", DATABASE_NAME)?;
+    let projects = Table::load(conn, "projects", "public", DATABASE_NAME)?;
+    let teams = Table::load(conn, "teams", "public", DATABASE_NAME)?;
+    let team_members = Table::load(conn, "team_members", "public", DATABASE_NAME)?;
+    let team_projects = Table::load(conn, "team_projects", "public", DATABASE_NAME)?;
     let Some(pgrx_validation) = PgExtension::load("pgrx_validation", "public", conn)? else {
         return Err(WebCodeGenError::MissingExtension("pgrx_validation".to_owned()).into());
     };
@@ -33,7 +33,7 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
 
     let mut time_tracker = TimeTracker::new("Code Generation");
 
-    let core_structures_tracker = Codegen::default()
+    let mut codegen = Codegen::default()
         .users(&users)
         .projects(&projects)
         .teams(&teams)
@@ -49,14 +49,16 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
         .enable_crud_operations()
         .enable_yew()
         .beautify()
-        .generate(conn, DATABASE_NAME)?;
-
-    time_tracker.extend(core_structures_tracker);
+        .add_schema("public")
+        .add_schema(PROCEDURES_SCHEMA)
+        .add_schema(PROCEDURE_TEMPLATES_SCHEMA);
+    codegen.print_same_as_network(conn, DATABASE_NAME, "columns_same_as_network.dot")?;
+    time_tracker.extend(codegen.generate(conn, DATABASE_NAME)?);
 
     let procedures_tracker = ProcedureCodegen::builder()
         .output_directory(out_dir.as_ref())
         .generate_procedure_impls()
-        .generate_procedure_model_impls()
+        .generate_procedure_template_impls()
         .beautify()
         .build()?
         .generate(conn, DATABASE_NAME)?;
@@ -79,35 +81,48 @@ pub async fn main() {
     let mut time_tracker = TimeTracker::new("Building Core Structures");
 
     // We initialize the database into the docker container
-    if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
-        docker.stop().await.expect("Failed to stop the docker container");
-        eprintln!("Failed to initialize the database: {err:?}");
-        return;
-    }
-
-    // We save the time tracker
-    time_tracker.save(Path::new("./time_tracker")).unwrap();
-
-    let same_as_graph = ColumnSameAsNetwork::new(&mut conn, DATABASE_NAME)
-        .expect("Failed to build the column same-as network");
-
-    let same_as_dot = same_as_graph
-        .to_dot(&mut conn)
-        .expect("Failed to convert the column same-as network to dot format");
-    let same_as_path = Path::new("column_same_as_network.dot");
-    std::fs::write(same_as_path, same_as_dot)
-        .expect("Failed to write the column same-as network dot file");
+    match init_database(DATABASE_NAME, &mut conn).await {
+        Ok(tracker) => time_tracker.extend(tracker),
+        Err(err) => {
+            docker.stop().await.expect("Failed to stop the docker container");
+            eprintln!("Failed to initialize the database: {err}");
+            return;
+        }
+    };
 
     match build_core_structures(&mut conn) {
         Ok(tracker) => {
             time_tracker.extend(tracker);
         }
         Err(err) => {
+            let expensive_statements =
+                PgStatStatement::most_expensive_queries(&mut conn).unwrap_or_default();
+
+            // We only keep the top 100 most expensive statements
+            let expensive_statements =
+                expensive_statements.into_iter().take(100).collect::<Vec<_>>();
+
+            // We serialize the expensive statements to JSON and save them to a file
+            let json = serde_json::to_string_pretty(&expensive_statements).unwrap_or_default();
+            std::fs::write("most_expensive_queries.json", json)
+                .expect("Failed to write most_expensive_queries.json");
+
             docker.stop().await.expect("Failed to stop the docker container");
             eprintln!("Failed to build core structures: {err:?}");
             return;
         }
     }
+
+    let expensive_statements =
+        PgStatStatement::most_expensive_queries(&mut conn).unwrap_or_default();
+
+    // We only keep the top 100 most expensive statements
+    let expensive_statements = expensive_statements.into_iter().take(100).collect::<Vec<_>>();
+
+    // We serialize the expensive statements to JSON and save them to a file
+    let json = serde_json::to_string_pretty(&expensive_statements).unwrap_or_default();
+    std::fs::write("most_expensive_queries.json", json)
+        .expect("Failed to write most_expensive_queries.json");
 
     // We stop the docker container
     if let Err(err) = docker.stop().await {
@@ -120,9 +135,7 @@ pub async fn main() {
     }
 
     // We print the report
-    let mut report = Report::new(time_tracker);
-    report.add_directory(Path::new("./time_tracker")).unwrap();
-    report
+    Report::new(time_tracker)
         .write(Path::new("time_requirements_report.md"), Path::new("time_requirements_report.png"))
         .unwrap();
 }

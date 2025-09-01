@@ -6,8 +6,7 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table};
-use crate::traits::TableLike;
+use crate::{Codegen, Table, traits::TableLike};
 
 impl Codegen<'_> {
     /// Generates the [`Insertable`](web_common_traits::database::Insertable)

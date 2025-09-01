@@ -68,7 +68,16 @@ impl Display for Error {
             }
             Error::ConnectionFailed(err) => write!(f, "Connection failed: {err}"),
             Error::ExecutingMigrationFailed(num, kind, err) => {
-                write!(f, "Executing migration {num} ({kind}): {err}")
+                write!(f, "Executing migration {num} ({kind}): `{err}`")?;
+                if let diesel::result::Error::DatabaseError(_, info) = err {
+                    if let Some(details) = info.details() {
+                        write!(f, " Details: `{details}`")?;
+                    }
+                    if let Some(table_name) = info.table_name() {
+                        write!(f, " Table: `{table_name}`")?;
+                    }
+                }
+                Ok(())
             }
             Error::ParsingMigrationFailed(num, kind, err) => {
                 write!(f, "Parsing migration {num} ({kind}): {err}")

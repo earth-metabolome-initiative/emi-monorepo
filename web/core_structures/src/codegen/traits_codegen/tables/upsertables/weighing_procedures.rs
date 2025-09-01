@@ -14,15 +14,18 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
-                    .or(weighted_with.ne(excluded(weighted_with)))
-                    .or(weighted_container_id.ne(excluded(weighted_container_id)))
-                    .or(kilograms.ne(excluded(kilograms))),
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
+                    .or(weighed_container.ne(excluded(weighed_container)))
+                    .or(kilograms.ne(excluded(kilograms)))
+                    .or(weighed_with_model.ne(excluded(weighed_with_model)))
+                    .or(weighed_with.ne(excluded(weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -44,15 +47,18 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
-                    .or(weighted_with.ne(excluded(weighted_with)))
-                    .or(weighted_container_id.ne(excluded(weighted_container_id)))
-                    .or(kilograms.ne(excluded(kilograms))),
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
+                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
+                    .or(weighed_container.ne(excluded(weighed_container)))
+                    .or(kilograms.ne(excluded(kilograms)))
+                    .or(weighed_with_model.ne(excluded(weighed_with_model)))
+                    .or(weighed_with.ne(excluded(weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

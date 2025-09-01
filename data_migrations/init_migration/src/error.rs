@@ -2,8 +2,8 @@
 
 use core_structures::tables::insertables::{
     InsertableBrandAttributes, InsertableCommercialProductAttributes, InsertableDocumentAttributes,
-    InsertableLoginProviderAttributes, InsertableParentProcedureModelAttributes,
-    InsertableProcedureModelAttributes, InsertableReagentAttributes, InsertableUserAttributes,
+    InsertableLoginProviderAttributes, InsertableParentProcedureTemplateAttributes,
+    InsertableProcedureTemplateAttributes, InsertableReagentAttributes, InsertableUserAttributes,
 };
 use web_common_traits::database::InsertError;
 
@@ -17,8 +17,8 @@ pub enum Error {
     QueryFailed(diesel::result::Error),
     /// Failed to insert a new login provider
     LoginProvider(InsertError<InsertableLoginProviderAttributes>),
-    /// Failed to insert a new procedure model
-    ProcedureModel(InsertError<InsertableProcedureModelAttributes>),
+    /// Failed to insert a new procedure template
+    ProcedureTemplate(InsertError<InsertableProcedureTemplateAttributes>),
     /// Failed to insert a new commercial product
     CommercialProduct(InsertError<InsertableCommercialProductAttributes>),
     /// Failed to insert a new brand
@@ -30,7 +30,7 @@ pub enum Error {
     /// Failed to insert a new document
     Document(InsertError<InsertableDocumentAttributes>),
     /// Failed to insert a parent-child relationship
-    ParentProcedureModel(InsertError<InsertableParentProcedureModelAttributes>),
+    ParentProcedureTemplate(InsertError<InsertableParentProcedureTemplateAttributes>),
 }
 
 impl From<diesel::ConnectionError> for Error {
@@ -51,9 +51,9 @@ impl From<InsertError<InsertableLoginProviderAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableProcedureModelAttributes>> for Error {
-    fn from(value: InsertError<InsertableProcedureModelAttributes>) -> Self {
-        Error::ProcedureModel(value)
+impl From<InsertError<InsertableProcedureTemplateAttributes>> for Error {
+    fn from(value: InsertError<InsertableProcedureTemplateAttributes>) -> Self {
+        Error::ProcedureTemplate(value)
     }
 }
 
@@ -87,8 +87,8 @@ impl From<InsertError<InsertableDocumentAttributes>> for Error {
     }
 }
 
-impl From<InsertError<InsertableParentProcedureModelAttributes>> for Error {
-    fn from(value: InsertError<InsertableParentProcedureModelAttributes>) -> Self {
-        Error::ParentProcedureModel(value)
+impl From<InsertError<InsertableParentProcedureTemplateAttributes>> for Error {
+    fn from(value: InsertError<InsertableParentProcedureTemplateAttributes>) -> Self {
+        Error::ParentProcedureTemplate(value)
     }
 }

@@ -20,13 +20,10 @@ where
         crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
     >,
     C: diesel::connection::LoadConnection,
-    CameraModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
+    CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<
         C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel;

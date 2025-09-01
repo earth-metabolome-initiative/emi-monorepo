@@ -7,17 +7,33 @@
     table_name = crate::codegen::diesel_codegen::tables::phone_models::phone_models
 )]
 pub struct PhoneModel {
-    pub id: ::rosetta_uuid::Uuid,
+    pub id: i32,
 }
 impl web_common_traits::prelude::TableName for PhoneModel {
     const TABLE_NAME: &'static str = "phone_models";
 }
 impl
     web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::camera_models::CameraModel,
     > for PhoneModel
 where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl
@@ -25,19 +41,11 @@ impl
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     > for PhoneModel
 where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{
-}
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-    > for PhoneModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for PhoneModel {
-    type Id = ::rosetta_uuid::Uuid;
+    type Id = i32;
     fn id(self) -> Self::Id {
         self.id
     }
@@ -108,21 +116,44 @@ impl PhoneModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
+    pub fn from_parent_model_id(
+        parent_model_id: &i32,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
             ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
             associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            phone_models::phone_models, physical_asset_models::physical_asset_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::name.eq(name))
+            .inner_join(
+                physical_asset_models::table.on(phone_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model_id.eq(parent_model_id))
+            .order_by(phone_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_id_and_id(
+        parent_model_id: &i32,
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, phone_models::phone_models,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
@@ -138,51 +169,11 @@ impl PhoneModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            asset_models::asset_models, phone_models::phone_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::description.eq(description))
-            .order_by(phone_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photograph_id(
-        photograph_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(phone_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::parent_id.eq(parent_id))
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::description.eq(description))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -198,11 +189,11 @@ impl PhoneModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            asset_models::asset_models, phone_models::phone_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::created_by.eq(created_by))
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::created_by.eq(created_by))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -218,11 +209,11 @@ impl PhoneModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            asset_models::asset_models, phone_models::phone_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::created_at.eq(created_at))
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::created_at.eq(created_at))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -238,11 +229,11 @@ impl PhoneModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            asset_models::asset_models, phone_models::phone_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::updated_by.eq(updated_by))
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::updated_by.eq(updated_by))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -258,11 +249,11 @@ impl PhoneModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            phone_models::phone_models, trackables::trackables,
+            asset_models::asset_models, phone_models::phone_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(phone_models::id.eq(trackables::id)))
-            .filter(trackables::updated_at.eq(updated_at))
+            .inner_join(asset_models::table.on(phone_models::id.eq(asset_models::id)))
+            .filter(asset_models::updated_at.eq(updated_at))
             .order_by(phone_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

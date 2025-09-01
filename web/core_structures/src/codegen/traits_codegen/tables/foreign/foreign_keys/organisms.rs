@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub id: Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organisms::Organism
@@ -13,7 +13,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
@@ -28,21 +28,21 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
+                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == trackables.id {
-                    foreign_keys.id = Some(trackables);
+                if self.id == physical_assets.id {
+                    foreign_keys.id = Some(physical_assets);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
+                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == trackables.id {
+                if self.id == physical_assets.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

@@ -108,18 +108,83 @@ pub struct InsertableUserOrganizationBuilder {
     pub(crate) user_id: Option<i32>,
     pub(crate) organization_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableUserOrganizationBuilder {
-    type Attributes = InsertableUserOrganizationAttributes;
-    fn extend_builder(
+/// Trait defining setters for attributes of an instance of `UserOrganization`
+/// or descendant tables.
+pub trait UserOrganizationBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.user_organizations.user_id` column.
+    ///
+    /// # Arguments
+    /// * `user_id`: The value to set for the
+    ///   `public.user_organizations.user_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn user(
+        self,
+        user_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.user_organizations.organization_id`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `organization_id`: The value to set for the
+    ///   `public.user_organizations.organization_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn organization(
+        self,
+        organization_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+}
+impl UserOrganizationBuildable for InsertableUserOrganizationBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttributes;
+    /// Sets the value of the `public.user_organizations.user_id` column.
+    fn user(
         mut self,
-        other: Self,
+        user_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(user_id) = other.user_id {
-            self = self.user(user_id)?;
-        }
-        if let Some(organization_id) = other.organization_id {
-            self = self.organization(organization_id)?;
-        }
+        let user_id = user_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserOrganizationAttributes::UserId)
+        })?;
+        self.user_id = Some(user_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.user_organizations.organization_id`
+    /// column.
+    fn organization(
+        mut self,
+        organization_id: i16,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let organization_id = organization_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableUserOrganizationAttributes::OrganizationId)
+        })?;
+        self.organization_id = Some(organization_id);
         Ok(self)
     }
 }
@@ -127,30 +192,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserOrganizationBui
     type PrimaryKey = (i32, i16);
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
-    /// Sets the value of the `user_organizations.organization_id` column from
-    /// table `user_organizations`.
-    pub fn organization(
-        mut self,
-        organization_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
-    {
-        self.organization_id = Some(organization_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder {
-    /// Sets the value of the `user_organizations.user_id` column from table
-    /// `user_organizations`.
-    pub fn user(
-        mut self,
-        user_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>>
-    {
-        self.user_id = Some(user_id);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserOrganizationBuilder

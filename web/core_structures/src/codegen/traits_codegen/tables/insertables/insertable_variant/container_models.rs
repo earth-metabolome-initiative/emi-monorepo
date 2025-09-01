@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    Trackable,
+    PhysicalAssetModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-    Trackable,
+    PhysicalAssetModel,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -18,9 +18,9 @@ where
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     >,
     C: diesel::connection::LoadConnection,
-    Trackable: web_common_traits::database::TryInsertGeneric<
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        PrimaryKey = i32,
     >,
 {
     type Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel;
@@ -54,8 +54,8 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelExtensionAttributes::Trackable(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelExtensionAttributes::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
                     ),
                 ))
             })?;

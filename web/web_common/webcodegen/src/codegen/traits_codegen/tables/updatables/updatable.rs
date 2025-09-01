@@ -6,9 +6,8 @@ use std::{collections::HashMap, path::Path};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
-use crate::traits::TableLike;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Table, traits::TableLike};
 
 impl Table {
     /// Returns whether the table allows for the implementation of the

@@ -94,27 +94,267 @@ pub struct InsertableAddressBuilder {
     pub(crate) postal_code: Option<String>,
     pub(crate) geolocation: Option<postgis_diesel::types::Point>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableAddressBuilder {
-    type Attributes = InsertableAddressAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
+/// Trait defining setters for attributes of an instance of `Address` or
+/// descendant tables.
+pub trait AddressBuildable: std::marker::Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.addresses.city_id` column.
+    ///
+    /// # Arguments
+    /// * `city_id`: The value to set for the `public.addresses.city_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn city(
+        self,
+        city_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.addresses.street_name` column.
+    ///
+    /// # Arguments
+    /// * `street_name`: The value to set for the `public.addresses.street_name`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn street_name<'SN, SN>(
+        self,
+        street_name: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>;
+    /// Sets the value of the `public.addresses.street_number` column.
+    ///
+    /// # Arguments
+    /// * `street_number`: The value to set for the
+    ///   `public.addresses.street_number` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn street_number<'SN, SN>(
+        self,
+        street_number: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>;
+    /// Sets the value of the `public.addresses.postal_code` column.
+    ///
+    /// # Arguments
+    /// * `postal_code`: The value to set for the `public.addresses.postal_code`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn postal_code<'PC, PC>(
+        self,
+        postal_code: &'PC PC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PC PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>;
+    /// Sets the value of the `public.addresses.geolocation` column.
+    ///
+    /// # Arguments
+    /// * `geolocation`: The value to set for the `public.addresses.geolocation`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `postgis_diesel::types::Point`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn geolocation<'G, G>(
+        self,
+        geolocation: &'G G,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'G G: TryInto<postgis_diesel::types::Point>,
+        validation_errors::SingleFieldError:
+            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>;
+}
+impl AddressBuildable for Option<i32> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes;
+    fn city(
+        self,
+        _city_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(city_id) = other.city_id {
-            self = self.city(city_id)?;
-        }
-        if let Some(street_name) = other.street_name {
-            self = self.street_name(street_name)?;
-        }
-        if let Some(street_number) = other.street_number {
-            self = self.street_number(street_number)?;
-        }
-        if let Some(postal_code) = other.postal_code {
-            self = self.postal_code(postal_code)?;
-        }
-        if let Some(geolocation) = other.geolocation {
-            self = self.geolocation(geolocation)?;
-        }
+        Ok(self)
+    }
+    fn street_name<'SN, SN>(
+        self,
+        _street_name: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn street_number<'SN, SN>(
+        self,
+        _street_number: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn postal_code<'PC, PC>(
+        self,
+        _postal_code: &'PC PC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PC PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
+    fn geolocation<'G, G>(
+        self,
+        _geolocation: &'G G,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'G G: TryInto<postgis_diesel::types::Point>,
+        validation_errors::SingleFieldError:
+            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>,
+    {
+        Ok(self)
+    }
+}
+impl AddressBuildable for InsertableAddressBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes;
+    /// Sets the value of the `public.addresses.city_id` column.
+    fn city(
+        mut self,
+        city_id: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let city_id = city_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAddressAttributes::CityId)
+        })?;
+        self.city_id = Some(city_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.addresses.street_name` column.
+    fn street_name<'SN, SN>(
+        mut self,
+        street_name: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+    {
+        let street_name = street_name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAddressAttributes::StreetName)
+        })?;
+        self.street_name = Some(street_name);
+        Ok(self)
+    }
+    /// Sets the value of the `public.addresses.street_number` column.
+    fn street_number<'SN, SN>(
+        mut self,
+        street_number: &'SN SN,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'SN SN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'SN SN as TryInto<String>>::Error>,
+    {
+        let street_number = street_number.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAddressAttributes::StreetNumber)
+        })?;
+        self.street_number = Some(street_number);
+        Ok(self)
+    }
+    /// Sets the value of the `public.addresses.postal_code` column.
+    fn postal_code<'PC, PC>(
+        mut self,
+        postal_code: &'PC PC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'PC PC: TryInto<String>,
+        validation_errors::SingleFieldError: From<<&'PC PC as TryInto<String>>::Error>,
+    {
+        let postal_code = postal_code.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAddressAttributes::PostalCode)
+        })?;
+        self.postal_code = Some(postal_code);
+        Ok(self)
+    }
+    /// Sets the value of the `public.addresses.geolocation` column.
+    fn geolocation<'G, G>(
+        mut self,
+        geolocation: &'G G,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        &'G G: TryInto<postgis_diesel::types::Point>,
+        validation_errors::SingleFieldError:
+            From<<&'G G as TryInto<postgis_diesel::types::Point>>::Error>,
+    {
+        let geolocation = geolocation.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAddressAttributes::Geolocation)
+        })?;
+        self.geolocation = Some(geolocation);
         Ok(self)
     }
 }
@@ -122,94 +362,6 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAddressBuilder {
     type PrimaryKey = i32;
     fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
         self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.city_id` column from table `addresses`.
-    pub fn city(
-        mut self,
-        city_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>> {
-        self.city_id = Some(city_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.geolocation` column from table
-    /// `addresses`.
-    pub fn geolocation<Geolocation>(
-        mut self,
-        geolocation: Geolocation,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        Geolocation: TryInto<postgis_diesel::types::Point>,
-        <Geolocation as TryInto<postgis_diesel::types::Point>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let geolocation = geolocation.try_into().map_err(
-            |err: <Geolocation as TryInto<postgis_diesel::types::Point>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::Geolocation)
-            },
-        )?;
-        self.geolocation = Some(geolocation);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.postal_code` column from table
-    /// `addresses`.
-    pub fn postal_code<PostalCode>(
-        mut self,
-        postal_code: PostalCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        PostalCode: TryInto<String>,
-        <PostalCode as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let postal_code =
-            postal_code.try_into().map_err(|err: <PostalCode as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::PostalCode)
-            })?;
-        self.postal_code = Some(postal_code);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.street_name` column from table
-    /// `addresses`.
-    pub fn street_name<StreetName>(
-        mut self,
-        street_name: StreetName,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        StreetName: TryInto<String>,
-        <StreetName as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let street_name =
-            street_name.try_into().map_err(|err: <StreetName as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::StreetName)
-            })?;
-        self.street_name = Some(street_name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder {
-    /// Sets the value of the `addresses.street_number` column from table
-    /// `addresses`.
-    pub fn street_number<StreetNumber>(
-        mut self,
-        street_number: StreetNumber,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableAddressAttributes>>
-    where
-        StreetNumber: TryInto<String>,
-        <StreetNumber as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let street_number =
-            street_number.try_into().map_err(|err: <StreetNumber as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableAddressAttributes::StreetNumber)
-            })?;
-        self.street_number = Some(street_number);
-        Ok(self)
     }
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableAddressBuilder
