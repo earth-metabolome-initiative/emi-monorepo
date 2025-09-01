@@ -61,7 +61,7 @@ impl DirectusVersion {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::table(),
-                self.collection.clone(),
+                self.collection,
             ),
             conn,
         )

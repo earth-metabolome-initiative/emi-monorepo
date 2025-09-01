@@ -44,7 +44,7 @@ where
     type SqlType = diesel::sql_types::Integer;
 }
 impl web_common_traits::prelude::Descendant<DirectusRevision> for DirectusRevision {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.parent.as_ref()
     }
 }

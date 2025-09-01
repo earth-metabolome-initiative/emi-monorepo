@@ -104,22 +104,6 @@ impl SiUnit {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_unit_name(
-        unit_name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::si_units::si_units;
-        Self::table()
-            .filter(si_units::unit_name.eq(unit_name))
-            .order_by(si_units::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

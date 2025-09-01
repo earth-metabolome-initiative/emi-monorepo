@@ -180,38 +180,6 @@ impl DirectusOperation {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_reject(
-        reject: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
-        Self::table()
-            .filter(directus_operations::reject.eq(reject))
-            .order_by(directus_operations::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_resolve(
-        resolve: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
-        Self::table()
-            .filter(directus_operations::resolve.eq(resolve))
-            .order_by(directus_operations::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,

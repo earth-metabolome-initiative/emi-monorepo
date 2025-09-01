@@ -72,22 +72,6 @@ impl DirectusFlow {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_operation(
-        operation: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_flows::directus_flows;
-        Self::table()
-            .filter(directus_flows::operation.eq(operation))
-            .order_by(directus_flows::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,

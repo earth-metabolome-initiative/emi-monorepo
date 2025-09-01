@@ -86,54 +86,6 @@ impl DirectusUser {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_email(
-        email: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
-        Self::table()
-            .filter(directus_users::email.eq(email))
-            .order_by(directus_users::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_external_identifier(
-        external_identifier: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
-        Self::table()
-            .filter(directus_users::external_identifier.eq(external_identifier))
-            .order_by(directus_users::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_token(
-        token: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
-        Self::table()
-            .filter(directus_users::token.eq(token))
-            .order_by(directus_users::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_first_name(
         first_name: &str,
         conn: &mut diesel::PgConnection,

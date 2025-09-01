@@ -101,22 +101,6 @@ impl Brand {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_brand(
-        brand: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::brands::brands;
-        Self::table()
-            .filter(brands::brand.eq(brand))
-            .order_by(brands::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

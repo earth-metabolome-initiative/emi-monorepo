@@ -273,22 +273,6 @@ impl MsDatum {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_filename(
-        filename: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
-        Self::table()
-            .filter(ms_data::filename.eq(filename))
-            .order_by(ms_data::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

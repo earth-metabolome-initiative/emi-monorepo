@@ -1495,29 +1495,6 @@ impl Table {
         Ok(self._must_be_inserted_alongside_with(other, conn)?
             || other._must_be_inserted_alongside_with(self, conn)?)
     }
-
-    /// Returns the set of ancestral same-as columns, including both
-    /// explicitly defined ones and inferred ones.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub(crate) fn all_ancestral_same_as_columns(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, WebCodeGenError> {
-        let mut ancestral_same_as_columns = Vec::new();
-        for column in self.columns(conn)? {
-            ancestral_same_as_columns.extend(column.all_ancestral_same_as_columns(conn)?);
-        }
-        ancestral_same_as_columns.sort_unstable();
-        ancestral_same_as_columns.dedup();
-        Ok(ancestral_same_as_columns)
-    }
 }
 
 impl AsRef<Table> for Table {

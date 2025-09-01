@@ -41,7 +41,7 @@ where
     type SqlType = ::rosetta_uuid::diesel_impls::Uuid;
 }
 impl web_common_traits::prelude::Descendant<DirectusRole> for DirectusRole {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.parent.as_ref()
     }
 }

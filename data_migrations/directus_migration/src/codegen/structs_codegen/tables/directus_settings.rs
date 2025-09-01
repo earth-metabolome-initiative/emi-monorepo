@@ -45,6 +45,7 @@ pub struct DirectusSetting {
     pub public_registration_verify_email: bool,
     pub public_registration_role: Option<::rosetta_uuid::Uuid>,
     pub public_registration_email_filter: Option<::serde_json::Value>,
+    pub visual_editor_urls: Option<::serde_json::Value>,
 }
 impl web_common_traits::prelude::TableName for DirectusSetting {
     const TABLE_NAME: &'static str = "directus_settings";

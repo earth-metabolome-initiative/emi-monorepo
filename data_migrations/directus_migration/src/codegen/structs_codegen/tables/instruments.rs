@@ -170,22 +170,6 @@ impl Instrument {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_instrument_id(
-        instrument_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::instruments::instruments;
-        Self::table()
-            .filter(instruments::instrument_id.eq(instrument_id))
-            .order_by(instruments::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

@@ -15,5 +15,7 @@ diesel::table! {
     ::rosetta_uuid::diesel_impls::Uuid >, sample_container -> diesel::sql_types::Integer,
     parent_container -> diesel::sql_types::Nullable < diesel::sql_types::Integer >,
     parent_sample_container -> diesel::sql_types::Integer, extraction_container ->
-    diesel::sql_types::Nullable < diesel::sql_types::Integer > }
+    diesel::sql_types::Nullable < diesel::sql_types::Integer >, altemis_tube_id ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, altemis_rack_id ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text > }
 }

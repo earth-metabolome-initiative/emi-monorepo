@@ -23,7 +23,8 @@ pub async fn main() {
     let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 
     // We write to the target directory the generated structs
-    let curation_data = Table::load(&mut conn, "Curation_Data", DATABASE_SCHEMA, DATABASE_NAME).unwrap();
+    let curation_data =
+        Table::load(&mut conn, "Curation_Data", DATABASE_SCHEMA, DATABASE_NAME).unwrap();
 
     // Generate the code associated with the database
     Codegen::default()

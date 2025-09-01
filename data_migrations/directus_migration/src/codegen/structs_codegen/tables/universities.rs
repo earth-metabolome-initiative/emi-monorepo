@@ -109,22 +109,6 @@ impl University {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_university_name(
-        university_name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::universities::universities;
-        Self::table()
-            .filter(universities::university_name.eq(university_name))
-            .order_by(universities::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

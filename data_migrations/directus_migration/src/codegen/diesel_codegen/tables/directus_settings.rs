@@ -30,5 +30,6 @@ diesel::table! {
     diesel::sql_types::Bool, public_registration_verify_email -> diesel::sql_types::Bool,
     public_registration_role -> diesel::sql_types::Nullable <
     ::rosetta_uuid::diesel_impls::Uuid >, public_registration_email_filter ->
+    diesel::sql_types::Nullable < diesel::sql_types::Json >, visual_editor_urls ->
     diesel::sql_types::Nullable < diesel::sql_types::Json > }
 }

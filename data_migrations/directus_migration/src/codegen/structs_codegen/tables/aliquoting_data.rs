@@ -236,22 +236,6 @@ impl AliquotingDatum {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_sample_container(
-        sample_container: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::aliquoting_data::aliquoting_data;
-        Self::table()
-            .filter(aliquoting_data::sample_container.eq(sample_container))
-            .order_by(aliquoting_data::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

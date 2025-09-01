@@ -56,7 +56,7 @@ where
     type SqlType = diesel::sql_types::Text;
 }
 impl web_common_traits::prelude::Descendant<DirectusCollection> for DirectusCollection {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.group.as_ref()
     }
 }
@@ -93,7 +93,7 @@ impl DirectusCollection {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(group) = self.group.clone() else {
+        let Some(group) = self.group else {
             return Ok(None);
         };
         RunQueryDsl::first(

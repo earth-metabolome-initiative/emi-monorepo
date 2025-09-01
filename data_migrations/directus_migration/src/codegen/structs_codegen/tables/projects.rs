@@ -45,7 +45,7 @@ where
     type SqlType = diesel::sql_types::Integer;
 }
 impl web_common_traits::prelude::Descendant<Project> for Project {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.parent_project.as_ref()
     }
 }
@@ -195,38 +195,6 @@ impl Project {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_project_id(
-        project_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::project_id.eq(project_id))
-            .order_by(projects::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_batch(
-        batch: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::batch.eq(batch))
-            .order_by(projects::id.asc())
-            .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_status(

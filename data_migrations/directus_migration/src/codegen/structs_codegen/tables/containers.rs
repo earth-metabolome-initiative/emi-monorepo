@@ -53,7 +53,7 @@ where
     type SqlType = diesel::sql_types::Integer;
 }
 impl web_common_traits::prelude::Descendant<Container> for Container {
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
         self.parent_container.as_ref()
     }
 }
@@ -245,38 +245,6 @@ impl Container {
             conn,
         )
         .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_container_id(
-        container_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::containers::containers;
-        Self::table()
-            .filter(containers::container_id.eq(container_id))
-            .order_by(containers::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_old_id(
-        old_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::containers::containers;
-        Self::table()
-            .filter(containers::old_id.eq(old_id))
-            .order_by(containers::id.asc())
-            .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_status(

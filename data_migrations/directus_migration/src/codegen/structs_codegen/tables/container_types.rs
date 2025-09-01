@@ -103,22 +103,6 @@ impl ContainerType {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_type(
-        container_type: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::container_types::container_types;
-        Self::table()
-            .filter(container_types::container_type.eq(container_type))
-            .order_by(container_types::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

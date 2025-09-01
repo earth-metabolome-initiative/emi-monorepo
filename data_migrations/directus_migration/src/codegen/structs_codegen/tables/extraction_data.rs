@@ -29,6 +29,8 @@ pub struct ExtractionDatum {
     pub parent_container: Option<i32>,
     pub parent_sample_container: i32,
     pub extraction_container: Option<i32>,
+    pub altemis_tube_id: Option<String>,
+    pub altemis_rack_id: Option<String>,
 }
 impl web_common_traits::prelude::TableName for ExtractionDatum {
     const TABLE_NAME: &'static str = "Extraction_Data";
@@ -390,22 +392,6 @@ impl ExtractionDatum {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_sample_container(
-        sample_container: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::extraction_data::extraction_data;
-        Self::table()
-            .filter(extraction_data::sample_container.eq(sample_container))
-            .order_by(extraction_data::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,
@@ -571,6 +557,32 @@ impl ExtractionDatum {
         use crate::codegen::diesel_codegen::tables::extraction_data::extraction_data;
         Self::table()
             .filter(extraction_data::extraction_container.eq(extraction_container))
+            .order_by(extraction_data::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_altemis_tube_id(
+        altemis_tube_id: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::extraction_data::extraction_data;
+        Self::table()
+            .filter(extraction_data::altemis_tube_id.eq(altemis_tube_id))
+            .order_by(extraction_data::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_altemis_rack_id(
+        altemis_rack_id: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::extraction_data::extraction_data;
+        Self::table()
+            .filter(extraction_data::altemis_rack_id.eq(altemis_rack_id))
             .order_by(extraction_data::id.asc())
             .load::<Self>(conn)
     }

@@ -51,6 +51,8 @@ pub struct FieldDatum {
     pub geometry: Option<postgis_diesel::types::Point>,
     pub date: Option<i64>,
     pub soil_type: Option<String>,
+    pub catalogue_number: Option<String>,
+    pub extracted_id: Option<String>,
 }
 impl web_common_traits::prelude::TableName for FieldDatum {
     const TABLE_NAME: &'static str = "Field_Data";
@@ -133,22 +135,6 @@ impl FieldDatum {
             conn,
         )
         .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_sample_id(
-        sample_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::field_data::field_data;
-        Self::table()
-            .filter(field_data::sample_id.eq(sample_id))
-            .order_by(field_data::id.asc())
-            .first::<Self>(conn)
-            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_user_created(
@@ -563,6 +549,32 @@ impl FieldDatum {
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::soil_type.eq(soil_type))
+            .order_by(field_data::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_catalogue_number(
+        catalogue_number: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::field_data::field_data;
+        Self::table()
+            .filter(field_data::catalogue_number.eq(catalogue_number))
+            .order_by(field_data::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_extracted_id(
+        extracted_id: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::field_data::field_data;
+        Self::table()
+            .filter(field_data::extracted_id.eq(extracted_id))
             .order_by(field_data::id.asc())
             .load::<Self>(conn)
     }

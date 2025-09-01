@@ -20,7 +20,6 @@ pub struct DirectusActivity {
     pub user_agent: Option<String>,
     pub collection: String,
     pub item: String,
-    pub comment: Option<String>,
     pub origin: Option<String>,
 }
 impl web_common_traits::prelude::TableName for DirectusActivity {
@@ -121,19 +120,6 @@ impl DirectusActivity {
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::item.eq(item))
-            .order_by(directus_activity::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_comment(
-        comment: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
-        Self::table()
-            .filter(directus_activity::comment.eq(comment))
             .order_by(directus_activity::id.asc())
             .load::<Self>(conn)
     }

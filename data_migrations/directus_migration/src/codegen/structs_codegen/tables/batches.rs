@@ -143,38 +143,6 @@ impl Batch {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_batch_id(
-        batch_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::batches::batches;
-        Self::table()
-            .filter(batches::batch_id.eq(batch_id))
-            .order_by(batches::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_old_id(
-        old_id: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::batches::batches;
-        Self::table()
-            .filter(batches::old_id.eq(old_id))
-            .order_by(batches::id.asc())
-            .first::<Self>(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

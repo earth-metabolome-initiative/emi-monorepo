@@ -41,5 +41,7 @@ diesel::table! {
     diesel::sql_types::Float >, geometry -> diesel::sql_types::Nullable <
     ::postgis_diesel::sql_types::Geometry >, date -> diesel::sql_types::Nullable <
     diesel::sql_types::BigInt >, soil_type -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, catalogue_number -> diesel::sql_types::Nullable <
+    diesel::sql_types::Text >, extracted_id -> diesel::sql_types::Nullable <
     diesel::sql_types::Text > }
 }
