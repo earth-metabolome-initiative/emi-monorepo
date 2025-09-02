@@ -219,7 +219,7 @@ impl Default for InsertableProcedureTemplateAssetModelBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ProcedureTemplateAssetModel` or descendant tables.
-pub trait ProcedureTemplateAssetModelBuildable: std::marker::Sized {
+pub trait ProcedureTemplateAssetModelBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedure_template_asset_models.name`
@@ -397,65 +397,6 @@ pub trait ProcedureTemplateAssetModelBuildable: std::marker::Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-}
-impl ProcedureTemplateAssetModelBuildable for Option<i32> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn asset_model(
-        self,
-        _asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetModelBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes;

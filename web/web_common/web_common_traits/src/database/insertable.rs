@@ -68,6 +68,20 @@ where
     }
 }
 
+/// A trait for types that can have their most concrete table set.
+pub trait MostConcreteTable {
+    /// Sets the most concrete table for the type.
+    ///
+    /// # Arguments
+    ///
+    /// * `table_name` - The name of the most concrete table.
+    fn set_most_concrete_table(&mut self, table_name: &str);
+}
+
+impl<T> MostConcreteTable for Option<T> {
+    fn set_most_concrete_table(&mut self, _table_name: &str) {}
+}
+
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
 pub trait InsertableVariant<C> {

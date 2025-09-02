@@ -15,9 +15,7 @@ where
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
     C: diesel::connection::LoadConnection,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel;
@@ -32,10 +30,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "asset_models",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("asset_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -88,7 +84,7 @@ where
             most_concrete_table,
             name: self.name,
             description: self.description,
-            parent_model_id: self.parent_model_id,
+            parent_model: self.parent_model,
             created_by,
             created_at,
             updated_by,

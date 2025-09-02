@@ -21,6 +21,14 @@ pub struct Brand {
 impl web_common_traits::prelude::TableName for Brand {
     const TABLE_NAME: &'static str = "brands";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::brands::Brand,
+    > for Brand
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for Brand {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -143,6 +151,16 @@ impl Brand {
             .filter(brands::updated_at.eq(updated_at))
             .order_by(brands::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::brands::brands;
+        Self::table().filter(brands::name.eq(name)).order_by(brands::id.asc()).first::<Self>(conn)
     }
 }
 impl AsRef<Brand> for Brand {

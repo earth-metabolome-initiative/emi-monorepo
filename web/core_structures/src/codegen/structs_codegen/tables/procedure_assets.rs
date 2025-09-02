@@ -25,6 +25,14 @@ pub struct ProcedureAsset {
 impl web_common_traits::prelude::TableName for ProcedureAsset {
     const TABLE_NAME: &'static str = "procedure_assets";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    > for ProcedureAsset
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>,
+{
+}
 impl diesel::Identifiable for ProcedureAsset {
     type Id = (::rosetta_uuid::Uuid, i32);
     fn id(self) -> Self::Id {

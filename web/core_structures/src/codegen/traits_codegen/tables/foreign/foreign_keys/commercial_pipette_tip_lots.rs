@@ -39,7 +39,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::Commer
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPipetteTipModel(
-                        self.product_model_id,
+                        self.product_model,
                     ),
                 ),
             );
@@ -65,7 +65,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::Commer
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.product_model_id == commercial_pipette_tip_models.id {
+                if self.product_model == commercial_pipette_tip_models.id {
                     foreign_keys.product_model = Some(commercial_pipette_tip_models);
                     updated = true;
                 }
@@ -76,7 +76,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::Commer
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.product_model_id == commercial_pipette_tip_models.id {
+                if self.product_model == commercial_pipette_tip_models.id {
                     foreign_keys.product_model = None;
                     updated = true;
                 }

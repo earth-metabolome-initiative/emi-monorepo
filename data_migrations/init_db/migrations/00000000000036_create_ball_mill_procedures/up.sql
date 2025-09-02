@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 	-- And that the `milled_with` is indeed a procedure asset, if it is not NULL.
 	FOREIGN KEY (procedure, milled_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the specified ball mill machine has as parent model the specified model.
-	FOREIGN KEY (milled_with, milled_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (milled_with, milled_with_model) REFERENCES assets(id, model),
 	-- Additionally, we enforce that the `milled_container` is indeed a procedure asset.
 	FOREIGN KEY (foreign_procedure, milled_container) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.

@@ -33,11 +33,17 @@ pub enum InsertableAliquotingProcedureTemplateAttributes {
     ForeignProcedureTemplate,
     ProcedureTemplateAliquotedFromModel,
     AliquotedIntoModel,
-    ProcedureTemplateAliquotedIntoModel,
+    ProcedureTemplateAliquotedIntoModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
     AliquotedWithModel,
-    ProcedureTemplateAliquotedWithModel,
+    ProcedureTemplateAliquotedWithModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
     PipetteTipModel,
-    ProcedureTemplatePipetteTipModel,
+    ProcedureTemplatePipetteTipModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
 }
 impl core::str::FromStr for InsertableAliquotingProcedureTemplateAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -46,13 +52,33 @@ impl core::str::FromStr for InsertableAliquotingProcedureTemplateAttributes {
             "Liters" => Ok(Self::Liters),
             "AliquotedFromModel" => Ok(Self::AliquotedFromModel),
             "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
-            "ProcedureTemplateAliquotedFromModel" => Ok(Self::ProcedureTemplateAliquotedFromModel),
+            "ProcedureTemplateAliquotedFromModel" => {
+                Ok(Self::ProcedureTemplateAliquotedFromModel)
+            }
             "AliquotedIntoModel" => Ok(Self::AliquotedIntoModel),
-            "ProcedureTemplateAliquotedIntoModel" => Ok(Self::ProcedureTemplateAliquotedIntoModel),
+            "ProcedureTemplateAliquotedIntoModel" => {
+                Ok(
+                    Self::ProcedureTemplateAliquotedIntoModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
             "AliquotedWithModel" => Ok(Self::AliquotedWithModel),
-            "ProcedureTemplateAliquotedWithModel" => Ok(Self::ProcedureTemplateAliquotedWithModel),
+            "ProcedureTemplateAliquotedWithModel" => {
+                Ok(
+                    Self::ProcedureTemplateAliquotedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
             "PipetteTipModel" => Ok(Self::PipetteTipModel),
-            "ProcedureTemplatePipetteTipModel" => Ok(Self::ProcedureTemplatePipetteTipModel),
+            "ProcedureTemplatePipetteTipModel" => {
+                Ok(
+                    Self::ProcedureTemplatePipetteTipModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
             "liters" => Ok(Self::Liters),
             "aliquoted_from_model" => Ok(Self::AliquotedFromModel),
             "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
@@ -61,15 +87,35 @@ impl core::str::FromStr for InsertableAliquotingProcedureTemplateAttributes {
             }
             "aliquoted_into_model" => Ok(Self::AliquotedIntoModel),
             "procedure_template_aliquoted_into_model" => {
-                Ok(Self::ProcedureTemplateAliquotedIntoModel)
+                Ok(
+                    Self::ProcedureTemplateAliquotedIntoModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "aliquoted_with_model" => Ok(Self::AliquotedWithModel),
             "procedure_template_aliquoted_with_model" => {
-                Ok(Self::ProcedureTemplateAliquotedWithModel)
+                Ok(
+                    Self::ProcedureTemplateAliquotedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "pipette_tip_model" => Ok(Self::PipetteTipModel),
-            "procedure_template_pipette_tip_model" => Ok(Self::ProcedureTemplatePipetteTipModel),
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+            "procedure_template_pipette_tip_model" => {
+                Ok(
+                    Self::ProcedureTemplatePipetteTipModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
         }
     }
 }
@@ -85,17 +131,11 @@ impl core::fmt::Display for InsertableAliquotingProcedureTemplateAttributes {
                 write!(f, "procedure_template_aliquoted_from_model")
             }
             Self::AliquotedIntoModel => write!(f, "aliquoted_into_model"),
-            Self::ProcedureTemplateAliquotedIntoModel => {
-                write!(f, "procedure_template_aliquoted_into_model")
-            }
+            Self::ProcedureTemplateAliquotedIntoModel(e) => write!(f, "{e}"),
             Self::AliquotedWithModel => write!(f, "aliquoted_with_model"),
-            Self::ProcedureTemplateAliquotedWithModel => {
-                write!(f, "procedure_template_aliquoted_with_model")
-            }
+            Self::ProcedureTemplateAliquotedWithModel(e) => write!(f, "{e}"),
             Self::PipetteTipModel => write!(f, "pipette_tip_model"),
-            Self::ProcedureTemplatePipetteTipModel => {
-                write!(f, "procedure_template_pipette_tip_model")
-            }
+            Self::ProcedureTemplatePipetteTipModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -492,18 +532,18 @@ pub struct InsertableAliquotingProcedureTemplateBuilder<
     pub(crate) foreign_procedure_template: Option<i32>,
     pub(crate) procedure_template_aliquoted_from_model: Option<i32>,
     pub(crate) aliquoted_into_model: Option<i32>,
-    pub(crate) procedure_template_aliquoted_into_model: Option<i32>,
+    pub(crate) procedure_template_aliquoted_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) aliquoted_with_model: Option<i32>,
-    pub(crate) procedure_template_aliquoted_with_model: Option<i32>,
+    pub(crate) procedure_template_aliquoted_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) pipette_tip_model: Option<i32>,
-    pub(crate) procedure_template_pipette_tip_model: Option<i32>,
+    pub(crate) procedure_template_pipette_tip_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) procedure_template: ProcedureTemplate,
 }
 /// Trait defining setters for attributes of an instance of
 /// `AliquotingProcedureTemplate` or descendant tables.
-pub trait AliquotingProcedureTemplateBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
-{
+pub trait AliquotingProcedureTemplateBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.aliquoting_procedure_templates.liters`
     /// column.
     ///
@@ -649,7 +689,7 @@ pub trait AliquotingProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_aliquoted_into_model(
         self,
-        procedure_template_aliquoted_into_model: i32,
+        procedure_template_aliquoted_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.aliquoted_with_model` column.
@@ -697,7 +737,7 @@ pub trait AliquotingProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_aliquoted_with_model(
         self,
-        procedure_template_aliquoted_with_model: i32,
+        procedure_template_aliquoted_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.pipette_tip_model` column.
@@ -745,82 +785,15 @@ pub trait AliquotingProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_pipette_tip_model(
         self,
-        procedure_template_pipette_tip_model: i32,
+        procedure_template_pipette_tip_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl AliquotingProcedureTemplateBuildable for Option<i32> {
-    fn liters<L>(
-        self,
-        _liters: L,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        L: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn aliquoted_from_model(
-        self,
-        _aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_aliquoted_from_model(
-        self,
-        _procedure_template_aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn aliquoted_into_model(
-        self,
-        _aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_aliquoted_into_model(
-        self,
-        _procedure_template_aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn aliquoted_with_model(
-        self,
-        _aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_aliquoted_with_model(
-        self,
-        _procedure_template_aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn pipette_tip_model(
-        self,
-        _pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_pipette_tip_model(
-        self,
-        _procedure_template_pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-        >,
-> AliquotingProcedureTemplateBuildable
-for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `public.aliquoting_procedure_templates.liters` column.
+impl<ProcedureTemplate> AliquotingProcedureTemplateBuildable
+    for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes;
+    /// Sets the value of the `public.aliquoting_procedure_templates.liters`
+    /// column.
     fn liters<L>(
         mut self,
         liters: L,
@@ -829,14 +802,10 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
         L: TryInto<f32>,
         validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>,
     {
-        let liters = liters
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::Liters,
-                    )
-            })?;
+        let liters = liters.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAliquotingProcedureTemplateAttributes::Liters)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
@@ -847,39 +816,37 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
         self.liters = Some(liters);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.aliquoted_from_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.aliquoted_from_model` column.
     fn aliquoted_from_model(
         mut self,
         aliquoted_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let aliquoted_from_model = aliquoted_from_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::AliquotedFromModel,
-                    )
-            })?;
+        let aliquoted_from_model = aliquoted_from_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAliquotingProcedureTemplateAttributes::AliquotedFromModel)
+        })?;
         self.aliquoted_from_model = Some(aliquoted_from_model);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.foreign_procedure_template` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.foreign_procedure_template`
+    /// column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
+        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableAliquotingProcedureTemplateAttributes::ForeignProcedureTemplate,
+            )
+        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.procedure_template_aliquoted_from_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.
+    /// procedure_template_aliquoted_from_model` column.
     fn procedure_template_aliquoted_from_model(
         mut self,
         procedure_template_aliquoted_from_model: i32,
@@ -892,111 +859,317 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
                         InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedFromModel,
                     )
             })?;
-        self.procedure_template_aliquoted_from_model = Some(
-            procedure_template_aliquoted_from_model,
-        );
+        self.procedure_template_aliquoted_from_model =
+            Some(procedure_template_aliquoted_from_model);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.aliquoted_into_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.aliquoted_into_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
+    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_into_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn aliquoted_into_model(
         mut self,
         aliquoted_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let aliquoted_into_model = aliquoted_into_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::AliquotedIntoModel,
-                    )
+        let aliquoted_into_model = aliquoted_into_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAliquotingProcedureTemplateAttributes::AliquotedIntoModel)
+        })?;
+        self.procedure_template_aliquoted_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_aliquoted_into_model,
+                aliquoted_into_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateAliquotedIntoModel(attribute)
+                })
             })?;
         self.aliquoted_into_model = Some(aliquoted_into_model);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.procedure_template_aliquoted_into_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.
+    /// procedure_template_aliquoted_into_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "aliquoted_into_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_aliquoted_into_model(
         mut self,
-        procedure_template_aliquoted_into_model: i32,
+        mut procedure_template_aliquoted_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_aliquoted_into_model = procedure_template_aliquoted_into_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedIntoModel,
-                    )
-            })?;
-        self.procedure_template_aliquoted_into_model = Some(
-            procedure_template_aliquoted_into_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.aliquoted_into_model, procedure_template_aliquoted_into_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::AliquotedIntoModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_aliquoted_into_model.asset_model {
+            self.aliquoted_into_model = Some(asset_model);
+        } else if let Some(local) = self.aliquoted_into_model {
+            procedure_template_aliquoted_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_aliquoted_into_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateAliquotedIntoModel(attribute)
+                    })
+                })?;
+        }
+        self.procedure_template_aliquoted_into_model = procedure_template_aliquoted_into_model;
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.aliquoted_with_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.aliquoted_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn aliquoted_with_model(
         mut self,
         aliquoted_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let aliquoted_with_model = aliquoted_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::AliquotedWithModel,
-                    )
+        let aliquoted_with_model = aliquoted_with_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAliquotingProcedureTemplateAttributes::AliquotedWithModel)
+        })?;
+        self.procedure_template_aliquoted_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_aliquoted_with_model,
+                aliquoted_with_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateAliquotedWithModel(attribute)
+                })
             })?;
         self.aliquoted_with_model = Some(aliquoted_with_model);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.procedure_template_aliquoted_with_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.
+    /// procedure_template_aliquoted_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_aliquoted_with_model(
         mut self,
-        procedure_template_aliquoted_with_model: i32,
+        mut procedure_template_aliquoted_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_aliquoted_with_model = procedure_template_aliquoted_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedWithModel,
-                    )
-            })?;
-        self.procedure_template_aliquoted_with_model = Some(
-            procedure_template_aliquoted_with_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.aliquoted_with_model, procedure_template_aliquoted_with_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::AliquotedWithModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_aliquoted_with_model.asset_model {
+            self.aliquoted_with_model = Some(asset_model);
+        } else if let Some(local) = self.aliquoted_with_model {
+            procedure_template_aliquoted_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_aliquoted_with_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateAliquotedWithModel(attribute)
+                    })
+                })?;
+        }
+        self.procedure_template_aliquoted_with_model = procedure_template_aliquoted_with_model;
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.pipette_tip_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.pipette_tip_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "pipette_tip_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let pipette_tip_model = pipette_tip_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::PipetteTipModel,
-                    )
+        let pipette_tip_model = pipette_tip_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAliquotingProcedureTemplateAttributes::PipetteTipModel)
+        })?;
+        self.procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_pipette_tip_model,
+                pipette_tip_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplatePipetteTipModel(attribute)
+                })
             })?;
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
-    ///Sets the value of the `public.aliquoting_procedure_templates.procedure_template_pipette_tip_model` column.
+    /// Sets the value of the
+    /// `public.aliquoting_procedure_templates.
+    /// procedure_template_pipette_tip_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`aliquoting_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "pipette_tip_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_pipette_tip_model(
         mut self,
-        procedure_template_pipette_tip_model: i32,
+        mut procedure_template_pipette_tip_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_pipette_tip_model = procedure_template_pipette_tip_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplatePipetteTipModel,
-                    )
-            })?;
-        self.procedure_template_pipette_tip_model = Some(
-            procedure_template_pipette_tip_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.pipette_tip_model, procedure_template_pipette_tip_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::PipetteTipModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_pipette_tip_model.asset_model {
+            self.pipette_tip_model = Some(asset_model);
+        } else if let Some(local) = self.pipette_tip_model {
+            procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_pipette_tip_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplatePipetteTipModel(attribute)
+                    })
+                })?;
+        }
+        self.procedure_template_pipette_tip_model = procedure_template_pipette_tip_model;
         Ok(self)
     }
 }
@@ -1007,28 +1180,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes;
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-                self.procedure_template,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1202,6 +1353,15 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
 }
+impl<ProcedureTemplate> web_common_traits::database::MostConcreteTable
+    for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure_template.set_most_concrete_table(table_name);
+    }
+}
 impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey
     for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -1228,6 +1388,9 @@ where
         C,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = InsertableAliquotingProcedureTemplateAttributes;
     fn is_complete(&self) -> bool {
@@ -1236,11 +1399,11 @@ where
             && self.foreign_procedure_template.is_some()
             && self.procedure_template_aliquoted_from_model.is_some()
             && self.aliquoted_into_model.is_some()
-            && self.procedure_template_aliquoted_into_model.is_some()
+            && self.procedure_template_aliquoted_into_model.is_complete()
             && self.aliquoted_with_model.is_some()
-            && self.procedure_template_aliquoted_with_model.is_some()
+            && self.procedure_template_aliquoted_with_model.is_complete()
             && self.pipette_tip_model.is_some()
-            && self.procedure_template_pipette_tip_model.is_some()
+            && self.procedure_template_pipette_tip_model.is_complete()
     }
     fn mint_primary_key(
         self,

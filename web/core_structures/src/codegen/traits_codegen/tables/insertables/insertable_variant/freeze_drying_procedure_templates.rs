@@ -27,9 +27,37 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
     >,
+    <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate;
@@ -44,12 +72,35 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-            self,
-            "freeze_drying_procedure_templates",
-        )?;
+        use web_common_traits::database::Updatable;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("freeze_drying_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate = self
             .try_insert(user_id, conn)?;
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct
+            .procedure_template_freeze_dried_with_model(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct
+            .procedure_template_freeze_dried_container_model(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -61,6 +112,7 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::TryInsertGeneric;
         let kelvin = self
             .kelvin
             .ok_or(
@@ -96,13 +148,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::FreezeDriedWithModel,
                 ),
             )?;
-        let procedure_template_freeze_dried_with_model = self
-            .procedure_template_freeze_dried_with_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedWithModel,
-                ),
-            )?;
         let freeze_dried_container_model = self
             .freeze_dried_container_model
             .ok_or(
@@ -117,13 +162,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::ForeignProcedureTemplate,
                 ),
             )?;
-        let procedure_template_freeze_dried_container_model = self
-            .procedure_template_freeze_dried_container_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedContainerModel,
-                ),
-            )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
@@ -133,6 +171,22 @@ where
                         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        let procedure_template_freeze_dried_with_model = self
+            .procedure_template_freeze_dried_with_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedWithModel,
+                )
+            })?;
+        let procedure_template_freeze_dried_container_model = self
+            .procedure_template_freeze_dried_container_model
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedContainerModel,
+                )
             })?;
         Ok(Self::InsertableVariant {
             procedure_template,

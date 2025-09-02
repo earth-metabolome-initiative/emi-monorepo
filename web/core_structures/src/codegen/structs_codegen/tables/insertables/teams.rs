@@ -279,7 +279,7 @@ impl Default for InsertableTeamBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Team` or descendant
 /// tables.
-pub trait TeamBuildable: std::marker::Sized {
+pub trait TeamBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.teams.id` column.
@@ -541,100 +541,6 @@ pub trait TeamBuildable: std::marker::Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-}
-impl TeamBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes;
-    fn id(
-        self,
-        id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(Some(id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
-        })?))
-    }
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn icon<I>(
-        self,
-        _icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn color(
-        self,
-        _color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn state(
-        self,
-        _state_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn parent_team(
-        self,
-        _parent_team_id: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl TeamBuildable for InsertableTeamBuilder {
     type Attributes =

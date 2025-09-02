@@ -51,7 +51,7 @@ pub struct InsertableColorBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Color` or
 /// descendant tables.
-pub trait ColorBuildable: std::marker::Sized {
+pub trait ColorBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.colors.name` column.
@@ -131,40 +131,6 @@ pub trait ColorBuildable: std::marker::Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-}
-impl ColorBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableColorAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn hexadecimal_value<HV>(
-        self,
-        _hexadecimal_value: HV,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        HV: TryInto<String>,
-        validation_errors::SingleFieldError: From<<HV as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl ColorBuildable for InsertableColorBuilder {
     type Attributes =

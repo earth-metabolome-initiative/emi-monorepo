@@ -32,6 +32,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    > for GeolocationProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
 impl diesel::Identifiable for GeolocationProcedure {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {

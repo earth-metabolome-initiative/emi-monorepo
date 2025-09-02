@@ -271,7 +271,7 @@ impl Default for InsertableNextProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `NextProcedureTemplate` or descendant tables.
-pub trait NextProcedureTemplateBuildable: std::marker::Sized {
+pub trait NextProcedureTemplateBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.next_procedure_templates.parent` column.

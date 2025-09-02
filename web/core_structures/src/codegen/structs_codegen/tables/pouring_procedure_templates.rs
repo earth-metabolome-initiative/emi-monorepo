@@ -34,6 +34,12 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+> for PouringProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for PouringProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -523,6 +529,30 @@ impl PouringProcedureTemplate {
             )
             .order_by(pouring_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            pouring_procedure_templates::pouring_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(pouring_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::name.eq(name))
+            .order_by(pouring_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(

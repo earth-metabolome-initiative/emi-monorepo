@@ -88,7 +88,7 @@ pub struct InsertableTaxonBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Taxon` or
 /// descendant tables.
-pub trait TaxonBuildable: std::marker::Sized {
+pub trait TaxonBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.taxa.id` column.
@@ -182,44 +182,6 @@ pub trait TaxonBuildable: std::marker::Sized {
         self,
         rank_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl TaxonBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes;
-    fn id(
-        self,
-        id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(Some(id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
-        })?))
-    }
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn parent<PI>(
-        self,
-        _parent_id: PI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn rank(
-        self,
-        _rank_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl TaxonBuildable for InsertableTaxonBuilder {
     type Attributes =

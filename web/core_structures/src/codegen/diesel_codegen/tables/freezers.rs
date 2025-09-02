@@ -1,4 +1,4 @@
 diesel::table! {
-    freezers(id) { id -> ::rosetta_uuid::diesel_impls::Uuid, model_id ->
+    freezers(id) { id -> ::rosetta_uuid::diesel_impls::Uuid, model ->
     diesel::sql_types::Integer }
 }

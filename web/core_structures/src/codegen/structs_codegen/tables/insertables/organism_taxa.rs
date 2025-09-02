@@ -164,7 +164,7 @@ impl Default for InsertableOrganismTaxonBuilder {
 }
 /// Trait defining setters for attributes of an instance of `OrganismTaxon` or
 /// descendant tables.
-pub trait OrganismTaxonBuildable: std::marker::Sized {
+pub trait OrganismTaxonBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.organism_taxa.created_by` column.

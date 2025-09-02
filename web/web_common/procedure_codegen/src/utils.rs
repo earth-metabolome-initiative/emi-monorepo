@@ -124,32 +124,3 @@ pub(crate) fn is_procedure_template_asset_model_foreign_key(
 ) -> Result<Option<KeyColumnUsage>, diesel::result::Error> {
     is_foreign_primary_key_to_table(column, conn, PROCEDURE_TEMPLATE_ASSETS_TABLE_NAME)
 }
-
-/// Returns whether the provided column appears in a same-as constraint in its
-/// own table with the primary key of the table.
-///
-/// # Arguments
-///
-/// * `column` - The column to check.
-/// * `conn` - The database connection to use.
-///
-/// # Errors
-///
-/// * Returns a `diesel::result::Error` if there is an error querying the
-///   database.
-pub(crate) fn is_in_same_as_with_primary_key(
-    column: &webcodegen::Column,
-    conn: &mut PgConnection,
-) -> Result<bool, crate::errors::Error> {
-    let table = column.table(conn)?;
-    let primary_key_columns = table.primary_key_columns(conn)?;
-
-    for same_as_foreign_key in column.same_as_constraints(conn)? {
-        let same_as_columns = same_as_foreign_key.columns(conn)?;
-        if primary_key_columns.iter().all(|pk_col| same_as_columns.contains(pk_col)) {
-            return Ok(true);
-        }
-    }
-
-    Ok(false)
-}

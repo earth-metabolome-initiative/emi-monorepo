@@ -30,7 +30,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCentrifugeModel(
-                self.product_model_id,
+                self.product_model,
             ),
         ));
     }
@@ -75,7 +75,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.product_model_id == commercial_centrifuge_models.id {
+                if self.product_model == commercial_centrifuge_models.id {
                     foreign_keys.product_model = Some(commercial_centrifuge_models);
                     updated = true;
                 }
@@ -86,7 +86,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.product_model_id == commercial_centrifuge_models.id {
+                if self.product_model == commercial_centrifuge_models.id {
                     foreign_keys.product_model = None;
                     updated = true;
                 }

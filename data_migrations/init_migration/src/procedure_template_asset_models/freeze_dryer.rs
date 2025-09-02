@@ -1,12 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to freezedryers.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt,
-    trackables::instruments::freeze_dryer::freeze_dryer,
+    asset_models::instruments::freeze_dryer::freeze_dryer,
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a freeze_dryer trackable.
@@ -23,5 +23,5 @@ pub(crate) fn freeze_dryer_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, freeze_dryer(user, conn)?.id(conn)?)
+    default_pmt(user, freeze_dryer(user, conn)?.id(conn)?.id(conn)?)
 }

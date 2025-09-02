@@ -52,43 +52,5 @@ async fn test_requires_partial_builder() {
         );
     }
 
-    // We now check that `specific_procedures`'s table column `procedure_template`
-    // is correctly identified as `same-as` `procedures`'s `procedure_template`
-    // column. This check is obtained via the existence of the `UNIQUE`
-    // constraints which operates of the `id` and `procedure_template` columns.
-    let specific_procedures =
-        Table::load(&mut conn, "specific_procedures", "public", &database_name)
-            .expect("Failed to load table `specific_procedures`.");
-
-    let procedure_template = specific_procedures
-        .column_by_name(&mut conn, "procedure_template")
-        .expect("Failed to find column `procedure_template` in table `specific_procedures`.");
-
-    let mut procedure_template_same_as = procedure_template
-        .same_as_columns(&mut conn)
-        .expect("Failed to check if column `procedure_template` is same as another column.");
-
-    assert_eq!(
-        procedure_template_same_as.len(),
-        1,
-        "Column `procedure_template` should have exactly one `same-as` constraint."
-    );
-
-    let Some(same_as_column) = procedure_template_same_as.pop() else {
-        panic!("Expected at least one `same-as` constraint for column `procedure_template`.");
-    };
-
-    let procedures = Table::load(&mut conn, "procedures", "public", &database_name)
-        .expect("Failed to load table `procedures`.");
-
-    let procedures_procedure_template = procedures
-        .column_by_name(&mut conn, "procedure_template")
-        .expect("Failed to find column `procedure_template` in table `procedures`.");
-
-    assert_eq!(
-        same_as_column, procedures_procedure_template,
-        "Column `procedure_template` in table `specific_procedures` should be the same as `procedure_template` in table `procedures`."
-    );
-
     docker.stop().await.unwrap();
 }

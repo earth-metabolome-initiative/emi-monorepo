@@ -164,7 +164,7 @@ impl Default for InsertableAssetCompatibilityRuleBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `AssetCompatibilityRule` or descendant tables.
-pub trait AssetCompatibilityRuleBuildable: std::marker::Sized {
+pub trait AssetCompatibilityRuleBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the

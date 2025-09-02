@@ -96,7 +96,7 @@ pub struct InsertableAddressBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Address` or
 /// descendant tables.
-pub trait AddressBuildable: std::marker::Sized {
+pub trait AddressBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.addresses.city_id` column.
@@ -225,57 +225,6 @@ pub trait AddressBuildable: std::marker::Sized {
         G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
-}
-impl AddressBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttributes;
-    fn city(
-        self,
-        _city_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn street_name<SN>(
-        self,
-        _street_name: SN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn street_number<SN>(
-        self,
-        _street_number: SN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn postal_code<PC>(
-        self,
-        _postal_code: PC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn geolocation<G>(
-        self,
-        _geolocation: G,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
-            From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl AddressBuildable for InsertableAddressBuilder {
     type Attributes =

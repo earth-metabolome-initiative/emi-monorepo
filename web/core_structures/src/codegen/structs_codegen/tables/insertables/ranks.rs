@@ -45,7 +45,7 @@ pub struct InsertableRankBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Rank` or descendant
 /// tables.
-pub trait RankBuildable: std::marker::Sized {
+pub trait RankBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.ranks.name` column.
@@ -99,30 +99,6 @@ pub trait RankBuildable: std::marker::Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-}
-impl RankBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableRankAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl RankBuildable for InsertableRankBuilder {
     type Attributes =

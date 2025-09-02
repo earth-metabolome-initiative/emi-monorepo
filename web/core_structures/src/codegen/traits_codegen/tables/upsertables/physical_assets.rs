@@ -16,7 +16,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(model_id.ne(excluded(model_id)))
+            .filter(model.ne(excluded(model)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -39,7 +39,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(model_id.ne(excluded(model_id)))
+            .filter(model.ne(excluded(model)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

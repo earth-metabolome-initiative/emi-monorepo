@@ -90,7 +90,7 @@ pub struct InsertableUnitBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Unit` or descendant
 /// tables.
-pub trait UnitBuildable: std::marker::Sized {
+pub trait UnitBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.units.name` column.
@@ -189,46 +189,6 @@ pub trait UnitBuildable: std::marker::Sized {
         self,
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl UnitBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn unit<U>(
-        self,
-        _unit: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn icon<I>(
-        self,
-        _icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn color(
-        self,
-        _color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl UnitBuildable for InsertableUnitBuilder {
     type Attributes =

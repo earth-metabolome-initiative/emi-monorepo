@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(product_model_id.ne(excluded(product_model_id)))
+            .filter(product_model.ne(excluded(product_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(product_model_id.ne(excluded(product_model_id)))
+            .filter(product_model.ne(excluded(product_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

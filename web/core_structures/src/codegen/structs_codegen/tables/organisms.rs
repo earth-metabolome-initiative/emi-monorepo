@@ -26,6 +26,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organisms::Organism,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
 impl diesel::Identifiable for Organism {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -66,8 +74,8 @@ impl Organism {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id(
-        model_id: &i32,
+    pub fn from_model(
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -80,14 +88,32 @@ impl Organism {
         };
         Self::table()
             .inner_join(physical_assets::table.on(organisms::id.eq(physical_assets::id)))
-            .filter(physical_assets::model_id.eq(model_id))
+            .filter(physical_assets::model.eq(model))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id_and_id(
-        model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
+        Self::table()
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(organisms::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -99,7 +125,7 @@ impl Organism {
         use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
         Self::table()
             .inner_join(assets::table.on(organisms::id.eq(assets::id)))
-            .filter(assets::model_id.eq(model_id).and(assets::id.eq(id)))
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

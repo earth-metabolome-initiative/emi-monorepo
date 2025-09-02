@@ -110,7 +110,7 @@ pub struct InsertableEmailProviderBuilder {
 }
 /// Trait defining setters for attributes of an instance of `EmailProvider` or
 /// descendant tables.
-pub trait EmailProviderBuildable: std::marker::Sized {
+pub trait EmailProviderBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.email_providers.email_id` column.

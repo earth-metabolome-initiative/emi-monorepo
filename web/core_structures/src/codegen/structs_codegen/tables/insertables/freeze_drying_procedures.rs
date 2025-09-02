@@ -83,34 +83,70 @@ pub struct InsertableFreezeDryingProcedure {
     pub(crate) freeze_dryed_with_model: i32,
 }
 impl InsertableFreezeDryingProcedure {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn freeze_dryed_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        Option<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+            crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(freeze_dryed_with) = self.freeze_dryed_with else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer::table(),
+                freeze_dryed_with,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn freeze_dryed_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table(),
-                self.procedure_template,
+                crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel::table(),
+                self.freeze_dryed_with_model,
             ),
             conn,
         )
@@ -143,6 +179,38 @@ impl InsertableFreezeDryingProcedure {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
                 self.procedure,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table(),
+                self.procedure_template,
             ),
             conn,
         )
@@ -239,74 +307,6 @@ impl InsertableFreezeDryingProcedure {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::table(),
                 self.freeze_dryed_container,
-            ),
-            conn,
-        )
-    }
-    pub fn freeze_dryed_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer>,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(freeze_dryed_with) = self.freeze_dryed_with else {
-            return Ok(None);
-        };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer::table(),
-                freeze_dryed_with,
-            ),
-            conn,
-        )
-        .map(Some)
-    }
-    pub fn freeze_dryed_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel::table(),
-                self.freeze_dryed_with_model,
             ),
             conn,
         )
@@ -413,9 +413,9 @@ pub struct InsertableFreezeDryingProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `FreezeDryingProcedure` or descendant tables.
-pub trait FreezeDryingProcedureBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-{
+pub trait FreezeDryingProcedureBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the
     /// `public.freeze_drying_procedures.procedure_template` column.
     ///
@@ -558,49 +558,12 @@ pub trait FreezeDryingProcedureBuildable:
         freeze_dryed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl FreezeDryingProcedureBuildable for Option<::rosetta_uuid::Uuid> {
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure(
-        self,
-        _foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn freeze_dryed_container(
-        self,
-        _freeze_dryed_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn freeze_dryed_with(
-        self,
-        _freeze_dryed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn freeze_dryed_with_model(
-        self,
-        _freeze_dryed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > FreezeDryingProcedureBuildable for InsertableFreezeDryingProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes;
     ///Sets the value of the `public.freeze_drying_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -636,9 +599,10 @@ impl<
                         InsertableFreezeDryingProcedureAttributes::ProcedureTemplate,
                     )
             })?;
-        self.procedure = self
-            .procedure
-            .procedure_template(procedure_template)
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+                self.procedure,
+                procedure_template,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
@@ -759,7 +723,12 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-for InsertableFreezeDryingProcedureBuilder<Procedure> {
+for InsertableFreezeDryingProcedureBuilder<Procedure>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
@@ -811,28 +780,6 @@ for InsertableFreezeDryingProcedureBuilder<Procedure> {
             self,
             procedure_template,
         )
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-                self.procedure,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -917,6 +864,15 @@ for InsertableFreezeDryingProcedureBuilder<Procedure> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<Procedure> web_common_traits::database::MostConcreteTable
+    for InsertableFreezeDryingProcedureBuilder<Procedure>
+where
+    Procedure: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure.set_most_concrete_table(table_name);
     }
 }
 impl<Procedure> web_common_traits::prelude::SetPrimaryKey

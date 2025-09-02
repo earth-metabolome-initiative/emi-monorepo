@@ -26,14 +26,14 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysic
 pub enum InsertableCentrifugeAttributes {
     Extension(InsertableCentrifugeExtensionAttributes),
     Id,
-    ModelId,
+    Model,
 }
 impl core::str::FromStr for InsertableCentrifugeAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ModelId" => Ok(Self::ModelId),
-            "model_id" => Ok(Self::ModelId),
+            "Model" => Ok(Self::Model),
+            "model" => Ok(Self::Model),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -43,7 +43,7 @@ impl core::fmt::Display for InsertableCentrifugeAttributes {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Id => write!(f, "id"),
-            Self::ModelId => write!(f, "model_id"),
+            Self::Model => write!(f, "model"),
         }
     }
 }
@@ -55,7 +55,7 @@ impl core::fmt::Display for InsertableCentrifugeAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCentrifuge {
     pub(crate) id: ::rosetta_uuid::Uuid,
-    pub(crate) model_id: i32,
+    pub(crate) model: i32,
 }
 impl InsertableCentrifuge {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -117,7 +117,7 @@ impl InsertableCentrifuge {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot::table(),
-                self.model_id,
+                self.model,
             ),
             conn,
         )
@@ -131,19 +131,18 @@ pub struct InsertableCentrifugeBuilder<
             crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
         >,
 > {
-    pub(crate) model_id: Option<i32>,
+    pub(crate) model: Option<i32>,
     pub(crate) id: PhysicalAsset,
 }
 /// Trait defining setters for attributes of an instance of `Centrifuge` or
 /// descendant tables.
-pub trait CentrifugeBuildable:
-    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
-{
-    /// Sets the value of the `public.centrifuges.model_id` column.
+pub trait CentrifugeBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.centrifuges.model` column.
     ///
     /// # Arguments
-    /// * `model_id`: The value to set for the `public.centrifuges.model_id`
-    ///   column.
+    /// * `model`: The value to set for the `public.centrifuges.model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -159,43 +158,81 @@ pub trait CentrifugeBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn model(
         self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl CentrifugeBuildable for Option<::rosetta_uuid::Uuid> {
-    fn model(
-        self,
-        _model_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
         >,
 > CentrifugeBuildable for InsertableCentrifugeBuilder<PhysicalAsset> {
-    ///Sets the value of the `public.centrifuges.model_id` column.
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes;
+    ///Sets the value of the `public.centrifuges.model` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`assets`"]
+    ///    v2@{shape: rounded, label: "model"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v4 ["`centrifuges`"]
+    ///    v0@{shape: rounded, label: "model"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v5 ["`physical_assets`"]
+    ///    v1@{shape: rounded, label: "model"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
+    ///v4 -.->|"`descendant of`"| v3
+    ///```
     fn model(
         mut self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let model_id = model_id
+        let model = model
             .try_into()
             .map_err(|err| {
                 validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableCentrifugeAttributes::ModelId)
+                    .rename_field(InsertableCentrifugeAttributes::Model)
             })?;
-        self.model_id = Some(model_id);
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+                self.id,
+                model,
+            )
+            .map_err(|err| {
+                err.into_field_name(|attribute| Self::Attributes::Extension(
+                    attribute.into(),
+                ))
+            })?;
+        self.model = Some(model);
         Ok(self)
     }
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetBuildable
-for InsertableCentrifugeBuilder<PhysicalAsset> {
+for InsertableCentrifugeBuilder<PhysicalAsset>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
@@ -206,28 +243,6 @@ for InsertableCentrifugeBuilder<PhysicalAsset> {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
                 self.id,
                 id,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.assets.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
             )
             .map_err(|e| {
                 e
@@ -282,7 +297,7 @@ for InsertableCentrifugeBuilder<PhysicalAsset> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.model_id` column.
+    ///Sets the value of the `public.assets.model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -295,21 +310,24 @@ for InsertableCentrifugeBuilder<PhysicalAsset> {
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]
-    ///    v0@{shape: rounded, label: "model_id"}
+    ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
-    ///subgraph v3 ["`centrifuges`"]
-    ///    v1@{shape: rounded, label: "model_id"}
+    ///subgraph v3 ["`physical_assets`"]
+    ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
-    ///v3 -.->|"`descendant of`"| v2
+    ///v3 --->|"`extends`"| v2
     ///```
     fn model(
         self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CentrifugeBuildable>::model(self, model_id)
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+            self,
+            model,
+        )
     }
     #[inline]
     ///Sets the value of the `public.assets.created_by` column.
@@ -397,28 +415,62 @@ for InsertableCentrifugeBuilder<PhysicalAsset> {
     }
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
-        >,
+    PhysicalAsset,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
-for InsertableCentrifugeBuilder<PhysicalAsset> {
+for InsertableCentrifugeBuilder<PhysicalAsset>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::CentrifugeBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes,
+    >,
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes;
     #[inline]
-    ///Sets the value of the `public.physical_assets.model_id` column.
+    ///Sets the value of the `public.physical_assets.model` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`assets`"]
+    ///    v2@{shape: rounded, label: "model"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v4 ["`centrifuges`"]
+    ///    v1@{shape: rounded, label: "model"}
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`physical_assets`"]
+    ///    v0@{shape: rounded, label: "model"}
+    ///class v0 column-of-interest
+    ///end
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
+    ///v4 -.->|"`descendant of`"| v3
+    ///```
     fn model(
-        mut self,
-        model_id: i32,
+        self,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
-                self.id,
-                model_id,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
+        <Self as CentrifugeBuildable>::model(self, model)
+    }
+}
+impl<PhysicalAsset> web_common_traits::database::MostConcreteTable
+    for InsertableCentrifugeBuilder<PhysicalAsset>
+where
+    PhysicalAsset: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<PhysicalAsset> web_common_traits::prelude::SetPrimaryKey
@@ -446,7 +498,7 @@ where
 {
     type Attributes = InsertableCentrifugeAttributes;
     fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model_id.is_some()
+        self.id.is_complete() && self.model.is_some()
     }
     fn mint_primary_key(
         self,

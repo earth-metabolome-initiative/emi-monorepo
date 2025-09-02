@@ -38,6 +38,12 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+> for BallMillProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for BallMillProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -543,46 +549,6 @@ impl BallMillProcedureTemplate {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_bead_model_and_procedure_template(
-        procedure_template_bead_model: &i32,
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
-        Self::table()
-            .filter(
-                ball_mill_procedure_templates::procedure_template_bead_model
-                    .eq(procedure_template_bead_model)
-                    .and(ball_mill_procedure_templates::procedure_template.eq(procedure_template)),
-            )
-            .order_by(ball_mill_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_bead_model_and_bead_model(
-        procedure_template_bead_model: &i32,
-        bead_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
-        Self::table()
-            .filter(
-                ball_mill_procedure_templates::procedure_template_bead_model
-                    .eq(procedure_template_bead_model)
-                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
-            )
-            .order_by(ball_mill_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_procedure_template_milled_with_model_and_procedure_template(
         procedure_template_milled_with_model: &i32,
         procedure_template: &i32,
@@ -621,6 +587,46 @@ impl BallMillProcedureTemplate {
                         ball_mill_procedure_templates::foreign_procedure_template
                             .eq(foreign_procedure_template),
                     ),
+            )
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_bead_model_and_procedure_template(
+        procedure_template_bead_model: &i32,
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
+        Self::table()
+            .filter(
+                ball_mill_procedure_templates::procedure_template_bead_model
+                    .eq(procedure_template_bead_model)
+                    .and(ball_mill_procedure_templates::procedure_template.eq(procedure_template)),
+            )
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_bead_model_and_bead_model(
+        procedure_template_bead_model: &i32,
+        bead_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
+        Self::table()
+            .filter(
+                ball_mill_procedure_templates::procedure_template_bead_model
+                    .eq(procedure_template_bead_model)
+                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -723,6 +729,30 @@ impl BallMillProcedureTemplate {
             ))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedure_templates::ball_mill_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::name.eq(name))
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(

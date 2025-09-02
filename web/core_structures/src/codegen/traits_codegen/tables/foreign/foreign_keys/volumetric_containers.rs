@@ -20,7 +20,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                self.volumetric_container_model_id,
+                self.volumetric_container_model,
             ),
         ));
     }
@@ -63,7 +63,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.volumetric_container_model_id == volumetric_container_models.id {
+                if self.volumetric_container_model == volumetric_container_models.id {
                     foreign_keys.volumetric_container_model = Some(volumetric_container_models);
                     updated = true;
                 }
@@ -74,7 +74,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.volumetric_container_model_id == volumetric_container_models.id {
+                if self.volumetric_container_model == volumetric_container_models.id {
                     foreign_keys.volumetric_container_model = None;
                     updated = true;
                 }

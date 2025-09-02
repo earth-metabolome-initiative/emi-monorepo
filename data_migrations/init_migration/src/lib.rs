@@ -1,18 +1,17 @@
 #![doc = include_str!("../README.md")]
 use diesel::{Connection, PgConnection};
 
+mod asset_models;
 mod brands;
-mod error;
 mod login_providers;
 mod procedure_template_asset_models;
 mod procedure_templates;
-mod trackables;
 mod users;
 
+use asset_models::init_compatibility_rules;
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
 pub use procedure_templates::init_dbgi_plan;
-use trackables::init_compatibility_rules;
 pub use users::init_root_user;
 
 /// Executes the init migration.

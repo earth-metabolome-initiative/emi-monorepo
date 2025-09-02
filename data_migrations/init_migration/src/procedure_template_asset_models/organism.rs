@@ -1,12 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to organisms.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt,
-    trackables::organisms::{organism, sample},
+    asset_models::organisms::{organism, sample},
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a organism trackable.

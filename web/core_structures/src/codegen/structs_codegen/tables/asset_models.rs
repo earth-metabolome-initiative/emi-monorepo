@@ -17,7 +17,7 @@ pub struct AssetModel {
     pub most_concrete_table: String,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub parent_model_id: Option<i32>,
+    pub parent_model: Option<i32>,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -25,6 +25,14 @@ pub struct AssetModel {
 }
 impl web_common_traits::prelude::TableName for AssetModel {
     const TABLE_NAME: &'static str = "asset_models";
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for AssetModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
 }
 impl<C> web_common_traits::prelude::Ancestor<C> for AssetModel
 where
@@ -41,13 +49,13 @@ where
     for<'a> <&'a Self as diesel::Identifiable>::Id:
         diesel::serialize::ToSql<diesel::sql_types::Integer, C::Backend>,
 {
-    const PARENT_ID: &'static str = "parent_model_id";
+    const PARENT_ID: &'static str = "parent_model";
     const ID: &'static str = "id";
     type SqlType = diesel::sql_types::Integer;
 }
 impl web_common_traits::prelude::Descendant<AssetModel> for AssetModel {
     fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
-        self.parent_model_id.as_ref()
+        self.parent_model.as_ref()
     }
 }
 impl diesel::Identifiable for AssetModel {
@@ -81,13 +89,13 @@ impl AssetModel {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(parent_model_id) = self.parent_model_id else {
+        let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
-                parent_model_id,
+                parent_model,
             ),
             conn,
         )
@@ -184,15 +192,15 @@ impl AssetModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id(
-        parent_model_id: &i32,
+    pub fn from_parent_model(
+        parent_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
         Self::table()
-            .filter(asset_models::parent_model_id.eq(parent_model_id))
+            .filter(asset_models::parent_model.eq(parent_model))
             .order_by(asset_models::id.asc())
             .load::<Self>(conn)
     }
@@ -249,8 +257,21 @@ impl AssetModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id_and_id(
-        parent_model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
+        Self::table()
+            .filter(asset_models::name.eq(name))
+            .order_by(asset_models::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_and_id(
+        parent_model: &i32,
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -260,7 +281,7 @@ impl AssetModel {
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
         Self::table()
-            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
+            .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
             .order_by(asset_models::id.asc())
             .first::<Self>(conn)
     }

@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS weighing_procedures(
 	-- And that the `weighed_with` is indeed a procedure asset, if it is not NULL.
 	FOREIGN KEY (procedure, weighed_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the specified weighing device has as parent model the specified model.
-	FOREIGN KEY (weighed_with, weighed_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (weighed_with, weighed_with_model) REFERENCES assets(id, model),
 	-- Additionally, we enforce that the `weighed_container` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (foreign_procedure, weighed_container) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `foreign_procedure` has as `procedure_template` the specified `foreign_procedure_template`.

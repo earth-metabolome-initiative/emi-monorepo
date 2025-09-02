@@ -16,7 +16,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(volumetric_container_model_id.ne(excluded(volumetric_container_model_id)))
+            .filter(volumetric_container_model.ne(excluded(volumetric_container_model)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -39,7 +39,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(volumetric_container_model_id.ne(excluded(volumetric_container_model_id)))
+            .filter(volumetric_container_model.ne(excluded(volumetric_container_model)))
             .get_results(conn)
             .map(|mut result| result.pop())
     }

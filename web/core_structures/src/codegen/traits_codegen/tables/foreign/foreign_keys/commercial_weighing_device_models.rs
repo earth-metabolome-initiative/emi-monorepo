@@ -1,6 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialWeighingDeviceModelForeignKeys {
+    pub parent_model: Option<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+    >,
     pub commercial_weighing_device_models_id_fkey: Option<
         crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
     >,
@@ -19,6 +22,14 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
+                        self.parent_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
                         self.id,
                     ),
                 ),
@@ -33,7 +44,8 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.commercial_weighing_device_models_id_fkey.is_some()
+        foreign_keys.parent_model.is_some()
+            && foreign_keys.commercial_weighing_device_models_id_fkey.is_some()
             && foreign_keys.commercial_weighing_device_models_id_fkey1.is_some()
     }
     fn update(
@@ -74,6 +86,10 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
+                if self.parent_model == weighing_device_models.id {
+                    foreign_keys.parent_model = Some(weighing_device_models);
+                    updated = true;
+                }
                 if self.id == weighing_device_models.id {
                     foreign_keys.commercial_weighing_device_models_id_fkey = Some(
                         weighing_device_models,
@@ -87,6 +103,10 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.parent_model == weighing_device_models.id {
+                    foreign_keys.parent_model = None;
+                    updated = true;
+                }
                 if self.id == weighing_device_models.id {
                     foreign_keys.commercial_weighing_device_models_id_fkey = None;
                     updated = true;

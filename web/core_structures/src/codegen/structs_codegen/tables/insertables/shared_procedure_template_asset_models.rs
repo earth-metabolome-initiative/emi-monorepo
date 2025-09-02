@@ -388,7 +388,7 @@ impl Default for InsertableSharedProcedureTemplateAssetModelBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `SharedProcedureTemplateAssetModel` or descendant tables.
-pub trait SharedProcedureTemplateAssetModelBuildable: std::marker::Sized {
+pub trait SharedProcedureTemplateAssetModelBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the

@@ -71,7 +71,7 @@ pub struct InsertableOrganizationBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Organization` or
 /// descendant tables.
-pub trait OrganizationBuildable: std::marker::Sized {
+pub trait OrganizationBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.organizations.name` column.
@@ -229,71 +229,6 @@ pub trait OrganizationBuildable: std::marker::Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-}
-impl OrganizationBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn url<U>(
-        self,
-        _url: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn country<C>(
-        self,
-        _country: C,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn alpha_two_code<ATC>(
-        self,
-        _alpha_two_code: ATC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        ATC: TryInto<::iso_codes::CountryCode>,
-        validation_errors::SingleFieldError:
-            From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>,
-    {
-        Ok(self)
-    }
-    fn state_province<SP>(
-        self,
-        _state_province: SP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn domain<D>(
-        self,
-        _domain: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl OrganizationBuildable for InsertableOrganizationBuilder {
     type Attributes =

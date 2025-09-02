@@ -25,6 +25,12 @@ pub struct ProcedureTemplateAssetModel {
 impl web_common_traits::prelude::TableName for ProcedureTemplateAssetModel {
     const TABLE_NAME: &'static str = "procedure_template_asset_models";
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+> for ProcedureTemplateAssetModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for ProcedureTemplateAssetModel {
     type Id = i32;
     fn id(self) -> Self::Id {

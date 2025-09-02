@@ -43,7 +43,7 @@ pub struct InsertableCountryBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Country` or
 /// descendant tables.
-pub trait CountryBuildable: std::marker::Sized {
+pub trait CountryBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.countries.iso` column.
@@ -93,28 +93,6 @@ pub trait CountryBuildable: std::marker::Sized {
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
-}
-impl CountryBuildable for Option<::iso_codes::CountryCode> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes;
-    fn iso(
-        self,
-        iso: ::iso_codes::CountryCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(Some(iso.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Iso)
-        })?))
-    }
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl CountryBuildable for InsertableCountryBuilder {
     type Attributes =

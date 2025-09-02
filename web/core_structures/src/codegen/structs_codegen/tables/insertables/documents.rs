@@ -144,7 +144,7 @@ impl Default for InsertableDocumentBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Document` or
 /// descendant tables.
-pub trait DocumentBuildable: std::marker::Sized {
+pub trait DocumentBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.documents.id` column.
@@ -293,62 +293,6 @@ pub trait DocumentBuildable: std::marker::Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-}
-impl DocumentBuildable for Option<::rosetta_uuid::Uuid> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes;
-    fn id(
-        self,
-        id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(Some(id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Id)
-        })?))
-    }
-    fn mime_type<MT>(
-        self,
-        _mime_type: MT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MT: TryInto<::media_types::MediaType>,
-        validation_errors::SingleFieldError: From<<MT as TryInto<::media_types::MediaType>>::Error>,
-    {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl DocumentBuildable for InsertableDocumentBuilder {
     type Attributes =

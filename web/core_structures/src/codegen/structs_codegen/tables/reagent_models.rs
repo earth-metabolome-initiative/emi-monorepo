@@ -29,6 +29,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
+    > for ReagentModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for ReagentModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -69,8 +77,41 @@ impl ReagentModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id_and_id(
-        parent_model_id: &i32,
+    pub fn from_cas_code(
+        cas_code: &::cas_codes::CAS,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::reagent_models::reagent_models;
+        Self::table()
+            .filter(reagent_models::cas_code.eq(cas_code))
+            .order_by(reagent_models::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, reagent_models::reagent_models,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(reagent_models::id.eq(asset_models::id)))
+            .filter(asset_models::name.eq(name))
+            .order_by(reagent_models::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_and_id(
+        parent_model: &i32,
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -84,7 +125,7 @@ impl ReagentModel {
         };
         Self::table()
             .inner_join(asset_models::table.on(reagent_models::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
+            .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
             .order_by(reagent_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
@@ -130,8 +171,8 @@ impl ReagentModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id(
-        parent_model_id: &i32,
+    pub fn from_parent_model(
+        parent_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -144,7 +185,7 @@ impl ReagentModel {
         };
         Self::table()
             .inner_join(asset_models::table.on(reagent_models::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model_id.eq(parent_model_id))
+            .filter(asset_models::parent_model.eq(parent_model))
             .order_by(reagent_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -67,7 +67,7 @@ impl Default for InsertableUserBuilder {
 }
 /// Trait defining setters for attributes of an instance of `User` or descendant
 /// tables.
-pub trait UserBuildable: std::marker::Sized {
+pub trait UserBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.users.first_name` column.
@@ -175,52 +175,6 @@ pub trait UserBuildable: std::marker::Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-}
-impl UserBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes;
-    fn first_name<FN>(
-        self,
-        _first_name: FN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn last_name<LN>(
-        self,
-        _last_name: LN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl UserBuildable for InsertableUserBuilder {
     type Attributes =

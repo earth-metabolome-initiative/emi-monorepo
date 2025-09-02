@@ -2,12 +2,16 @@
 
 use core_structures::{
     PackagingProcedureTemplate, ProcedureTemplate, StorageProcedureTemplate, User,
+    tables::insertables::{
+        PackagingProcedureTemplateBuildable, ProcedureTemplateBuildable,
+        StorageProcedureTemplateBuildable,
+    },
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::procedure_template_trackables::{
+use crate::procedure_template_asset_models::{
     coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
     conical_tubes_box::cct_box_builder, organism::sample_builder,
 };
@@ -75,8 +79,8 @@ pub(crate) fn init_part_of_organism_collection(
             "Wrap the cut part of the organism in a coffee filter paper to protect it during transport.",
         )?
         .created_by(user.id)?
-        .procedure_packaged_with(coffee_wrapper_builder(user, conn)?)?
-        .procedure_sample(sample_builder(user, conn)?)?
+        .procedure_template_packaged_with_model(coffee_wrapper_builder(user, conn)?)?
+        .procedure_template_sample_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
     // Placing the wrapped sample in the conical centrifugal tube
@@ -85,8 +89,8 @@ pub(crate) fn init_part_of_organism_collection(
         .description(
             "Place the wrapped sample in a conical centrifugal tube for storage and transport.",
         )?
-        .procedure_parent_container(cct_builder(user, conn)?)?
-        .procedure_child_container(coffee_wrapper_builder(user, conn)?)?
+        .procedure_template_stored_into_model(cct_builder(user, conn)?)?
+        .procedure_template_stored_asset_model(coffee_wrapper_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -96,10 +100,10 @@ pub(crate) fn init_part_of_organism_collection(
         .description(
             "Place the conical centrifugal tube with the sample in a storage box for long-term storage.",
         )?
-        .procedure_parent_container(
+        .procedure_template_stored_into_model(
             cct_box_builder(user, conn)?
         )?
-        .procedure_child_container(cct_builder(user, conn)?)?
+        .procedure_template_stored_asset_model(cct_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -111,7 +115,7 @@ pub(crate) fn init_part_of_organism_collection(
         &place_in_tube.procedure_template(conn)?,
         &place_in_storage_box.procedure_template(conn)?,
     ] {
-        collection.child(procedure, ChildOptions::default().inherit_trackables(), user, conn)?;
+        collection.child(procedure, ChildOptions::default().inherit_asset_models(), user, conn)?;
     }
 
     collection.extend(

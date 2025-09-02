@@ -124,9 +124,9 @@ pub struct InsertableReagentModelBuilder<
 }
 /// Trait defining setters for attributes of an instance of `ReagentModel` or
 /// descendant tables.
-pub trait ReagentModelBuildable:
-    crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
-{
+pub trait ReagentModelBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.reagent_models.purity` column.
     ///
     /// # Arguments
@@ -206,45 +206,10 @@ pub trait ReagentModelBuildable:
         validation_errors::SingleFieldError:
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
-impl ReagentModelBuildable for Option<i32> {
-    fn purity<P>(
-        self,
-        _purity: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn cas_code<CC>(
-        self,
-        _cas_code: CC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>,
-    {
-        Ok(self)
-    }
-    fn molecular_formula<MF>(
-        self,
-        _molecular_formula: MF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MF: TryInto<::molecular_formulas::MolecularFormula>,
-        validation_errors::SingleFieldError:
-            From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>,
-    {
-        Ok(self)
-    }
-}
-impl<
-    AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
-        >,
-> ReagentModelBuildable for InsertableReagentModelBuilder<AssetModel> {
-    ///Sets the value of the `public.reagent_models.purity` column.
+impl<AssetModel> ReagentModelBuildable for InsertableReagentModelBuilder<AssetModel> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes;
+    /// Sets the value of the `public.reagent_models.purity` column.
     fn purity<P>(
         mut self,
         purity: P,
@@ -253,12 +218,10 @@ impl<
         P: TryInto<f32>,
         validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
     {
-        let purity = purity
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableReagentModelAttributes::Purity)
-            })?;
+        let purity = purity.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableReagentModelAttributes::Purity)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(purity)
             .map_err(|e| {
                 e
@@ -278,43 +241,36 @@ impl<
         self.purity = Some(purity);
         Ok(self)
     }
-    ///Sets the value of the `public.reagent_models.cas_code` column.
+    /// Sets the value of the `public.reagent_models.cas_code` column.
     fn cas_code<CC>(
         mut self,
         cas_code: CC,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
         CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<
-            <CC as TryInto<::cas_codes::CAS>>::Error,
-        >,
+        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>,
     {
-        let cas_code = cas_code
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableReagentModelAttributes::CasCode)
-            })?;
+        let cas_code = cas_code.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableReagentModelAttributes::CasCode)
+        })?;
         self.cas_code = Some(cas_code);
         Ok(self)
     }
-    ///Sets the value of the `public.reagent_models.molecular_formula` column.
+    /// Sets the value of the `public.reagent_models.molecular_formula` column.
     fn molecular_formula<MF>(
         mut self,
         molecular_formula: MF,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
         MF: TryInto<::molecular_formulas::MolecularFormula>,
-        validation_errors::SingleFieldError: From<
-            <MF as TryInto<::molecular_formulas::MolecularFormula>>::Error,
-        >,
+        validation_errors::SingleFieldError:
+            From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>,
     {
-        let molecular_formula = molecular_formula
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableReagentModelAttributes::MolecularFormula)
-            })?;
+        let molecular_formula = molecular_formula.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableReagentModelAttributes::MolecularFormula)
+        })?;
         self.molecular_formula = Some(molecular_formula);
         Ok(self)
     }
@@ -326,28 +282,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
 for InsertableReagentModelBuilder<AssetModel> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes;
-    #[inline]
-    ///Sets the value of the `public.asset_models.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -393,14 +327,14 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.parent_model_id` column.
+    ///Sets the value of the `public.asset_models.parent_model` column.
     fn parent_model(
         mut self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::parent_model(
                 self.id,
-                parent_model_id,
+                parent_model,
             )
             .map_err(|e| {
                 e
@@ -493,6 +427,15 @@ for InsertableReagentModelBuilder<AssetModel> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<AssetModel> web_common_traits::database::MostConcreteTable
+    for InsertableReagentModelBuilder<AssetModel>
+where
+    AssetModel: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<AssetModel> web_common_traits::prelude::SetPrimaryKey

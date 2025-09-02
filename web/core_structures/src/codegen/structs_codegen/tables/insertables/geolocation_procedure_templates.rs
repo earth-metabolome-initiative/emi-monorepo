@@ -29,7 +29,9 @@ pub enum InsertableGeolocationProcedureTemplateAttributes {
     Extension(InsertableGeolocationProcedureTemplateExtensionAttributes),
     ProcedureTemplate,
     GeolocatedWithModel,
-    ProcedureTemplateGeolocatedWithModel,
+    ProcedureTemplateGeolocatedWithModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
     GeolocatedAssetModel,
     ForeignProcedureTemplate,
     ProcedureTemplateGeolocatedAssetModel,
@@ -40,7 +42,11 @@ impl core::str::FromStr for InsertableGeolocationProcedureTemplateAttributes {
         match s {
             "GeolocatedWithModel" => Ok(Self::GeolocatedWithModel),
             "ProcedureTemplateGeolocatedWithModel" => {
-                Ok(Self::ProcedureTemplateGeolocatedWithModel)
+                Ok(
+                    Self::ProcedureTemplateGeolocatedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "GeolocatedAssetModel" => Ok(Self::GeolocatedAssetModel),
             "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
@@ -49,14 +55,24 @@ impl core::str::FromStr for InsertableGeolocationProcedureTemplateAttributes {
             }
             "geolocated_with_model" => Ok(Self::GeolocatedWithModel),
             "procedure_template_geolocated_with_model" => {
-                Ok(Self::ProcedureTemplateGeolocatedWithModel)
+                Ok(
+                    Self::ProcedureTemplateGeolocatedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "geolocated_asset_model" => Ok(Self::GeolocatedAssetModel),
             "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_geolocated_asset_model" => {
                 Ok(Self::ProcedureTemplateGeolocatedAssetModel)
             }
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
         }
     }
 }
@@ -66,9 +82,7 @@ impl core::fmt::Display for InsertableGeolocationProcedureTemplateAttributes {
             Self::Extension(e) => write!(f, "{e}"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
             Self::GeolocatedWithModel => write!(f, "geolocated_with_model"),
-            Self::ProcedureTemplateGeolocatedWithModel => {
-                write!(f, "procedure_template_geolocated_with_model")
-            }
+            Self::ProcedureTemplateGeolocatedWithModel(e) => write!(f, "{e}"),
             Self::GeolocatedAssetModel => write!(f, "geolocated_asset_model"),
             Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
             Self::ProcedureTemplateGeolocatedAssetModel => {
@@ -298,7 +312,7 @@ pub struct InsertableGeolocationProcedureTemplateBuilder<
         = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
 > {
     pub(crate) geolocated_with_model: Option<i32>,
-    pub(crate) procedure_template_geolocated_with_model: Option<i32>,
+    pub(crate) procedure_template_geolocated_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) geolocated_asset_model: Option<i32>,
     pub(crate) foreign_procedure_template: Option<i32>,
     pub(crate) procedure_template_geolocated_asset_model: Option<i32>,
@@ -306,9 +320,9 @@ pub struct InsertableGeolocationProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `GeolocationProcedureTemplate` or descendant tables.
-pub trait GeolocationProcedureTemplateBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
-{
+pub trait GeolocationProcedureTemplateBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the
     /// `public.geolocation_procedure_templates.geolocated_with_model` column.
     ///
@@ -355,7 +369,7 @@ pub trait GeolocationProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_geolocated_with_model(
         self,
-        procedure_template_geolocated_with_model: i32,
+        procedure_template_geolocated_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.geolocation_procedure_templates.geolocated_asset_model` column.
@@ -432,111 +446,145 @@ pub trait GeolocationProcedureTemplateBuildable:
         procedure_template_geolocated_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl GeolocationProcedureTemplateBuildable for Option<i32> {
-    fn geolocated_with_model(
-        self,
-        _geolocated_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_geolocated_with_model(
-        self,
-        _procedure_template_geolocated_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn geolocated_asset_model(
-        self,
-        _geolocated_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_geolocated_asset_model(
-        self,
-        _procedure_template_geolocated_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-        >,
-> GeolocationProcedureTemplateBuildable
-for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `public.geolocation_procedure_templates.geolocated_with_model` column.
+impl<ProcedureTemplate> GeolocationProcedureTemplateBuildable
+    for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttributes;
+    /// Sets the value of the
+    /// `public.geolocation_procedure_templates.geolocated_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`geolocation_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "geolocated_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn geolocated_with_model(
         mut self,
         geolocated_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let geolocated_with_model = geolocated_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableGeolocationProcedureTemplateAttributes::GeolocatedWithModel,
-                    )
+        let geolocated_with_model = geolocated_with_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableGeolocationProcedureTemplateAttributes::GeolocatedWithModel)
+        })?;
+        self.procedure_template_geolocated_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_geolocated_with_model,
+                geolocated_with_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateGeolocatedWithModel(attribute)
+                })
             })?;
         self.geolocated_with_model = Some(geolocated_with_model);
         Ok(self)
     }
-    ///Sets the value of the `public.geolocation_procedure_templates.procedure_template_geolocated_with_model` column.
+    /// Sets the value of the
+    /// `public.geolocation_procedure_templates.
+    /// procedure_template_geolocated_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`geolocation_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_with_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "geolocated_with_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_geolocated_with_model(
         mut self,
-        procedure_template_geolocated_with_model: i32,
+        mut procedure_template_geolocated_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_geolocated_with_model = procedure_template_geolocated_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableGeolocationProcedureTemplateAttributes::ProcedureTemplateGeolocatedWithModel,
-                    )
-            })?;
-        self.procedure_template_geolocated_with_model = Some(
-            procedure_template_geolocated_with_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.geolocated_with_model, procedure_template_geolocated_with_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::GeolocatedWithModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_geolocated_with_model.asset_model {
+            self.geolocated_with_model = Some(asset_model);
+        } else if let Some(local) = self.geolocated_with_model {
+            procedure_template_geolocated_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_geolocated_with_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateGeolocatedWithModel(attribute)
+                    })
+                })?;
+        }
+        self.procedure_template_geolocated_with_model = procedure_template_geolocated_with_model;
         Ok(self)
     }
-    ///Sets the value of the `public.geolocation_procedure_templates.geolocated_asset_model` column.
+    /// Sets the value of the
+    /// `public.geolocation_procedure_templates.geolocated_asset_model` column.
     fn geolocated_asset_model(
         mut self,
         geolocated_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let geolocated_asset_model = geolocated_asset_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableGeolocationProcedureTemplateAttributes::GeolocatedAssetModel,
-                    )
-            })?;
+        let geolocated_asset_model = geolocated_asset_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableGeolocationProcedureTemplateAttributes::GeolocatedAssetModel,
+            )
+        })?;
         self.geolocated_asset_model = Some(geolocated_asset_model);
         Ok(self)
     }
-    ///Sets the value of the `public.geolocation_procedure_templates.foreign_procedure_template` column.
+    /// Sets the value of the
+    /// `public.geolocation_procedure_templates.foreign_procedure_template`
+    /// column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableGeolocationProcedureTemplateAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
+        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableGeolocationProcedureTemplateAttributes::ForeignProcedureTemplate,
+            )
+        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.geolocation_procedure_templates.procedure_template_geolocated_asset_model` column.
+    /// Sets the value of the
+    /// `public.geolocation_procedure_templates.
+    /// procedure_template_geolocated_asset_model` column.
     fn procedure_template_geolocated_asset_model(
         mut self,
         procedure_template_geolocated_asset_model: i32,
@@ -549,9 +597,8 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
                         InsertableGeolocationProcedureTemplateAttributes::ProcedureTemplateGeolocatedAssetModel,
                     )
             })?;
-        self.procedure_template_geolocated_asset_model = Some(
-            procedure_template_geolocated_asset_model,
-        );
+        self.procedure_template_geolocated_asset_model =
+            Some(procedure_template_geolocated_asset_model);
         Ok(self)
     }
 }
@@ -562,28 +609,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttributes;
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-                self.procedure_template,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -757,6 +782,15 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
 }
+impl<ProcedureTemplate> web_common_traits::database::MostConcreteTable
+    for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure_template.set_most_concrete_table(table_name);
+    }
+}
 impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey
     for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -783,11 +817,14 @@ where
         C,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = InsertableGeolocationProcedureTemplateAttributes;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.geolocated_with_model.is_some()
-            && self.procedure_template_geolocated_with_model.is_some()
+            && self.procedure_template_geolocated_with_model.is_complete()
             && self.geolocated_asset_model.is_some()
             && self.foreign_procedure_template.is_some()
             && self.procedure_template_geolocated_asset_model.is_some()

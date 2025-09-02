@@ -210,25 +210,14 @@ impl Table {
                 if let Some(partial_builder_constraint) =
                     insertable_column.requires_partial_builder(conn)?
                 {
-                    // If the column requires a partial builder, we use the
-                    // partial builder identifier.
-                    let foreign_columns = partial_builder_constraint.foreign_columns(conn)?;
-
-                    // We expect the partial builder to have exactly one column.
-                    assert_eq!(
-                        foreign_columns.len(),
-                        1,
-                        "Partial builder on `{}.{}` must have exactly one column",
-                        partial_builder_constraint.table_name,
-                        partial_builder_constraint.column_name
-                    );
-
                     let foreign_table = partial_builder_constraint
                         .foreign_table(conn)?
                         .expect("Partial builder must have a foreign table");
+                    assert!(!foreign_table.has_composite_primary_key(conn)?);
+                    let foreign_primary_key_columns = foreign_table.primary_key_columns(conn)?;
 
                     let foreign_builder_enum_type = foreign_table.insertable_enum_ty()?;
-                    let foreign_column_camel_case_ident = foreign_columns[0].camel_case_ident()?;
+                    let foreign_column_camel_case_ident = foreign_primary_key_columns[0].camel_case_ident()?;
                     quote::quote! {
                         #column_camel_case_ident(#foreign_builder_enum_type::#foreign_column_camel_case_ident)
                     }

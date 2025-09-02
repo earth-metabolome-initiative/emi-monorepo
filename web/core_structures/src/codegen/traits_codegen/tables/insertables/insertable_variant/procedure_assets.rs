@@ -15,16 +15,6 @@ where
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset;

@@ -107,22 +107,25 @@ pub struct InsertableOrganismBuilder<
 }
 /// Trait defining setters for attributes of an instance of `Organism` or
 /// descendant tables.
-pub trait OrganismBuildable:
-    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
-{
+pub trait OrganismBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
 }
-impl OrganismBuildable for Option<::rosetta_uuid::Uuid> {}
+impl<PhysicalAsset> OrganismBuildable for InsertableOrganismBuilder<PhysicalAsset> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttributes;
+}
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
-        >,
-> OrganismBuildable for InsertableOrganismBuilder<PhysicalAsset> {}
-impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetBuildable
-for InsertableOrganismBuilder<PhysicalAsset> {
+for InsertableOrganismBuilder<PhysicalAsset>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttributes;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
@@ -133,28 +136,6 @@ for InsertableOrganismBuilder<PhysicalAsset> {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
                 self.id,
                 id,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.assets.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
             )
             .map_err(|e| {
                 e
@@ -209,7 +190,7 @@ for InsertableOrganismBuilder<PhysicalAsset> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.model_id` column.
+    ///Sets the value of the `public.assets.model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -222,11 +203,11 @@ for InsertableOrganismBuilder<PhysicalAsset> {
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]
-    ///    v0@{shape: rounded, label: "model_id"}
+    ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
     ///subgraph v3 ["`physical_assets`"]
-    ///    v1@{shape: rounded, label: "model_id"}
+    ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
@@ -234,11 +215,11 @@ for InsertableOrganismBuilder<PhysicalAsset> {
     ///```
     fn model(
         self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
             self,
-            model_id,
+            model,
         )
     }
     #[inline]
@@ -332,15 +313,16 @@ impl<
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
 for InsertableOrganismBuilder<PhysicalAsset> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttributes;
     #[inline]
-    ///Sets the value of the `public.physical_assets.model_id` column.
+    ///Sets the value of the `public.physical_assets.model` column.
     fn model(
         mut self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
                 self.id,
-                model_id,
+                model,
             )
             .map_err(|e| {
                 e
@@ -349,6 +331,15 @@ for InsertableOrganismBuilder<PhysicalAsset> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<PhysicalAsset> web_common_traits::database::MostConcreteTable
+    for InsertableOrganismBuilder<PhysicalAsset>
+where
+    PhysicalAsset: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<PhysicalAsset> web_common_traits::prelude::SetPrimaryKey

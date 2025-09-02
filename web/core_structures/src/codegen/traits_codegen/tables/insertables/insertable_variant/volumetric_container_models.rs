@@ -19,9 +19,7 @@ where
     >,
     C: diesel::connection::LoadConnection,
     ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel;
@@ -36,10 +34,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "volumetric_container_models",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("volumetric_container_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel = self
             .try_insert(user_id, conn)?;
         Ok(

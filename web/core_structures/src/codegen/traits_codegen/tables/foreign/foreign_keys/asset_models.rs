@@ -14,10 +14,10 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        if let Some(parent_model_id) = self.parent_model_id {
+        if let Some(parent_model) = self.parent_model {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                    parent_model_id,
+                    parent_model,
                 ),
             ));
         }
@@ -29,7 +29,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        (foreign_keys.parent_model.is_some() || self.parent_model_id.is_some())
+        (foreign_keys.parent_model.is_some() || self.parent_model.is_some())
             && foreign_keys.created_by.is_some()
             && foreign_keys.updated_by.is_some()
     }
@@ -47,10 +47,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self
-                    .parent_model_id
-                    .is_some_and(|parent_model_id| parent_model_id == asset_models.id)
-                {
+                if self.parent_model.is_some_and(|parent_model| parent_model == asset_models.id) {
                     foreign_keys.parent_model = Some(asset_models);
                     updated = true;
                 }
@@ -59,10 +56,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self
-                    .parent_model_id
-                    .is_some_and(|parent_model_id| parent_model_id == asset_models.id)
-                {
+                if self.parent_model.is_some_and(|parent_model| parent_model == asset_models.id) {
                     foreign_keys.parent_model = None;
                     updated = true;
                 }

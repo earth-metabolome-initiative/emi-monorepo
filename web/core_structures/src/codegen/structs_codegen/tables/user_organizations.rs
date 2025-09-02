@@ -13,6 +13,14 @@ pub struct UserOrganization {
 impl web_common_traits::prelude::TableName for UserOrganization {
     const TABLE_NAME: &'static str = "user_organizations";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
+    > for UserOrganization
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i16)>,
+{
+}
 impl diesel::Identifiable for UserOrganization {
     type Id = (i32, i16);
     fn id(self) -> Self::Id {

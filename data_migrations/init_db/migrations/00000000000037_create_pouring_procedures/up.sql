@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS pouring_procedures (
 	-- We enforce that the `measured_with` is indeed a procedure asset.
 	FOREIGN KEY (procedure, measured_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the model of the `measured_with` matches the `measured_with_model`.
-	FOREIGN KEY (measured_with, measured_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (measured_with, measured_with_model) REFERENCES assets(id, model),
 	-- We enforce that the foreign procedure is of the foreign procedure template.
 	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.

@@ -26,6 +26,13 @@ pub struct Team {
 impl web_common_traits::prelude::TableName for Team {
     const TABLE_NAME: &'static str = "teams";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::teams::Team>
+    for Team
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl<C> web_common_traits::prelude::Ancestor<C> for Team
 where
     Self: web_common_traits::prelude::TableName + Sized,
@@ -334,6 +341,16 @@ impl Team {
             .filter(teams::updated_at.eq(updated_at))
             .order_by(teams::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::teams::teams;
+        Self::table().filter(teams::name.eq(name)).order_by(teams::id.asc()).first::<Self>(conn)
     }
 }
 impl AsRef<Team> for Team {

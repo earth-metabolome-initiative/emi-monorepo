@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- We check that the trackable is indeed a descendant of the ancestor trackable defined in the procedure template trackable.
 	FOREIGN KEY (asset_model, ancestor_model) REFERENCES asset_model_ancestors(descendant_model, ancestor_model),
 	-- We check that the specified asset (if any) is indeed of the specified asset model.
-	FOREIGN KEY (asset, asset_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (asset, asset_model) REFERENCES assets(id, model),
 	-- We check that the specified asset (if any) has as parent the specified asset model.
 	PRIMARY KEY (procedure, asset_model),
 	UNIQUE (procedure, asset)

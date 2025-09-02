@@ -414,9 +414,9 @@ pub struct InsertableCentrifugeProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CentrifugeProcedure` or descendant tables.
-pub trait CentrifugeProcedureBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-{
+pub trait CentrifugeProcedureBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.centrifuge_procedures.procedure_template`
     /// column.
     ///
@@ -559,49 +559,12 @@ pub trait CentrifugeProcedureBuildable:
         centrifuged_with: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl CentrifugeProcedureBuildable for Option<::rosetta_uuid::Uuid> {
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure(
-        self,
-        _foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn centrifuged_container(
-        self,
-        _centrifuged_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn centrifuged_with_model(
-        self,
-        _centrifuged_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn centrifuged_with(
-        self,
-        _centrifuged_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > CentrifugeProcedureBuildable for InsertableCentrifugeProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureAttributes;
     ///Sets the value of the `public.centrifuge_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -637,9 +600,10 @@ impl<
                         InsertableCentrifugeProcedureAttributes::ProcedureTemplate,
                     )
             })?;
-        self.procedure = self
-            .procedure
-            .procedure_template(procedure_template)
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+                self.procedure,
+                procedure_template,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
@@ -760,7 +724,12 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-for InsertableCentrifugeProcedureBuilder<Procedure> {
+for InsertableCentrifugeProcedureBuilder<Procedure>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureAttributes;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
@@ -812,28 +781,6 @@ for InsertableCentrifugeProcedureBuilder<Procedure> {
             self,
             procedure_template,
         )
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-                self.procedure,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -918,6 +865,15 @@ for InsertableCentrifugeProcedureBuilder<Procedure> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<Procedure> web_common_traits::database::MostConcreteTable
+    for InsertableCentrifugeProcedureBuilder<Procedure>
+where
+    Procedure: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure.set_most_concrete_table(table_name);
     }
 }
 impl<Procedure> web_common_traits::prelude::SetPrimaryKey

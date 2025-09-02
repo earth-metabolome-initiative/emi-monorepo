@@ -11,7 +11,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
+use crate::{Codegen, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     /// Returns the implementation of the `TryInsert` trait for the insertable
@@ -279,106 +279,32 @@ impl Codegen<'_> {
 
         let mut dependant_tables_completion: Vec<TokenStream> = Vec::new();
 
-        // We retrieve the columns that compose the primary key of the current table.
-        let primary_key_columns = table.primary_key_columns(conn)?;
         // Then, for each column in the primary key, we determine the same-as
         // relationships and complete the dependant tables. It is possible that
         // multiple primary key columns have the same local same-as column attribute,
         // in which case it is needful to group by the foreign keys by the local same-as
         // column.
-        let mut grouped_same_as_columns: HashMap<Column, Vec<(&Column, Column)>> = HashMap::new();
-        for primary_key_column in &primary_key_columns {
-            for same_as_constraint in primary_key_column.same_as_constraints(conn)? {
-                let local_columns = same_as_constraint.columns(conn)?;
-                let foreign_table = same_as_constraint.foreign_table(conn)?.unwrap();
+        for (partial_builder_column, constraint) in table.partial_builder_columns(conn)? {
+            let foreign_table = constraint.foreign_table(conn)?.unwrap();
 
-                if !try_insert_generic_constraint.contains(&foreign_table) {
-                    let foreign_builder = foreign_table.insertable_builder_ty()?;
-                    let foreign_attributes = foreign_table.insertable_enum_ty()?;
-                    let foreign_table_primary_key_type = foreign_table.primary_key_type(conn)?;
-                    additional_where_requirements.push(quote! {
-                        #foreign_builder: web_common_traits::database::TryInsertGeneric<
-                            C,
-                            Attributes = #foreign_attributes,
-                            PrimaryKey = #foreign_table_primary_key_type
-                        >
-                    });
-                    try_insert_generic_constraint.insert(foreign_table);
-                }
-
-                assert_eq!(
-                    local_columns.len(),
-                    2,
-                    "The same-as constraint should have exactly two columns"
-                );
-
-                let foreign_columns = same_as_constraint.foreign_columns(conn)?;
-
-                assert_eq!(
-                    foreign_columns.len(),
-                    2,
-                    "The same-as constraint should have exactly two foreign columns"
-                );
-
-                // We find the foreign column which should be set to the primary key
-                // column of the current table.
-                let associated_foreign_column = foreign_columns
-                    .into_iter()
-                    .zip(local_columns.iter())
-                    .find(|(_, local_column)| {
-                        local_column == &primary_key_column
-                    })
-                    .expect("The same-as constraint should contain the primary key column and another column")
-                    .0;
-
-                // One of the columns is the primary key column, the other is the
-                // column attribute meant to contain the foreign primary key of the
-                // dependant table.
-                let local_column = local_columns.into_iter().find(|col| {
-                    col != primary_key_column
-                }).expect("The same-as constraint should contain the primary key column and another column");
-
-                // If the local column is not a partial builder foreign key,
-                // we can ignore it.
-                if !local_column.requires_partial_builder(conn)?.is_some() {
-                    continue;
-                }
-
-                grouped_same_as_columns
-                    .entry(local_column)
-                    .or_default()
-                    .push((primary_key_column, associated_foreign_column));
-            }
-        }
-
-        let mut grouped_same_as_columns = grouped_same_as_columns.into_iter().collect::<Vec<_>>();
-        let mut maybe_mut = None;
-
-        grouped_same_as_columns.sort_unstable();
-
-        // Now we iterate over the grouped same-as columns and generate
-        // the completion code for each foreign table.
-        for (local_column, same_as_columns) in grouped_same_as_columns {
-            let mut completion_assignments: Vec<TokenStream> = Vec::new();
-            let camel_cased_column_ident = local_column.camel_case_ident()?;
-            let local_column_ident = local_column.snake_case_ident()?;
-            for (primary_key_column, associated_foreign_column) in same_as_columns {
-                let primary_key_column_ident = primary_key_column.snake_case_ident()?;
-                let associated_foreign_column_ident = associated_foreign_column.getter_ident()?;
-                let foreign_table = associated_foreign_column.table(conn)?;
-                let foreign_table_builder_trait = foreign_table.builder_trait_ty()?;
-                maybe_mut = Some(quote! {mut});
-                completion_assignments.push(quote! {
-                    self.#local_column_ident = #foreign_table_builder_trait::#associated_foreign_column_ident(
-                        self.#local_column_ident,
-                        #primary_key_column_ident
-                    ).map_err(|err| {
-                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
-                    })?;
+            if !try_insert_generic_constraint.contains(&foreign_table) {
+                let foreign_builder = foreign_table.insertable_builder_ty()?;
+                let foreign_attributes = foreign_table.insertable_enum_ty()?;
+                let foreign_table_primary_key_type = foreign_table.primary_key_type(conn)?;
+                additional_where_requirements.push(quote! {
+                    #foreign_builder: web_common_traits::database::TryInsertGeneric<
+                        C,
+                        Attributes = #foreign_attributes,
+                        PrimaryKey = #foreign_table_primary_key_type
+                    >
                 });
+                try_insert_generic_constraint.insert(foreign_table);
             }
+
+            let local_column_ident = partial_builder_column.snake_case_ident()?;
+            let camel_cased_column_ident = partial_builder_column.camel_case_ident()?;
+
             dependant_tables_completion.push(quote! {
-                #(#completion_assignments)*
                 let #local_column_ident = self.#local_column_ident
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
@@ -402,7 +328,7 @@ impl Codegen<'_> {
         Ok((
             quote! {
                 fn try_insert(
-                    #maybe_mut self,
+                    self,
                     #user_id_ident: #user_id_type,
                     #conn_ident: &mut C
                 ) -> Result<
@@ -467,12 +393,6 @@ impl Codegen<'_> {
             for parent_key in table.parent_keys(conn)? {
                 let parent_key_method = parent_key.constraint_ident(conn)?;
                 let parent_table = parent_key.foreign_table(conn)?.expect("Parent table not found");
-
-                // If the parent table must be inserted alongside the current table,
-                // there is no need to check if the user can update it.
-                if table.must_be_inserted_alongside_with(&parent_table, conn)? {
-                    continue;
-                }
 
                 if !parent_table.allows_updatable(conn)? {
                     continue;
@@ -550,22 +470,19 @@ impl Codegen<'_> {
             let maybe_right_generics =
                 if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };
 
-            let mut maybe_mut = None;
+            let mut maybe_mut: Option<TokenStream> = None;
             let maybe_complete_most_concrete_table =
-                if let Some(most_concrete_column) = table.most_concrete_table_column(true, conn)? {
-                    let root_table = most_concrete_column.table(conn)?;
-                    let root_table_trait = root_table.builder_trait_ty()?;
+                if table.has_most_concrete_table_column(true, conn)? {
                     let current_table_name = table.table_name.clone();
-                    let most_concrete_column_setter = most_concrete_column.getter_ident()?;
                     maybe_mut = Some(quote! {mut});
                     additional_where_clause.push(quote! {
-                        Self: #root_table_trait<Attributes = #attributes_enum>
+                        Self: web_common_traits::database::MostConcreteTable
+                    });
+                    additional_imports.push(quote! {
+                        use web_common_traits::database::MostConcreteTable;
                     });
                     Some(quote! {
-                        self = <Self as #root_table_trait>::#most_concrete_column_setter(
-                            self,
-                            #current_table_name
-                        )?;
+                        self.set_most_concrete_table(#current_table_name);
                     })
                 } else {
                     None

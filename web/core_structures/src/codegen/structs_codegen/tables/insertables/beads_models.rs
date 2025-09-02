@@ -119,9 +119,9 @@ pub struct InsertableBeadsModelBuilder<
 }
 /// Trait defining setters for attributes of an instance of `BeadsModel` or
 /// descendant tables.
-pub trait BeadsModelBuildable:
-    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
-{
+pub trait BeadsModelBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.beads_models.diameter_millimeters` column.
     ///
     /// # Arguments
@@ -148,24 +148,10 @@ pub trait BeadsModelBuildable:
         DM: TryInto<f32>,
         validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>;
 }
-impl BeadsModelBuildable for Option<i32> {
-    fn diameter_millimeters<DM>(
-        self,
-        _diameter_millimeters: DM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        DM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-}
-impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
-        >,
-> BeadsModelBuildable for InsertableBeadsModelBuilder<PhysicalAssetModel> {
-    ///Sets the value of the `public.beads_models.diameter_millimeters` column.
+impl<PhysicalAssetModel> BeadsModelBuildable for InsertableBeadsModelBuilder<PhysicalAssetModel> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableBeadsModelAttributes;
+    /// Sets the value of the `public.beads_models.diameter_millimeters` column.
     fn diameter_millimeters<DM>(
         mut self,
         diameter_millimeters: DM,
@@ -174,12 +160,10 @@ impl<
         DM: TryInto<f32>,
         validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
     {
-        let diameter_millimeters = diameter_millimeters
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableBeadsModelAttributes::DiameterMillimeters)
-            })?;
+        let diameter_millimeters = diameter_millimeters.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableBeadsModelAttributes::DiameterMillimeters)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(diameter_millimeters)
             .map_err(|e| {
                 e
@@ -192,34 +176,17 @@ impl<
     }
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
-for InsertableBeadsModelBuilder<PhysicalAssetModel> {
+for InsertableBeadsModelBuilder<PhysicalAssetModel>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadsModelAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadsModelAttributes;
-    #[inline]
-    ///Sets the value of the `public.asset_models.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -265,7 +232,7 @@ for InsertableBeadsModelBuilder<PhysicalAssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.parent_model_id` column.
+    ///Sets the value of the `public.asset_models.parent_model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -278,11 +245,11 @@ for InsertableBeadsModelBuilder<PhysicalAssetModel> {
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model_id"}
+    ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
     ///subgraph v3 ["`physical_asset_models`"]
-    ///    v1@{shape: rounded, label: "parent_model_id"}
+    ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
@@ -290,11 +257,11 @@ for InsertableBeadsModelBuilder<PhysicalAssetModel> {
     ///```
     fn parent_model(
         self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
             self,
-            parent_model_id,
+            parent_model,
         )
     }
     #[inline]
@@ -388,15 +355,16 @@ impl<
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
 for InsertableBeadsModelBuilder<PhysicalAssetModel> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadsModelAttributes;
     #[inline]
-    ///Sets the value of the `public.physical_asset_models.parent_model_id` column.
+    ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
         mut self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
                 self.id,
-                parent_model_id,
+                parent_model,
             )
             .map_err(|e| {
                 e
@@ -405,6 +373,15 @@ for InsertableBeadsModelBuilder<PhysicalAssetModel> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<PhysicalAssetModel> web_common_traits::database::MostConcreteTable
+    for InsertableBeadsModelBuilder<PhysicalAssetModel>
+where
+    PhysicalAssetModel: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<PhysicalAssetModel> web_common_traits::prelude::SetPrimaryKey

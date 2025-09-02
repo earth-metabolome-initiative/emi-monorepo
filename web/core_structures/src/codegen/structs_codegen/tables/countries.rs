@@ -17,13 +17,35 @@ pub struct Country {
 impl web_common_traits::prelude::TableName for Country {
     const TABLE_NAME: &'static str = "countries";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::countries::Country,
+    > for Country
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::iso_codes::CountryCode>,
+{
+}
 impl diesel::Identifiable for Country {
     type Id = ::iso_codes::CountryCode;
     fn id(self) -> Self::Id {
         self.iso
     }
 }
-impl Country {}
+impl Country {
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::countries::countries;
+        Self::table()
+            .filter(countries::name.eq(name))
+            .order_by(countries::iso.asc())
+            .first::<Self>(conn)
+    }
+}
 impl AsRef<Country> for Country {
     fn as_ref(&self) -> &Country {
         self

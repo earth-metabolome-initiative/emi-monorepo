@@ -1,12 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to pipettes.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt,
-    trackables::instruments::pipettes::{pipette_200ul, pipette_1000ul},
+    asset_models::instruments::pipettes::{pipette_200ul, pipette_1000ul},
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a pipettes 1000ul trackable.
@@ -23,7 +23,7 @@ pub(crate) fn pipette_1000ul_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, pipette_1000ul(user, conn)?.id(conn)?)
+    default_pmt(user, pipette_1000ul(user, conn)?.id(conn)?.id(conn)?)
 }
 
 /// Returns a partial builder for a pipettes 200ul trackable.
@@ -40,5 +40,5 @@ pub(crate) fn pipette_200ul_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, pipette_200ul(user, conn)?.id(conn)?)
+    default_pmt(user, pipette_200ul(user, conn)?.id(conn)?.id(conn)?)
 }

@@ -12,7 +12,7 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::containers::containers)]
 pub struct Container {
     pub id: ::rosetta_uuid::Uuid,
-    pub container_model_id: i32,
+    pub container_model: i32,
 }
 impl web_common_traits::prelude::TableName for Container {
     const TABLE_NAME: &'static str = "containers";
@@ -28,6 +28,14 @@ where
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for Container
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::containers::Container,
     > for Container
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -99,28 +107,28 @@ impl Container {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.container_model_id,
+                self.container_model,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_model_id(
-        container_model_id: &i32,
+    pub fn from_container_model(
+        container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
-            .filter(containers::container_model_id.eq(container_model_id))
+            .filter(containers::container_model.eq(container_model))
             .order_by(containers::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_container_model_id(
+    pub fn from_id_and_container_model(
         id: &::rosetta_uuid::Uuid,
-        container_model_id: &i32,
+        container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -129,15 +137,13 @@ impl Container {
 
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
-            .filter(
-                containers::id.eq(id).and(containers::container_model_id.eq(container_model_id)),
-            )
+            .filter(containers::id.eq(id).and(containers::container_model.eq(container_model)))
             .order_by(containers::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id(
-        model_id: &i32,
+    pub fn from_model(
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -150,14 +156,32 @@ impl Container {
         };
         Self::table()
             .inner_join(physical_assets::table.on(containers::id.eq(physical_assets::id)))
-            .filter(physical_assets::model_id.eq(model_id))
+            .filter(physical_assets::model.eq(model))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id_and_id(
-        model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
+        Self::table()
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(containers::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -169,7 +193,7 @@ impl Container {
         use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
         Self::table()
             .inner_join(assets::table.on(containers::id.eq(assets::id)))
-            .filter(assets::model_id.eq(model_id).and(assets::id.eq(id)))
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

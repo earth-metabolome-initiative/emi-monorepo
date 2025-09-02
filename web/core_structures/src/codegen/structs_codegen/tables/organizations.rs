@@ -24,6 +24,14 @@ pub struct Organization {
 impl web_common_traits::prelude::TableName for Organization {
     const TABLE_NAME: &'static str = "organizations";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+    > for Organization
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Organization {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -82,6 +90,32 @@ impl Organization {
             .filter(organizations::state_province.eq(state_province))
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_url(
+        url: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::url.eq(url))
+            .order_by(organizations::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_domain(
+        domain: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::organizations::organizations;
+        Self::table()
+            .filter(organizations::domain.eq(domain))
+            .order_by(organizations::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<Organization> for Organization {

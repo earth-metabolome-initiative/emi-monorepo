@@ -199,7 +199,7 @@ impl Default for InsertableRoomBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Room` or descendant
 /// tables.
-pub trait RoomBuildable: std::marker::Sized {
+pub trait RoomBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.rooms.name` column.
@@ -425,91 +425,6 @@ pub trait RoomBuildable: std::marker::Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-}
-impl RoomBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn qrcode<Q>(
-        self,
-        _qrcode: Q,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        Q: TryInto<::rosetta_uuid::Uuid>,
-        validation_errors::SingleFieldError: From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>,
-    {
-        Ok(self)
-    }
-    fn addresses(
-        self,
-        _addresses_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn geolocation<G>(
-        self,
-        _geolocation: G,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
-            From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
-    {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl RoomBuildable for InsertableRoomBuilder {
     type Attributes =

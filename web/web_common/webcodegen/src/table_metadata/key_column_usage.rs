@@ -495,25 +495,22 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
-        let foreign_table = self.foreign_table(conn)?;
+        let Some(foreign_table) = self.foreign_table(conn)? else {
+            return Ok(None);
+        };
         let foreign_columns = self.foreign_columns(conn)?;
 
-        if let Some(foreign_table) = foreign_table {
-            // Check if the foreign table has a unique key constraint
-            let unique_constraints = foreign_table.unique_indices(conn)?;
-            for unique_constraint in unique_constraints {
-                // Check if the foreign columns match the unique constraint columns
-                let unique_columns = unique_constraint.columns(conn)?;
-                if unique_columns.len() == foreign_columns.len()
-                    && unique_columns.iter().all(|c| foreign_columns.contains(c))
-                {
-                    return Ok(Some(unique_constraint));
-                }
+        // Check if the foreign table has a unique key constraint
+        for unique_constraint in foreign_table.unique_indices(conn)? {
+            // Check if the foreign columns match the unique constraint columns
+            let unique_columns = unique_constraint.columns(conn)?;
+            if unique_columns.len() == foreign_columns.len()
+                && unique_columns.iter().all(|c| foreign_columns.contains(c))
+            {
+                return Ok(Some(unique_constraint));
             }
-            Ok(None)
-        } else {
-            Ok(None)
         }
+        Ok(None)
     }
 
     /// Returns whether this key column usage defines an extension.
@@ -696,13 +693,13 @@ impl KeyColumnUsage {
             return Ok(None);
         };
 
-        if foreign_unique_constraint.is_same_as(conn)?.is_some() {
+        Ok(if foreign_unique_constraint.is_same_as(conn)?.is_some() {
             // If the foreign unique constraint is a same-as constraint, we return it
-            Ok(Some(foreign_unique_constraint))
+            Some(foreign_unique_constraint)
         } else {
             // Otherwise, we return None
-            Ok(None)
-        }
+            None
+        })
     }
 
     /// Returns whether this key column usage is an ancestral same-as
@@ -761,6 +758,55 @@ impl KeyColumnUsage {
         let table = self.table(conn)?;
 
         if table.is_extending(&foreign_table, conn)? {
+            return Ok(None);
+        }
+
+        self.is_same_as_constraint(conn)
+    }
+
+    /// Returns whether this key column usage is a partial builder
+    /// same-as constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_partial_builder_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
+        if !self.includes_local_primary_key(conn)? {
+            return Ok(None);
+        }
+
+        let Some(foreign_table) = self.foreign_table(conn)? else {
+            return Ok(None);
+        };
+
+        let table = self.table(conn)?;
+        let ancestors = table.ancestral_extension_tables(conn)?;
+
+        if ancestors.contains(&foreign_table) {
+            return Ok(None);
+        }
+
+        // If the foreign table has a foreign key to an ancestor
+        // of the current table.
+        let mut found_foreign_reference = false;
+        for foreign_key in foreign_table.foreign_keys(conn)? {
+            let Some(foreign_key_table) = foreign_key.foreign_table(conn)? else {
+                continue;
+            };
+            if ancestors.contains(&foreign_key_table) {
+                found_foreign_reference = true;
+                break;
+            }
+        }
+
+        if !found_foreign_reference {
             return Ok(None);
         }
 

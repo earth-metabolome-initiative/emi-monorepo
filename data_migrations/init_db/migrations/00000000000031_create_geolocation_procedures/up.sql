@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS geolocation_procedures (
 	-- And that the `geolocated_with` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, geolocated_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `geolocated_with` is indeed a weighing device of the correct model.
-	FOREIGN KEY (geolocated_with, geolocated_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (geolocated_with, geolocated_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES geolocation_procedure_templates(procedure_template, foreign_procedure_template)
 );

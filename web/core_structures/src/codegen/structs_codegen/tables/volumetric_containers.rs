@@ -14,7 +14,7 @@
 )]
 pub struct VolumetricContainer {
     pub id: ::rosetta_uuid::Uuid,
-    pub volumetric_container_model_id: i32,
+    pub volumetric_container_model: i32,
 }
 impl web_common_traits::prelude::TableName for VolumetricContainer {
     const TABLE_NAME: &'static str = "volumetric_containers";
@@ -38,6 +38,14 @@ where
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for VolumetricContainer
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     > for VolumetricContainer
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -109,14 +117,14 @@ impl VolumetricContainer {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.volumetric_container_model_id,
+                self.volumetric_container_model,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_volumetric_container_model_id(
-        volumetric_container_model_id: &i32,
+    pub fn from_volumetric_container_model(
+        volumetric_container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -124,16 +132,15 @@ impl VolumetricContainer {
         use crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers;
         Self::table()
             .filter(
-                volumetric_containers::volumetric_container_model_id
-                    .eq(volumetric_container_model_id),
+                volumetric_containers::volumetric_container_model.eq(volumetric_container_model),
             )
             .order_by(volumetric_containers::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_volumetric_container_model_id(
+    pub fn from_id_and_volumetric_container_model(
         id: &::rosetta_uuid::Uuid,
-        volumetric_container_model_id: &i32,
+        volumetric_container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -142,18 +149,15 @@ impl VolumetricContainer {
 
         use crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers;
         Self::table()
-            .filter(
-                volumetric_containers::id.eq(id).and(
-                    volumetric_containers::volumetric_container_model_id
-                        .eq(volumetric_container_model_id),
-                ),
-            )
+            .filter(volumetric_containers::id.eq(id).and(
+                volumetric_containers::volumetric_container_model.eq(volumetric_container_model),
+            ))
             .order_by(volumetric_containers::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_model_id(
-        container_model_id: &i32,
+    pub fn from_container_model(
+        container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -166,14 +170,14 @@ impl VolumetricContainer {
         };
         Self::table()
             .inner_join(containers::table.on(volumetric_containers::id.eq(containers::id)))
-            .filter(containers::container_model_id.eq(container_model_id))
+            .filter(containers::container_model.eq(container_model))
             .order_by(volumetric_containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id(
-        model_id: &i32,
+    pub fn from_model(
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -188,14 +192,34 @@ impl VolumetricContainer {
             .inner_join(
                 physical_assets::table.on(volumetric_containers::id.eq(physical_assets::id)),
             )
-            .filter(physical_assets::model_id.eq(model_id))
+            .filter(physical_assets::model.eq(model))
             .order_by(volumetric_containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id_and_id(
-        model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            assets::assets, volumetric_containers::volumetric_containers,
+        };
+        Self::table()
+            .inner_join(assets::table.on(volumetric_containers::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(volumetric_containers::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -209,7 +233,7 @@ impl VolumetricContainer {
         };
         Self::table()
             .inner_join(assets::table.on(volumetric_containers::id.eq(assets::id)))
-            .filter(assets::model_id.eq(model_id).and(assets::id.eq(id)))
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
             .order_by(volumetric_containers::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

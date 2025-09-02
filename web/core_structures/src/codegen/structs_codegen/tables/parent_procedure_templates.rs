@@ -25,6 +25,12 @@ pub struct ParentProcedureTemplate {
 impl web_common_traits::prelude::TableName for ParentProcedureTemplate {
     const TABLE_NAME: &'static str = "parent_procedure_templates";
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+> for ParentProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{}
 impl diesel::Identifiable for ParentProcedureTemplate {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {

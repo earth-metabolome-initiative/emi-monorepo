@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS storage_procedure_templates (
 		stored_asset_model
 	) REFERENCES procedure_template_asset_models(id, asset_model),
 	-- We check that the `stored_into_model` is indeed a container that can hold the `stored_asset_model`.
-	CONSTRAINT storage_pm_compatibility_rules FOREIGN KEY (stored_into_model, stored_asset_model) REFERENCES container_compatibility_rules(container_model_id, contained_asset_model),
+	CONSTRAINT storage_pm_compatibility_rules FOREIGN KEY (stored_into_model, stored_asset_model) REFERENCES container_compatibility_rules(container_model, contained_asset_model),
 	-- We create a same-as index to allow for foreign key references to check whether a `storage_procedure_template`
 	-- is associated with a given `storage_foreign_procedure_template`.
 	UNIQUE (procedure_template, foreign_procedure_template)

@@ -25,9 +25,37 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
     >,
+    <<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+    >,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel;
@@ -42,12 +70,24 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "phone_models",
-        )?;
+        use web_common_traits::database::Updatable;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("phone_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel = self
             .try_insert(user_id, conn)?;
+        if !insertable_struct.phone_models_camera(conn)?.can_update(user_id, conn)? {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct.phone_models_positioning(conn)?.can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)

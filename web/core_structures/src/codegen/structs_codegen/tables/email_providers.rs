@@ -13,6 +13,14 @@ pub struct EmailProvider {
 impl web_common_traits::prelude::TableName for EmailProvider {
     const TABLE_NAME: &'static str = "email_providers";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
+    > for EmailProvider
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i16)>,
+{
+}
 impl diesel::Identifiable for EmailProvider {
     type Id = (i32, i16);
     fn id(self) -> Self::Id {

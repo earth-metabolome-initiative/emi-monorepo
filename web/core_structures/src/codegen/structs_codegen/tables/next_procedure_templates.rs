@@ -22,6 +22,14 @@ pub struct NextProcedureTemplate {
 impl web_common_traits::prelude::TableName for NextProcedureTemplate {
     const TABLE_NAME: &'static str = "next_procedure_templates";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
+    > for NextProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32, i32)>,
+{
+}
 impl diesel::Identifiable for NextProcedureTemplate {
     type Id = (i32, i32, i32);
     fn id(self) -> Self::Id {

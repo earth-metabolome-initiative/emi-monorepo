@@ -1,6 +1,6 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
-use core_structures::{ProcedureTemplate, User};
+use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateBuildable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 

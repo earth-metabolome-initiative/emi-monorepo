@@ -42,11 +42,11 @@ where
         _user_id: i32,
         _conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let container_model_id = self
-            .container_model_id
+        let container_model = self
+            .container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
                 ),
             )?;
         let contained_asset_model = self
@@ -71,7 +71,7 @@ where
                 ),
             )?;
         Ok(Self::InsertableVariant {
-            container_model_id,
+            container_model,
             contained_asset_model,
             quantity: self.quantity,
             created_by,

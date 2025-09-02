@@ -78,7 +78,7 @@ pub struct InsertableCityBuilder {
 }
 /// Trait defining setters for attributes of an instance of `City` or descendant
 /// tables.
-pub trait CityBuildable: std::marker::Sized {
+pub trait CityBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.cities.name` column.
@@ -128,26 +128,6 @@ pub trait CityBuildable: std::marker::Sized {
         self,
         iso: ::iso_codes::CountryCode,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl CityBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCityAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn iso(
-        self,
-        _iso: ::iso_codes::CountryCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl CityBuildable for InsertableCityBuilder {
     type Attributes =

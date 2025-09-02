@@ -19,7 +19,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::DigitalAssetModel(
-                self.model_id,
+                self.model,
             ),
         ));
     }
@@ -60,7 +60,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.model_id == digital_asset_models.id {
+                if self.model == digital_asset_models.id {
                     foreign_keys.model = Some(digital_asset_models);
                     updated = true;
                 }
@@ -69,7 +69,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::DigitalAssetModel(digital_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.model_id == digital_asset_models.id {
+                if self.model == digital_asset_models.id {
                     foreign_keys.model = None;
                     updated = true;
                 }

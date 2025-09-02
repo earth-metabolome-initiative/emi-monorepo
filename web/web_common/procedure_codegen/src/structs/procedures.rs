@@ -11,7 +11,7 @@ use crate::{
 /// The name of the procedure table.
 pub const PROCEDURES_TABLE_NAME: &str = "procedures";
 
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
 /// Struct representing a procedure table.
 pub(crate) struct Procedure {
     /// The underlying table.
@@ -44,50 +44,19 @@ fn procedure_template_foreign_key(
         return Ok(None);
     }
 
-    let primary_key_columns = procedure_table.primary_key_columns(conn)?;
-
-    if primary_key_columns.len() != 1 {
-        return Err(ProcedureError::NotAProcedureTable(Box::new(procedure_table.clone())).into());
-    }
-
-    let primary_key_column = &primary_key_columns[0];
-
-    for foreign_key in procedure_table.foreign_keys(conn)? {
-        let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-            continue;
-        };
-        // If the foreign table is not a procedure template table, continue searching.
-        if ProcedureTemplate::must_be_procedure_template_table(&foreign_table, conn).is_err() {
-            continue;
-        }
-
-        // If the foreign key has more than one column, continue searching.
+    for foreign_key in procedure_table.ancestral_same_as_foreign_keys(conn)? {
         let local_columns = foreign_key.columns(conn)?;
-        if local_columns.len() != 1 {
-            continue;
-        }
-
-        let local_column = &local_columns[0];
-
-        // For the local column, there must exist a same-as relationship with the
-        // primary key column which links to the procedure table: (procedure,
-        // procedure_template).
-        for same_as_constraint in local_column.same_as_constraints(conn)? {
-            let Some(foreign_table) = same_as_constraint.foreign_table(conn)? else {
+        assert_eq!(local_columns.len(), 2);
+        for foreign_key in local_columns[1].foreign_primary_keys(conn)? {
+            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
                 continue;
             };
-            if foreign_table.table_name != PROCEDURES_TABLE_NAME {
-                continue;
-            }
-            let columns = same_as_constraint.columns(conn)?;
-            if columns.len() != 2 {
-                continue;
-            }
-            if &columns[0] == primary_key_column && &columns[1] == local_column {
+            if ProcedureTemplate::from_table(foreign_table.clone(), conn).is_ok() {
                 return Ok(Some(foreign_key));
             }
         }
     }
+
     Err(ProcedureError::NotAProcedureTable(Box::new(procedure_table.clone())).into())
 }
 
@@ -117,8 +86,7 @@ impl Procedure {
             return Ok(());
         }
 
-        let procedure =
-            Table::load(conn, PROCEDURES_TABLE_NAME, "public", &table.table_catalog)?;
+        let procedure = Table::load(conn, PROCEDURES_TABLE_NAME, "public", &table.table_catalog)?;
 
         if !table.is_extending(&procedure, conn)? {
             return Err(ProcedureError::NotAProcedureTable(Box::new(table.clone())).into());
@@ -170,7 +138,7 @@ impl Procedure {
                     &self.table.table_catalog,
                 )?
             },
-            conn
+            conn,
         )
     }
 

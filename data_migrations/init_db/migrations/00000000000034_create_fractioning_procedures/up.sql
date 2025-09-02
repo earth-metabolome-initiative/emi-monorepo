@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS fractioning_procedures (
 	-- And that the `weighed_with` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, weighed_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `weighed_with` is indeed a weighing device of the correct model.
-	FOREIGN KEY (weighed_with, weighed_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (weighed_with, weighed_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES fractioning_procedure_templates(procedure_template, foreign_procedure_template)
 );

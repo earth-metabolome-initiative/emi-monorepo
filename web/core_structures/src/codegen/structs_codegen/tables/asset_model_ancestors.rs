@@ -13,6 +13,14 @@ pub struct AssetModelAncestor {
 impl web_common_traits::prelude::TableName for AssetModelAncestor {
     const TABLE_NAME: &'static str = "asset_model_ancestors";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    > for AssetModelAncestor
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{
+}
 impl diesel::Identifiable for AssetModelAncestor {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {

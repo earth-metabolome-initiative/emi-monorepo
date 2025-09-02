@@ -20,6 +20,14 @@ pub struct TemporaryUser {
 impl web_common_traits::prelude::TableName for TemporaryUser {
     const TABLE_NAME: &'static str = "temporary_user";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
+    > for TemporaryUser
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for TemporaryUser {
     type Id = i32;
     fn id(self) -> Self::Id {

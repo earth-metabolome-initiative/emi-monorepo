@@ -20,6 +20,14 @@ pub struct UserEmail {
 impl web_common_traits::prelude::TableName for UserEmail {
     const TABLE_NAME: &'static str = "user_emails";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail,
+    > for UserEmail
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for UserEmail {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -97,6 +105,19 @@ impl UserEmail {
             .filter(user_emails::primary_email.eq(primary_email))
             .order_by(user_emails::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_email(
+        email: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::email.eq(email))
+            .order_by(user_emails::id.asc())
+            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_email_and_created_by(

@@ -1,12 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to centrifuges.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt,
-    trackables::instruments::centrifuge::safelock_centrifuge,
+    asset_models::instruments::centrifuge::safelock_centrifuge,
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a safelock centrifuge trackable.
@@ -23,5 +23,5 @@ pub(crate) fn safelock_centrifuge_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, safelock_centrifuge(user, conn)?.id(conn)?)
+    default_pmt(user, safelock_centrifuge(user, conn)?.id(conn)?.id(conn)?)
 }

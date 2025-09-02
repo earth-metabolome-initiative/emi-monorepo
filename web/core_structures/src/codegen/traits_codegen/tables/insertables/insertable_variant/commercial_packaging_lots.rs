@@ -25,14 +25,7 @@ where
         PrimaryKey = i32,
     >,
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
-        PrimaryKey = i32,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLotAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLot;
@@ -47,10 +40,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "commercial_packaging_lots",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_packaging_lots");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLot = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -64,11 +55,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let product_model_id = self
-            .product_model_id
+        let product_model = self
+            .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLotAttributes::ProductModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLotAttributes::ProductModel,
                 ),
             )?;
         let id = if self.commercial_packaging_lots_id_fkey.is_complete() {
@@ -120,7 +111,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            product_model_id,
+            product_model,
         })
     }
 }

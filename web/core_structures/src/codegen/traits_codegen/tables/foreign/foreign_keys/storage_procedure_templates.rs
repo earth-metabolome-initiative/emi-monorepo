@@ -115,7 +115,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.stored_into_model
-                    == container_compatibility_rules.container_model_id
+                    == container_compatibility_rules.container_model
                     && self.stored_asset_model
                         == container_compatibility_rules.contained_asset_model
                 {
@@ -132,7 +132,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.stored_into_model
-                    == container_compatibility_rules.container_model_id
+                    == container_compatibility_rules.container_model
                     && self.stored_asset_model
                         == container_compatibility_rules.contained_asset_model
                 {

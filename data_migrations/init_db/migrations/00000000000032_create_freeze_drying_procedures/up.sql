@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedures (
 	-- And that the `freeze_dryed_with` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, freeze_dryed_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `freeze_dryed_with` is indeed a weighing device of the correct model.
-	FOREIGN KEY (freeze_dryed_with, freeze_dryed_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (freeze_dryed_with, freeze_dryed_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES freeze_drying_procedure_templates(procedure_template, foreign_procedure_template)
 );

@@ -25,14 +25,22 @@ where
         PrimaryKey = i32,
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
-        PrimaryKey = i32,
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot;
@@ -47,12 +55,20 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "commercial_freezer_lots",
-        )?;
+        use web_common_traits::database::Updatable;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_freezer_lots");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot = self
             .try_insert(user_id, conn)?;
+        if !insertable_struct
+            .commercial_freezer_lots_id_fkey1(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -64,11 +80,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let product_model_id = self
-            .product_model_id
+        let product_model = self
+            .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::ProductModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::ProductModel,
                 ),
             )?;
         let id = if self.commercial_freezer_lots_id_fkey.is_complete() {
@@ -120,7 +136,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            product_model_id,
+            product_model,
         })
     }
 }

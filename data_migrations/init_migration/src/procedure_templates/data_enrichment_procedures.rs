@@ -8,7 +8,7 @@ use core_structures::{
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 mod weather_retrieval_procedure;
-
+use core_structures::tables::insertables::ProcedureTemplateBuildable;
 const DATA_ENRICHMENT_PROCEDURES: &str = "Data Enrichment Procedure";
 
 /// Initializes the sample collection procedures in the database.
@@ -45,7 +45,7 @@ pub(crate) fn init_data_enrichment_procedure(
 
     data_enrichment_procedure.child(
         &weather_retrieval_procedure,
-        ChildOptions::default().inherit_trackables(),
+        ChildOptions::default().inherit_asset_models(),
         user,
         conn,
     )?;

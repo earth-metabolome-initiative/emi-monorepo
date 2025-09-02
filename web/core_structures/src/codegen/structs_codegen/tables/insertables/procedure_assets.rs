@@ -357,7 +357,7 @@ impl Default for InsertableProcedureAssetBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ProcedureAsset` or
 /// descendant tables.
-pub trait ProcedureAssetBuildable: std::marker::Sized {
+pub trait ProcedureAssetBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedure_assets.procedure` column.

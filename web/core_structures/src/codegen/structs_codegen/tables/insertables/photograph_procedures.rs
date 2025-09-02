@@ -413,9 +413,9 @@ pub struct InsertablePhotographProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `PhotographProcedure` or descendant tables.
-pub trait PhotographProcedureBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-{
+pub trait PhotographProcedureBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.photograph_procedures.procedure_template`
     /// column.
     ///
@@ -558,49 +558,12 @@ pub trait PhotographProcedureBuildable:
         photographed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl PhotographProcedureBuildable for Option<::rosetta_uuid::Uuid> {
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure(
-        self,
-        _foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn photographed_asset(
-        self,
-        _photographed_asset: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn photographed_with(
-        self,
-        _photographed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn photographed_with_model(
-        self,
-        _photographed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > PhotographProcedureBuildable for InsertablePhotographProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes;
     ///Sets the value of the `public.photograph_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -636,9 +599,10 @@ impl<
                         InsertablePhotographProcedureAttributes::ProcedureTemplate,
                     )
             })?;
-        self.procedure = self
-            .procedure
-            .procedure_template(procedure_template)
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+                self.procedure,
+                procedure_template,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
@@ -759,7 +723,12 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-for InsertablePhotographProcedureBuilder<Procedure> {
+for InsertablePhotographProcedureBuilder<Procedure>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::PhotographProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
@@ -811,28 +780,6 @@ for InsertablePhotographProcedureBuilder<Procedure> {
             self,
             procedure_template,
         )
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-                self.procedure,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -917,6 +864,15 @@ for InsertablePhotographProcedureBuilder<Procedure> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<Procedure> web_common_traits::database::MostConcreteTable
+    for InsertablePhotographProcedureBuilder<Procedure>
+where
+    Procedure: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure.set_most_concrete_table(table_name);
     }
 }
 impl<Procedure> web_common_traits::prelude::SetPrimaryKey

@@ -25,14 +25,7 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
-        PrimaryKey = i32,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsLotAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsLot;
@@ -47,10 +40,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "commercial_beads_lots",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_beads_lots");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsLot = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -64,11 +55,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let product_model_id = self
-            .product_model_id
+        let product_model = self
+            .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsLotAttributes::ProductModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsLotAttributes::ProductModel,
                 ),
             )?;
         let id = if self.commercial_beads_lots_id_fkey1.is_complete() {
@@ -120,7 +111,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            product_model_id,
+            product_model,
         })
     }
 }

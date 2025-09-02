@@ -8,10 +8,7 @@
 use sqlparser::ast::CascadeOption;
 use webcodegen::{ConstraintError, CustomColumnConstraint};
 
-use crate::{
-    Procedure, ProcedureTemplate, is_in_same_as_with_primary_key,
-    is_procedure_template_asset_model_foreign_key,
-};
+use crate::{Procedure, ProcedureTemplate, is_procedure_template_asset_model_foreign_key};
 
 /// Constraint to check that if a column is a foreign key to `procedure template
 /// asset` and the current table is a procedure or procedure template table,
@@ -57,25 +54,25 @@ impl CustomColumnConstraint for ProcedureTemplateAssetModelsForeignKeysConstrain
                     .into());
                 }
 
-                if is_in_same_as_with_primary_key(column, conn)? {
-                    // The column is always associated to the current procedure or
-                    // procedure template, so the foreign key MUST be cascading.
-                    if !foreign_key.has_on_delete_cascade(conn)? {
-                        return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
-                            column: Box::new(column.clone()),
-                            expected_behavior: CascadeOption::Cascade,
-                            found_behavior: CascadeOption::Restrict,
-                        }
-                        .into());
-                    }
-                } else {
+                if column.requires_partial_builder(conn)?.is_some() {
                     // The column may be associated to other procedures or
                     // procedure templates, so the foreign key MUST NOT be cascading.
-                    if foreign_key.has_on_delete_cascade(conn)? {
+                    if !foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
                             column: Box::new(column.clone()),
                             expected_behavior: CascadeOption::Restrict,
                             found_behavior: CascadeOption::Cascade,
+                        }
+                        .into());
+                    }
+                } else {
+                    // The column is always associated to the current procedure or
+                    // procedure template, so the foreign key MUST be cascading.
+                    if foreign_key.has_on_delete_cascade(conn)? {
+                        return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
+                            column: Box::new(column.clone()),
+                            expected_behavior: CascadeOption::Cascade,
+                            found_behavior: CascadeOption::Restrict,
                         }
                         .into());
                     }

@@ -1,12 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to safelock tubes.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt,
-    trackables::containers::safelock_tubes::safelock_tubes_2ml,
+    asset_models::containers::safelock_tubes::safelock_tubes_2ml,
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a safelock tube trackable.
@@ -23,5 +23,5 @@ pub(crate) fn safelock_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, safelock_tubes_2ml(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, safelock_tubes_2ml(user, conn)?.id(conn)?.id(conn)?.id(conn)?)
 }

@@ -12,7 +12,7 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::pipettes::pipettes)]
 pub struct Pipette {
     pub id: ::rosetta_uuid::Uuid,
-    pub model_id: i32,
+    pub model: i32,
 }
 impl web_common_traits::prelude::TableName for Pipette {
     const TABLE_NAME: &'static str = "pipettes";
@@ -28,6 +28,14 @@ where
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for Pipette
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::pipettes::Pipette,
     > for Pipette
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -99,28 +107,28 @@ impl Pipette {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot::table(),
-                self.model_id,
+                self.model,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id(
-        model_id: &i32,
+    pub fn from_model(
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::pipettes::pipettes;
         Self::table()
-            .filter(pipettes::model_id.eq(model_id))
+            .filter(pipettes::model.eq(model))
             .order_by(pipettes::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_model_id(
+    pub fn from_id_and_model(
         id: &::rosetta_uuid::Uuid,
-        model_id: &i32,
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -129,13 +137,31 @@ impl Pipette {
 
         use crate::codegen::diesel_codegen::tables::pipettes::pipettes;
         Self::table()
-            .filter(pipettes::id.eq(id).and(pipettes::model_id.eq(model_id)))
+            .filter(pipettes::id.eq(id).and(pipettes::model.eq(model)))
             .order_by(pipettes::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id_and_id(
-        model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, pipettes::pipettes};
+        Self::table()
+            .inner_join(assets::table.on(pipettes::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(pipettes::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -147,7 +173,7 @@ impl Pipette {
         use crate::codegen::diesel_codegen::tables::{assets::assets, pipettes::pipettes};
         Self::table()
             .inner_join(assets::table.on(pipettes::id.eq(assets::id)))
-            .filter(assets::model_id.eq(model_id).and(assets::id.eq(id)))
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
             .order_by(pipettes::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

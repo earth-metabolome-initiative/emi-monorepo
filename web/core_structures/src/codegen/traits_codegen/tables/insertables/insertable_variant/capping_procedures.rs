@@ -22,14 +22,22 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder: web_common_traits::database::TryInsertGeneric<
+    crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedure;
@@ -44,12 +52,17 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-            self,
-            "capping_procedures",
-        )?;
+        use web_common_traits::database::Updatable;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("capping_procedures");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedure = self
             .try_insert(user_id, conn)?;
+        if !insertable_struct.procedure(conn)?.can_update(user_id, conn)? {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)

@@ -2,6 +2,7 @@
 
 use core_structures::{
     ProcedureTemplate, User,
+    tables::insertables::ProcedureTemplateBuildable,
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -40,14 +41,14 @@ pub(super) fn init_dbgi_collection_preparation(
 
     dbgi_collection_preparation.child(
         &make_ethanol_70,
-        ChildOptions::default().inherit_trackables(),
+        ChildOptions::default().inherit_asset_models(),
         user,
         conn,
     )?;
 
     dbgi_collection_preparation.child(
         &make_solvent,
-        ChildOptions::default().inherit_trackables(),
+        ChildOptions::default().inherit_asset_models(),
         user,
         conn,
     )?;

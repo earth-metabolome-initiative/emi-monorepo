@@ -80,7 +80,7 @@ pub struct InsertableTemporaryUserBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TemporaryUser` or
 /// descendant tables.
-pub trait TemporaryUserBuildable: std::marker::Sized {
+pub trait TemporaryUserBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.temporary_user.email` column.
@@ -131,26 +131,6 @@ pub trait TemporaryUserBuildable: std::marker::Sized {
         self,
         login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl TemporaryUserBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
-    fn email<E>(
-        self,
-        _email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn login_provider(
-        self,
-        _login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
     type Attributes =

@@ -33,24 +33,25 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
 
     let mut time_tracker = TimeTracker::new("Code Generation");
 
-    let mut codegen = Codegen::default()
-        .users(&users)
-        .projects(&projects)
-        .teams(&teams)
-        .team_members(&team_members)
-        .team_projects(&team_projects)
-        .add_check_constraint_extension(&pgrx_validation)
-        .set_output_directory(out_dir.as_ref())
-        .enable_deletable_trait()
-        .enable_insertable_trait()
-        .enable_foreign_trait()
-        .enable_updatable_trait()
-        .enable_upsertable_trait()
-        .enable_crud_operations()
-        .enable_yew()
-        .beautify();
-    codegen.print_same_as_network(conn, DATABASE_NAME, "columns_same_as_network.dot")?;
-    time_tracker.extend(codegen.generate(conn, DATABASE_NAME)?);
+    time_tracker.extend(
+        Codegen::default()
+            .users(&users)
+            .projects(&projects)
+            .teams(&teams)
+            .team_members(&team_members)
+            .team_projects(&team_projects)
+            .add_check_constraint_extension(&pgrx_validation)
+            .set_output_directory(out_dir.as_ref())
+            .enable_deletable_trait()
+            .enable_insertable_trait()
+            .enable_foreign_trait()
+            .enable_updatable_trait()
+            .enable_upsertable_trait()
+            .enable_crud_operations()
+            .enable_yew()
+            .beautify()
+            .generate(conn, DATABASE_NAME)?,
+    );
 
     let procedures_tracker = ProcedureCodegen::builder()
         .output_directory(out_dir.as_ref())

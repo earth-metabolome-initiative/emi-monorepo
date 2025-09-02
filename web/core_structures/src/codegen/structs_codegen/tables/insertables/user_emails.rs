@@ -100,7 +100,7 @@ impl Default for InsertableUserEmailBuilder {
 }
 /// Trait defining setters for attributes of an instance of `UserEmail` or
 /// descendant tables.
-pub trait UserEmailBuildable: std::marker::Sized {
+pub trait UserEmailBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.user_emails.email` column.
@@ -202,47 +202,6 @@ pub trait UserEmailBuildable: std::marker::Sized {
     where
         PE: TryInto<bool>,
         validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
-}
-impl UserEmailBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttributes;
-    fn email<E>(
-        self,
-        _email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn primary_email<PE>(
-        self,
-        _primary_email: PE,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl UserEmailBuildable for InsertableUserEmailBuilder {
     type Attributes =

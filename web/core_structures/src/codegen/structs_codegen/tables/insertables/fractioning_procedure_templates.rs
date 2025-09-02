@@ -31,12 +31,16 @@ pub enum InsertableFractioningProcedureTemplateAttributes {
     Kilograms,
     TolerancePercentage,
     WeighedWithModel,
-    ProcedureTemplateWeighedWithModel,
+    ProcedureTemplateWeighedWithModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
     FragmentContainerModel,
     ForeignProcedureTemplate,
     ProcedureTemplateFragmentContainerModel,
     FragmentPlacedIntoModel,
-    ProcedureTemplateFragmentPlacedIntoModel,
+    ProcedureTemplateFragmentPlacedIntoModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
 }
 impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -45,7 +49,13 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             "Kilograms" => Ok(Self::Kilograms),
             "TolerancePercentage" => Ok(Self::TolerancePercentage),
             "WeighedWithModel" => Ok(Self::WeighedWithModel),
-            "ProcedureTemplateWeighedWithModel" => Ok(Self::ProcedureTemplateWeighedWithModel),
+            "ProcedureTemplateWeighedWithModel" => {
+                Ok(
+                    Self::ProcedureTemplateWeighedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
             "FragmentContainerModel" => Ok(Self::FragmentContainerModel),
             "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateFragmentContainerModel" => {
@@ -53,12 +63,22 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             }
             "FragmentPlacedIntoModel" => Ok(Self::FragmentPlacedIntoModel),
             "ProcedureTemplateFragmentPlacedIntoModel" => {
-                Ok(Self::ProcedureTemplateFragmentPlacedIntoModel)
+                Ok(
+                    Self::ProcedureTemplateFragmentPlacedIntoModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "kilograms" => Ok(Self::Kilograms),
             "tolerance_percentage" => Ok(Self::TolerancePercentage),
             "weighed_with_model" => Ok(Self::WeighedWithModel),
-            "procedure_template_weighed_with_model" => Ok(Self::ProcedureTemplateWeighedWithModel),
+            "procedure_template_weighed_with_model" => {
+                Ok(
+                    Self::ProcedureTemplateWeighedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
+            }
             "fragment_container_model" => Ok(Self::FragmentContainerModel),
             "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_fragment_container_model" => {
@@ -66,9 +86,19 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             }
             "fragment_placed_into_model" => Ok(Self::FragmentPlacedIntoModel),
             "procedure_template_fragment_placed_into_model" => {
-                Ok(Self::ProcedureTemplateFragmentPlacedIntoModel)
+                Ok(
+                    Self::ProcedureTemplateFragmentPlacedIntoModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
         }
     }
 }
@@ -80,18 +110,14 @@ impl core::fmt::Display for InsertableFractioningProcedureTemplateAttributes {
             Self::Kilograms => write!(f, "kilograms"),
             Self::TolerancePercentage => write!(f, "tolerance_percentage"),
             Self::WeighedWithModel => write!(f, "weighed_with_model"),
-            Self::ProcedureTemplateWeighedWithModel => {
-                write!(f, "procedure_template_weighed_with_model")
-            }
+            Self::ProcedureTemplateWeighedWithModel(e) => write!(f, "{e}"),
             Self::FragmentContainerModel => write!(f, "fragment_container_model"),
             Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
             Self::ProcedureTemplateFragmentContainerModel => {
                 write!(f, "procedure_template_fragment_container_model")
             }
             Self::FragmentPlacedIntoModel => write!(f, "fragment_placed_into_model"),
-            Self::ProcedureTemplateFragmentPlacedIntoModel => {
-                write!(f, "procedure_template_fragment_placed_into_model")
-            }
+            Self::ProcedureTemplateFragmentPlacedIntoModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -386,19 +412,19 @@ pub struct InsertableFractioningProcedureTemplateBuilder<
     pub(crate) kilograms: Option<f32>,
     pub(crate) tolerance_percentage: Option<f32>,
     pub(crate) weighed_with_model: Option<i32>,
-    pub(crate) procedure_template_weighed_with_model: Option<i32>,
+    pub(crate) procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) fragment_container_model: Option<i32>,
     pub(crate) foreign_procedure_template: Option<i32>,
     pub(crate) procedure_template_fragment_container_model: Option<i32>,
     pub(crate) fragment_placed_into_model: Option<i32>,
-    pub(crate) procedure_template_fragment_placed_into_model: Option<i32>,
+    pub(crate) procedure_template_fragment_placed_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) procedure_template: ProcedureTemplate,
 }
 /// Trait defining setters for attributes of an instance of
 /// `FractioningProcedureTemplate` or descendant tables.
-pub trait FractioningProcedureTemplateBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
-{
+pub trait FractioningProcedureTemplateBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.fractioning_procedure_templates.kilograms`
     /// column.
     ///
@@ -497,7 +523,7 @@ pub trait FractioningProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_weighed_with_model(
         self,
-        procedure_template_weighed_with_model: i32,
+        procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.fractioning_procedure_templates.fragment_container_model`
@@ -622,80 +648,15 @@ pub trait FractioningProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_fragment_placed_into_model(
         self,
-        procedure_template_fragment_placed_into_model: i32,
+        procedure_template_fragment_placed_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl FractioningProcedureTemplateBuildable for Option<i32> {
-    fn kilograms<K>(
-        self,
-        _kilograms: K,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn tolerance_percentage<TP>(
-        self,
-        _tolerance_percentage: TP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        TP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn weighed_with_model(
-        self,
-        _weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_weighed_with_model(
-        self,
-        _procedure_template_weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn fragment_container_model(
-        self,
-        _fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_fragment_container_model(
-        self,
-        _procedure_template_fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn fragment_placed_into_model(
-        self,
-        _fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_fragment_placed_into_model(
-        self,
-        _procedure_template_fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-        >,
-> FractioningProcedureTemplateBuildable
-for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `public.fractioning_procedure_templates.kilograms` column.
+impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
+    for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
+    /// Sets the value of the `public.fractioning_procedure_templates.kilograms`
+    /// column.
     fn kilograms<K>(
         mut self,
         kilograms: K,
@@ -704,14 +665,10 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
-        let kilograms = kilograms
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::Kilograms,
-                    )
-            })?;
+        let kilograms = kilograms.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFractioningProcedureTemplateAttributes::Kilograms)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| {
                 e
@@ -722,7 +679,8 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.tolerance_percentage` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.tolerance_percentage` column.
     fn tolerance_percentage<TP>(
         mut self,
         tolerance_percentage: TP,
@@ -731,14 +689,10 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         TP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>,
     {
-        let tolerance_percentage = tolerance_percentage
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::TolerancePercentage,
-                    )
-            })?;
+        let tolerance_percentage = tolerance_percentage.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFractioningProcedureTemplateAttributes::TolerancePercentage)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(tolerance_percentage)
             .map_err(|e| {
                 e
@@ -758,73 +712,142 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.tolerance_percentage = Some(tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.weighed_with_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.weighed_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`fractioning_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "weighed_with_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn weighed_with_model(
         mut self,
         weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let weighed_with_model = weighed_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::WeighedWithModel,
-                    )
+        let weighed_with_model = weighed_with_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFractioningProcedureTemplateAttributes::WeighedWithModel)
+        })?;
+        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_weighed_with_model,
+                weighed_with_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
+                })
             })?;
         self.weighed_with_model = Some(weighed_with_model);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_weighed_with_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.
+    /// procedure_template_weighed_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`fractioning_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "weighed_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_weighed_with_model(
         mut self,
-        procedure_template_weighed_with_model: i32,
+        mut procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_weighed_with_model = procedure_template_weighed_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::ProcedureTemplateWeighedWithModel,
-                    )
-            })?;
-        self.procedure_template_weighed_with_model = Some(
-            procedure_template_weighed_with_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.weighed_with_model, procedure_template_weighed_with_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::WeighedWithModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_weighed_with_model.asset_model {
+            self.weighed_with_model = Some(asset_model);
+        } else if let Some(local) = self.weighed_with_model {
+            procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_weighed_with_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
+                    })
+                })?;
+        }
+        self.procedure_template_weighed_with_model = procedure_template_weighed_with_model;
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.fragment_container_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.fragment_container_model`
+    /// column.
     fn fragment_container_model(
         mut self,
         fragment_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let fragment_container_model = fragment_container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::FragmentContainerModel,
-                    )
-            })?;
+        let fragment_container_model = fragment_container_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableFractioningProcedureTemplateAttributes::FragmentContainerModel,
+            )
+        })?;
         self.fragment_container_model = Some(fragment_container_model);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.foreign_procedure_template` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.foreign_procedure_template`
+    /// column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
+        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableFractioningProcedureTemplateAttributes::ForeignProcedureTemplate,
+            )
+        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_fragment_container_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.
+    /// procedure_template_fragment_container_model` column.
     fn procedure_template_fragment_container_model(
         mut self,
         procedure_template_fragment_container_model: i32,
@@ -837,43 +860,118 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
                         InsertableFractioningProcedureTemplateAttributes::ProcedureTemplateFragmentContainerModel,
                     )
             })?;
-        self.procedure_template_fragment_container_model = Some(
-            procedure_template_fragment_container_model,
-        );
+        self.procedure_template_fragment_container_model =
+            Some(procedure_template_fragment_container_model);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.fragment_placed_into_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.fragment_placed_into_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`fractioning_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "fragment_placed_into_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_fragment_placed_into_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn fragment_placed_into_model(
         mut self,
         fragment_placed_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let fragment_placed_into_model = fragment_placed_into_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::FragmentPlacedIntoModel,
-                    )
+        let fragment_placed_into_model = fragment_placed_into_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableFractioningProcedureTemplateAttributes::FragmentPlacedIntoModel,
+            )
+        })?;
+        self.procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_fragment_placed_into_model,
+                fragment_placed_into_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateFragmentPlacedIntoModel(attribute)
+                })
             })?;
         self.fragment_placed_into_model = Some(fragment_placed_into_model);
         Ok(self)
     }
-    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_fragment_placed_into_model` column.
+    /// Sets the value of the
+    /// `public.fractioning_procedure_templates.
+    /// procedure_template_fragment_placed_into_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`fractioning_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "fragment_placed_into_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_fragment_placed_into_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_fragment_placed_into_model(
         mut self,
-        procedure_template_fragment_placed_into_model: i32,
+        mut procedure_template_fragment_placed_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_fragment_placed_into_model = procedure_template_fragment_placed_into_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFractioningProcedureTemplateAttributes::ProcedureTemplateFragmentPlacedIntoModel,
-                    )
-            })?;
-        self.procedure_template_fragment_placed_into_model = Some(
-            procedure_template_fragment_placed_into_model,
-        );
+        if let (Some(local), Some(foreign)) = (
+            self.fragment_placed_into_model,
+            procedure_template_fragment_placed_into_model.asset_model,
+        ) {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::FragmentPlacedIntoModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_fragment_placed_into_model.asset_model
+        {
+            self.fragment_placed_into_model = Some(asset_model);
+        } else if let Some(local) = self.fragment_placed_into_model {
+            procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_fragment_placed_into_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateFragmentPlacedIntoModel(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
+        self.procedure_template_fragment_placed_into_model =
+            procedure_template_fragment_placed_into_model;
         Ok(self)
     }
 }
@@ -884,28 +982,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-                self.procedure_template,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1079,6 +1155,15 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
 }
+impl<ProcedureTemplate> web_common_traits::database::MostConcreteTable
+    for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure_template.set_most_concrete_table(table_name);
+    }
+}
 impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey
     for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -1105,17 +1190,20 @@ where
         C,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = InsertableFractioningProcedureTemplateAttributes;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kilograms.is_some()
             && self.tolerance_percentage.is_some() && self.weighed_with_model.is_some()
-            && self.procedure_template_weighed_with_model.is_some()
+            && self.procedure_template_weighed_with_model.is_complete()
             && self.fragment_container_model.is_some()
             && self.foreign_procedure_template.is_some()
             && self.procedure_template_fragment_container_model.is_some()
             && self.fragment_placed_into_model.is_some()
-            && self.procedure_template_fragment_placed_into_model.is_some()
+            && self.procedure_template_fragment_placed_into_model.is_complete()
     }
     fn mint_primary_key(
         self,

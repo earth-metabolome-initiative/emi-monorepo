@@ -1,6 +1,6 @@
 //! Submodule for positive ionization LC-MS procedures.
 
-use core_structures::{ProcedureTemplate, User};
+use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateBuildable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 

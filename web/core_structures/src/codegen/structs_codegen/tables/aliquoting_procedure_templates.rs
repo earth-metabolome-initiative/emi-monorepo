@@ -36,6 +36,12 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
+> for AliquotingProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for AliquotingProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -746,6 +752,30 @@ impl AliquotingProcedureTemplate {
             )
             .order_by(aliquoting_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            aliquoting_procedure_templates::aliquoting_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(aliquoting_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::name.eq(name))
+            .order_by(aliquoting_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(

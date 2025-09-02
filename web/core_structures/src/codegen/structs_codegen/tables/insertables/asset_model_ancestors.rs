@@ -110,7 +110,7 @@ pub struct InsertableAssetModelAncestorBuilder {
 }
 /// Trait defining setters for attributes of an instance of `AssetModelAncestor`
 /// or descendant tables.
-pub trait AssetModelAncestorBuildable: std::marker::Sized {
+pub trait AssetModelAncestorBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`

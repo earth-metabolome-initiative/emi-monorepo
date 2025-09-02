@@ -33,10 +33,14 @@ pub enum InsertableFreezeDryingProcedureTemplateAttributes {
     Pascal,
     Seconds,
     FreezeDriedWithModel,
-    ProcedureTemplateFreezeDriedWithModel,
+    ProcedureTemplateFreezeDriedWithModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
     FreezeDriedContainerModel,
     ForeignProcedureTemplate,
-    ProcedureTemplateFreezeDriedContainerModel,
+    ProcedureTemplateFreezeDriedContainerModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    ),
 }
 impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -48,12 +52,20 @@ impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
             "Seconds" => Ok(Self::Seconds),
             "FreezeDriedWithModel" => Ok(Self::FreezeDriedWithModel),
             "ProcedureTemplateFreezeDriedWithModel" => {
-                Ok(Self::ProcedureTemplateFreezeDriedWithModel)
+                Ok(
+                    Self::ProcedureTemplateFreezeDriedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "FreezeDriedContainerModel" => Ok(Self::FreezeDriedContainerModel),
             "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateFreezeDriedContainerModel" => {
-                Ok(Self::ProcedureTemplateFreezeDriedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateFreezeDriedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
@@ -61,14 +73,28 @@ impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
             "seconds" => Ok(Self::Seconds),
             "freeze_dried_with_model" => Ok(Self::FreezeDriedWithModel),
             "procedure_template_freeze_dried_with_model" => {
-                Ok(Self::ProcedureTemplateFreezeDriedWithModel)
+                Ok(
+                    Self::ProcedureTemplateFreezeDriedWithModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
             "freeze_dried_container_model" => Ok(Self::FreezeDriedContainerModel),
             "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_freeze_dried_container_model" => {
-                Ok(Self::ProcedureTemplateFreezeDriedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateFreezeDriedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                    ),
+                )
             }
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+            _ => {
+                Err(
+                    web_common_traits::database::InsertError::UnknownAttribute(
+                        s.to_owned(),
+                    ),
+                )
+            }
         }
     }
 }
@@ -82,14 +108,10 @@ impl core::fmt::Display for InsertableFreezeDryingProcedureTemplateAttributes {
             Self::Pascal => write!(f, "pascal"),
             Self::Seconds => write!(f, "seconds"),
             Self::FreezeDriedWithModel => write!(f, "freeze_dried_with_model"),
-            Self::ProcedureTemplateFreezeDriedWithModel => {
-                write!(f, "procedure_template_freeze_dried_with_model")
-            }
+            Self::ProcedureTemplateFreezeDriedWithModel(e) => write!(f, "{e}"),
             Self::FreezeDriedContainerModel => write!(f, "freeze_dried_container_model"),
             Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplateFreezeDriedContainerModel => {
-                write!(f, "procedure_template_freeze_dried_container_model")
-            }
+            Self::ProcedureTemplateFreezeDriedContainerModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -354,10 +376,10 @@ pub struct InsertableFreezeDryingProcedureTemplateBuilder<
     pub(crate) pascal: Option<f32>,
     pub(crate) seconds: Option<f32>,
     pub(crate) freeze_dried_with_model: Option<i32>,
-    pub(crate) procedure_template_freeze_dried_with_model: Option<i32>,
+    pub(crate) procedure_template_freeze_dried_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) freeze_dried_container_model: Option<i32>,
     pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_freeze_dried_container_model: Option<i32>,
+    pub(crate) procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) procedure_template: ProcedureTemplate,
 }
 impl<ProcedureTemplate> Default
@@ -382,9 +404,9 @@ where
 }
 /// Trait defining setters for attributes of an instance of
 /// `FreezeDryingProcedureTemplate` or descendant tables.
-pub trait FreezeDryingProcedureTemplateBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
-{
+pub trait FreezeDryingProcedureTemplateBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.freeze_drying_procedure_templates.kelvin`
     /// column.
     ///
@@ -539,7 +561,7 @@ pub trait FreezeDryingProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_freeze_dried_with_model(
         self,
-        procedure_template_freeze_dried_with_model: i32,
+        procedure_template_freeze_dried_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.freeze_drying_procedure_templates.freeze_dried_container_model`
@@ -614,88 +636,15 @@ pub trait FreezeDryingProcedureTemplateBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_freeze_dried_container_model(
         self,
-        procedure_template_freeze_dried_container_model: i32,
+        procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl FreezeDryingProcedureTemplateBuildable for Option<i32> {
-    fn kelvin<K>(
-        self,
-        _kelvin: K,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn kelvin_tolerance_percentage<KTP>(
-        self,
-        _kelvin_tolerance_percentage: KTP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn pascal<P>(
-        self,
-        _pascal: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn seconds<S>(
-        self,
-        _seconds: S,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>,
-    {
-        Ok(self)
-    }
-    fn freeze_dried_with_model(
-        self,
-        _freeze_dried_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_freeze_dried_with_model(
-        self,
-        _procedure_template_freeze_dried_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn freeze_dried_container_model(
-        self,
-        _freeze_dried_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_freeze_dried_container_model(
-        self,
-        _procedure_template_freeze_dried_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-        >,
-> FreezeDryingProcedureTemplateBuildable
-for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `public.freeze_drying_procedure_templates.kelvin` column.
+impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
+    for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes;
+    /// Sets the value of the `public.freeze_drying_procedure_templates.kelvin`
+    /// column.
     fn kelvin<K>(
         mut self,
         kelvin: K,
@@ -704,14 +653,10 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
-        let kelvin = kelvin
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::Kelvin,
-                    )
-            })?;
+        let kelvin = kelvin.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFreezeDryingProcedureTemplateAttributes::Kelvin)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
@@ -722,7 +667,9 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin = Some(kelvin);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.kelvin_tolerance_percentage` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.kelvin_tolerance_percentage`
+    /// column.
     fn kelvin_tolerance_percentage<KTP>(
         mut self,
         kelvin_tolerance_percentage: KTP,
@@ -731,13 +678,11 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
-        let kelvin_tolerance_percentage = kelvin_tolerance_percentage
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::KelvinTolerancePercentage,
-                    )
+        let kelvin_tolerance_percentage =
+            kelvin_tolerance_percentage.try_into().map_err(|err| {
+                validation_errors::SingleFieldError::from(err).rename_field(
+                    InsertableFreezeDryingProcedureTemplateAttributes::KelvinTolerancePercentage,
+                )
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
@@ -761,7 +706,8 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.pascal` column.
+    /// Sets the value of the `public.freeze_drying_procedure_templates.pascal`
+    /// column.
     fn pascal<P>(
         mut self,
         pascal: P,
@@ -770,14 +716,10 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         P: TryInto<f32>,
         validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
     {
-        let pascal = pascal
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::Pascal,
-                    )
-            })?;
+        let pascal = pascal.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFreezeDryingProcedureTemplateAttributes::Pascal)
+        })?;
         pgrx_validation::must_be_strictly_positive_f32(pascal)
             .map_err(|e| {
                 e
@@ -797,7 +739,8 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         self.pascal = Some(pascal);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.seconds` column.
+    /// Sets the value of the `public.freeze_drying_procedure_templates.seconds`
+    /// column.
     fn seconds<S>(
         mut self,
         seconds: S,
@@ -806,14 +749,10 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         S: TryInto<f32>,
         validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>,
     {
-        let seconds = seconds
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::Seconds,
-                    )
-            })?;
+        let seconds = seconds.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableFreezeDryingProcedureTemplateAttributes::Seconds)
+        })?;
         pgrx_validation::must_be_strictly_greater_than_f32(seconds, 7200f32)
             .map_err(|e| {
                 e
@@ -833,88 +772,241 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         self.seconds = Some(seconds);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.freeze_dried_with_model` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.freeze_dried_with_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`freeze_drying_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn freeze_dried_with_model(
         mut self,
         freeze_dried_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let freeze_dried_with_model = freeze_dried_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::FreezeDriedWithModel,
-                    )
+        let freeze_dried_with_model = freeze_dried_with_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableFreezeDryingProcedureTemplateAttributes::FreezeDriedWithModel,
+            )
+        })?;
+        self.procedure_template_freeze_dried_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_freeze_dried_with_model,
+                freeze_dried_with_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateFreezeDriedWithModel(attribute)
+                })
             })?;
         self.freeze_dried_with_model = Some(freeze_dried_with_model);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.procedure_template_freeze_dried_with_model` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.
+    /// procedure_template_freeze_dried_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`freeze_drying_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_freeze_dried_with_model(
         mut self,
-        procedure_template_freeze_dried_with_model: i32,
+        mut procedure_template_freeze_dried_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_freeze_dried_with_model = procedure_template_freeze_dried_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedWithModel,
-                    )
-            })?;
-        self.procedure_template_freeze_dried_with_model = Some(
-            procedure_template_freeze_dried_with_model,
-        );
+        if let (Some(local), Some(foreign)) =
+            (self.freeze_dried_with_model, procedure_template_freeze_dried_with_model.asset_model)
+        {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::FreezeDriedWithModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) = procedure_template_freeze_dried_with_model.asset_model {
+            self.freeze_dried_with_model = Some(asset_model);
+        } else if let Some(local) = self.freeze_dried_with_model {
+            procedure_template_freeze_dried_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_freeze_dried_with_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateFreezeDriedWithModel(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
+        self.procedure_template_freeze_dried_with_model =
+            procedure_template_freeze_dried_with_model;
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.freeze_dried_container_model` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.freeze_dried_container_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`freeze_drying_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
+    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn freeze_dried_container_model(
         mut self,
         freeze_dried_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let freeze_dried_container_model = freeze_dried_container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::FreezeDriedContainerModel,
+        let freeze_dried_container_model =
+            freeze_dried_container_model.try_into().map_err(|err| {
+                validation_errors::SingleFieldError::from(err).rename_field(
+                    InsertableFreezeDryingProcedureTemplateAttributes::FreezeDriedContainerModel,
+                )
+            })?;
+        self.procedure_template_freeze_dried_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                self.procedure_template_freeze_dried_container_model,
+                freeze_dried_container_model,
+            )
+            .map_err(|e| {
+                e.into_field_name(|attribute| {
+                    Self::Attributes::ProcedureTemplateFreezeDriedContainerModel(
+                        attribute,
                     )
+                })
             })?;
         self.freeze_dried_container_model = Some(freeze_dried_container_model);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.foreign_procedure_template` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.foreign_procedure_template`
+    /// column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
+        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableFreezeDryingProcedureTemplateAttributes::ForeignProcedureTemplate,
+            )
+        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.freeze_drying_procedure_templates.procedure_template_freeze_dried_container_model` column.
+    /// Sets the value of the
+    /// `public.freeze_drying_procedure_templates.
+    /// procedure_template_freeze_dried_container_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v3 ["`freeze_drying_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v3 ---o|"`associated with`"| v4
+    /// ```
     fn procedure_template_freeze_dried_container_model(
         mut self,
-        procedure_template_freeze_dried_container_model: i32,
+        mut procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_freeze_dried_container_model = procedure_template_freeze_dried_container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezeDryingProcedureTemplateAttributes::ProcedureTemplateFreezeDriedContainerModel,
-                    )
-            })?;
-        self.procedure_template_freeze_dried_container_model = Some(
-            procedure_template_freeze_dried_container_model,
-        );
+        if let (Some(local), Some(foreign)) = (
+            self.freeze_dried_container_model,
+            procedure_template_freeze_dried_container_model.asset_model,
+        ) {
+            if local != foreign {
+                return Err(web_common_traits::database::InsertError::BuilderError(
+                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                        Self::Attributes::FreezeDriedContainerModel,
+                    ),
+                ));
+            }
+        } else if let Some(asset_model) =
+            procedure_template_freeze_dried_container_model.asset_model
+        {
+            self.freeze_dried_container_model = Some(asset_model);
+        } else if let Some(local) = self.freeze_dried_container_model {
+            procedure_template_freeze_dried_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+                    procedure_template_freeze_dried_container_model,
+                    local,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateFreezeDriedContainerModel(
+                            attribute,
+                        )
+                    })
+                })?;
+        }
+        self.procedure_template_freeze_dried_container_model =
+            procedure_template_freeze_dried_container_model;
         Ok(self)
     }
 }
@@ -925,28 +1017,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttributes;
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-                self.procedure_template,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1120,6 +1190,15 @@ for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
 }
+impl<ProcedureTemplate> web_common_traits::database::MostConcreteTable
+    for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure_template.set_most_concrete_table(table_name);
+    }
+}
 impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey
     for InsertableFreezeDryingProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -1146,16 +1225,19 @@ where
         C,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = InsertableFreezeDryingProcedureTemplateAttributes;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kelvin.is_some()
             && self.kelvin_tolerance_percentage.is_some() && self.pascal.is_some()
             && self.seconds.is_some() && self.freeze_dried_with_model.is_some()
-            && self.procedure_template_freeze_dried_with_model.is_some()
+            && self.procedure_template_freeze_dried_with_model.is_complete()
             && self.freeze_dried_container_model.is_some()
             && self.foreign_procedure_template.is_some()
-            && self.procedure_template_freeze_dried_container_model.is_some()
+            && self.procedure_template_freeze_dried_container_model.is_complete()
     }
     fn mint_primary_key(
         self,

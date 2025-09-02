@@ -1,4 +1,7 @@
-use std::fmt::Display;
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Display,
+};
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
@@ -141,110 +144,6 @@ fn geography(
 }
 
 #[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
-fn requires_partial_builder(
-    column: &Column,
-    conn: &mut PgConnection,
-) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
-    if column.is_nullable() {
-        // If the column is nullable, we do not need a partial builder
-        return Ok(None);
-    }
-    // First, we retrieve the table that contains the column
-    let table = column.table(conn)?;
-
-    // - The table T is an extension table, meaning it extends some other table E.
-    let ancestral_extension_tables = table.ancestral_extension_tables(conn)?;
-    if ancestral_extension_tables.is_empty() {
-        // If the table is not an extension table, we do not need a partial builder
-        return Ok(None);
-    }
-
-    // - The column C from table T is a foreign key to the primary key of the table
-    //   F, and F != E.
-    let mut found_foreign_key = None;
-    for foreign_key in column.foreign_keys(conn)? {
-        if !foreign_key.is_foreign_primary_key(conn)? {
-            // If the foreign key is not a foreign primary key, this column
-            // does not require a partial builder.
-            continue;
-        }
-        if foreign_key.is_local_primary_key(conn)? {
-            // If the foreign key is a local primary key, this column does not
-            // require a partial builder.
-            continue;
-        }
-        if !foreign_key.includes_local_primary_key(conn)? {
-            // If the foreign key does not include the local primary key, this
-            // column does not require a partial builder.
-            continue;
-        }
-        let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-            // If the foreign table is not found, we do not need a partial builder.
-            continue;
-        };
-        if ancestral_extension_tables.contains(&foreign_table) {
-            // If the foreign table is one of the extended tables, we do not
-            // need a partial builder.
-            continue;
-        }
-
-        // - The table F has a same-as UNIQUE index constraint on the primary key of the
-        //   table E.
-        let same_as_indices = foreign_table
-            .same_as_indices(conn)?
-            .into_iter()
-            .filter(|index| {
-                let Ok(Some(foreign_key_constraint)) = index.is_same_as(conn) else {
-                    return false;
-                };
-                let Ok(Some(foreign_key_constraint_table)) =
-                    foreign_key_constraint.foreign_table(conn)
-                else {
-                    return false;
-                };
-                ancestral_extension_tables.contains(&foreign_key_constraint_table)
-            })
-            .collect::<Vec<_>>();
-
-        if same_as_indices.is_empty() {
-            // If the foreign table does not have a same-as index constraint on
-            // the primary key of the extended table, we do not need a partial
-            // builder.
-            continue;
-        }
-
-        // - The table T has a foreign key same-as constraint to the same-as UNIQUE
-        //   index constraint of the table F.
-        if !table.foreign_keys(conn)?.into_iter().any(|table_foreign_key| {
-            let Ok(Some(same_as_index)) = table_foreign_key.is_same_as_constraint(conn) else {
-                // If the foreign key is not a same-as constraint, we do not
-                // need a partial builder.
-                return false;
-            };
-            same_as_indices.contains(&same_as_index)
-        }) {
-            // If the table does not have a foreign key same-as constraint to
-            // the same-as UNIQUE index constraint of the foreign table, we do
-            // not need a partial builder.
-            continue;
-        }
-
-        // If we have already found a foreign key with these properties,
-        // it is not clear what to do, so we raise an unreachable panic.
-        if found_foreign_key.is_some() {
-            panic!(
-                "Multiple foreign keys found for column {} in table {}. This is not supported.",
-                column.column_name, column.table_name
-            );
-        }
-
-        found_foreign_key = Some(foreign_key);
-    }
-
-    Ok(found_foreign_key)
-}
-
-#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn str_rust_data_type(column: &Column, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
     if let Ok(Some(geometry)) = column.geometry(conn) {
         return Ok(geometry.str_rust_type().to_owned());
@@ -262,6 +161,164 @@ fn str_rust_data_type(column: &Column, conn: &mut PgConnection) -> Result<String
             }
         }
     }
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn requires_partial_builder(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Option<KeyColumnUsage>, WebCodeGenError> {
+    if column.is_part_of_primary_key(conn)? {
+        return Ok(None);
+    }
+
+    let mut partial_builder_foreign_keys = Vec::new();
+
+    for foreign_key in column.foreign_keys(conn)? {
+        if foreign_key.is_partial_builder_constraint(conn)?.is_none() {
+            continue;
+        }
+        partial_builder_foreign_keys.push(foreign_key);
+    }
+
+    if partial_builder_foreign_keys.len() > 1 {
+        unreachable!(
+            "Column {column} seems to be is part of {} partial builder constraints, which is not supported. The builders include the columns: {}",
+            partial_builder_foreign_keys.len(),
+            partial_builder_foreign_keys
+                .iter()
+                .map(|key| {
+                    key.columns(conn)
+                        .unwrap_or_default()
+                        .iter()
+                        .map(|col| col.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                })
+                .collect::<Vec<_>>()
+                .join(" | ")
+        );
+    }
+
+    Ok(partial_builder_foreign_keys.pop())
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn ancestral_same_as_constraints(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+    Ok(column
+        .foreign_keys(conn)?
+        .into_iter()
+        .filter(|foreign_key| {
+            foreign_key
+                .is_ancestral_same_as_constraint(conn)
+                .map(|index| index.is_some())
+                .unwrap_or(false)
+        })
+        .collect())
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn ancestral_same_as_reachable_set(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<HashSet<Column>, WebCodeGenError> {
+    let ancestral_same_as_columns = column.ancestral_same_as_columns(conn)?;
+    let mut reachable_set = ancestral_same_as_columns.iter().cloned().collect::<HashSet<_>>();
+    for column in &ancestral_same_as_columns {
+        let ancestral_same_as_columns = column.ancestral_same_as_reachable_set(conn)?;
+        reachable_set.extend(ancestral_same_as_columns);
+    }
+    Ok(reachable_set)
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn associated_same_as_columns(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Vec<Column>, WebCodeGenError> {
+    Ok(column
+        .associated_same_as_constraints(conn)?
+        .into_iter()
+        .map(|constraint| {
+            let local_columns = constraint.columns(conn)?;
+            let foreign_columns = constraint.foreign_columns(conn)?;
+            Ok(local_columns
+                .iter()
+                .zip(foreign_columns)
+                .filter_map(|(local_column, foreign_column)| {
+                    if local_column == column { Some(foreign_column.clone()) } else { None }
+                })
+                .next()
+                .unwrap())
+        })
+        .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn all_ancestral_same_as_columns(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Vec<Column>, WebCodeGenError> {
+    let mut reachable_set = column.ancestral_same_as_reachable_set(conn)?;
+    // The frontier contains the set of columns which so far can only be reached
+    // from the current column. Once a column in the frontier is found to be
+    // reachable from another column in the reachable set, it is marked as true
+    // and will not be used to expand the reachable set anymore.
+    let mut frontier: HashMap<Column, bool> =
+        column.ancestral_same_as_columns(conn)?.into_iter().map(|c| (c, false)).collect();
+    let table = column.table(conn)?;
+    let ancestral_extension_tables = table.ancestral_extension_tables(conn)?;
+    let mut changed = true;
+
+    while changed {
+        changed = false;
+        for ancestor in &ancestral_extension_tables {
+            for ancestor_column in ancestor.columns(conn)? {
+                // If the ancestor node is already in the reachable set, skip it.
+                if reachable_set.contains(&ancestor_column) {
+                    continue;
+                }
+
+                let ancestor_reachable_set =
+                    ancestor_column.ancestral_same_as_reachable_set(conn)?;
+
+                // We update the frontier to mark as true columns which we have now discovered
+                // can be reached also from this ancestor column.
+                for (frontier_column, is_reachable) in frontier.iter_mut() {
+                    if !*is_reachable && ancestor_reachable_set.contains(frontier_column) {
+                        *is_reachable = true;
+                        changed = true;
+                    }
+                }
+
+                // If the ancestor reachable set intersects with the current reachable
+                // set, then the ancestor column is inferred to be ancestrally same-as
+                // the current column. We then merge the ancestor reachable set into
+                // the current reachable set, and add the ancestor column to the
+                // frontier.
+                if !reachable_set.is_disjoint(&ancestor_reachable_set) {
+                    reachable_set.insert(ancestor_column.clone());
+                    frontier.insert(ancestor_column.clone(), false);
+                    reachable_set.extend(ancestor_reachable_set);
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    // We then consider as ancestrally same-as only those columns in the frontier
+    // which are still marked as false, meaning they could not be reached
+    // from any other column in the reachable set.
+    let mut ancestral_same_as_columns = frontier
+        .into_iter()
+        .filter_map(|(column, is_reachable)| if !is_reachable { Some(column) } else { None })
+        .collect::<Vec<_>>();
+    ancestral_same_as_columns.sort_unstable();
+
+    Ok(ancestral_same_as_columns)
 }
 
 /// Struct defining the `information_schema.columns` table.
@@ -1378,6 +1435,26 @@ impl Column {
         requires_partial_builder(self, conn)
     }
 
+    /// Returns the foreign keys that are foreign primary keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn foreign_primary_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .into_iter()
+            .filter(|key| key.is_foreign_primary_key(conn).unwrap_or(false))
+            .collect())
+    }
+
     /// Returns whether the column is a foreign primary key.
     ///
     /// # Arguments
@@ -1391,53 +1468,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(self
-            .foreign_keys(conn)?
-            .into_iter()
-            .any(|key| key.is_foreign_primary_key(conn).unwrap_or(false)))
-    }
-
-    /// Returns the `same-as` UNIQUE constraints for the column, if any.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    ///
-    /// # Implementation details
-    ///
-    /// The `same-as` constraints are defined as:
-    ///
-    /// * A column is a `same-as` constraint if is part of a `composite` foreign
-    ///   key which refers to a "tautological" composite UNIQUE constraint which
-    ///   is composed of the primary key of the foreign table and the column
-    ///   itself. An important corner case to take into account is that the
-    ///   foreign table's composite UNIQUE constraint may be the COMPOSITE
-    ///   PRIMARY KEY of the foreign table itself, and not the primary key plus
-    ///   something else.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of tuples, each containing a
-    /// `KeyColumnUsage` and the foreign `Column` that the current column is
-    /// a `same-as` constraint for.
-    pub fn same_as_constraints(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
-        Ok(self
-            .foreign_keys(conn)?
-            .into_iter()
-            .filter(|foreign_key| {
-                foreign_key
-                    .is_same_as_constraint(conn)
-                    .map(|index| index.is_some())
-                    .unwrap_or(false)
-            })
-            .collect())
+        Ok(!self.foreign_primary_keys(conn)?.is_empty())
     }
 
     /// Returns the ancestral same-as constraints for the column, if any.
@@ -1449,20 +1480,11 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub(crate) fn ancestral_same_as_constraints(
+    pub fn ancestral_same_as_constraints(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
-        Ok(self
-            .foreign_keys(conn)?
-            .into_iter()
-            .filter(|foreign_key| {
-                foreign_key
-                    .is_ancestral_same_as_constraint(conn)
-                    .map(|index| index.is_some())
-                    .unwrap_or(false)
-            })
-            .collect())
+        ancestral_same_as_constraints(self, conn)
     }
 
     /// Returns the associated same-as constraints for the column, if any.
@@ -1474,7 +1496,7 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub(crate) fn associated_same_as_constraints(
+    pub fn associated_same_as_constraints(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
@@ -1484,29 +1506,6 @@ impl Column {
             if foreign_key.is_associated_same_as_constraint(conn)?.is_none() {
                 continue;
             }
-
-            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-                continue;
-            };
-
-            let mut found_foreign_primary_key = false;
-            for inner_foreign_key in self.foreign_keys(conn)? {
-                let Some(inner_foreign_table) = inner_foreign_key.foreign_table(conn)? else {
-                    continue;
-                };
-
-                if foreign_table == inner_foreign_table
-                    && inner_foreign_key.is_foreign_primary_key(conn)?
-                {
-                    found_foreign_primary_key = true;
-                    break;
-                }
-            }
-
-            if found_foreign_primary_key {
-                continue;
-            }
-
             associated_same_as_constraints.push(foreign_key);
         }
 
@@ -1544,6 +1543,22 @@ impl Column {
             .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
     }
 
+    /// Returns the ancestral same-as reachable set for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn ancestral_same_as_reachable_set(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<HashSet<Column>, WebCodeGenError> {
+        ancestral_same_as_reachable_set(self, conn)
+    }
+
     /// Returns the associated same-as columns for the column, if any.
     ///
     /// # Arguments
@@ -1557,22 +1572,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
-        Ok(self
-            .associated_same_as_constraints(conn)?
-            .into_iter()
-            .map(|constraint| {
-                let local_columns = constraint.columns(conn)?;
-                let foreign_columns = constraint.foreign_columns(conn)?;
-                Ok(local_columns
-                    .iter()
-                    .zip(foreign_columns)
-                    .filter_map(|(local_column, foreign_column)| {
-                        if local_column == self { Some(foreign_column.clone()) } else { None }
-                    })
-                    .next()
-                    .unwrap())
-            })
-            .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+        associated_same_as_columns(self, conn)
     }
 
     /// Returns the normal and inferred ancestral same-as constraints for the
@@ -1589,54 +1589,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, WebCodeGenError> {
-        let mut ancestral_same_as_columns = self.ancestral_same_as_columns(conn)?;
-
-        let table = self.table(conn)?;
-        for ancestor in table.ancestral_extension_tables(conn)? {
-            for ancestor_column in ancestor.columns(conn)? {
-                let ancestor_same_as_columns =
-                    ancestor_column.all_ancestral_same_as_columns(conn)?;
-                for same_as_column in &ancestor_same_as_columns {
-                    if ancestral_same_as_columns.contains(&same_as_column) {
-                        ancestral_same_as_columns.extend(ancestor_same_as_columns);
-                        break;
-                    }
-                }
-            }
-        }
-
-        ancestral_same_as_columns.sort_unstable();
-        ancestral_same_as_columns.dedup();
-
-        Ok(ancestral_same_as_columns)
-    }
-
-    /// Returns the `same-as` foreign columns associated with the current
-    /// column.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    ///
-    /// # Implementation details
-    ///
-    /// See method `same_as_constraints` for the definition of `same-as`
-    /// constraints.
-    pub fn same_as_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        if self.is_part_of_primary_key(conn)? {
-            return Ok(vec![]);
-        }
-
-        let mut same_as_columns = self.ancestral_same_as_columns(conn)?;
-        same_as_columns.extend(self.associated_same_as_columns(conn)?);
-
-        same_as_columns.sort_unstable();
-        same_as_columns.dedup();
-        Ok(same_as_columns)
+        all_ancestral_same_as_columns(self, conn)
     }
 
     /// Returns the set of unique tables that are referenced by foreign keys
@@ -1650,7 +1603,7 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn referenced_by_foreign_keys(
+    pub(crate) fn referenced_by_foreign_keys(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Table>, WebCodeGenError> {

@@ -1,6 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FractioningProcedureForeignKeys {
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+    >,
     pub foreign_procedure_template: Option<
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
@@ -9,12 +15,6 @@ pub struct FractioningProcedureForeignKeys {
     >,
     pub fragment_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
     >,
     pub fragment_placed_into: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
@@ -39,6 +39,17 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                 self.foreign_procedure_template,
             ),
@@ -53,17 +64,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.fragment_container,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.fragment_placed_into,
@@ -89,11 +89,11 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.foreign_procedure_template.is_some()
+        foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.foreign_procedure_template.is_some()
             && foreign_keys.foreign_procedure.is_some()
             && foreign_keys.fragment_container.is_some()
-            && foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
             && foreign_keys.fragment_placed_into.is_some()
             && (foreign_keys.weighed_with.is_some() || self.weighed_with.is_some())
             && foreign_keys.weighed_with_model.is_some()
@@ -182,12 +182,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = Some(procedures.clone());
-                    updated = true;
-                }
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = Some(procedures.clone());
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = Some(procedures.clone());
                     updated = true;
                 }
             }
@@ -195,12 +195,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::Procedure(procedures),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = None;
-                    updated = true;
-                }
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = None;
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = None;
                     updated = true;
                 }
             }

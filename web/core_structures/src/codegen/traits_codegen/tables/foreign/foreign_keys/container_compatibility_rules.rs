@@ -19,7 +19,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
-                        self.container_model_id,
+                        self.container_model,
                     ),
                 ),
             );
@@ -59,7 +59,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.container_model_id == container_models.id {
+                if self.container_model == container_models.id {
                     foreign_keys.container_model = Some(container_models);
                     updated = true;
                 }
@@ -68,7 +68,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
                 crate::codegen::tables::row::Row::ContainerModel(container_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.container_model_id == container_models.id {
+                if self.container_model == container_models.id {
                     foreign_keys.container_model = None;
                     updated = true;
                 }

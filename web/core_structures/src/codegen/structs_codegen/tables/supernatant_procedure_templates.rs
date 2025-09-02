@@ -36,6 +36,12 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+> for SupernatantProcedureTemplate
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for SupernatantProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -564,6 +570,28 @@ impl SupernatantProcedureTemplate {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_transferred_with_model_and_procedure_template(
+        procedure_template_transferred_with_model: &i32,
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates;
+        Self::table()
+            .filter(
+                supernatant_procedure_templates::procedure_template_transferred_with_model
+                    .eq(procedure_template_transferred_with_model)
+                    .and(
+                        supernatant_procedure_templates::procedure_template.eq(procedure_template),
+                    ),
+            )
+            .order_by(supernatant_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_template_transferred_with_model_and_transferred_with_model(
         procedure_template_transferred_with_model: &i32,
         transferred_with_model: &i32,
@@ -601,28 +629,6 @@ impl SupernatantProcedureTemplate {
             .filter(
                 supernatant_procedure_templates::procedure_template_pipette_tip_model
                     .eq(procedure_template_pipette_tip_model)
-                    .and(
-                        supernatant_procedure_templates::procedure_template.eq(procedure_template),
-                    ),
-            )
-            .order_by(supernatant_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_transferred_with_model_and_procedure_template(
-        procedure_template_transferred_with_model: &i32,
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates;
-        Self::table()
-            .filter(
-                supernatant_procedure_templates::procedure_template_transferred_with_model
-                    .eq(procedure_template_transferred_with_model)
                     .and(
                         supernatant_procedure_templates::procedure_template.eq(procedure_template),
                     ),
@@ -760,6 +766,30 @@ impl SupernatantProcedureTemplate {
             )
             .order_by(supernatant_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedure_templates::procedure_templates,
+            supernatant_procedure_templates::supernatant_procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(supernatant_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::name.eq(name))
+            .order_by(supernatant_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(

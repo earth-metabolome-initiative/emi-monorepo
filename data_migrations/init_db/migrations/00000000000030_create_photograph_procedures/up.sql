@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS photograph_procedures (
 	-- And that the `photographed_with` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, photographed_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `photographed_with` is indeed a weighing device of the correct model.
-	FOREIGN KEY (photographed_with, photographed_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (photographed_with, photographed_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES photograph_procedure_templates(procedure_template, foreign_procedure_template)
 );

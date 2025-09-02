@@ -17,8 +17,8 @@ pub trait Procedure: Insertable {
 
 /// Trait defining a procedure builder.
 pub trait ProcedureInitializer<C>: ProcedureTemplate {
-    /// Root procedure template type.
-    type Root: ProcedureTemplate;
+    /// Root procedure.
+    type Root: Procedure;
     /// Expected error type.
     type Error;
 
@@ -26,16 +26,9 @@ pub trait ProcedureInitializer<C>: ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `root` - The root procedure template from which to determine shared
-    ///   trackables.
+    /// * `root` - The root procedure from which to determine shared assets and
+    ///   asset models.
     /// * `conn` - A mutable reference to a database connection.
-    ///
-    /// # Implementation details
-    ///
-    /// The builder initialization takes into account any shared trackables
-    /// that have already been inserted in previous procedures, ensuring that
-    /// the builder is correctly set up to avoid requiring the user to specify
-    /// multiple times inferrable fields.
     fn procedure_builder(
         &self,
         root: &Self::Root,

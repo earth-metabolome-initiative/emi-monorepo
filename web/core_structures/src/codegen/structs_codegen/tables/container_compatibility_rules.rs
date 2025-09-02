@@ -8,12 +8,12 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(container_model_id, contained_asset_model))]
+#[diesel(primary_key(container_model, contained_asset_model))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules
 )]
 pub struct ContainerCompatibilityRule {
-    pub container_model_id: i32,
+    pub container_model: i32,
     pub contained_asset_model: i32,
     pub quantity: Option<i16>,
     pub created_by: i32,
@@ -22,10 +22,16 @@ pub struct ContainerCompatibilityRule {
 impl web_common_traits::prelude::TableName for ContainerCompatibilityRule {
     const TABLE_NAME: &'static str = "container_compatibility_rules";
 }
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
+> for ContainerCompatibilityRule
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{}
 impl diesel::Identifiable for ContainerCompatibilityRule {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
-        (self.container_model_id, self.contained_asset_model)
+        (self.container_model, self.contained_asset_model)
     }
 }
 impl ContainerCompatibilityRule {
@@ -56,7 +62,7 @@ impl ContainerCompatibilityRule {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.container_model_id,
+                self.container_model,
             ),
             conn,
         )
@@ -126,17 +132,17 @@ impl ContainerCompatibilityRule {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_model_id(
-        container_model_id: &i32,
+    pub fn from_container_model(
+        container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules;
         Self::table()
-            .filter(container_compatibility_rules::container_model_id.eq(container_model_id))
+            .filter(container_compatibility_rules::container_model.eq(container_model))
             .order_by((
-                container_compatibility_rules::container_model_id.asc(),
+                container_compatibility_rules::container_model.asc(),
                 container_compatibility_rules::contained_asset_model.asc(),
             ))
             .load::<Self>(conn)
@@ -152,7 +158,7 @@ impl ContainerCompatibilityRule {
         Self::table()
             .filter(container_compatibility_rules::contained_asset_model.eq(contained_asset_model))
             .order_by((
-                container_compatibility_rules::container_model_id.asc(),
+                container_compatibility_rules::container_model.asc(),
                 container_compatibility_rules::contained_asset_model.asc(),
             ))
             .load::<Self>(conn)
@@ -168,7 +174,7 @@ impl ContainerCompatibilityRule {
         Self::table()
             .filter(container_compatibility_rules::quantity.eq(quantity))
             .order_by((
-                container_compatibility_rules::container_model_id.asc(),
+                container_compatibility_rules::container_model.asc(),
                 container_compatibility_rules::contained_asset_model.asc(),
             ))
             .load::<Self>(conn)
@@ -184,7 +190,7 @@ impl ContainerCompatibilityRule {
         Self::table()
             .filter(container_compatibility_rules::created_by.eq(created_by))
             .order_by((
-                container_compatibility_rules::container_model_id.asc(),
+                container_compatibility_rules::container_model.asc(),
                 container_compatibility_rules::contained_asset_model.asc(),
             ))
             .load::<Self>(conn)
@@ -200,7 +206,7 @@ impl ContainerCompatibilityRule {
         Self::table()
             .filter(container_compatibility_rules::created_at.eq(created_at))
             .order_by((
-                container_compatibility_rules::container_model_id.asc(),
+                container_compatibility_rules::container_model.asc(),
                 container_compatibility_rules::contained_asset_model.asc(),
             ))
             .load::<Self>(conn)

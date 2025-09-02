@@ -30,11 +30,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
-        PrimaryKey = i32,
-    >,
     crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<

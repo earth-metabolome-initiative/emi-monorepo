@@ -33,6 +33,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+    > for PouringProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
 impl diesel::Identifiable for PouringProcedure {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {

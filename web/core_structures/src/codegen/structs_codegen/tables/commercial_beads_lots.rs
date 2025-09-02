@@ -14,7 +14,7 @@
 )]
 pub struct CommercialBeadsLot {
     pub id: i32,
-    pub product_model_id: i32,
+    pub product_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialBeadsLot {
     const TABLE_NAME: &'static str = "commercial_beads_lots";
@@ -46,6 +46,14 @@ where
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for CommercialBeadsLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot,
     > for CommercialBeadsLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
@@ -149,28 +157,28 @@ impl CommercialBeadsLot {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel::table(),
-                self.product_model_id,
+                self.product_model,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_product_model_id(
-        product_model_id: &i32,
+    pub fn from_product_model(
+        product_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_beads_lots::commercial_beads_lots;
         Self::table()
-            .filter(commercial_beads_lots::product_model_id.eq(product_model_id))
+            .filter(commercial_beads_lots::product_model.eq(product_model))
             .order_by(commercial_beads_lots::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_product_model_id(
+    pub fn from_id_and_product_model(
         id: &i32,
-        product_model_id: &i32,
+        product_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -182,15 +190,15 @@ impl CommercialBeadsLot {
             .filter(
                 commercial_beads_lots::id
                     .eq(id)
-                    .and(commercial_beads_lots::product_model_id.eq(product_model_id)),
+                    .and(commercial_beads_lots::product_model.eq(product_model)),
             )
             .order_by(commercial_beads_lots::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_lot_and_product_model_id(
+    pub fn from_lot_and_product_model(
         lot: &str,
-        product_model_id: &i32,
+        product_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -210,7 +218,7 @@ impl CommercialBeadsLot {
             .filter(
                 commercial_product_lots::lot
                     .eq(lot)
-                    .and(commercial_product_lots::product_model_id.eq(product_model_id)),
+                    .and(commercial_product_lots::product_model.eq(product_model)),
             )
             .order_by(commercial_beads_lots::id.asc())
             .select(Self::as_select())
@@ -241,8 +249,8 @@ impl CommercialBeadsLot {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id(
-        parent_model_id: &i32,
+    pub fn from_parent_model(
+        parent_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -259,14 +267,34 @@ impl CommercialBeadsLot {
                 physical_asset_models::table
                     .on(commercial_beads_lots::id.eq(physical_asset_models::id)),
             )
-            .filter(physical_asset_models::parent_model_id.eq(parent_model_id))
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_beads_lots::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id_and_id(
-        parent_model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, commercial_beads_lots::commercial_beads_lots,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(commercial_beads_lots::id.eq(asset_models::id)))
+            .filter(asset_models::name.eq(name))
+            .order_by(commercial_beads_lots::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_and_id(
+        parent_model: &i32,
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -280,7 +308,7 @@ impl CommercialBeadsLot {
         };
         Self::table()
             .inner_join(asset_models::table.on(commercial_beads_lots::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
+            .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
             .order_by(commercial_beads_lots::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

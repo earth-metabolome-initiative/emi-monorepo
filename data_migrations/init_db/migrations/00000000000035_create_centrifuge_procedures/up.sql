@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedures (
 	-- We check that the `centrifuged_with` is indeed a instrument that is compatible with the procedure template, if provided.
 	FOREIGN KEY (procedure, centrifuged_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the specified `centrifuged_with` is of the specified `centrifuged_with_model`.
-	FOREIGN KEY (centrifuged_with, centrifuged_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (centrifuged_with, centrifuged_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES centrifuge_procedure_templates(procedure_template, foreign_procedure_template)
 );

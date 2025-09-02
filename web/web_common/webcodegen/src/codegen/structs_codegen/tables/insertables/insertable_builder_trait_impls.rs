@@ -1,6 +1,8 @@
 //! Submodule defining the trait builder implementation for a table and all
 //! its extensions.
 
+use std::collections::{HashMap, HashSet};
+
 use quote::quote;
 
 mod generate_setter_method;
@@ -8,8 +10,7 @@ mod mermaid_illustration;
 use mermaid_illustration::columns_to_mermaid_illustration;
 
 use crate::{
-    Column, ColumnSameAsNetwork, PgExtension, Table, TableExtensionNetwork, TableLike,
-    errors::WebCodeGenError,
+    Column, PgExtension, Table, TableExtensionNetwork, TableLike, errors::WebCodeGenError,
 };
 
 impl Table {
@@ -61,8 +62,6 @@ impl Table {
     ///
     /// * `extension_network`: The network of table extensions to which the
     ///   current table belongs.
-    /// * `same_as_network`: The network of "same as" columns to which the
-    ///   current table belongs.
     /// * `conn`: The PostgreSQL connection to use to retrieve information about
     ///   the table.
     /// * `insertable_column`: The insertable column for which the setter method
@@ -76,8 +75,8 @@ impl Table {
         conn: &mut diesel::PgConnection,
         insertable_column: &crate::Column,
         extension_network: &TableExtensionNetwork,
-        same_as_network: &ColumnSameAsNetwork,
         check_constraints_extensions: &[&PgExtension],
+        extension_table_traits: &mut HashMap<Table, HashSet<Table>>,
     ) -> Result<(bool, bool, bool, Vec<Column>, proc_macro2::TokenStream), WebCodeGenError> {
         // If the provided column is part of the current table, we generate
         // the standard setter method body.
@@ -86,8 +85,8 @@ impl Table {
                 .generate_setter_method(
                     insertable_column,
                     extension_network,
-                    same_as_network,
                     check_constraints_extensions,
+                    extension_table_traits,
                     conn,
                 )
                 .map(|(requires_attribute_mutability, body, involved_columns)| {
@@ -123,6 +122,7 @@ impl Table {
                 let foreign_key_ident = foreign_key.constraint_ident(conn)?;
                 let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
                 let foreign_table_ident = foreign_table.struct_ident()?;
+                extension_table_traits.get_mut(&foreign_table).unwrap().insert(table);
                 Ok((
                     true,
                     true,
@@ -136,6 +136,7 @@ impl Table {
                     },
                 ))
             } else {
+                extension_table_traits.get_mut(self).unwrap().insert(table);
                 Ok((
                     true,
                     false,
@@ -171,8 +172,6 @@ impl Table {
     ///
     /// * `extension_network`: The network of table extensions to which the
     ///   current table belongs.
-    /// * `same_as_network`: The network of "same as" columns to which the
-    ///   current table belongs.
     /// * `conn`: The PostgreSQL connection to use to retrieve information about
     ///   the table.
     /// * `ancestral_table`: The ancestral table for which the trait
@@ -184,7 +183,6 @@ impl Table {
     fn generate_builder_trait_impl_for_ancestral_table(
         &self,
         extension_network: &TableExtensionNetwork,
-        same_as_network: &ColumnSameAsNetwork,
         conn: &mut diesel::PgConnection,
         ancestral_table: &Table,
         check_constraints_extensions: &[&PgExtension],
@@ -198,35 +196,18 @@ impl Table {
         };
         let builder_ident = self.insertable_builder_ident()?;
         let extension_tables = extension_network.extension_tables(self);
-        let left_generics = extension_tables
-            .iter()
-            .map(|extension_table| {
-                let generic_ident = extension_table.struct_ident()?;
-                let trait_ident = extension_table.builder_trait_ty()?;
-                let generic_attributes = extension_table.insertable_enum_ty()?;
-                Ok(quote! { #generic_ident: #trait_ident<Attributes = #generic_attributes> })
-            })
-            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-        let right_generics = extension_tables
-            .iter()
-            .map(|extension_table| extension_table.struct_ident())
-            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-
-        let maybe_left_generics = if left_generics.is_empty() {
-            quote! {}
-        } else {
-            quote! { < #(#left_generics),* > }
-        };
-        let maybe_right_generics = if right_generics.is_empty() {
-            quote! {}
-        } else {
-            quote! { < #(#right_generics),* > }
-        };
+        let mut extension_table_traits: HashMap<Table, HashSet<Table>> =
+            extension_tables.iter().map(|table| ((**table).clone(), HashSet::new())).collect();
+        extension_table_traits.insert(self.clone(), HashSet::new());
 
         let method_impls = ancestral_table
             .insertable_columns(conn, false)?
             .iter()
             .map(|insertable_column| {
+                if insertable_column.is_most_concrete_table(conn)? {
+                    return Ok(quote! {});
+                }
+
                 let setter_method = insertable_column.getter_ident()?;
                 let column_snake_case_ident = insertable_column.snake_case_ident()?;
                 let maybe_generics = self.builder_trait_generics(&insertable_column, conn)?;
@@ -244,8 +225,8 @@ impl Table {
                     conn,
                     insertable_column,
                     extension_network,
-                    same_as_network,
                     check_constraints_extensions,
+                    &mut extension_table_traits,
                 )?;
 
                 let maybe_inline = include_inlining.then(|| quote! { #[inline] });
@@ -294,21 +275,114 @@ impl Table {
             })
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
-        let maybe_attributes = if ancestral_table.extension_tables(conn)?.is_empty() {
-            let attributes = self.insertable_enum_ty()?;
-            Some(quote! {
-                type Attributes = #attributes;
+        let attributes = self.insertable_enum_ty()?;
+
+        let left_generics = extension_tables
+            .iter()
+            .map(|extension_table| {
+                let generic_ident = extension_table.struct_ident()?;
+                let generic_attributes = extension_table.insertable_enum_ty()?;
+
+                let trait_idents = extension_table_traits
+                    .get(extension_table)
+                    .unwrap()
+                    .iter()
+                    .map(|required_table| {
+                        let trait_ident = required_table.builder_trait_ty()?;
+                        Ok(quote! {
+                            #trait_ident<Attributes = #generic_attributes>
+                        })
+                    })
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+                Ok(if trait_idents.is_empty() {
+                    quote! { #generic_ident }
+                } else {
+                    quote! { #generic_ident: #(#trait_idents)+* }
+                })
             })
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+        let right_generics = extension_tables
+            .iter()
+            .map(|extension_table| extension_table.struct_ident())
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+        let maybe_left_generics = if left_generics.is_empty() {
+            quote! {}
         } else {
-            None
+            quote! { < #(#left_generics),* > }
+        };
+        let maybe_right_generics = if right_generics.is_empty() {
+            quote! {}
+        } else {
+            quote! { < #(#right_generics),* > }
+        };
+
+        let self_trait_requirements = extension_table_traits.get(self).unwrap();
+        let maybe_where = if self_trait_requirements.is_empty() {
+            quote! {}
+        } else {
+            let where_clauses = self_trait_requirements
+                .iter()
+                .map(|required_table| {
+                    let trait_ident = required_table.builder_trait_ty()?;
+                    Ok(quote! { Self: #trait_ident<Attributes = #attributes> })
+                })
+                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+            quote! { where #(#where_clauses),* }
         };
 
         Ok(quote! {
-            impl #maybe_left_generics #trait_path for #builder_ident #maybe_right_generics {
-                #maybe_attributes
+            impl #maybe_left_generics #trait_path for #builder_ident #maybe_right_generics #maybe_where{
+                type Attributes = #attributes;
 
                 #(#method_impls)*
             }
+        })
+    }
+
+    fn generate_most_concrete_table_trait_impl(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<proc_macro2::TokenStream>, WebCodeGenError> {
+        let builder_ident = self.insertable_builder_ident()?;
+        Ok(if let Some(column) = self.most_concrete_table_column(true, conn)? {
+            Some(if self.has_column(&column) {
+                let column_snake_case_ident = column.snake_case_ident()?;
+                quote! {
+                    impl web_common_traits::database::MostConcreteTable for #builder_ident {
+                        fn set_most_concrete_table(&mut self, table_name: &str) {
+                            if self.#column_snake_case_ident.is_some() {
+                                self.#column_snake_case_ident = Some(table_name.to_owned());
+                            }
+                        }
+                    }
+                }
+            } else {
+                let generics = self
+                    .extension_tables(conn)?
+                    .iter()
+                    .map(|table| table.struct_ident())
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                let dispatch = self
+                    .extension_foreign_keys(conn)?
+                    .iter()
+                    .map(|extension_foreign_key| extension_foreign_key.constraint_ident(conn))
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                quote! {
+                    impl<#(#generics),*> web_common_traits::database::MostConcreteTable for #builder_ident<#(#generics),*>
+                        where #(#generics: web_common_traits::database::MostConcreteTable),*
+                    {
+                        fn set_most_concrete_table(&mut self, table_name: &str) {
+                            #(
+                                self.#dispatch.set_most_concrete_table(table_name);
+                            )*
+                        }
+                    }
+                }
+            })
+        } else {
+            None
         })
     }
 
@@ -318,8 +392,6 @@ impl Table {
     /// # Arguments
     ///
     /// * `extension_network`: The network of table extensions to which the
-    ///   current table belongs.
-    /// * `same_as_network`: The network of "same as" columns to which the
     ///   current table belongs.
     /// * `conn`: The PostgreSQL connection to use to retrieve information about
     ///   the table.
@@ -332,13 +404,11 @@ impl Table {
     pub(super) fn generate_builder_trait_impl_for_ancestral_tables(
         &self,
         extension_network: &TableExtensionNetwork,
-        same_as_network: &ColumnSameAsNetwork,
         conn: &mut diesel::PgConnection,
         check_constraints_extensions: &[&PgExtension],
     ) -> Result<Vec<proc_macro2::TokenStream>, WebCodeGenError> {
         let mut impls = vec![self.generate_builder_trait_impl_for_ancestral_table(
             extension_network,
-            same_as_network,
             conn,
             self,
             check_constraints_extensions,
@@ -347,12 +417,13 @@ impl Table {
         for ancestor in self.ancestral_extension_tables(conn)? {
             impls.push(self.generate_builder_trait_impl_for_ancestral_table(
                 extension_network,
-                same_as_network,
                 conn,
                 &ancestor,
                 check_constraints_extensions,
             )?);
         }
+
+        impls.push(self.generate_most_concrete_table_trait_impl(conn)?.unwrap_or_default());
 
         Ok(impls)
     }

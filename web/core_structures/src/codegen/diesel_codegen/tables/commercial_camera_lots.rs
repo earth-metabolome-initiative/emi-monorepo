@@ -1,4 +1,4 @@
 diesel::table! {
-    commercial_camera_lots(id) { id -> diesel::sql_types::Integer, product_model_id ->
+    commercial_camera_lots(id) { id -> diesel::sql_types::Integer, product_model ->
     diesel::sql_types::Integer }
 }

@@ -488,9 +488,9 @@ pub struct InsertableBallMillProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of `BallMillProcedure`
 /// or descendant tables.
-pub trait BallMillProcedureBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-{
+pub trait BallMillProcedureBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.ball_mill_procedures.procedure_template`
     /// column.
     ///
@@ -654,55 +654,12 @@ pub trait BallMillProcedureBuildable:
         milled_container: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl BallMillProcedureBuildable for Option<::rosetta_uuid::Uuid> {
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure(
-        self,
-        _foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn bead_model(
-        self,
-        _bead_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn milled_with_model(
-        self,
-        _milled_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn milled_with(
-        self,
-        _milled_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn milled_container(
-        self,
-        _milled_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > BallMillProcedureBuildable for InsertableBallMillProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes;
     ///Sets the value of the `public.ball_mill_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -738,9 +695,10 @@ impl<
                         InsertableBallMillProcedureAttributes::ProcedureTemplate,
                     )
             })?;
-        self.procedure = self
-            .procedure
-            .procedure_template(procedure_template)
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+                self.procedure,
+                procedure_template,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
@@ -869,7 +827,12 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-for InsertableBallMillProcedureBuilder<Procedure> {
+for InsertableBallMillProcedureBuilder<Procedure>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::BallMillProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
@@ -921,28 +884,6 @@ for InsertableBallMillProcedureBuilder<Procedure> {
             self,
             procedure_template,
         )
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-                self.procedure,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -1027,6 +968,15 @@ for InsertableBallMillProcedureBuilder<Procedure> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<Procedure> web_common_traits::database::MostConcreteTable
+    for InsertableBallMillProcedureBuilder<Procedure>
+where
+    Procedure: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure.set_most_concrete_table(table_name);
     }
 }
 impl<Procedure> web_common_traits::prelude::SetPrimaryKey

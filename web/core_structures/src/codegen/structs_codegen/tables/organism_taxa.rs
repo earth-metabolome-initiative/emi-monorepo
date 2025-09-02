@@ -21,6 +21,14 @@ pub struct OrganismTaxon {
 impl web_common_traits::prelude::TableName for OrganismTaxon {
     const TABLE_NAME: &'static str = "organism_taxa";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
+    > for OrganismTaxon
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>,
+{
+}
 impl diesel::Identifiable for OrganismTaxon {
     type Id = (::rosetta_uuid::Uuid, i32);
     fn id(self) -> Self::Id {

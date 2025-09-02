@@ -26,14 +26,14 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetM
 pub enum InsertableDigitalAssetModelAttributes {
     Extension(InsertableDigitalAssetModelExtensionAttributes),
     Id,
-    ParentModelId,
+    ParentModel,
 }
 impl core::str::FromStr for InsertableDigitalAssetModelAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ParentModelId" => Ok(Self::ParentModelId),
-            "parent_model_id" => Ok(Self::ParentModelId),
+            "ParentModel" => Ok(Self::ParentModel),
+            "parent_model" => Ok(Self::ParentModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -43,7 +43,7 @@ impl core::fmt::Display for InsertableDigitalAssetModelAttributes {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Id => write!(f, "id"),
-            Self::ParentModelId => write!(f, "parent_model_id"),
+            Self::ParentModel => write!(f, "parent_model"),
         }
     }
 }
@@ -57,7 +57,7 @@ impl core::fmt::Display for InsertableDigitalAssetModelAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDigitalAssetModel {
     pub(crate) id: i32,
-    pub(crate) parent_model_id: Option<i32>,
+    pub(crate) parent_model: Option<i32>,
 }
 impl InsertableDigitalAssetModel {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -118,13 +118,13 @@ impl InsertableDigitalAssetModel {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(parent_model_id) = self.parent_model_id else {
+        let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
         RunQueryDsl::first(
                 QueryDsl::find(
                     crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::table(),
-                    parent_model_id,
+                    parent_model,
                 ),
                 conn,
             )
@@ -136,20 +136,19 @@ impl InsertableDigitalAssetModel {
 pub struct InsertableDigitalAssetModelBuilder<
     AssetModel = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
 > {
-    pub(crate) parent_model_id: Option<i32>,
+    pub(crate) parent_model: Option<i32>,
     pub(crate) id: AssetModel,
 }
 /// Trait defining setters for attributes of an instance of `DigitalAssetModel`
 /// or descendant tables.
-pub trait DigitalAssetModelBuildable:
-    crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
-{
-    /// Sets the value of the `public.digital_asset_models.parent_model_id`
-    /// column.
+pub trait DigitalAssetModelBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
+    /// Sets the value of the `public.digital_asset_models.parent_model` column.
     ///
     /// # Arguments
-    /// * `parent_model_id`: The value to set for the
-    ///   `public.digital_asset_models.parent_model_id` column.
+    /// * `parent_model`: The value to set for the
+    ///   `public.digital_asset_models.parent_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -165,23 +164,16 @@ pub trait DigitalAssetModelBuildable:
     /// * If the provided value does not pass schema-defined validation.
     fn parent_model(
         self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl DigitalAssetModelBuildable for Option<i32> {
-    fn parent_model(
-        self,
-        _parent_model_id: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
         >,
 > DigitalAssetModelBuildable for InsertableDigitalAssetModelBuilder<AssetModel> {
-    ///Sets the value of the `public.digital_asset_models.parent_model_id` column.
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttributes;
+    ///Sets the value of the `public.digital_asset_models.parent_model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -194,11 +186,11 @@ impl<
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model_id"}
+    ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 directly-involved-column
     ///end
     ///subgraph v3 ["`digital_asset_models`"]
-    ///    v1@{shape: rounded, label: "parent_model_id"}
+    ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
     ///v1 --->|"`ancestral same as`"| v0
@@ -206,23 +198,24 @@ impl<
     ///```
     fn parent_model(
         mut self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_model_id = parent_model_id
+        let parent_model = parent_model
             .try_into()
             .map_err(|err| {
                 validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableDigitalAssetModelAttributes::ParentModelId)
+                    .rename_field(InsertableDigitalAssetModelAttributes::ParentModel)
             })?;
-        self.id = self
-            .id
-            .parent_model(parent_model_id)
+        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::parent_model(
+                self.id,
+                parent_model,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
                 ))
             })?;
-        self.parent_model_id = parent_model_id;
+        self.parent_model = parent_model;
         Ok(self)
     }
 }
@@ -231,30 +224,13 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
-for InsertableDigitalAssetModelBuilder<AssetModel> {
+for InsertableDigitalAssetModelBuilder<AssetModel>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttributes;
-    #[inline]
-    ///Sets the value of the `public.asset_models.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -300,7 +276,7 @@ for InsertableDigitalAssetModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.parent_model_id` column.
+    ///Sets the value of the `public.asset_models.parent_model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -313,11 +289,11 @@ for InsertableDigitalAssetModelBuilder<AssetModel> {
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model_id"}
+    ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
     ///subgraph v3 ["`digital_asset_models`"]
-    ///    v1@{shape: rounded, label: "parent_model_id"}
+    ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
@@ -325,9 +301,9 @@ for InsertableDigitalAssetModelBuilder<AssetModel> {
     ///```
     fn parent_model(
         self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as DigitalAssetModelBuildable>::parent_model(self, parent_model_id)
+        <Self as DigitalAssetModelBuildable>::parent_model(self, parent_model)
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
@@ -412,6 +388,15 @@ for InsertableDigitalAssetModelBuilder<AssetModel> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<AssetModel> web_common_traits::database::MostConcreteTable
+    for InsertableDigitalAssetModelBuilder<AssetModel>
+where
+    AssetModel: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<AssetModel> web_common_traits::prelude::SetPrimaryKey

@@ -25,9 +25,7 @@ where
         PrimaryKey = i32,
     >,
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModel;
@@ -42,10 +40,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "commercial_packaging_models",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_packaging_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModel = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -59,6 +55,13 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        let parent_model = self
+            .parent_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttributes::ParentModel,
+                ),
+            )?;
         let id = if self.commercial_packaging_models_id_fkey1.is_complete() {
             let id = self
                 .commercial_packaging_models_id_fkey1
@@ -106,6 +109,9 @@ where
                 })?;
             id
         };
-        Ok(Self::InsertableVariant { id })
+        Ok(Self::InsertableVariant {
+            id,
+            parent_model,
+        })
     }
 }

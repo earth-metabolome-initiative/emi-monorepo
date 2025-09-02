@@ -110,7 +110,7 @@ pub struct InsertableUserOrganizationBuilder {
 }
 /// Trait defining setters for attributes of an instance of `UserOrganization`
 /// or descendant tables.
-pub trait UserOrganizationBuildable: std::marker::Sized {
+pub trait UserOrganizationBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.user_organizations.user_id` column.

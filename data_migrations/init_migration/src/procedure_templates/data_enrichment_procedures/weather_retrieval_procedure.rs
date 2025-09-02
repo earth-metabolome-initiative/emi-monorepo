@@ -1,7 +1,7 @@
 //! Submodule defining the sample collection procedures in the
 //! database.
 
-use core_structures::ProcedureTemplate;
+use core_structures::{ProcedureTemplate, tables::insertables::ProcedureTemplateBuildable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 const WEATHER_RETRIEVAL_PROCEDURE: &str = "Weather Retrieval Procedure";

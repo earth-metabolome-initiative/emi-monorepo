@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS freezing_procedures (
 	-- And that the `frozen_with` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, frozen_with) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `frozen_with` is indeed a weighing device of the correct model.
-	FOREIGN KEY (frozen_with, frozen_with_model) REFERENCES assets(id, model_id),
+	FOREIGN KEY (frozen_with, frozen_with_model) REFERENCES assets(id, model),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
 	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES freezing_procedure_templates(procedure_template, foreign_procedure_template)
 );

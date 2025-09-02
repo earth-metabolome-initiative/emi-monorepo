@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableContainerCompatibilityRuleAttributes {
-    ContainerModelId,
+    ContainerModel,
     ContainedAssetModel,
     Quantity,
     CreatedBy,
@@ -11,12 +11,12 @@ impl core::str::FromStr for InsertableContainerCompatibilityRuleAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ContainerModelId" => Ok(Self::ContainerModelId),
+            "ContainerModel" => Ok(Self::ContainerModel),
             "ContainedAssetModel" => Ok(Self::ContainedAssetModel),
             "Quantity" => Ok(Self::Quantity),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
-            "container_model_id" => Ok(Self::ContainerModelId),
+            "container_model" => Ok(Self::ContainerModel),
             "contained_asset_model" => Ok(Self::ContainedAssetModel),
             "quantity" => Ok(Self::Quantity),
             "created_by" => Ok(Self::CreatedBy),
@@ -28,7 +28,7 @@ impl core::str::FromStr for InsertableContainerCompatibilityRuleAttributes {
 impl core::fmt::Display for InsertableContainerCompatibilityRuleAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ContainerModelId => write!(f, "container_model_id"),
+            Self::ContainerModel => write!(f, "container_model"),
             Self::ContainedAssetModel => write!(f, "contained_asset_model"),
             Self::Quantity => write!(f, "quantity"),
             Self::CreatedBy => write!(f, "created_by"),
@@ -45,7 +45,7 @@ impl core::fmt::Display for InsertableContainerCompatibilityRuleAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerCompatibilityRule {
-    pub(crate) container_model_id: i32,
+    pub(crate) container_model: i32,
     pub(crate) contained_asset_model: i32,
     pub(crate) quantity: Option<i16>,
     pub(crate) created_by: i32,
@@ -79,7 +79,7 @@ impl InsertableContainerCompatibilityRule {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.container_model_id,
+                self.container_model,
             ),
             conn,
         )
@@ -152,7 +152,7 @@ impl InsertableContainerCompatibilityRule {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerCompatibilityRuleBuilder {
-    pub(crate) container_model_id: Option<i32>,
+    pub(crate) container_model: Option<i32>,
     pub(crate) contained_asset_model: Option<i32>,
     pub(crate) quantity: Option<i16>,
     pub(crate) created_by: Option<i32>,
@@ -161,7 +161,7 @@ pub struct InsertableContainerCompatibilityRuleBuilder {
 impl Default for InsertableContainerCompatibilityRuleBuilder {
     fn default() -> Self {
         Self {
-            container_model_id: Default::default(),
+            container_model: Default::default(),
             contained_asset_model: Default::default(),
             quantity: Default::default(),
             created_by: Default::default(),
@@ -171,15 +171,15 @@ impl Default for InsertableContainerCompatibilityRuleBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ContainerCompatibilityRule` or descendant tables.
-pub trait ContainerCompatibilityRuleBuildable: std::marker::Sized {
+pub trait ContainerCompatibilityRuleBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
-    /// `public.container_compatibility_rules.container_model_id` column.
+    /// `public.container_compatibility_rules.container_model` column.
     ///
     /// # Arguments
-    /// * `container_model_id`: The value to set for the
-    ///   `public.container_compatibility_rules.container_model_id` column.
+    /// * `container_model`: The value to set for the
+    ///   `public.container_compatibility_rules.container_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -195,7 +195,7 @@ pub trait ContainerCompatibilityRuleBuildable: std::marker::Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn container_model(
         self,
-        container_model_id: i32,
+        container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.container_compatibility_rules.contained_asset_model` column.
@@ -301,29 +301,26 @@ pub trait ContainerCompatibilityRuleBuildable: std::marker::Sized {
 impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRuleBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes;
     /// Sets the value of the
-    /// `public.container_compatibility_rules.container_model_id` column.
+    /// `public.container_compatibility_rules.container_model` column.
     fn container_model(
         mut self,
-        container_model_id: i32,
+        container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let container_model_id = container_model_id.try_into().map_err(|err| {
+        let container_model = container_model.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::ContainerModelId)
+                .rename_field(InsertableContainerCompatibilityRuleAttributes::ContainerModel)
         })?;
         if let Some(contained_asset_model) = self.contained_asset_model {
-            pgrx_validation::must_be_distinct_i32(
-                    container_model_id,
-                    contained_asset_model,
-                )
+            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModelId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
                             crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel,
                         )
                 })?;
         }
-        self.container_model_id = Some(container_model_id);
+        self.container_model = Some(container_model);
         Ok(self)
     }
     /// Sets the value of the
@@ -336,15 +333,12 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
             validation_errors::SingleFieldError::from(err)
                 .rename_field(InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel)
         })?;
-        if let Some(container_model_id) = self.container_model_id {
-            pgrx_validation::must_be_distinct_i32(
-                    container_model_id,
-                    contained_asset_model,
-                )
+        if let Some(container_model) = self.container_model {
+            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModelId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
                             crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel,
                         )
                 })?;
@@ -430,7 +424,7 @@ where
 {
     type Attributes = InsertableContainerCompatibilityRuleAttributes;
     fn is_complete(&self) -> bool {
-        self.container_model_id.is_some() && self.contained_asset_model.is_some()
+        self.container_model.is_some() && self.contained_asset_model.is_some()
             && self.created_by.is_some() && self.created_at.is_some()
     }
     fn mint_primary_key(

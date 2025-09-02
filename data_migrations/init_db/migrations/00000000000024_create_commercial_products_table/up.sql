@@ -5,61 +5,85 @@ CREATE TABLE IF NOT EXISTS commercial_products (
 );
 CREATE TABLE IF NOT EXISTS commercial_weighing_device_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES weighing_device_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES weighing_device_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_volume_measuring_device_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES volume_measuring_device_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES volume_measuring_device_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_pipette_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES pipette_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES pipette_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_pipette_tip_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES pipette_tip_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES pipette_tip_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_packaging_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES packaging_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES packaging_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_beads_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES beads_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES beads_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_ball_mill_machine_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES ball_mill_machine_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES ball_mill_machine_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_centrifuge_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES centrifuge_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES centrifuge_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_freezer_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES freezer_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES freezer_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_freeze_dryer_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES freeze_dryer_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES freeze_dryer_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_positioning_device_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES positioning_device_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES positioning_device_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_camera_models (
 	id INTEGER PRIMARY KEY,
+	parent_model INTEGER NOT NULL REFERENCES camera_models(id) ON DELETE CASCADE,
 	FOREIGN KEY (id) REFERENCES camera_models(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE
+	FOREIGN KEY (id) REFERENCES commercial_products(id) ON DELETE CASCADE,
+	FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
 );

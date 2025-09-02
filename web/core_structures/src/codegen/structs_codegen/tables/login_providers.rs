@@ -24,6 +24,14 @@ pub struct LoginProvider {
 impl web_common_traits::prelude::TableName for LoginProvider {
     const TABLE_NAME: &'static str = "login_providers";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+    > for LoginProvider
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for LoginProvider {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -95,6 +103,19 @@ impl LoginProvider {
             .filter(login_providers::scope.eq(scope))
             .order_by(login_providers::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::name.eq(name))
+            .order_by(login_providers::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<LoginProvider> for LoginProvider {

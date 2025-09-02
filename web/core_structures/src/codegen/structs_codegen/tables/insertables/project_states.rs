@@ -92,7 +92,7 @@ pub struct InsertableProjectStateBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ProjectState` or
 /// descendant tables.
-pub trait ProjectStateBuildable: std::marker::Sized {
+pub trait ProjectStateBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.project_states.name` column.
@@ -193,46 +193,6 @@ pub trait ProjectStateBuildable: std::marker::Sized {
         self,
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-}
-impl ProjectStateBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn icon<I>(
-        self,
-        _icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn color(
-        self,
-        _color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
 }
 impl ProjectStateBuildable for InsertableProjectStateBuilder {
     type Attributes =

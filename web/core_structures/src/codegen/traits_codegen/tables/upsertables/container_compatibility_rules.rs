@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
         use crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((container_model_id, contained_asset_model))
+            .on_conflict((container_model, contained_asset_model))
             .do_update()
             .set(self)
             .filter(
@@ -41,7 +41,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
         use crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((container_model_id, contained_asset_model))
+            .on_conflict((container_model, contained_asset_model))
             .do_update()
             .set(self)
             .filter(

@@ -1,6 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialCentrifugeModelForeignKeys {
+    pub parent_model:
+        Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
     pub commercial_centrifuge_models_id_fkey:
         Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
     pub commercial_centrifuge_models_id_fkey1:
@@ -14,6 +16,14 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
+                        self.parent_model,
+                    ),
+                ),
+            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -32,7 +42,8 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.commercial_centrifuge_models_id_fkey.is_some()
+        foreign_keys.parent_model.is_some()
+            && foreign_keys.commercial_centrifuge_models_id_fkey.is_some()
             && foreign_keys.commercial_centrifuge_models_id_fkey1.is_some()
     }
     fn update(
@@ -49,6 +60,10 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
+                if self.parent_model == centrifuge_models.id {
+                    foreign_keys.parent_model = Some(centrifuge_models);
+                    updated = true;
+                }
                 if self.id == centrifuge_models.id {
                     foreign_keys.commercial_centrifuge_models_id_fkey = Some(
                         centrifuge_models,
@@ -60,6 +75,10 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
                 crate::codegen::tables::row::Row::CentrifugeModel(centrifuge_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.parent_model == centrifuge_models.id {
+                    foreign_keys.parent_model = None;
+                    updated = true;
+                }
                 if self.id == centrifuge_models.id {
                     foreign_keys.commercial_centrifuge_models_id_fkey = None;
                     updated = true;

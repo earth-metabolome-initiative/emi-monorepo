@@ -110,7 +110,7 @@ pub struct InsertableTeamMemberBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TeamMember` or
 /// descendant tables.
-pub trait TeamMemberBuildable: std::marker::Sized {
+pub trait TeamMemberBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.team_members.team_id` column.

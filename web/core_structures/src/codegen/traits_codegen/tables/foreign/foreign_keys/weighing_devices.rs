@@ -24,7 +24,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialWeighingDeviceLot(
-                        self.model_id,
+                        self.model,
                     ),
                 ),
             );
@@ -48,7 +48,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.model_id == commercial_weighing_device_lots.id {
+                if self.model == commercial_weighing_device_lots.id {
                     foreign_keys.model = Some(commercial_weighing_device_lots);
                     updated = true;
                 }
@@ -59,7 +59,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.model_id == commercial_weighing_device_lots.id {
+                if self.model == commercial_weighing_device_lots.id {
                     foreign_keys.model = None;
                     updated = true;
                 }

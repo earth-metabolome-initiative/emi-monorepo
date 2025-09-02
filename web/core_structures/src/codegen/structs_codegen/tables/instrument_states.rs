@@ -22,6 +22,14 @@ pub struct InstrumentState {
 impl web_common_traits::prelude::TableName for InstrumentState {
     const TABLE_NAME: &'static str = "instrument_states";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
+    > for InstrumentState
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for InstrumentState {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -60,6 +68,58 @@ impl InstrumentState {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
+        Self::table()
+            .filter(instrument_states::name.eq(name))
+            .order_by(instrument_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
+        Self::table()
+            .filter(instrument_states::description.eq(description))
+            .order_by(instrument_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_icon(
+        icon: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
+        Self::table()
+            .filter(instrument_states::icon.eq(icon))
+            .order_by(instrument_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_color_id(
+        color_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::instrument_states::instrument_states;
+        Self::table()
+            .filter(instrument_states::color_id.eq(color_id))
+            .order_by(instrument_states::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<InstrumentState> for InstrumentState {

@@ -1,11 +1,15 @@
 use core_structures::{
     GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate, User,
+    tables::insertables::{
+        GeolocationProcedureTemplateBuildable, PhotographProcedureTemplateBuildable,
+        ProcedureTemplateBuildable,
+    },
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::procedure_template_trackables::{organism::organism_builder, phone::phone_builder};
+use crate::procedure_template_asset_models::{organism::organism_builder, phone::phone_builder};
 
 /// Initializes the Organism observation procedure template in the database.
 ///
@@ -49,8 +53,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_in_ecosystem_picture = PhotographProcedureTemplate::new()
         .name("Organism in Ecosystem Picture")?
         .description("Photograph of the organism in its surrounding ecosystem.")?
-        .procedure_photographed_with(phone_builder(user, conn)?)?
-        .trackable(organism_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -58,8 +62,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_picture = PhotographProcedureTemplate::new()
         .name("Organism Picture")?
         .description("Photograph of the full organism for identification.")?
-        .procedure_photographed_with(phone_builder(user, conn)?)?
-        .trackable(organism_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -68,8 +72,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_details_picture = PhotographProcedureTemplate::new()
         .name("Organism Details Picture")?
         .description("Photograph of details of the organism to facilitate identification.")?
-        .procedure_photographed_with(phone_builder(user, conn)?)?
-        .trackable(organism_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -77,8 +81,8 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_geolocation = GeolocationProcedureTemplate::new()
         .name("Organism Geolocation")?
         .description("Geolocation of the organism observation.")?
-        .procedure_geolocated_with(phone_builder(user, conn)?)?
-        .trackable(organism_builder(user, conn)?)?
+        .procedure_template_geolocated_with_model(phone_builder(user, conn)?)?
+        .procedure_template_geolocated_asset_model(organism_builder(user, conn)?)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -97,7 +101,7 @@ pub(crate) fn init_organism_observation_procedure(
     ] {
         observation_procedure.child(
             procedure,
-            ChildOptions::default().inherit_trackables(),
+            ChildOptions::default().inherit_asset_models(),
             user,
             conn,
         )?;

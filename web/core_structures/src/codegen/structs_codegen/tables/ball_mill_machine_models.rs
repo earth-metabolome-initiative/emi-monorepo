@@ -28,6 +28,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    > for BallMillMachineModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for BallMillMachineModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -68,8 +76,8 @@ impl BallMillMachineModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id(
-        parent_model_id: &i32,
+    pub fn from_parent_model(
+        parent_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -86,14 +94,34 @@ impl BallMillMachineModel {
                 physical_asset_models::table
                     .on(ball_mill_machine_models::id.eq(physical_asset_models::id)),
             )
-            .filter(physical_asset_models::parent_model_id.eq(parent_model_id))
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(ball_mill_machine_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_id_and_id(
-        parent_model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, ball_mill_machine_models::ball_mill_machine_models,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(ball_mill_machine_models::id.eq(asset_models::id)))
+            .filter(asset_models::name.eq(name))
+            .order_by(ball_mill_machine_models::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model_and_id(
+        parent_model: &i32,
         id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -107,7 +135,7 @@ impl BallMillMachineModel {
         };
         Self::table()
             .inner_join(asset_models::table.on(ball_mill_machine_models::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model_id.eq(parent_model_id).and(asset_models::id.eq(id)))
+            .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
             .order_by(ball_mill_machine_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

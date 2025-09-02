@@ -63,7 +63,7 @@ pub struct InsertableSpatialRefSyBuilder {
 }
 /// Trait defining setters for attributes of an instance of `SpatialRefSy` or
 /// descendant tables.
-pub trait SpatialRefSyBuildable: std::marker::Sized {
+pub trait SpatialRefSyBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.spatial_ref_sys.srid` column.
@@ -190,58 +190,6 @@ pub trait SpatialRefSyBuildable: std::marker::Sized {
     where
         P: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
-}
-impl SpatialRefSyBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyAttributes;
-    fn srid(
-        self,
-        srid: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(Some(srid.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(Self::Attributes::Srid)
-        })?))
-    }
-    fn auth_name<AN>(
-        self,
-        _auth_name: AN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn auth_srid<AS>(
-        self,
-        _auth_srid: AS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn srtext<S>(
-        self,
-        _srtext: S,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn proj4text<P>(
-        self,
-        _proj4text: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     type Attributes =

@@ -20,6 +20,13 @@ pub struct Unit {
 impl web_common_traits::prelude::TableName for Unit {
     const TABLE_NAME: &'static str = "units";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::units::Unit>
+    for Unit
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Unit {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -81,6 +88,26 @@ impl Unit {
             .filter(units::color_id.eq(color_id))
             .order_by(units::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::units::units;
+        Self::table().filter(units::name.eq(name)).order_by(units::id.asc()).first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_unit(
+        unit: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::units::units;
+        Self::table().filter(units::unit.eq(unit)).order_by(units::id.asc()).first::<Self>(conn)
     }
 }
 impl AsRef<Unit> for Unit {

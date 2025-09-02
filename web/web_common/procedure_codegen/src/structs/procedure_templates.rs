@@ -45,7 +45,7 @@ impl ProcedureTemplate {
 
         let procedure_template =
             Table::load(conn, PROCEDURE_TEMPLATES_TABLE_NAME, "public", &table.table_catalog)?;
-        
+
         if !table.is_extending(&procedure_template, conn)? {
             return Err(crate::errors::ProcedureTemplateError::NotAProcedureTemplateTable(
                 Box::new(table.clone()),
@@ -69,10 +69,19 @@ impl ProcedureTemplate {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Procedure, crate::errors::Error> {
-        let mut compatible_procedures = Vec::new();
-        for procedure in Procedure::load_all(&self.table.table_catalog, conn)? {
+        let mut compatible_procedures: Vec<Procedure> = Vec::new();
+        let procedures = Procedure::load_all(&self.table.table_catalog, conn)?;
+
+        if procedures.is_empty() {
+            unreachable!(
+                "There should be at least one procedure defined in the database `{}`",
+                self.table.table_catalog
+            );
+        }
+
+        for procedure in &procedures {
             if procedure.procedure_template(conn)? == *self {
-                compatible_procedures.push(procedure);
+                compatible_procedures.push(procedure.clone());
             }
         }
 
@@ -119,14 +128,14 @@ impl ProcedureTemplate {
     }
 
     /// Constructs a `ProcedureTemplate` from a `Table`.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `table` - The table to convert.
     /// * `conn` - A mutable reference to a PostgreSQL connection.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the database query fails, returns a `diesel::result::Error`.
     /// * If the table is not recognized as a procedure template, returns a
     ///   custom error.

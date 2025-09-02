@@ -30,9 +30,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::assets::Asset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAsset;
@@ -48,10 +46,8 @@ where
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
-            self,
-            "assets",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("assets");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableAsset = self
             .try_insert(user_id, conn)?;
         if !insertable_struct.model(conn)?.can_update(user_id, conn)? {
@@ -85,11 +81,11 @@ where
                     crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::MostConcreteTable,
                 ),
             )?;
-        let model_id = self
-            .model_id
+        let model = self
+            .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::ModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::Model,
                 ),
             )?;
         let created_by = self
@@ -125,7 +121,7 @@ where
             most_concrete_table,
             name: self.name,
             description: self.description,
-            model_id,
+            model,
             created_by,
             created_at,
             updated_by,

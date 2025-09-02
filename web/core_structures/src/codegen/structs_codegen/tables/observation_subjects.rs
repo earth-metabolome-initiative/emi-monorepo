@@ -22,6 +22,14 @@ pub struct ObservationSubject {
 impl web_common_traits::prelude::TableName for ObservationSubject {
     const TABLE_NAME: &'static str = "observation_subjects";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
+    > for ObservationSubject
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for ObservationSubject {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -73,6 +81,45 @@ impl ObservationSubject {
             .filter(observation_subjects::color_id.eq(color_id))
             .order_by(observation_subjects::id.asc())
             .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        Self::table()
+            .filter(observation_subjects::name.eq(name))
+            .order_by(observation_subjects::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        Self::table()
+            .filter(observation_subjects::description.eq(description))
+            .order_by(observation_subjects::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_icon(
+        icon: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
+        Self::table()
+            .filter(observation_subjects::icon.eq(icon))
+            .order_by(observation_subjects::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<ObservationSubject> for ObservationSubject {

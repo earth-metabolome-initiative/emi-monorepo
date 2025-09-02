@@ -71,7 +71,7 @@ pub struct InsertableLoginProviderBuilder {
 }
 /// Trait defining setters for attributes of an instance of `LoginProvider` or
 /// descendant tables.
-pub trait LoginProviderBuildable: std::marker::Sized {
+pub trait LoginProviderBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.login_providers.name` column.
@@ -228,70 +228,6 @@ pub trait LoginProviderBuildable: std::marker::Sized {
     where
         S: TryInto<String>,
         validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>;
-}
-impl LoginProviderBuildable for Option<i16> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttributes;
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn icon<I>(
-        self,
-        _icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn client<CI>(
-        self,
-        _client_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn redirect_uri<RU>(
-        self,
-        _redirect_uri: RU,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn oauth_url<OU>(
-        self,
-        _oauth_url: OU,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn scope<S>(
-        self,
-        _scope: S,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
 }
 impl LoginProviderBuildable for InsertableLoginProviderBuilder {
     type Attributes =

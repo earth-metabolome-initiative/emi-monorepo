@@ -1,6 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialBallMillMachineModelForeignKeys {
+    pub parent_model: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
     pub commercial_ball_mill_machine_models_id_fkey: Option<
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     >,
@@ -19,6 +22,14 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
+                        self.parent_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
                         self.id,
                     ),
                 ),
@@ -33,7 +44,8 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.commercial_ball_mill_machine_models_id_fkey.is_some()
+        foreign_keys.parent_model.is_some()
+            && foreign_keys.commercial_ball_mill_machine_models_id_fkey.is_some()
             && foreign_keys.commercial_ball_mill_machine_models_id_fkey1.is_some()
     }
     fn update(
@@ -52,6 +64,10 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
+                if self.parent_model == ball_mill_machine_models.id {
+                    foreign_keys.parent_model = Some(ball_mill_machine_models);
+                    updated = true;
+                }
                 if self.id == ball_mill_machine_models.id {
                     foreign_keys.commercial_ball_mill_machine_models_id_fkey = Some(
                         ball_mill_machine_models,
@@ -65,6 +81,10 @@ for crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.parent_model == ball_mill_machine_models.id {
+                    foreign_keys.parent_model = None;
+                    updated = true;
+                }
                 if self.id == ball_mill_machine_models.id {
                     foreign_keys.commercial_ball_mill_machine_models_id_fkey = None;
                     updated = true;

@@ -22,9 +22,7 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::packaging_models::PackagingModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel;
@@ -39,10 +37,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "packaging_models",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("packaging_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel = self
             .try_insert(user_id, conn)?;
         Ok(

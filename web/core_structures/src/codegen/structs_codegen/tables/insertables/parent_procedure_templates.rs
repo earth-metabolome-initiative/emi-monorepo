@@ -192,7 +192,7 @@ impl Default for InsertableParentProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ParentProcedureTemplate` or descendant tables.
-pub trait ParentProcedureTemplateBuildable: std::marker::Sized {
+pub trait ParentProcedureTemplateBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the

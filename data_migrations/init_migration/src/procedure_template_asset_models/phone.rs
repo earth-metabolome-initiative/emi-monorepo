@@ -1,11 +1,12 @@
-//! Submodule defining partial builders for procedure template trackables
+//! Submodule defining partial builders for procedure template asset_models
 //! related to phones.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    procedure_template_trackables::default_pmt::default_pmt, trackables::instruments::phone::phone,
+    asset_models::instruments::phone::phone,
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a phone trackable.
@@ -22,5 +23,5 @@ pub(crate) fn phone_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, phone(user, conn)?.phone_models_camera(conn)?.id(conn)?)
+    default_pmt(user, phone(user, conn)?.phone_models_camera(conn)?.id(conn)?.id(conn)?)
 }

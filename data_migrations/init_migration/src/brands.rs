@@ -1,6 +1,6 @@
 //! Submodule defining the init migrations for the brands.
 
-use core_structures::{Brand, User};
+use core_structures::{Brand, User, tables::insertables::BrandBuildable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 

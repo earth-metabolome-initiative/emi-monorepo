@@ -5,7 +5,7 @@ pub enum InsertableAssetModelAttributes {
     MostConcreteTable,
     Name,
     Description,
-    ParentModelId,
+    ParentModel,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -18,7 +18,7 @@ impl core::str::FromStr for InsertableAssetModelAttributes {
             "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "Name" => Ok(Self::Name),
             "Description" => Ok(Self::Description),
-            "ParentModelId" => Ok(Self::ParentModelId),
+            "ParentModel" => Ok(Self::ParentModel),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
@@ -26,7 +26,7 @@ impl core::str::FromStr for InsertableAssetModelAttributes {
             "most_concrete_table" => Ok(Self::MostConcreteTable),
             "name" => Ok(Self::Name),
             "description" => Ok(Self::Description),
-            "parent_model_id" => Ok(Self::ParentModelId),
+            "parent_model" => Ok(Self::ParentModel),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
             "updated_by" => Ok(Self::UpdatedBy),
@@ -42,7 +42,7 @@ impl core::fmt::Display for InsertableAssetModelAttributes {
             Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::Name => write!(f, "name"),
             Self::Description => write!(f, "description"),
-            Self::ParentModelId => write!(f, "parent_model_id"),
+            Self::ParentModel => write!(f, "parent_model"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
             Self::UpdatedBy => write!(f, "updated_by"),
@@ -62,7 +62,7 @@ pub struct InsertableAssetModel {
     pub(crate) most_concrete_table: String,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
-    pub(crate) parent_model_id: Option<i32>,
+    pub(crate) parent_model: Option<i32>,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
@@ -93,13 +93,13 @@ impl InsertableAssetModel {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(parent_model_id) = self.parent_model_id else {
+        let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
-                parent_model_id,
+                parent_model,
             ),
             conn,
         )
@@ -176,7 +176,7 @@ pub struct InsertableAssetModelBuilder {
     pub(crate) most_concrete_table: Option<String>,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
-    pub(crate) parent_model_id: Option<i32>,
+    pub(crate) parent_model: Option<i32>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
@@ -188,7 +188,7 @@ impl Default for InsertableAssetModelBuilder {
             most_concrete_table: Default::default(),
             name: Default::default(),
             description: Default::default(),
-            parent_model_id: Default::default(),
+            parent_model: Default::default(),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
@@ -198,35 +198,9 @@ impl Default for InsertableAssetModelBuilder {
 }
 /// Trait defining setters for attributes of an instance of `AssetModel` or
 /// descendant tables.
-pub trait AssetModelBuildable: std::marker::Sized {
+pub trait AssetModelBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
-    /// Sets the value of the `public.asset_models.most_concrete_table` column.
-    ///
-    /// # Arguments
-    /// * `most_concrete_table`: The value to set for the
-    ///   `public.asset_models.most_concrete_table` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `String`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn most_concrete_table<MCT>(
-        self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>;
     /// Sets the value of the `public.asset_models.name` column.
     ///
     /// # Arguments
@@ -278,11 +252,11 @@ pub trait AssetModelBuildable: std::marker::Sized {
     where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>;
-    /// Sets the value of the `public.asset_models.parent_model_id` column.
+    /// Sets the value of the `public.asset_models.parent_model` column.
     ///
     /// # Arguments
-    /// * `parent_model_id`: The value to set for the
-    ///   `public.asset_models.parent_model_id` column.
+    /// * `parent_model`: The value to set for the
+    ///   `public.asset_models.parent_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -298,7 +272,7 @@ pub trait AssetModelBuildable: std::marker::Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn parent_model(
         self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the `public.asset_models.created_by` column.
     ///
@@ -399,101 +373,9 @@ pub trait AssetModelBuildable: std::marker::Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl AssetModelBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes;
-    fn most_concrete_table<MCT>(
-        self,
-        _most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
-    {
-        Ok(self)
-    }
-    fn parent_model(
-        self,
-        _parent_model_id: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-}
 impl AssetModelBuildable for InsertableAssetModelBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes;
-    /// Sets the value of the `public.asset_models.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        let most_concrete_table = most_concrete_table.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttributes::MostConcreteTable)
-        })?;
-        if self.most_concrete_table.is_none() {
-            self.most_concrete_table = Some(most_concrete_table);
-        }
-        Ok(self)
-    }
     /// Sets the value of the `public.asset_models.name` column.
     fn name<N>(
         mut self,
@@ -555,16 +437,16 @@ impl AssetModelBuildable for InsertableAssetModelBuilder {
         self.description = description;
         Ok(self)
     }
-    /// Sets the value of the `public.asset_models.parent_model_id` column.
+    /// Sets the value of the `public.asset_models.parent_model` column.
     fn parent_model(
         mut self,
-        parent_model_id: Option<i32>,
+        parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_model_id = parent_model_id.try_into().map_err(|err| {
+        let parent_model = parent_model.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttributes::ParentModelId)
+                .rename_field(InsertableAssetModelAttributes::ParentModel)
         })?;
-        self.parent_model_id = parent_model_id;
+        self.parent_model = parent_model;
         Ok(self)
     }
     /// Sets the value of the `public.asset_models.created_by` column.
@@ -661,6 +543,13 @@ impl AssetModelBuildable for InsertableAssetModelBuilder {
         }
         self.updated_at = Some(updated_at);
         Ok(self)
+    }
+}
+impl web_common_traits::database::MostConcreteTable for InsertableAssetModelBuilder {
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        if self.most_concrete_table.is_some() {
+            self.most_concrete_table = Some(table_name.to_owned());
+        }
     }
 }
 impl web_common_traits::prelude::SetPrimaryKey for InsertableAssetModelBuilder {

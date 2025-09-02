@@ -1,6 +1,6 @@
 //! Submodule defining the procedure template to create a standard sample
 //! extraction solvent.
-use core_structures::{ProcedureTemplate, User};
+use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateBuildable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 /// The name of the sample extraction solvent procedure template.

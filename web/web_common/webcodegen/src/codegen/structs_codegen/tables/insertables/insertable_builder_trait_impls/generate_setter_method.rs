@@ -1,10 +1,10 @@
+use std::collections::{HashMap, HashSet};
+
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{
-    Column, ColumnSameAsNetwork, PgExtension, Table, TableExtensionNetwork, errors::WebCodeGenError,
-};
+use crate::{Column, PgExtension, Table, TableExtensionNetwork, errors::WebCodeGenError};
 
 mod generate_method_check_constraints;
 mod generate_same_as_assignments;
@@ -34,8 +34,8 @@ impl Table {
         &self,
         column: &Column,
         extension_network: &TableExtensionNetwork,
-        same_as_network: &ColumnSameAsNetwork,
         check_constraints_extensions: &[&PgExtension],
+        extension_table_traits: &mut HashMap<Table, HashSet<Table>>,
         conn: &mut PgConnection,
     ) -> Result<(bool, TokenStream, Vec<Column>), WebCodeGenError> {
         assert!(self.has_column(column), "The column must belong to the current table");
@@ -74,16 +74,18 @@ impl Table {
             None
         };
 
-        let mut same_as_assignments = Vec::new();
-
-        let (requires_attribute_mutability, this_same_as_assignments, same_as_columns) =
-            self.generate_same_as_assignments(column, extension_network, same_as_network, conn)?;
+        let (requires_attribute_mutability, same_as_assignments, same_as_columns) = self
+            .generate_same_as_assignments(
+                column,
+                extension_network,
+                extension_table_traits,
+                conn,
+            )?;
 
         involved_columns.extend(same_as_columns);
         involved_columns.sort_unstable();
         involved_columns.dedup();
 
-        same_as_assignments.extend(this_same_as_assignments);
         let column_camel_case_ident = column.camel_case_ident()?;
         let column_snake_case_ident = column.snake_case_ident()?;
 

@@ -10,137 +10,180 @@ graph [
         ];
 node [shape=box, style=rounded, fontname="Helvetica"];
 edge [fontname="Helvetica"];
-subgraph cluster_aliquoting_procedures {
-  C20 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nforeign_procedure_template"];
-  C23 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_template"];
-  label="aliquoting_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_packaging_lots {
-  C142 [color="blue", fillcolor="#ffffff", label="commercial_packaging_lots\nproduct_model_id"];
-  label="commercial_packaging_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_packaging_procedure_templates {
-  C307 [color="blue", fillcolor="#ffffff", label="packaging_procedure_templates\npackaged_with_model"];
-  label="packaging_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_geolocation_procedures {
-  C261 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\nforeign_procedure_template"];
-  C263 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\ngeolocated_with"];
-  C264 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\ngeolocated_with_model"];
-  C266 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\nprocedure_template"];
-  label="geolocation_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_volumetric_containers {
-  C548 [color="blue", fillcolor="#ffffff", label="volumetric_containers\nvolumetric_container_model_id"];
-  label="volumetric_containers";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_pipette_tip_lots {
-  C148 [color="blue", fillcolor="#ffffff", label="commercial_pipette_tip_lots\nproduct_model_id"];
-  label="commercial_pipette_tip_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_geolocation_procedure_templates {
-  C254 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\nforeign_procedure_template"];
-  C255 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\ngeolocated_asset_model"];
-  C256 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\ngeolocated_with_model"];
-  label="geolocation_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_freezing_procedures {
-  C248 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nforeign_procedure_template"];
-  C250 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nfrozen_with"];
-  C251 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nfrozen_with_model"];
-  C253 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nprocedure_template"];
-  label="freezing_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_storage_procedures {
-  C474 [color="blue", fillcolor="#ffffff", label="storage_procedures\nforeign_procedure_template"];
-  C476 [color="blue", fillcolor="#ffffff", label="storage_procedures\nprocedure_template"];
-  label="storage_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_freeze_drying_procedure_templates {
-  C218 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nforeign_procedure_template"];
-  C219 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nfreeze_dried_container_model"];
-  C220 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nfreeze_dried_with_model"];
-  label="freeze_drying_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_weighing_device_lots {
-  C163 [color="blue", fillcolor="#ffffff", label="commercial_weighing_device_lots\nproduct_model_id"];
-  label="commercial_weighing_device_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_digital_assets {
-  C178 [color="blue", fillcolor="#ffffff", label="digital_assets\nmodel_id"];
-  label="digital_assets";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_freezers {
-  C237 [color="blue", fillcolor="#ffffff", label="freezers\nmodel_id"];
-  label="freezers";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_photograph_procedure_templates {
-  C328 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nforeign_procedure_template"];
-  C329 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nphotographed_asset_model"];
-  C330 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nphotographed_with_model"];
-  label="photograph_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_physical_assets {
-  C344 [color="blue", fillcolor="#ffffff", label="physical_assets\nmodel_id"];
-  label="physical_assets";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_positioning_devices {
-  C351 [color="blue", fillcolor="#ffffff", label="positioning_devices\nmodel_id"];
-  label="positioning_devices";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_camera_lots {
-  C130 [color="blue", fillcolor="#ffffff", label="commercial_camera_lots\nproduct_model_id"];
-  label="commercial_camera_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_positioning_device_lots {
-  C151 [color="blue", fillcolor="#ffffff", label="commercial_positioning_device_lots\nproduct_model_id"];
-  label="commercial_positioning_device_lots";
+subgraph cluster_commercial_volume_measuring_device_lots {
+  C170 [color="blue", fillcolor="#ffffff", label="commercial_volume_measuring_device_lots\nproduct_model"];
+  label="commercial_volume_measuring_device_lots";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
 subgraph cluster_commercial_centrifuge_lots {
-  C133 [color="blue", fillcolor="#ffffff", label="commercial_centrifuge_lots\nproduct_model_id"];
+  C136 [color="blue", fillcolor="#ffffff", label="commercial_centrifuge_lots\nproduct_model"];
   label="commercial_centrifuge_lots";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
 subgraph cluster_commercial_product_lots {
-  C155 [color="blue", fillcolor="#ffffff", label="commercial_product_lots\nproduct_model_id"];
+  C165 [color="blue", fillcolor="#ffffff", label="commercial_product_lots\nproduct_model"];
   label="commercial_product_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_supernatant_procedure_templates {
+  C491 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nforeign_procedure_template"];
+  C493 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\npipette_tip_model"];
+  C494 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nprocedure_template"];
+  C495 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nprocedure_template_pipette_tip_model"];
+  C496 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nprocedure_template_stratified_source_model"];
+  C497 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nprocedure_template_supernatant_destination_model"];
+  C498 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nprocedure_template_transferred_with_model"];
+  C499 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nstratified_source_model"];
+  C500 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nsupernatant_destination_model"];
+  C501 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\ntransferred_with_model"];
+  label="supernatant_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_photograph_procedure_templates {
+  C340 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nforeign_procedure_template"];
+  C341 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nphotographed_asset_model"];
+  C342 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nphotographed_with_model"];
+  C343 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nprocedure_template"];
+  C344 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nprocedure_template_photographed_asset_model"];
+  C345 [color="blue", fillcolor="#ffffff", label="photograph_procedure_templates\nprocedure_template_photographed_with_model"];
+  label="photograph_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_freeze_drying_procedure_templates {
+  C230 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nforeign_procedure_template"];
+  C231 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nfreeze_dried_container_model"];
+  C232 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nfreeze_dried_with_model"];
+  C236 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nprocedure_template"];
+  C237 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nprocedure_template_freeze_dried_container_model"];
+  C238 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedure_templates\nprocedure_template_freeze_dried_with_model"];
+  label="freeze_drying_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_camera_lots {
+  C132 [color="blue", fillcolor="#ffffff", label="commercial_camera_lots\nproduct_model"];
+  label="commercial_camera_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_digital_asset_models {
+  C188 [color="blue", fillcolor="#ffffff", label="digital_asset_models\nparent_model"];
+  label="digital_asset_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_freezer_lots {
+  C144 [color="blue", fillcolor="#ffffff", label="commercial_freezer_lots\nproduct_model"];
+  label="commercial_freezer_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_disposal_procedures {
+  C197 [color="blue", fillcolor="#ffffff", label="disposal_procedures\nforeign_procedure_template"];
+  C199 [color="blue", fillcolor="#ffffff", label="disposal_procedures\nprocedure_template"];
+  label="disposal_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_ball_mill_machine_lots {
+  C124 [color="blue", fillcolor="#ffffff", label="commercial_ball_mill_machine_lots\nproduct_model"];
+  label="commercial_ball_mill_machine_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_ball_mill_machines {
+  C50 [color="blue", fillcolor="#ffffff", label="ball_mill_machines\nmodel"];
+  label="ball_mill_machines";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_pipette_lots {
+  C152 [color="blue", fillcolor="#ffffff", label="commercial_pipette_lots\nproduct_model"];
+  label="commercial_pipette_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_pipette_models {
+  C154 [color="blue", fillcolor="#ffffff", label="commercial_pipette_models\nparent_model"];
+  label="commercial_pipette_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_storage_procedures {
+  C486 [color="blue", fillcolor="#ffffff", label="storage_procedures\nforeign_procedure_template"];
+  C488 [color="blue", fillcolor="#ffffff", label="storage_procedures\nprocedure_template"];
+  label="storage_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_packaging_models {
+  C150 [color="blue", fillcolor="#ffffff", label="commercial_packaging_models\nparent_model"];
+  label="commercial_packaging_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_procedure_assets {
+  C381 [color="blue", fillcolor="#ffffff", label="procedure_assets\nancestor_model"];
+  C382 [color="blue", fillcolor="#ffffff", label="procedure_assets\nasset"];
+  C387 [color="blue", fillcolor="#ffffff", label="procedure_assets\nprocedure_template"];
+  C388 [color="blue", fillcolor="#ffffff", label="procedure_assets\nprocedure_template_asset_model"];
+  label="procedure_assets";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_physical_asset_models {
+  C354 [color="blue", fillcolor="#ffffff", label="physical_asset_models\nparent_model"];
+  label="physical_asset_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_fractioning_procedure_templates {
+  C208 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nforeign_procedure_template"];
+  C209 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nfragment_container_model"];
+  C210 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nfragment_placed_into_model"];
+  C212 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nprocedure_template"];
+  C213 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nprocedure_template_fragment_container_model"];
+  C214 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nprocedure_template_fragment_placed_into_model"];
+  C215 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nprocedure_template_weighed_with_model"];
+  C217 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nweighed_with_model"];
+  label="fractioning_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_freezing_procedure_templates {
+  C250 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nforeign_procedure_template"];
+  C251 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nfrozen_container_model"];
+  C252 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nfrozen_with_model"];
+  C255 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nprocedure_template"];
+  C256 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nprocedure_template_frozen_container_model"];
+  C257 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nprocedure_template_frozen_with_model"];
+  label="freezing_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_procedures {
+  C411 [color="blue", fillcolor="#ffffff", label="procedures\nprocedure_template"];
+  label="procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_weighing_procedures {
+  C571 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nforeign_procedure_template"];
+  C574 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_template"];
+  C576 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nweighed_with"];
+  C577 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nweighed_with_model"];
+  label="weighing_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_asset_models {
+  C36 [color="blue", fillcolor="#ffffff", label="asset_models\nparent_model"];
+  label="asset_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -151,37 +194,103 @@ subgraph cluster_capping_procedures {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_commercial_freeze_dryer_lots {
-  C136 [color="blue", fillcolor="#ffffff", label="commercial_freeze_dryer_lots\nproduct_model_id"];
-  label="commercial_freeze_dryer_lots";
+subgraph cluster_commercial_packaging_lots {
+  C148 [color="blue", fillcolor="#ffffff", label="commercial_packaging_lots\nproduct_model"];
+  label="commercial_packaging_lots";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_disposal_procedure_templates {
-  C179 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\ndisposed_asset_model"];
-  C180 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\nforeign_procedure_template"];
-  label="disposal_procedure_templates";
+subgraph cluster_commercial_freeze_dryer_models {
+  C142 [color="blue", fillcolor="#ffffff", label="commercial_freeze_dryer_models\nparent_model"];
+  label="commercial_freeze_dryer_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_pipettes {
-  C348 [color="blue", fillcolor="#ffffff", label="pipettes\nmodel_id"];
-  label="pipettes";
+subgraph cluster_freeze_dryers {
+  C229 [color="blue", fillcolor="#ffffff", label="freeze_dryers\nmodel"];
+  label="freeze_dryers";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_freezing_procedure_templates {
-  C238 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nforeign_procedure_template"];
-  C239 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nfrozen_container_model"];
-  C240 [color="blue", fillcolor="#ffffff", label="freezing_procedure_templates\nfrozen_with_model"];
-  label="freezing_procedure_templates";
+subgraph cluster_geolocation_procedures {
+  C273 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\nforeign_procedure_template"];
+  C275 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\ngeolocated_with"];
+  C276 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\ngeolocated_with_model"];
+  C278 [color="blue", fillcolor="#ffffff", label="geolocation_procedures\nprocedure_template"];
+  label="geolocation_procedures";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_procedure_template_asset_models {
-  C377 [color="blue", fillcolor="#ffffff", label="procedure_template_asset_models\nasset_model"];
-  C382 [color="blue", fillcolor="#ffffff", label="procedure_template_asset_models\nprocedure_template"];
-  label="procedure_template_asset_models";
+subgraph cluster_storage_procedure_templates {
+  C477 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nforeign_procedure_template"];
+  C480 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nprocedure_template"];
+  C481 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nprocedure_template_stored_asset_model"];
+  C482 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nprocedure_template_stored_into_model"];
+  C483 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nstored_asset_model"];
+  C484 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nstored_into_model"];
+  label="storage_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_supernatant_procedures {
+  C503 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nforeign_procedure_template"];
+  C506 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_template"];
+  label="supernatant_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_aliquoting_procedures {
+  C20 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nforeign_procedure_template"];
+  C23 [color="blue", fillcolor="#ffffff", label="aliquoting_procedures\nprocedure_template"];
+  label="aliquoting_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_cameras {
+  C82 [color="blue", fillcolor="#ffffff", label="cameras\nmodel"];
+  label="cameras";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_weighing_device_models {
+  C176 [color="blue", fillcolor="#ffffff", label="commercial_weighing_device_models\nparent_model"];
+  label="commercial_weighing_device_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_photograph_procedures {
+  C347 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nforeign_procedure_template"];
+  C349 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nphotographed_with"];
+  C350 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nphotographed_with_model"];
+  C352 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nprocedure_template"];
+  label="photograph_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_pouring_procedures {
+  C374 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nforeign_procedure_template"];
+  C375 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nmeasured_with"];
+  C376 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nmeasured_with_model"];
+  C380 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nprocedure_template"];
+  label="pouring_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_pipette_tip_models {
+  C158 [color="blue", fillcolor="#ffffff", label="commercial_pipette_tip_models\nparent_model"];
+  label="commercial_pipette_tip_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_positioning_device_lots {
+  C160 [color="blue", fillcolor="#ffffff", label="commercial_positioning_device_lots\nproduct_model"];
+  label="commercial_positioning_device_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_camera_models {
+  C134 [color="blue", fillcolor="#ffffff", label="commercial_camera_models\nparent_model"];
+  label="commercial_camera_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -189,213 +298,75 @@ subgraph cluster_centrifuge_procedure_templates {
   C97 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\ncentrifuged_container_model"];
   C98 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\ncentrifuged_with_model"];
   C99 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\nforeign_procedure_template"];
+  C102 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\nprocedure_template"];
+  C103 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\nprocedure_template_centrifuged_container_model"];
+  C104 [color="blue", fillcolor="#ffffff", label="centrifuge_procedure_templates\nprocedure_template_centrifuged_with_model"];
   label="centrifuge_procedure_templates";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_freeze_drying_procedures {
-  C229 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nforeign_procedure_template"];
-  C231 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nfreeze_dryed_with"];
-  C232 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nfreeze_dryed_with_model"];
-  C234 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nprocedure_template"];
-  label="freeze_drying_procedures";
+subgraph cluster_commercial_positioning_device_models {
+  C162 [color="blue", fillcolor="#ffffff", label="commercial_positioning_device_models\nparent_model"];
+  label="commercial_positioning_device_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_procedures {
-  C399 [color="blue", fillcolor="#ffffff", label="procedures\nprocedure_template"];
-  label="procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_ball_mill_machine_lots {
-  C124 [color="blue", fillcolor="#ffffff", label="commercial_ball_mill_machine_lots\nproduct_model_id"];
-  label="commercial_ball_mill_machine_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_pouring_procedure_templates {
-  C352 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nforeign_procedure_template"];
-  C354 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nmeasured_with_model"];
-  C356 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\npoured_into_model"];
-  label="pouring_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_centrifuges {
-  C115 [color="blue", fillcolor="#ffffff", label="centrifuges\nmodel_id"];
-  label="centrifuges";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_supernatant_procedures {
-  C491 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nforeign_procedure_template"];
-  C494 [color="blue", fillcolor="#ffffff", label="supernatant_procedures\nprocedure_template"];
-  label="supernatant_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_ball_mill_procedure_templates {
-  C51 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nbead_model"];
-  C52 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nforeign_procedure_template"];
-  C56 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nmilled_container_model"];
-  C57 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nmilled_with_model"];
-  label="ball_mill_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_shared_procedure_template_asset_models {
-  C449 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nchild_asset_model"];
-  C451 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nchild_procedure_template"];
-  C455 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nparent_asset_model"];
-  C456 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nparent_procedure_template"];
-  label="shared_procedure_template_asset_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_volume_measuring_device_lots {
-  C160 [color="blue", fillcolor="#ffffff", label="commercial_volume_measuring_device_lots\nproduct_model_id"];
-  label="commercial_volume_measuring_device_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_weighing_procedures {
-  C559 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nforeign_procedure_template"];
-  C562 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nprocedure_template"];
-  C564 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nweighed_with"];
-  C565 [color="blue", fillcolor="#ffffff", label="weighing_procedures\nweighed_with_model"];
-  label="weighing_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_digital_asset_models {
-  C176 [color="blue", fillcolor="#ffffff", label="digital_asset_models\nparent_model_id"];
-  label="digital_asset_models";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_commercial_pipette_lots {
-  C145 [color="blue", fillcolor="#ffffff", label="commercial_pipette_lots\nproduct_model_id"];
-  label="commercial_pipette_lots";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_freeze_dryers {
-  C217 [color="blue", fillcolor="#ffffff", label="freeze_dryers\nmodel_id"];
-  label="freeze_dryers";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_packaging_procedures {
-  C313 [color="blue", fillcolor="#ffffff", label="packaging_procedures\nprocedure_template"];
-  label="packaging_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_photograph_procedures {
-  C335 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nforeign_procedure_template"];
-  C337 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nphotographed_with"];
-  C338 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nphotographed_with_model"];
-  C340 [color="blue", fillcolor="#ffffff", label="photograph_procedures\nprocedure_template"];
-  label="photograph_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_storage_procedure_templates {
-  C465 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nforeign_procedure_template"];
-  C471 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nstored_asset_model"];
-  C472 [color="blue", fillcolor="#ffffff", label="storage_procedure_templates\nstored_into_model"];
-  label="storage_procedure_templates";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_weighing_devices {
-  C551 [color="blue", fillcolor="#ffffff", label="weighing_devices\nmodel_id"];
-  label="weighing_devices";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_containers {
-  C171 [color="blue", fillcolor="#ffffff", label="containers\ncontainer_model_id"];
-  label="containers";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_supernatant_procedure_templates {
-  C479 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nforeign_procedure_template"];
-  C481 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\npipette_tip_model"];
-  C487 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nstratified_source_model"];
-  C488 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\nsupernatant_destination_model"];
-  C489 [color="blue", fillcolor="#ffffff", label="supernatant_procedure_templates\ntransferred_with_model"];
-  label="supernatant_procedure_templates";
+subgraph cluster_volumetric_containers {
+  C560 [color="blue", fillcolor="#ffffff", label="volumetric_containers\nvolumetric_container_model"];
+  label="volumetric_containers";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
 subgraph cluster_volume_measuring_devices {
-  C544 [color="blue", fillcolor="#ffffff", label="volume_measuring_devices\nmodel_id"];
+  C556 [color="blue", fillcolor="#ffffff", label="volume_measuring_devices\nmodel"];
   label="volume_measuring_devices";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_procedure_assets {
-  C369 [color="blue", fillcolor="#ffffff", label="procedure_assets\nancestor_model"];
-  C375 [color="blue", fillcolor="#ffffff", label="procedure_assets\nprocedure_template"];
-  label="procedure_assets";
+subgraph cluster_commercial_beads_models {
+  C130 [color="blue", fillcolor="#ffffff", label="commercial_beads_models\nparent_model"];
+  label="commercial_beads_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_weighing_procedure_templates {
-  C552 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nforeign_procedure_template"];
-  C556 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nweighed_container_model"];
-  C557 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nweighed_with_model"];
-  label="weighing_procedure_templates";
+subgraph cluster_digital_assets {
+  C190 [color="blue", fillcolor="#ffffff", label="digital_assets\nmodel"];
+  label="digital_assets";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_pouring_procedures {
-  C362 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nforeign_procedure_template"];
-  C363 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nmeasured_with"];
-  C364 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nmeasured_with_model"];
-  C368 [color="blue", fillcolor="#ffffff", label="pouring_procedures\nprocedure_template"];
-  label="pouring_procedures";
+subgraph cluster_capping_procedure_templates {
+  C83 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\ncapped_with_model"];
+  C84 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\ncontainer_model"];
+  C85 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\nforeign_procedure_template"];
+  C86 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\nprocedure_template"];
+  C87 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\nprocedure_template_capped_with_model"];
+  C88 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\nprocedure_template_container_model"];
+  label="capping_procedure_templates";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_cameras {
-  C82 [color="blue", fillcolor="#ffffff", label="cameras\nmodel_id"];
-  label="cameras";
+subgraph cluster_commercial_centrifuge_models {
+  C138 [color="blue", fillcolor="#ffffff", label="commercial_centrifuge_models\nparent_model"];
+  label="commercial_centrifuge_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_aliquoting_procedure_templates {
-  C6 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_from_model"];
-  C7 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_into_model"];
-  C8 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_with_model"];
-  C9 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nforeign_procedure_template"];
-  C11 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\npipette_tip_model"];
-  label="aliquoting_procedure_templates";
+subgraph cluster_shared_procedure_template_asset_models {
+  C461 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nchild_asset_model"];
+  C463 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nchild_procedure_template"];
+  C467 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nparent_asset_model"];
+  C468 [color="blue", fillcolor="#ffffff", label="shared_procedure_template_asset_models\nparent_procedure_template"];
+  label="shared_procedure_template_asset_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_assets {
-  C42 [color="blue", fillcolor="#ffffff", label="assets\nid"];
-  C43 [color="blue", fillcolor="#ffffff", label="assets\nmodel_id"];
-  label="assets";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_ball_mill_procedures {
-  C66 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nforeign_procedure_template"];
-  C68 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nmilled_with"];
-  C69 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nmilled_with_model"];
-  C71 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nprocedure_template"];
-  label="ball_mill_procedures";
-  style="filled, rounded";
-  fillcolor="#f0f0f0";
-}
-subgraph cluster_asset_models {
-  C36 [color="blue", fillcolor="#ffffff", label="asset_models\nparent_model_id"];
-  label="asset_models";
+subgraph cluster_freeze_drying_procedures {
+  C241 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nforeign_procedure_template"];
+  C243 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nfreeze_dryed_with"];
+  C244 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nfreeze_dryed_with_model"];
+  C246 [color="blue", fillcolor="#ffffff", label="freeze_drying_procedures\nprocedure_template"];
+  label="freeze_drying_procedures";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
@@ -408,240 +379,482 @@ subgraph cluster_centrifuge_procedures {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_fractioning_procedure_templates {
-  C196 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nforeign_procedure_template"];
-  C197 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nfragment_container_model"];
-  C198 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nfragment_placed_into_model"];
-  C205 [color="blue", fillcolor="#ffffff", label="fractioning_procedure_templates\nweighed_with_model"];
-  label="fractioning_procedure_templates";
+subgraph cluster_weighing_devices {
+  C563 [color="blue", fillcolor="#ffffff", label="weighing_devices\nmodel"];
+  label="weighing_devices";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_ball_mill_machines {
-  C50 [color="blue", fillcolor="#ffffff", label="ball_mill_machines\nmodel_id"];
-  label="ball_mill_machines";
+subgraph cluster_assets {
+  C42 [color="blue", fillcolor="#ffffff", label="assets\nid"];
+  C43 [color="blue", fillcolor="#ffffff", label="assets\nmodel"];
+  label="assets";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_physical_asset_models {
-  C342 [color="blue", fillcolor="#ffffff", label="physical_asset_models\nparent_model_id"];
-  label="physical_asset_models";
+subgraph cluster_pipettes {
+  C360 [color="blue", fillcolor="#ffffff", label="pipettes\nmodel"];
+  label="pipettes";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_disposal_procedures {
-  C185 [color="blue", fillcolor="#ffffff", label="disposal_procedures\nforeign_procedure_template"];
-  C187 [color="blue", fillcolor="#ffffff", label="disposal_procedures\nprocedure_template"];
-  label="disposal_procedures";
+subgraph cluster_disposal_procedure_templates {
+  C191 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\ndisposed_asset_model"];
+  C192 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\nforeign_procedure_template"];
+  C193 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\nprocedure_template"];
+  C194 [color="blue", fillcolor="#ffffff", label="disposal_procedure_templates\nprocedure_template_disposed_asset_model"];
+  label="disposal_procedure_templates";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_capping_procedure_templates {
-  C83 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\ncapped_with_model"];
-  C84 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\ncontainer_model"];
-  C85 [color="blue", fillcolor="#ffffff", label="capping_procedure_templates\nforeign_procedure_template"];
-  label="capping_procedure_templates";
+subgraph cluster_ball_mill_procedure_templates {
+  C51 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nbead_model"];
+  C52 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nforeign_procedure_template"];
+  C56 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nmilled_container_model"];
+  C57 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nmilled_with_model"];
+  C59 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nprocedure_template"];
+  C60 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nprocedure_template_bead_model"];
+  C61 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nprocedure_template_milled_container_model"];
+  C62 [color="blue", fillcolor="#ffffff", label="ball_mill_procedure_templates\nprocedure_template_milled_with_model"];
+  label="ball_mill_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_freeze_dryer_lots {
+  C140 [color="blue", fillcolor="#ffffff", label="commercial_freeze_dryer_lots\nproduct_model"];
+  label="commercial_freeze_dryer_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_freezing_procedures {
+  C260 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nforeign_procedure_template"];
+  C262 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nfrozen_with"];
+  C263 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nfrozen_with_model"];
+  C265 [color="blue", fillcolor="#ffffff", label="freezing_procedures\nprocedure_template"];
+  label="freezing_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_pipette_tip_lots {
+  C156 [color="blue", fillcolor="#ffffff", label="commercial_pipette_tip_lots\nproduct_model"];
+  label="commercial_pipette_tip_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_volume_measuring_device_models {
+  C172 [color="blue", fillcolor="#ffffff", label="commercial_volume_measuring_device_models\nparent_model"];
+  label="commercial_volume_measuring_device_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_weighing_device_lots {
+  C174 [color="blue", fillcolor="#ffffff", label="commercial_weighing_device_lots\nproduct_model"];
+  label="commercial_weighing_device_lots";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_packaging_procedure_templates {
+  C319 [color="blue", fillcolor="#ffffff", label="packaging_procedure_templates\npackaged_with_model"];
+  C321 [color="blue", fillcolor="#ffffff", label="packaging_procedure_templates\nprocedure_template_packaged_with_model"];
+  label="packaging_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_weighing_procedure_templates {
+  C564 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nforeign_procedure_template"];
+  C565 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nprocedure_template"];
+  C566 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nprocedure_template_weighed_container_model"];
+  C567 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nprocedure_template_weighed_with_model"];
+  C568 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nweighed_container_model"];
+  C569 [color="blue", fillcolor="#ffffff", label="weighing_procedure_templates\nweighed_with_model"];
+  label="weighing_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_geolocation_procedure_templates {
+  C266 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\nforeign_procedure_template"];
+  C267 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\ngeolocated_asset_model"];
+  C268 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\ngeolocated_with_model"];
+  C269 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\nprocedure_template"];
+  C270 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\nprocedure_template_geolocated_asset_model"];
+  C271 [color="blue", fillcolor="#ffffff", label="geolocation_procedure_templates\nprocedure_template_geolocated_with_model"];
+  label="geolocation_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_freezer_models {
+  C146 [color="blue", fillcolor="#ffffff", label="commercial_freezer_models\nparent_model"];
+  label="commercial_freezer_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_procedure_template_asset_models {
+  C389 [color="blue", fillcolor="#ffffff", label="procedure_template_asset_models\nasset_model"];
+  C392 [color="blue", fillcolor="#ffffff", label="procedure_template_asset_models\nid"];
+  C394 [color="blue", fillcolor="#ffffff", label="procedure_template_asset_models\nprocedure_template"];
+  label="procedure_template_asset_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_aliquoting_procedure_templates {
+  C6 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_from_model"];
+  C7 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_into_model"];
+  C8 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\naliquoted_with_model"];
+  C9 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nforeign_procedure_template"];
+  C11 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\npipette_tip_model"];
+  C12 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nprocedure_template"];
+  C13 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nprocedure_template_aliquoted_from_model"];
+  C14 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nprocedure_template_aliquoted_into_model"];
+  C15 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nprocedure_template_aliquoted_with_model"];
+  C16 [color="blue", fillcolor="#ffffff", label="aliquoting_procedure_templates\nprocedure_template_pipette_tip_model"];
+  label="aliquoting_procedure_templates";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_centrifuges {
+  C115 [color="blue", fillcolor="#ffffff", label="centrifuges\nmodel"];
+  label="centrifuges";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_ball_mill_procedures {
+  C66 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nforeign_procedure_template"];
+  C68 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nmilled_with"];
+  C69 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nmilled_with_model"];
+  C71 [color="blue", fillcolor="#ffffff", label="ball_mill_procedures\nprocedure_template"];
+  label="ball_mill_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_physical_assets {
+  C356 [color="blue", fillcolor="#ffffff", label="physical_assets\nmodel"];
+  label="physical_assets";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
 subgraph cluster_fractioning_procedures {
-  C207 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nforeign_procedure_template"];
-  C212 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nprocedure_template"];
-  C213 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nweighed_with"];
-  C214 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nweighed_with_model"];
+  C219 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nforeign_procedure_template"];
+  C224 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nprocedure_template"];
+  C225 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nweighed_with"];
+  C226 [color="blue", fillcolor="#ffffff", label="fractioning_procedures\nweighed_with_model"];
   label="fractioning_procedures";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
 subgraph cluster_commercial_beads_lots {
-  C127 [color="blue", fillcolor="#ffffff", label="commercial_beads_lots\nproduct_model_id"];
+  C128 [color="blue", fillcolor="#ffffff", label="commercial_beads_lots\nproduct_model"];
   label="commercial_beads_lots";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_commercial_freezer_lots {
-  C139 [color="blue", fillcolor="#ffffff", label="commercial_freezer_lots\nproduct_model_id"];
-  label="commercial_freezer_lots";
+subgraph cluster_pouring_procedure_templates {
+  C364 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nforeign_procedure_template"];
+  C366 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nmeasured_with_model"];
+  C368 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\npoured_into_model"];
+  C369 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nprocedure_template"];
+  C370 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nprocedure_template_measured_with_model"];
+  C371 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nprocedure_template_poured_from_model"];
+  C372 [color="blue", fillcolor="#ffffff", label="pouring_procedure_templates\nprocedure_template_poured_into_model"];
+  label="pouring_procedure_templates";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-  C6 -> C377 [color="green", label="same as"];
-  C7 -> C377 [color="green", label="same as"];
-  C8 -> C377 [color="green", label="same as"];
-  C9 -> C382 [color="green", label="same as"];
-  C11 -> C377 [color="green", label="same as"];
+subgraph cluster_freezers {
+  C249 [color="blue", fillcolor="#ffffff", label="freezers\nmodel"];
+  label="freezers";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_containers {
+  C183 [color="blue", fillcolor="#ffffff", label="containers\ncontainer_model"];
+  label="containers";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_packaging_procedures {
+  C325 [color="blue", fillcolor="#ffffff", label="packaging_procedures\nprocedure_template"];
+  label="packaging_procedures";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_positioning_devices {
+  C363 [color="blue", fillcolor="#ffffff", label="positioning_devices\nmodel"];
+  label="positioning_devices";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+subgraph cluster_commercial_ball_mill_machine_models {
+  C126 [color="blue", fillcolor="#ffffff", label="commercial_ball_mill_machine_models\nparent_model"];
+  label="commercial_ball_mill_machine_models";
+  style="filled, rounded";
+  fillcolor="#f0f0f0";
+}
+  C6 -> C389 [color="green", label="same as"];
+  C7 -> C389 [color="green", label="same as"];
+  C8 -> C389 [color="green", label="same as"];
+  C9 -> C394 [color="green", label="same as"];
+  C11 -> C389 [color="green", label="same as"];
+  C13 -> C392 [color="green", label="same as"];
+  C14 -> C392 [color="green", label="same as"];
+  C15 -> C392 [color="green", label="same as"];
+  C16 -> C392 [color="green", label="same as"];
   C20 -> C9 [color="green", label="same as"];
-  C23 -> C399 [color="green", label="same as"];
+  C23 -> C12 [color="green", label="same as"];
+  C23 -> C411 [color="green", label="same as"];
   C50 -> C43 [color="green", label="same as"];
-  C51 -> C377 [color="green", label="same as"];
-  C52 -> C382 [color="green", label="same as"];
-  C56 -> C377 [color="green", label="same as"];
-  C57 -> C377 [color="green", label="same as"];
+  C51 -> C389 [color="green", label="same as"];
+  C52 -> C394 [color="green", label="same as"];
+  C56 -> C389 [color="green", label="same as"];
+  C57 -> C389 [color="green", label="same as"];
+  C60 -> C392 [color="green", label="same as"];
+  C61 -> C392 [color="green", label="same as"];
+  C62 -> C392 [color="green", label="same as"];
   C66 -> C52 [color="green", label="same as"];
   C68 -> C42 [color="green", label="same as"];
   C69 -> C43 [color="green", label="same as"];
-  C71 -> C399 [color="green", label="same as"];
+  C71 -> C59 [color="green", label="same as"];
+  C71 -> C411 [color="green", label="same as"];
   C82 -> C43 [color="green", label="same as"];
-  C83 -> C377 [color="green", label="same as"];
-  C84 -> C377 [color="green", label="same as"];
-  C85 -> C382 [color="green", label="same as"];
+  C83 -> C389 [color="green", label="same as"];
+  C84 -> C389 [color="green", label="same as"];
+  C85 -> C394 [color="green", label="same as"];
+  C87 -> C392 [color="green", label="same as"];
+  C88 -> C392 [color="green", label="same as"];
   C92 -> C85 [color="green", label="same as"];
-  C94 -> C399 [color="green", label="same as"];
-  C97 -> C377 [color="green", label="same as"];
-  C98 -> C377 [color="green", label="same as"];
-  C99 -> C382 [color="green", label="same as"];
+  C94 -> C86 [color="green", label="same as"];
+  C94 -> C411 [color="green", label="same as"];
+  C97 -> C389 [color="green", label="same as"];
+  C98 -> C389 [color="green", label="same as"];
+  C99 -> C394 [color="green", label="same as"];
+  C103 -> C392 [color="green", label="same as"];
+  C104 -> C392 [color="green", label="same as"];
   C108 -> C42 [color="green", label="same as"];
   C109 -> C43 [color="green", label="same as"];
   C111 -> C99 [color="green", label="same as"];
-  C113 -> C399 [color="green", label="same as"];
+  C113 -> C102 [color="green", label="same as"];
+  C113 -> C411 [color="green", label="same as"];
   C115 -> C43 [color="green", label="same as"];
   C124 -> C36 [color="green", label="same as"];
-  C127 -> C36 [color="green", label="same as"];
+  C126 -> C36 [color="green", label="same as"];
+  C128 -> C36 [color="green", label="same as"];
   C130 -> C36 [color="green", label="same as"];
-  C133 -> C36 [color="green", label="same as"];
+  C132 -> C36 [color="green", label="same as"];
+  C134 -> C36 [color="green", label="same as"];
   C136 -> C36 [color="green", label="same as"];
-  C139 -> C36 [color="green", label="same as"];
+  C138 -> C36 [color="green", label="same as"];
+  C140 -> C36 [color="green", label="same as"];
   C142 -> C36 [color="green", label="same as"];
-  C145 -> C36 [color="green", label="same as"];
+  C144 -> C36 [color="green", label="same as"];
+  C146 -> C36 [color="green", label="same as"];
   C148 -> C36 [color="green", label="same as"];
-  C151 -> C36 [color="green", label="same as"];
-  C155 -> C36 [color="green", label="same as"];
+  C150 -> C36 [color="green", label="same as"];
+  C152 -> C36 [color="green", label="same as"];
+  C154 -> C36 [color="green", label="same as"];
+  C156 -> C36 [color="green", label="same as"];
+  C158 -> C36 [color="green", label="same as"];
   C160 -> C36 [color="green", label="same as"];
-  C163 -> C36 [color="green", label="same as"];
-  C171 -> C43 [color="green", label="same as"];
+  C162 -> C36 [color="green", label="same as"];
+  C165 -> C36 [color="green", label="same as"];
+  C170 -> C36 [color="green", label="same as"];
+  C172 -> C36 [color="green", label="same as"];
+  C174 -> C36 [color="green", label="same as"];
   C176 -> C36 [color="green", label="same as"];
-  C178 -> C43 [color="green", label="same as"];
-  C179 -> C377 [color="green", label="same as"];
-  C180 -> C382 [color="green", label="same as"];
-  C185 -> C180 [color="green", label="same as"];
-  C187 -> C399 [color="green", label="same as"];
-  C196 -> C382 [color="green", label="same as"];
-  C197 -> C377 [color="green", label="same as"];
-  C198 -> C377 [color="green", label="same as"];
-  C205 -> C377 [color="green", label="same as"];
-  C207 -> C196 [color="green", label="same as"];
-  C212 -> C399 [color="green", label="same as"];
-  C213 -> C42 [color="green", label="same as"];
-  C214 -> C43 [color="green", label="same as"];
-  C217 -> C43 [color="green", label="same as"];
-  C219 -> C377 [color="green", label="same as"];
-  C220 -> C377 [color="green", label="same as"];
-  C229 -> C218 [color="green", label="same as"];
-  C231 -> C42 [color="green", label="same as"];
-  C232 -> C43 [color="green", label="same as"];
-  C234 -> C399 [color="green", label="same as"];
-  C237 -> C43 [color="green", label="same as"];
-  C238 -> C382 [color="green", label="same as"];
-  C239 -> C377 [color="green", label="same as"];
-  C240 -> C377 [color="green", label="same as"];
-  C248 -> C238 [color="green", label="same as"];
-  C250 -> C42 [color="green", label="same as"];
-  C251 -> C43 [color="green", label="same as"];
-  C253 -> C399 [color="green", label="same as"];
-  C254 -> C382 [color="green", label="same as"];
-  C255 -> C377 [color="green", label="same as"];
-  C256 -> C377 [color="green", label="same as"];
-  C261 -> C254 [color="green", label="same as"];
-  C263 -> C42 [color="green", label="same as"];
-  C264 -> C43 [color="green", label="same as"];
-  C266 -> C399 [color="green", label="same as"];
-  C307 -> C377 [color="green", label="same as"];
-  C313 -> C399 [color="green", label="same as"];
-  C328 -> C382 [color="green", label="same as"];
-  C329 -> C377 [color="green", label="same as"];
-  C330 -> C377 [color="green", label="same as"];
-  C335 -> C328 [color="green", label="same as"];
-  C337 -> C42 [color="green", label="same as"];
-  C338 -> C43 [color="green", label="same as"];
-  C340 -> C399 [color="green", label="same as"];
-  C342 -> C36 [color="green", label="same as"];
-  C344 -> C43 [color="green", label="same as"];
-  C348 -> C43 [color="green", label="same as"];
-  C351 -> C43 [color="green", label="same as"];
-  C352 -> C382 [color="green", label="same as"];
-  C354 -> C377 [color="green", label="same as"];
-  C356 -> C377 [color="green", label="same as"];
-  C362 -> C352 [color="green", label="same as"];
-  C363 -> C42 [color="green", label="same as"];
-  C364 -> C43 [color="green", label="same as"];
-  C368 -> C399 [color="green", label="same as"];
-  C369 -> C377 [color="green", label="same as"];
-  C375 -> C382 [color="green", label="same as"];
-  C375 -> C399 [color="green", label="same as"];
-  C449 -> C377 [color="green", label="same as"];
-  C451 -> C382 [color="green", label="same as"];
-  C455 -> C377 [color="green", label="same as"];
-  C456 -> C382 [color="green", label="same as"];
-  C465 -> C382 [color="green", label="same as"];
-  C471 -> C377 [color="green", label="same as"];
-  C472 -> C377 [color="green", label="same as"];
-  C474 -> C465 [color="green", label="same as"];
-  C476 -> C399 [color="green", label="same as"];
-  C479 -> C382 [color="green", label="same as"];
-  C481 -> C377 [color="green", label="same as"];
-  C487 -> C377 [color="green", label="same as"];
-  C488 -> C377 [color="green", label="same as"];
-  C489 -> C377 [color="green", label="same as"];
-  C491 -> C479 [color="green", label="same as"];
-  C494 -> C399 [color="green", label="same as"];
-  C544 -> C43 [color="green", label="same as"];
-  C548 -> C43 [color="green", label="same as"];
-  C551 -> C43 [color="green", label="same as"];
-  C552 -> C382 [color="green", label="same as"];
-  C556 -> C377 [color="green", label="same as"];
-  C557 -> C377 [color="green", label="same as"];
-  C559 -> C552 [color="green", label="same as"];
-  C562 -> C399 [color="green", label="same as"];
-  C564 -> C42 [color="green", label="same as"];
-  C565 -> C43 [color="green", label="same as"];
-  C20 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C50 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C66 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C82 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C92 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C111 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C115 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C124 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C124 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C127 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C127 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C130 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C130 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C133 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C133 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C136 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C136 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C139 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C139 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C142 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C142 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C145 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C145 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C148 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C148 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C151 -> C155 [dir="both", color="red", label="inferred", style=dashed];
-  C151 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C155 -> C160 [dir="both", color="red", label="inferred", style=dashed];
-  C155 -> C163 [dir="both", color="red", label="inferred", style=dashed];
-  C155 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C160 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C163 -> C342 [dir="both", color="red", label="inferred", style=dashed];
-  C171 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C171 -> C548 [dir="both", color="red", label="inferred", style=dashed];
-  C185 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C207 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C217 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C237 -> C344 [dir="both", color="red", label="inferred", style=dashed];
-  C248 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C261 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C335 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C344 -> C348 [dir="both", color="red", label="inferred", style=dashed];
-  C344 -> C351 [dir="both", color="red", label="inferred", style=dashed];
-  C344 -> C544 [dir="both", color="red", label="inferred", style=dashed];
-  C344 -> C548 [dir="both", color="red", label="inferred", style=dashed];
-  C344 -> C551 [dir="both", color="red", label="inferred", style=dashed];
-  C362 -> C399 [dir="both", color="red", label="inferred", style=dashed];
-  C399 -> C474 [dir="both", color="red", label="inferred", style=dashed];
-  C399 -> C491 [dir="both", color="red", label="inferred", style=dashed];
-  C399 -> C559 [dir="both", color="red", label="inferred", style=dashed];
+  C183 -> C43 [color="green", label="same as"];
+  C188 -> C36 [color="green", label="same as"];
+  C190 -> C43 [color="green", label="same as"];
+  C191 -> C389 [color="green", label="same as"];
+  C192 -> C394 [color="green", label="same as"];
+  C194 -> C392 [color="green", label="same as"];
+  C197 -> C192 [color="green", label="same as"];
+  C199 -> C193 [color="green", label="same as"];
+  C199 -> C411 [color="green", label="same as"];
+  C208 -> C394 [color="green", label="same as"];
+  C209 -> C389 [color="green", label="same as"];
+  C210 -> C389 [color="green", label="same as"];
+  C213 -> C392 [color="green", label="same as"];
+  C214 -> C392 [color="green", label="same as"];
+  C215 -> C392 [color="green", label="same as"];
+  C217 -> C389 [color="green", label="same as"];
+  C219 -> C208 [color="green", label="same as"];
+  C224 -> C212 [color="green", label="same as"];
+  C224 -> C411 [color="green", label="same as"];
+  C225 -> C42 [color="green", label="same as"];
+  C226 -> C43 [color="green", label="same as"];
+  C229 -> C43 [color="green", label="same as"];
+  C231 -> C389 [color="green", label="same as"];
+  C232 -> C389 [color="green", label="same as"];
+  C237 -> C392 [color="green", label="same as"];
+  C238 -> C392 [color="green", label="same as"];
+  C241 -> C230 [color="green", label="same as"];
+  C243 -> C42 [color="green", label="same as"];
+  C244 -> C43 [color="green", label="same as"];
+  C246 -> C236 [color="green", label="same as"];
+  C246 -> C411 [color="green", label="same as"];
+  C249 -> C43 [color="green", label="same as"];
+  C250 -> C394 [color="green", label="same as"];
+  C251 -> C389 [color="green", label="same as"];
+  C252 -> C389 [color="green", label="same as"];
+  C256 -> C392 [color="green", label="same as"];
+  C257 -> C392 [color="green", label="same as"];
+  C260 -> C250 [color="green", label="same as"];
+  C262 -> C42 [color="green", label="same as"];
+  C263 -> C43 [color="green", label="same as"];
+  C265 -> C255 [color="green", label="same as"];
+  C265 -> C411 [color="green", label="same as"];
+  C266 -> C394 [color="green", label="same as"];
+  C267 -> C389 [color="green", label="same as"];
+  C268 -> C389 [color="green", label="same as"];
+  C270 -> C392 [color="green", label="same as"];
+  C271 -> C392 [color="green", label="same as"];
+  C273 -> C266 [color="green", label="same as"];
+  C275 -> C42 [color="green", label="same as"];
+  C276 -> C43 [color="green", label="same as"];
+  C278 -> C269 [color="green", label="same as"];
+  C278 -> C411 [color="green", label="same as"];
+  C319 -> C389 [color="green", label="same as"];
+  C321 -> C392 [color="green", label="same as"];
+  C325 -> C411 [color="green", label="same as"];
+  C340 -> C394 [color="green", label="same as"];
+  C341 -> C389 [color="green", label="same as"];
+  C342 -> C389 [color="green", label="same as"];
+  C344 -> C392 [color="green", label="same as"];
+  C345 -> C392 [color="green", label="same as"];
+  C347 -> C340 [color="green", label="same as"];
+  C349 -> C42 [color="green", label="same as"];
+  C350 -> C43 [color="green", label="same as"];
+  C352 -> C343 [color="green", label="same as"];
+  C352 -> C411 [color="green", label="same as"];
+  C354 -> C36 [color="green", label="same as"];
+  C356 -> C43 [color="green", label="same as"];
+  C360 -> C43 [color="green", label="same as"];
+  C363 -> C43 [color="green", label="same as"];
+  C364 -> C394 [color="green", label="same as"];
+  C366 -> C389 [color="green", label="same as"];
+  C368 -> C389 [color="green", label="same as"];
+  C370 -> C392 [color="green", label="same as"];
+  C371 -> C392 [color="green", label="same as"];
+  C372 -> C392 [color="green", label="same as"];
+  C374 -> C364 [color="green", label="same as"];
+  C375 -> C42 [color="green", label="same as"];
+  C376 -> C43 [color="green", label="same as"];
+  C380 -> C369 [color="green", label="same as"];
+  C380 -> C411 [color="green", label="same as"];
+  C381 -> C389 [color="green", label="same as"];
+  C382 -> C42 [color="green", label="same as"];
+  C387 -> C394 [color="green", label="same as"];
+  C387 -> C411 [color="green", label="same as"];
+  C388 -> C392 [color="green", label="same as"];
+  C461 -> C389 [color="green", label="same as"];
+  C463 -> C394 [color="green", label="same as"];
+  C467 -> C389 [color="green", label="same as"];
+  C468 -> C394 [color="green", label="same as"];
+  C477 -> C394 [color="green", label="same as"];
+  C481 -> C392 [color="green", label="same as"];
+  C482 -> C392 [color="green", label="same as"];
+  C483 -> C389 [color="green", label="same as"];
+  C484 -> C389 [color="green", label="same as"];
+  C486 -> C477 [color="green", label="same as"];
+  C488 -> C411 [color="green", label="same as"];
+  C488 -> C480 [color="green", label="same as"];
+  C491 -> C394 [color="green", label="same as"];
+  C493 -> C389 [color="green", label="same as"];
+  C495 -> C392 [color="green", label="same as"];
+  C496 -> C392 [color="green", label="same as"];
+  C497 -> C392 [color="green", label="same as"];
+  C498 -> C392 [color="green", label="same as"];
+  C499 -> C389 [color="green", label="same as"];
+  C500 -> C389 [color="green", label="same as"];
+  C501 -> C389 [color="green", label="same as"];
+  C503 -> C491 [color="green", label="same as"];
+  C506 -> C411 [color="green", label="same as"];
+  C506 -> C494 [color="green", label="same as"];
+  C556 -> C43 [color="green", label="same as"];
+  C560 -> C43 [color="green", label="same as"];
+  C563 -> C43 [color="green", label="same as"];
+  C564 -> C394 [color="green", label="same as"];
+  C566 -> C392 [color="green", label="same as"];
+  C567 -> C392 [color="green", label="same as"];
+  C568 -> C389 [color="green", label="same as"];
+  C569 -> C389 [color="green", label="same as"];
+  C571 -> C564 [color="green", label="same as"];
+  C574 -> C411 [color="green", label="same as"];
+  C574 -> C565 [color="green", label="same as"];
+  C576 -> C42 [color="green", label="same as"];
+  C577 -> C43 [color="green", label="same as"];
+  C12 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C20 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C50 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C59 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C66 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C82 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C86 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C92 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C102 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C111 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C115 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C124 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C124 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C126 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C128 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C128 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C130 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C132 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C132 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C134 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C136 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C136 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C138 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C140 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C140 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C142 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C144 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C144 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C146 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C148 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C148 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C150 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C152 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C152 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C154 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C156 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C156 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C158 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C160 -> C165 [dir="both", color="red", label="inferred", style=dashed];
+  C160 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C162 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C165 -> C170 [dir="both", color="red", label="inferred", style=dashed];
+  C165 -> C174 [dir="both", color="red", label="inferred", style=dashed];
+  C165 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C170 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C172 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C174 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C176 -> C354 [dir="both", color="red", label="inferred", style=dashed];
+  C183 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C183 -> C560 [dir="both", color="red", label="inferred", style=dashed];
+  C193 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C197 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C212 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C219 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C229 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C236 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C249 -> C356 [dir="both", color="red", label="inferred", style=dashed];
+  C255 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C260 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C269 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C273 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C343 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C347 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C356 -> C360 [dir="both", color="red", label="inferred", style=dashed];
+  C356 -> C363 [dir="both", color="red", label="inferred", style=dashed];
+  C356 -> C556 [dir="both", color="red", label="inferred", style=dashed];
+  C356 -> C560 [dir="both", color="red", label="inferred", style=dashed];
+  C356 -> C563 [dir="both", color="red", label="inferred", style=dashed];
+  C369 -> C394 [dir="both", color="red", label="inferred", style=dashed];
+  C374 -> C411 [dir="both", color="red", label="inferred", style=dashed];
+  C394 -> C480 [dir="both", color="red", label="inferred", style=dashed];
+  C394 -> C494 [dir="both", color="red", label="inferred", style=dashed];
+  C394 -> C565 [dir="both", color="red", label="inferred", style=dashed];
+  C411 -> C486 [dir="both", color="red", label="inferred", style=dashed];
+  C411 -> C503 [dir="both", color="red", label="inferred", style=dashed];
+  C411 -> C571 [dir="both", color="red", label="inferred", style=dashed];
 }

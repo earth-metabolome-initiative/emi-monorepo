@@ -15,7 +15,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.model_id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.model),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
@@ -43,7 +43,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.model_id == asset_models.id {
+                if self.model == asset_models.id {
                     foreign_keys.model = Some(asset_models);
                     updated = true;
                 }
@@ -52,7 +52,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.model_id == asset_models.id {
+                if self.model == asset_models.id {
                     foreign_keys.model = None;
                     updated = true;
                 }

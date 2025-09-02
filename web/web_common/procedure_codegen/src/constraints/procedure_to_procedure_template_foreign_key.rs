@@ -37,19 +37,21 @@ impl CustomTableConstraint for ProcedureToProcedureTemplateForeignKeyConstraint 
                 return Ok(());
             };
 
-            let mut columns = procedure_template_foreign_key.columns(conn)?;
+            let columns = procedure_template_foreign_key.columns(conn)?;
             assert_eq!(columns.len(), 1, "Procedure tables must have exactly one column");
-            let column = columns.remove(0);
+            let column = &columns[0];
             if column.column_name != "procedure_template" {
                 return Err(ConstraintError::DoesNotHaveExpectedName {
-                    column: Box::new(column),
+                    column: Box::new(column.clone()),
                     expected_name: "procedure_template".to_owned(),
                 }
                 .into());
             }
 
             if column.is_nullable() {
-                return Err(ConstraintError::UnexpectedNullableColumn(Box::new(column)).into());
+                return Err(
+                    ConstraintError::UnexpectedNullableColumn(Box::new(column.clone())).into()
+                );
             }
         }
         Ok(())

@@ -333,9 +333,9 @@ pub struct InsertableStorageProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of `StorageProcedure`
 /// or descendant tables.
-pub trait StorageProcedureBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-{
+pub trait StorageProcedureBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.storage_procedures.procedure_template`
     /// column.
     ///
@@ -453,43 +453,12 @@ pub trait StorageProcedureBuildable:
         stored_with: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl StorageProcedureBuildable for Option<::rosetta_uuid::Uuid> {
-    fn procedure_template(
-        self,
-        _procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure(
-        self,
-        _foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn stored_asset(
-        self,
-        _stored_asset: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn stored_with(
-        self,
-        _stored_with: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > StorageProcedureBuildable for InsertableStorageProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes;
     ///Sets the value of the `public.storage_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -525,9 +494,10 @@ impl<
                         InsertableStorageProcedureAttributes::ProcedureTemplate,
                     )
             })?;
-        self.procedure = self
-            .procedure
-            .procedure_template(procedure_template)
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+                self.procedure,
+                procedure_template,
+            )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
@@ -626,7 +596,12 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
-for InsertableStorageProcedureBuilder<Procedure> {
+for InsertableStorageProcedureBuilder<Procedure>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
@@ -675,28 +650,6 @@ for InsertableStorageProcedureBuilder<Procedure> {
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         <Self as StorageProcedureBuildable>::procedure_template(self, procedure_template)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
-                self.procedure,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -781,6 +734,15 @@ for InsertableStorageProcedureBuilder<Procedure> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<Procedure> web_common_traits::database::MostConcreteTable
+    for InsertableStorageProcedureBuilder<Procedure>
+where
+    Procedure: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure.set_most_concrete_table(table_name);
     }
 }
 impl<Procedure> web_common_traits::prelude::SetPrimaryKey

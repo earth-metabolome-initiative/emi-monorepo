@@ -38,9 +38,7 @@ pub async fn init_database(
         let task = Task::new("Initialize Migrations");
         init_migrations(&migrations_directory, &extension_migrations_directory, portal_conn)?;
         time_tracker.add_completed_task(task);
-        let consistency_constraints_time_tracker =
-            execute_consistency_constraint_checks(database_name, portal_conn)?;
-        time_tracker.extend(consistency_constraints_time_tracker);
+        time_tracker.extend(execute_consistency_constraint_checks(database_name, portal_conn)?);
         Ok::<_, crate::errors::Error>(time_tracker)
     })?;
     Ok(transaction_time_tracker)

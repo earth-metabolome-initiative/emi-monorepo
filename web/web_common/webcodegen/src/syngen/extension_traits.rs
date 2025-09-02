@@ -24,7 +24,7 @@ impl crate::Table {
         let table_ident = self.struct_ident()?;
         let primary_key_type = self.primary_key_type(conn)?;
 
-        let extension_traits = self.ancestral_extension_tables(conn)?
+        let mut extension_traits = self.ancestral_extension_tables(conn)?
             .iter()
             .map(|extended_table| {
                 let extended_table_path = extended_table.import_struct_path()?;
@@ -34,6 +34,11 @@ impl crate::Table {
                 })
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+        let extended_table_path = self.import_struct_path()?;
+        extension_traits.push(quote! {
+            impl web_common_traits::prelude::ExtensionTable<#extended_table_path> for #table_ident where for<'a> &'a Self: diesel::Identifiable<Id=&'a #primary_key_type> {}
+        });
 
         Ok(extension_traits)
     }

@@ -22,6 +22,21 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     C: diesel::connection::LoadConnection,
+    crate::codegen::structs_codegen::tables::assets::Asset: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    >,
+    <<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    >,
     crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -37,14 +52,7 @@ where
         C,
         crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset;
@@ -60,12 +68,16 @@ where
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
-            self,
-            "digital_assets",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("digital_assets");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset = self
             .try_insert(user_id, conn)?;
+        if !insertable_struct.id(conn)?.can_update(user_id, conn)? {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         if !insertable_struct.model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
@@ -83,11 +95,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let model_id = self
-            .model_id
+        let model = self
+            .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes::ModelId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes::Model,
                 ),
             )?;
         let id = self
@@ -102,7 +114,7 @@ where
             })?;
         Ok(Self::InsertableVariant {
             id,
-            model_id,
+            model,
         })
     }
 }

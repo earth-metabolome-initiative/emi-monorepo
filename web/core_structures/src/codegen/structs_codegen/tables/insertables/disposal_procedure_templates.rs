@@ -220,9 +220,9 @@ pub struct InsertableDisposalProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `DisposalProcedureTemplate` or descendant tables.
-pub trait DisposalProcedureTemplateBuildable:
-    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
-{
+pub trait DisposalProcedureTemplateBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the
     /// `public.disposal_procedure_templates.disposed_asset_model` column.
     ///
@@ -296,65 +296,40 @@ pub trait DisposalProcedureTemplateBuildable:
         procedure_template_disposed_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl DisposalProcedureTemplateBuildable for Option<i32> {
-    fn disposed_asset_model(
-        self,
-        _disposed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn foreign_procedure_template(
-        self,
-        _foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn procedure_template_disposed_asset_model(
-        self,
-        _procedure_template_disposed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-        >,
-> DisposalProcedureTemplateBuildable
-for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `public.disposal_procedure_templates.disposed_asset_model` column.
+impl<ProcedureTemplate> DisposalProcedureTemplateBuildable
+    for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplateAttributes;
+    /// Sets the value of the
+    /// `public.disposal_procedure_templates.disposed_asset_model` column.
     fn disposed_asset_model(
         mut self,
         disposed_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let disposed_asset_model = disposed_asset_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableDisposalProcedureTemplateAttributes::DisposedAssetModel,
-                    )
-            })?;
+        let disposed_asset_model = disposed_asset_model.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableDisposalProcedureTemplateAttributes::DisposedAssetModel)
+        })?;
         self.disposed_asset_model = Some(disposed_asset_model);
         Ok(self)
     }
-    ///Sets the value of the `public.disposal_procedure_templates.foreign_procedure_template` column.
+    /// Sets the value of the
+    /// `public.disposal_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableDisposalProcedureTemplateAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
+        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(
+                InsertableDisposalProcedureTemplateAttributes::ForeignProcedureTemplate,
+            )
+        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.disposal_procedure_templates.procedure_template_disposed_asset_model` column.
+    /// Sets the value of the
+    /// `public.disposal_procedure_templates.
+    /// procedure_template_disposed_asset_model` column.
     fn procedure_template_disposed_asset_model(
         mut self,
         procedure_template_disposed_asset_model: i32,
@@ -367,9 +342,8 @@ for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
                         InsertableDisposalProcedureTemplateAttributes::ProcedureTemplateDisposedAssetModel,
                     )
             })?;
-        self.procedure_template_disposed_asset_model = Some(
-            procedure_template_disposed_asset_model,
-        );
+        self.procedure_template_disposed_asset_model =
+            Some(procedure_template_disposed_asset_model);
         Ok(self)
     }
 }
@@ -380,28 +354,6 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplateAttributes;
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-                self.procedure_template,
-                most_concrete_table,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -573,6 +525,15 @@ for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<ProcedureTemplate> web_common_traits::database::MostConcreteTable
+    for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate>
+where
+    ProcedureTemplate: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.procedure_template.set_most_concrete_table(table_name);
     }
 }
 impl<ProcedureTemplate> web_common_traits::prelude::SetPrimaryKey

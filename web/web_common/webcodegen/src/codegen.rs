@@ -15,7 +15,7 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    Column, ColumnSameAsNetwork, PgExtension, PgType, Table, TableExtensionNetwork,
+    Column, PgExtension, PgType, Table, TableExtensionNetwork,
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
@@ -121,18 +121,11 @@ pub struct Codegen<'a> {
     pub(super) enable_read_trait: bool,
     /// Whether to derive traits relative to the `yew` framework.
     pub(super) enable_yew: bool,
-    /// Graph representing the same-as relationships between columns.
-    column_same_as_network: Option<ColumnSameAsNetwork>,
     /// Graph representing the "extend" relationships between tables.
     table_extension_network: Option<TableExtensionNetwork>,
 }
 
 impl<'a> Codegen<'a> {
-    /// Returns a reference to the column same-as network.
-    pub fn column_same_as_network(&self) -> Option<&ColumnSameAsNetwork> {
-        self.column_same_as_network.as_ref()
-    }
-
     /// Returns a reference to the table extension network.
     pub fn table_extension_network(&self) -> Option<&TableExtensionNetwork> {
         self.table_extension_network.as_ref()
@@ -522,10 +515,6 @@ impl<'a> Codegen<'a> {
 
         time_tracker.add_completed_task(task);
 
-        let task = Task::new("Creating column same-as network");
-        self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
-        time_tracker.add_completed_task(task);
-
         let task = Task::new("Creating table extension network");
         self.table_extension_network =
             Some(TableExtensionNetwork::from_tables(conn, tables.clone())?);
@@ -572,39 +561,5 @@ impl<'a> Codegen<'a> {
         std::fs::write(&codegen_module, codegen_module_impl)?;
 
         Ok(time_tracker)
-    }
-
-    /// Prints the same-as network as a DOT file.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    /// * `output_path` - The path to the output DOT file.
-    ///
-    /// # Errors
-    ///
-    /// * Returns an error if the same-as network cannot be converted to DOT.
-    /// * Returns an error if the output file cannot be written.
-    pub fn print_same_as_network(
-        &mut self,
-        conn: &mut PgConnection,
-        table_catalog: &str,
-        output_path: &str,
-    ) -> Result<(), WebCodeGenError> {
-        if self.column_same_as_network.is_none() {
-            let mut tables = Table::load_all(conn, table_catalog, "public")?
-                .into_iter()
-                .filter(|table| !(table.is_temporary() || table.is_view()))
-                .filter(|table| !self.tables_deny_list.contains(&table))
-                .collect::<Vec<Table>>();
-
-            tables.sort_unstable();
-            self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
-        }
-
-        let dot = self.column_same_as_network.as_ref().unwrap().to_dot(conn)?;
-        std::fs::write(output_path, dot)?;
-
-        Ok(())
     }
 }

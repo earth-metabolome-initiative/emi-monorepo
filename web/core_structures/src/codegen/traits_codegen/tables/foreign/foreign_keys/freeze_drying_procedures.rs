@@ -1,11 +1,17 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDryingProcedureForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+    pub freeze_dryed_with: Option<
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
+    >,
+    pub freeze_dryed_with_model: Option<
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
     >,
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
     >,
     pub foreign_procedure_template: Option<
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
@@ -15,12 +21,6 @@ pub struct FreezeDryingProcedureForeignKeys {
     >,
     pub freeze_dryed_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub freeze_dryed_with: Option<
-        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
-    >,
-    pub freeze_dryed_with_model: Option<
-        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
     >,
     pub freeze_drying_procedures_procedure_freeze_dryed_with_model_fkey: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
@@ -35,6 +35,21 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
+        if let Some(freeze_dryed_with) = self.freeze_dryed_with {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryer(
+                    freeze_dryed_with,
+                ),
+            ));
+        }
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryerModel(
+                self.freeze_dryed_with_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -43,9 +58,6 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                 self.foreign_procedure_template,
@@ -61,18 +73,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.freeze_dryed_container,
             ),
         ));
-        if let Some(freeze_dryed_with) = self.freeze_dryed_with {
-            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryer(
-                    freeze_dryed_with,
-                ),
-            ));
-        }
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryerModel(
-                self.freeze_dryed_with_model,
-            ),
-        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset((
                 self.procedure,
@@ -81,13 +81,13 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
+        (foreign_keys.freeze_dryed_with.is_some() || self.freeze_dryed_with.is_some())
+            && foreign_keys.freeze_dryed_with_model.is_some()
             && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template.is_some()
             && foreign_keys.foreign_procedure_template.is_some()
             && foreign_keys.foreign_procedure.is_some()
             && foreign_keys.freeze_dryed_container.is_some()
-            && (foreign_keys.freeze_dryed_with.is_some() || self.freeze_dryed_with.is_some())
-            && foreign_keys.freeze_dryed_with_model.is_some()
             && foreign_keys
                 .freeze_drying_procedures_procedure_freeze_dryed_with_model_fkey
                 .is_some()

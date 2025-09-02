@@ -20,6 +20,14 @@ pub struct TeamState {
 impl web_common_traits::prelude::TableName for TeamState {
     const TABLE_NAME: &'static str = "team_states";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+    > for TeamState
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for TeamState {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -58,6 +66,58 @@ impl TeamState {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_states::team_states;
+        Self::table()
+            .filter(team_states::name.eq(name))
+            .order_by(team_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_states::team_states;
+        Self::table()
+            .filter(team_states::description.eq(description))
+            .order_by(team_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_icon(
+        icon: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_states::team_states;
+        Self::table()
+            .filter(team_states::icon.eq(icon))
+            .order_by(team_states::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_color_id(
+        color_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::team_states::team_states;
+        Self::table()
+            .filter(team_states::color_id.eq(color_id))
+            .order_by(team_states::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<TeamState> for TeamState {

@@ -25,9 +25,7 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsModelAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsModel;
@@ -42,10 +40,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
-            self,
-            "commercial_beads_models",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_beads_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsModel = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -59,6 +55,13 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        let parent_model = self
+            .parent_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadsModelAttributes::ParentModel,
+                ),
+            )?;
         let id = if self.commercial_beads_models_id_fkey.is_complete() {
             let id = self
                 .commercial_beads_models_id_fkey
@@ -106,6 +109,9 @@ where
                 })?;
             id
         };
-        Ok(Self::InsertableVariant { id })
+        Ok(Self::InsertableVariant {
+            id,
+            parent_model,
+        })
     }
 }

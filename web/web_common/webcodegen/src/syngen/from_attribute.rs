@@ -56,10 +56,6 @@ impl Table {
 
                 let columns = index.columns(conn)?;
 
-                if columns.len() == 1 {
-                    continue;
-                }
-
                 ancestral_from_attributes.push((
                     vec![root_table.clone(), extension_table.clone()],
                     columns,
@@ -168,10 +164,6 @@ impl Table {
             }
 
             let columns = index.columns(conn)?;
-
-            if columns.len() == 1 {
-                continue;
-            }
 
             from_methods.push((vec![self.clone()], columns, true, None));
         }

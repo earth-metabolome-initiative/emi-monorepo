@@ -137,6 +137,10 @@ impl Table {
             let maybe_where_constraints =
                 self.builder_trait_where_constraints(&insertable_column, conn)?;
 
+            if insertable_column.is_most_concrete_table(conn)? {
+                continue;
+            }
+
             let method_documentations =
                 vec![
 					format!("Sets the value of the {insertable_column} column."),
@@ -169,38 +173,16 @@ impl Table {
             })
         }
 
-        let mut required_traits = Vec::new();
-
-        let extension_tables = self.extension_tables(conn)?;
-        for extension_table in &extension_tables {
-            let builder_trait_ty = extension_table.builder_trait_ty()?;
-            required_traits.push(quote! {
-                #builder_trait_ty
-            });
-        }
-
-        if required_traits.is_empty() {
-            required_traits.push(quote! { std::marker::Sized });
-        }
-
         let trait_documentation = format!(
             "Trait defining setters for attributes of an instance of `{}` or descendant tables.",
             self.struct_name()?
         );
 
-        let maybe_attributes = if extension_tables.is_empty() {
-            Some(quote! {
-                /// Attributes required to build the insertable.
-                type Attributes;
-            })
-        } else {
-            None
-        };
-
         Ok(quote::quote! {
             #[doc = #trait_documentation]
-            pub trait #trait_ident: #(#required_traits)+* {
-                #maybe_attributes
+            pub trait #trait_ident: Sized {
+                /// Attributes required to build the insertable.
+                type Attributes;
 
                 #(#methods)*
             }

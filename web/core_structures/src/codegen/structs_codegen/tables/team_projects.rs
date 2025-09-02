@@ -13,6 +13,14 @@ pub struct TeamProject {
 impl web_common_traits::prelude::TableName for TeamProject {
     const TABLE_NAME: &'static str = "team_projects";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::team_projects::TeamProject,
+    > for TeamProject
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{
+}
 impl diesel::Identifiable for TeamProject {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {

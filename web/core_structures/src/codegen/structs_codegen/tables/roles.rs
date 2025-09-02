@@ -20,6 +20,13 @@ pub struct Role {
 impl web_common_traits::prelude::TableName for Role {
     const TABLE_NAME: &'static str = "roles";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::roles::Role>
+    for Role
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Role {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -58,6 +65,52 @@ impl Role {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::roles::roles;
+        Self::table().filter(roles::name.eq(name)).order_by(roles::id.asc()).first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::roles::roles;
+        Self::table()
+            .filter(roles::description.eq(description))
+            .order_by(roles::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_icon(
+        icon: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::roles::roles;
+        Self::table().filter(roles::icon.eq(icon)).order_by(roles::id.asc()).first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_color_id(
+        color_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::roles::roles;
+        Self::table()
+            .filter(roles::color_id.eq(color_id))
+            .order_by(roles::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<Role> for Role {

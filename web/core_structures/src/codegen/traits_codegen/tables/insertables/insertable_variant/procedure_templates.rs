@@ -15,9 +15,7 @@ where
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    >,
+    Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate;
@@ -32,10 +30,8 @@ where
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
-            self,
-            "procedure_templates",
-        )?;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate = self
             .try_insert(user_id, conn)?;
         Ok(

@@ -16,7 +16,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule((
-            self.container_model_id,
+            self.container_model,
             self.contained_asset_model,
         ))
     }

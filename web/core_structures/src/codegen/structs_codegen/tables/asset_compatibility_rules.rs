@@ -21,6 +21,14 @@ pub struct AssetCompatibilityRule {
 impl web_common_traits::prelude::TableName for AssetCompatibilityRule {
     const TABLE_NAME: &'static str = "asset_compatibility_rules";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    > for AssetCompatibilityRule
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{
+}
 impl diesel::Identifiable for AssetCompatibilityRule {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {

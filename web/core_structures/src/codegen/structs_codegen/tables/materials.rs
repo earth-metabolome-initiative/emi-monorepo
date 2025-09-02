@@ -20,6 +20,14 @@ pub struct Material {
 impl web_common_traits::prelude::TableName for Material {
     const TABLE_NAME: &'static str = "materials";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::materials::Material,
+    > for Material
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Material {
     type Id = i16;
     fn id(self) -> Self::Id {
@@ -58,6 +66,58 @@ impl Material {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::materials::materials;
+        Self::table()
+            .filter(materials::name.eq(name))
+            .order_by(materials::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_description(
+        description: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::materials::materials;
+        Self::table()
+            .filter(materials::description.eq(description))
+            .order_by(materials::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_icon(
+        icon: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::materials::materials;
+        Self::table()
+            .filter(materials::icon.eq(icon))
+            .order_by(materials::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_color_id(
+        color_id: &i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::materials::materials;
+        Self::table()
+            .filter(materials::color_id.eq(color_id))
+            .order_by(materials::id.asc())
+            .first::<Self>(conn)
     }
 }
 impl AsRef<Material> for Material {

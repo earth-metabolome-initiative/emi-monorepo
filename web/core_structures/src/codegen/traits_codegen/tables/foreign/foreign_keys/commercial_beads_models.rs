@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialBeadsModelForeignKeys {
+    pub parent_model: Option<crate::codegen::structs_codegen::tables::beads_models::BeadsModel>,
     pub commercial_beads_models_id_fkey:
         Option<crate::codegen::structs_codegen::tables::beads_models::BeadsModel>,
     pub commercial_beads_models_id_fkey1:
@@ -16,6 +17,11 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadsModel(
+                self.parent_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadsModel(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -23,7 +29,8 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.commercial_beads_models_id_fkey.is_some()
+        foreign_keys.parent_model.is_some()
+            && foreign_keys.commercial_beads_models_id_fkey.is_some()
             && foreign_keys.commercial_beads_models_id_fkey1.is_some()
     }
     fn update(
@@ -40,6 +47,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
+                if self.parent_model == beads_models.id {
+                    foreign_keys.parent_model = Some(beads_models);
+                    updated = true;
+                }
                 if self.id == beads_models.id {
                     foreign_keys.commercial_beads_models_id_fkey = Some(beads_models);
                     updated = true;
@@ -49,6 +60,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::BeadsModel(beads_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.parent_model == beads_models.id {
+                    foreign_keys.parent_model = None;
+                    updated = true;
+                }
                 if self.id == beads_models.id {
                     foreign_keys.commercial_beads_models_id_fkey = None;
                     updated = true;

@@ -28,6 +28,14 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    > for SpectraCollection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
 impl diesel::Identifiable for SpectraCollection {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -68,8 +76,8 @@ impl SpectraCollection {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id(
-        model_id: &i32,
+    pub fn from_model(
+        model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -82,14 +90,34 @@ impl SpectraCollection {
         };
         Self::table()
             .inner_join(digital_assets::table.on(spectra_collections::id.eq(digital_assets::id)))
-            .filter(digital_assets::model_id.eq(model_id))
+            .filter(digital_assets::model.eq(model))
             .order_by(spectra_collections::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_id_and_id(
-        model_id: &i32,
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            assets::assets, spectra_collections::spectra_collections,
+        };
+        Self::table()
+            .inner_join(assets::table.on(spectra_collections::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(spectra_collections::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
         id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
@@ -103,7 +131,7 @@ impl SpectraCollection {
         };
         Self::table()
             .inner_join(assets::table.on(spectra_collections::id.eq(assets::id)))
-            .filter(assets::model_id.eq(model_id).and(assets::id.eq(id)))
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
             .order_by(spectra_collections::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)

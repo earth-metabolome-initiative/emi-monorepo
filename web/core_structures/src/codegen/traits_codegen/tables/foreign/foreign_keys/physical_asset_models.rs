@@ -17,17 +17,17 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.id),
         ));
-        if let Some(parent_model_id) = self.parent_model_id {
+        if let Some(parent_model) = self.parent_model {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                    parent_model_id,
+                    parent_model,
                 ),
             ));
         }
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()
-            && (foreign_keys.parent_model.is_some() || self.parent_model_id.is_some())
+            && (foreign_keys.parent_model.is_some() || self.parent_model.is_some())
     }
     fn update(
         &self,
@@ -64,8 +64,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self
-                    .parent_model_id
-                    .is_some_and(|parent_model_id| parent_model_id == physical_asset_models.id)
+                    .parent_model
+                    .is_some_and(|parent_model| parent_model == physical_asset_models.id)
                 {
                     foreign_keys.parent_model = Some(physical_asset_models);
                     updated = true;
@@ -76,8 +76,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self
-                    .parent_model_id
-                    .is_some_and(|parent_model_id| parent_model_id == physical_asset_models.id)
+                    .parent_model
+                    .is_some_and(|parent_model| parent_model == physical_asset_models.id)
                 {
                     foreign_keys.parent_model = None;
                     updated = true;

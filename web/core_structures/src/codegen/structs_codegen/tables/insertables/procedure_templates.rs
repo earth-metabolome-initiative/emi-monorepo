@@ -169,36 +169,9 @@ impl Default for InsertableProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ProcedureTemplate`
 /// or descendant tables.
-pub trait ProcedureTemplateBuildable: std::marker::Sized {
+pub trait ProcedureTemplateBuildable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
-    /// Sets the value of the `public.procedure_templates.most_concrete_table`
-    /// column.
-    ///
-    /// # Arguments
-    /// * `most_concrete_table`: The value to set for the
-    ///   `public.procedure_templates.most_concrete_table` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `String`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn most_concrete_table<MCT>(
-        self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>;
     /// Sets the value of the `public.procedure_templates.name` column.
     ///
     /// # Arguments
@@ -401,116 +374,9 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureTemplateBuildable for Option<i32> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes;
-    fn most_concrete_table<MCT>(
-        self,
-        _most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn name<N>(
-        self,
-        _name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn description<D>(
-        self,
-        _description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn deprecated<D>(
-        self,
-        _deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
-    {
-        Ok(self)
-    }
-    fn icon<I>(
-        self,
-        _icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        Ok(self)
-    }
-    fn created_by(
-        self,
-        _created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn created_at<CA>(
-        self,
-        _created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-    fn updated_by(
-        self,
-        _updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-    fn updated_at<UA>(
-        self,
-        _updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        Ok(self)
-    }
-}
 impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes;
-    /// Sets the value of the `public.procedure_templates.most_concrete_table`
-    /// column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        let most_concrete_table = most_concrete_table.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::MostConcreteTable)
-        })?;
-        if self.most_concrete_table.is_none() {
-            self.most_concrete_table = Some(most_concrete_table);
-        }
-        Ok(self)
-    }
     /// Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
@@ -710,6 +576,13 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         }
         self.updated_at = Some(updated_at);
         Ok(self)
+    }
+}
+impl web_common_traits::database::MostConcreteTable for InsertableProcedureTemplateBuilder {
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        if self.most_concrete_table.is_some() {
+            self.most_concrete_table = Some(table_name.to_owned());
+        }
     }
 }
 impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureTemplateBuilder {

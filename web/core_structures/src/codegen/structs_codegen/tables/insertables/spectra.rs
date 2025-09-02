@@ -136,9 +136,9 @@ pub struct InsertableSpectrumBuilder<
 }
 /// Trait defining setters for attributes of an instance of `Spectrum` or
 /// descendant tables.
-pub trait SpectrumBuildable:
-    crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable
-{
+pub trait SpectrumBuildable: Sized {
+    /// Attributes required to build the insertable.
+    type Attributes;
     /// Sets the value of the `public.spectra.spectra_collection_id` column.
     ///
     /// # Arguments
@@ -163,40 +163,33 @@ pub trait SpectrumBuildable:
         spectra_collection_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl SpectrumBuildable for Option<::rosetta_uuid::Uuid> {
-    fn spectra_collection(
-        self,
-        _spectra_collection_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        Ok(self)
-    }
-}
-impl<
-    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
-        >,
-> SpectrumBuildable for InsertableSpectrumBuilder<DigitalAsset> {
-    ///Sets the value of the `public.spectra.spectra_collection_id` column.
+impl<DigitalAsset> SpectrumBuildable for InsertableSpectrumBuilder<DigitalAsset> {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
+    /// Sets the value of the `public.spectra.spectra_collection_id` column.
     fn spectra_collection(
         mut self,
         spectra_collection_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let spectra_collection_id = spectra_collection_id
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableSpectrumAttributes::SpectraCollectionId)
-            })?;
+        let spectra_collection_id = spectra_collection_id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableSpectrumAttributes::SpectraCollectionId)
+        })?;
         self.spectra_collection_id = Some(spectra_collection_id);
         Ok(self)
     }
 }
 impl<
-    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable<
+    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetBuildable
-for InsertableSpectrumBuilder<DigitalAsset> {
+for InsertableSpectrumBuilder<DigitalAsset>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes,
+    >,
+{
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
@@ -207,28 +200,6 @@ for InsertableSpectrumBuilder<DigitalAsset> {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
                 self.id,
                 id,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.assets.most_concrete_table` column.
-    fn most_concrete_table<MCT>(
-        mut self,
-        most_concrete_table: MCT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        MCT: TryInto<String>,
-        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
-    {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
-                self.id,
-                most_concrete_table,
             )
             .map_err(|e| {
                 e
@@ -283,7 +254,7 @@ for InsertableSpectrumBuilder<DigitalAsset> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.model_id` column.
+    ///Sets the value of the `public.assets.model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -296,11 +267,11 @@ for InsertableSpectrumBuilder<DigitalAsset> {
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]
-    ///    v0@{shape: rounded, label: "model_id"}
+    ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
     ///subgraph v3 ["`digital_assets`"]
-    ///    v1@{shape: rounded, label: "model_id"}
+    ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
@@ -308,11 +279,11 @@ for InsertableSpectrumBuilder<DigitalAsset> {
     ///```
     fn model(
         self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         <Self as crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable>::model(
             self,
-            model_id,
+            model,
         )
     }
     #[inline]
@@ -406,15 +377,16 @@ impl<
         >,
 > crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable
 for InsertableSpectrumBuilder<DigitalAsset> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
     #[inline]
-    ///Sets the value of the `public.digital_assets.model_id` column.
+    ///Sets the value of the `public.digital_assets.model` column.
     fn model(
         mut self,
-        model_id: i32,
+        model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable>::model(
                 self.id,
-                model_id,
+                model,
             )
             .map_err(|e| {
                 e
@@ -423,6 +395,15 @@ for InsertableSpectrumBuilder<DigitalAsset> {
                     ))
             })?;
         Ok(self)
+    }
+}
+impl<DigitalAsset> web_common_traits::database::MostConcreteTable
+    for InsertableSpectrumBuilder<DigitalAsset>
+where
+    DigitalAsset: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
     }
 }
 impl<DigitalAsset> web_common_traits::prelude::SetPrimaryKey
