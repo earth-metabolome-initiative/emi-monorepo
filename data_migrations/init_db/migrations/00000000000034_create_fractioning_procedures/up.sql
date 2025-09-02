@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS procedure_templates.fractioning_procedure_templates (
+CREATE TABLE IF NOT EXISTS fractioning_procedure_templates (
 	-- Identifier of the fractioning procedure template, which is also a foreign key to the general procedure template.
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- Expected amount of the fraction to be collected in kilograms.
 	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
 	-- The tolerance percentage of the fraction in kilograms.
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS procedure_templates.fractioning_procedure_templates (
 	-- Source container model from which the fraction is taken.
 	fragment_container_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- Foreign procedure template which originated the source container (e.g., a sampling procedure).
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
@@ -54,24 +54,24 @@ CREATE TABLE IF NOT EXISTS procedure_templates.fractioning_procedure_templates (
 		procedure_template_fragment_placed_into_model,
 		fragment_placed_into_model
 	) REFERENCES procedure_template_asset_models(id, asset_model),
-	-- We define a same-as index to allow for foreign key references to check whether a `fractioning_procedure_templates.procedure_template`
-	-- is associated with a given `fractioning_procedure_templates.foreign_procedure_template`.
+	-- We define a same-as index to allow for foreign key references to check whether a `fractioning_procedure_template`
+	-- is associated with a given `fractioning_foreign_procedure_template`.
 	UNIQUE (procedure_template, foreign_procedure_template)
 );
-CREATE TABLE IF NOT EXISTS procedures.fractioning_procedures (
+CREATE TABLE IF NOT EXISTS fractioning_procedures (
 	-- Identifier of the fractioning procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures.procedures(procedure) ON DELETE CASCADE,
+	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
 	-- The template of this procedure should be a fractioning procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates.fractioning_procedure_templates(procedure_template),
+	procedure_template INTEGER NOT NULL REFERENCES fractioning_procedure_templates(procedure_template),
 	-- The procedure template associated with the foreign procedure template.
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
 		)
 	),
 	-- The procedure that has populated the source container (e.g., a sampling procedure).
-	foreign_procedure UUID NOT NULL REFERENCES procedures.procedures(procedure) CHECK (
+	foreign_procedure UUID NOT NULL REFERENCES procedures(procedure) CHECK (
 		must_be_distinct_uuid(procedure, foreign_procedure)
 	),
 	-- The source container from which the fraction is taken, which must be a volumetric container model.
@@ -86,9 +86,9 @@ CREATE TABLE IF NOT EXISTS procedures.fractioning_procedures (
 	-- The model of the weighing device used, which must be a weighing device model.
 	weighed_with_model INTEGER NOT NULL REFERENCES weighing_device_models(id),
 	-- We enforce that the current `fractioning_procedures` has indeed the same `fractioning_procedures_template`.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the `foreign_procedure` has as `procedure_template` the specified `foreign_procedure_template`.
-	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- Additionally, we enforce that the `fragment_container` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (foreign_procedure, fragment_container) REFERENCES procedure_assets(procedure, asset),
 	-- Additionally, we enforce that the `fragment_placed_into` is indeed a procedure asset of the correct model.
@@ -100,5 +100,5 @@ CREATE TABLE IF NOT EXISTS procedures.fractioning_procedures (
 	-- We enforce that the `weighed_with` is indeed a weighing device of the correct model.
 	FOREIGN KEY (weighed_with, weighed_with_model) REFERENCES assets(id, model_id),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
-	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES procedure_templates.fractioning_procedure_templates(procedure_template, foreign_procedure_template)
+	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES fractioning_procedure_templates(procedure_template, foreign_procedure_template)
 );

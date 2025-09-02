@@ -1,196 +1,18 @@
+mod addresses;
+pub use addresses::{
+    AddressBuildable, InsertableAddress, InsertableAddressAttributes, InsertableAddressBuilder,
+};
 mod aliquoting_procedure_templates;
 pub use aliquoting_procedure_templates::{
     AliquotingProcedureTemplateBuildable, InsertableAliquotingProcedureTemplate,
     InsertableAliquotingProcedureTemplateAttributes, InsertableAliquotingProcedureTemplateBuilder,
     InsertableAliquotingProcedureTemplateExtensionAttributes,
 };
-mod ball_mill_procedure_templates;
-pub use ball_mill_procedure_templates::{
-    BallMillProcedureTemplateBuildable, InsertableBallMillProcedureTemplate,
-    InsertableBallMillProcedureTemplateAttributes, InsertableBallMillProcedureTemplateBuilder,
-    InsertableBallMillProcedureTemplateExtensionAttributes,
-};
-mod capping_procedure_templates;
-pub use capping_procedure_templates::{
-    CappingProcedureTemplateBuildable, InsertableCappingProcedureTemplate,
-    InsertableCappingProcedureTemplateAttributes, InsertableCappingProcedureTemplateBuilder,
-    InsertableCappingProcedureTemplateExtensionAttributes,
-};
-mod centrifuge_procedure_templates;
-pub use centrifuge_procedure_templates::{
-    CentrifugeProcedureTemplateBuildable, InsertableCentrifugeProcedureTemplate,
-    InsertableCentrifugeProcedureTemplateAttributes, InsertableCentrifugeProcedureTemplateBuilder,
-    InsertableCentrifugeProcedureTemplateExtensionAttributes,
-};
-mod disposal_procedure_templates;
-pub use disposal_procedure_templates::{
-    DisposalProcedureTemplateBuildable, InsertableDisposalProcedureTemplate,
-    InsertableDisposalProcedureTemplateAttributes, InsertableDisposalProcedureTemplateBuilder,
-    InsertableDisposalProcedureTemplateExtensionAttributes,
-};
-mod fractioning_procedure_templates;
-pub use fractioning_procedure_templates::{
-    FractioningProcedureTemplateBuildable, InsertableFractioningProcedureTemplate,
-    InsertableFractioningProcedureTemplateAttributes,
-    InsertableFractioningProcedureTemplateBuilder,
-    InsertableFractioningProcedureTemplateExtensionAttributes,
-};
-mod freeze_drying_procedure_templates;
-pub use freeze_drying_procedure_templates::{
-    FreezeDryingProcedureTemplateBuildable, InsertableFreezeDryingProcedureTemplate,
-    InsertableFreezeDryingProcedureTemplateAttributes,
-    InsertableFreezeDryingProcedureTemplateBuilder,
-    InsertableFreezeDryingProcedureTemplateExtensionAttributes,
-};
-mod freezing_procedure_templates;
-pub use freezing_procedure_templates::{
-    FreezingProcedureTemplateBuildable, InsertableFreezingProcedureTemplate,
-    InsertableFreezingProcedureTemplateAttributes, InsertableFreezingProcedureTemplateBuilder,
-    InsertableFreezingProcedureTemplateExtensionAttributes,
-};
-mod geolocation_procedure_templates;
-pub use geolocation_procedure_templates::{
-    GeolocationProcedureTemplateBuildable, InsertableGeolocationProcedureTemplate,
-    InsertableGeolocationProcedureTemplateAttributes,
-    InsertableGeolocationProcedureTemplateBuilder,
-    InsertableGeolocationProcedureTemplateExtensionAttributes,
-};
-mod packaging_procedure_templates;
-pub use packaging_procedure_templates::{
-    InsertablePackagingProcedureTemplate, InsertablePackagingProcedureTemplateAttributes,
-    InsertablePackagingProcedureTemplateBuilder,
-    InsertablePackagingProcedureTemplateExtensionAttributes, PackagingProcedureTemplateBuildable,
-};
-mod photograph_procedure_templates;
-pub use photograph_procedure_templates::{
-    InsertablePhotographProcedureTemplate, InsertablePhotographProcedureTemplateAttributes,
-    InsertablePhotographProcedureTemplateBuilder,
-    InsertablePhotographProcedureTemplateExtensionAttributes, PhotographProcedureTemplateBuildable,
-};
-mod pouring_procedure_templates;
-pub use pouring_procedure_templates::{
-    InsertablePouringProcedureTemplate, InsertablePouringProcedureTemplateAttributes,
-    InsertablePouringProcedureTemplateBuilder,
-    InsertablePouringProcedureTemplateExtensionAttributes, PouringProcedureTemplateBuildable,
-};
-mod procedure_templates;
-pub use procedure_templates::{
-    InsertableProcedureTemplate, InsertableProcedureTemplateAttributes,
-    InsertableProcedureTemplateBuilder, ProcedureTemplateBuildable,
-};
-mod storage_procedure_templates;
-pub use storage_procedure_templates::{
-    InsertableStorageProcedureTemplate, InsertableStorageProcedureTemplateAttributes,
-    InsertableStorageProcedureTemplateBuilder,
-    InsertableStorageProcedureTemplateExtensionAttributes, StorageProcedureTemplateBuildable,
-};
-mod supernatant_procedure_templates;
-pub use supernatant_procedure_templates::{
-    InsertableSupernatantProcedureTemplate, InsertableSupernatantProcedureTemplateAttributes,
-    InsertableSupernatantProcedureTemplateBuilder,
-    InsertableSupernatantProcedureTemplateExtensionAttributes,
-    SupernatantProcedureTemplateBuildable,
-};
-mod weighing_procedure_templates;
-pub use weighing_procedure_templates::{
-    InsertableWeighingProcedureTemplate, InsertableWeighingProcedureTemplateAttributes,
-    InsertableWeighingProcedureTemplateBuilder,
-    InsertableWeighingProcedureTemplateExtensionAttributes, WeighingProcedureTemplateBuildable,
-};
 mod aliquoting_procedures;
 pub use aliquoting_procedures::{
     AliquotingProcedureBuildable, InsertableAliquotingProcedure,
     InsertableAliquotingProcedureAttributes, InsertableAliquotingProcedureBuilder,
     InsertableAliquotingProcedureExtensionAttributes,
-};
-mod ball_mill_procedures;
-pub use ball_mill_procedures::{
-    BallMillProcedureBuildable, InsertableBallMillProcedure, InsertableBallMillProcedureAttributes,
-    InsertableBallMillProcedureBuilder, InsertableBallMillProcedureExtensionAttributes,
-};
-mod capping_procedures;
-pub use capping_procedures::{
-    CappingProcedureBuildable, InsertableCappingProcedure, InsertableCappingProcedureAttributes,
-    InsertableCappingProcedureBuilder, InsertableCappingProcedureExtensionAttributes,
-};
-mod centrifuge_procedures;
-pub use centrifuge_procedures::{
-    CentrifugeProcedureBuildable, InsertableCentrifugeProcedure,
-    InsertableCentrifugeProcedureAttributes, InsertableCentrifugeProcedureBuilder,
-    InsertableCentrifugeProcedureExtensionAttributes,
-};
-mod disposal_procedures;
-pub use disposal_procedures::{
-    DisposalProcedureBuildable, InsertableDisposalProcedure, InsertableDisposalProcedureAttributes,
-    InsertableDisposalProcedureBuilder, InsertableDisposalProcedureExtensionAttributes,
-};
-mod fractioning_procedures;
-pub use fractioning_procedures::{
-    FractioningProcedureBuildable, InsertableFractioningProcedure,
-    InsertableFractioningProcedureAttributes, InsertableFractioningProcedureBuilder,
-    InsertableFractioningProcedureExtensionAttributes,
-};
-mod freeze_drying_procedures;
-pub use freeze_drying_procedures::{
-    FreezeDryingProcedureBuildable, InsertableFreezeDryingProcedure,
-    InsertableFreezeDryingProcedureAttributes, InsertableFreezeDryingProcedureBuilder,
-    InsertableFreezeDryingProcedureExtensionAttributes,
-};
-mod freezing_procedures;
-pub use freezing_procedures::{
-    FreezingProcedureBuildable, InsertableFreezingProcedure, InsertableFreezingProcedureAttributes,
-    InsertableFreezingProcedureBuilder, InsertableFreezingProcedureExtensionAttributes,
-};
-mod geolocation_procedures;
-pub use geolocation_procedures::{
-    GeolocationProcedureBuildable, InsertableGeolocationProcedure,
-    InsertableGeolocationProcedureAttributes, InsertableGeolocationProcedureBuilder,
-    InsertableGeolocationProcedureExtensionAttributes,
-};
-mod packaging_procedures;
-pub use packaging_procedures::{
-    InsertablePackagingProcedure, InsertablePackagingProcedureAttributes,
-    InsertablePackagingProcedureBuilder, InsertablePackagingProcedureExtensionAttributes,
-    PackagingProcedureBuildable,
-};
-mod photograph_procedures;
-pub use photograph_procedures::{
-    InsertablePhotographProcedure, InsertablePhotographProcedureAttributes,
-    InsertablePhotographProcedureBuilder, InsertablePhotographProcedureExtensionAttributes,
-    PhotographProcedureBuildable,
-};
-mod pouring_procedures;
-pub use pouring_procedures::{
-    InsertablePouringProcedure, InsertablePouringProcedureAttributes,
-    InsertablePouringProcedureBuilder, InsertablePouringProcedureExtensionAttributes,
-    PouringProcedureBuildable,
-};
-mod procedures;
-pub use procedures::{
-    InsertableProcedure, InsertableProcedureAttributes, InsertableProcedureBuilder,
-    ProcedureBuildable,
-};
-mod storage_procedures;
-pub use storage_procedures::{
-    InsertableStorageProcedure, InsertableStorageProcedureAttributes,
-    InsertableStorageProcedureBuilder, InsertableStorageProcedureExtensionAttributes,
-    StorageProcedureBuildable,
-};
-mod supernatant_procedures;
-pub use supernatant_procedures::{
-    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttributes,
-    InsertableSupernatantProcedureBuilder, InsertableSupernatantProcedureExtensionAttributes,
-    SupernatantProcedureBuildable,
-};
-mod weighing_procedures;
-pub use weighing_procedures::{
-    InsertableWeighingProcedure, InsertableWeighingProcedureAttributes,
-    InsertableWeighingProcedureBuilder, InsertableWeighingProcedureExtensionAttributes,
-    WeighingProcedureBuildable,
-};
-mod addresses;
-pub use addresses::{
-    AddressBuildable, InsertableAddress, InsertableAddressAttributes, InsertableAddressBuilder,
 };
 mod asset_compatibility_rules;
 pub use asset_compatibility_rules::{
@@ -222,6 +44,17 @@ pub use ball_mill_machines::{
     BallMillMachineBuildable, InsertableBallMillMachine, InsertableBallMillMachineAttributes,
     InsertableBallMillMachineBuilder, InsertableBallMillMachineExtensionAttributes,
 };
+mod ball_mill_procedure_templates;
+pub use ball_mill_procedure_templates::{
+    BallMillProcedureTemplateBuildable, InsertableBallMillProcedureTemplate,
+    InsertableBallMillProcedureTemplateAttributes, InsertableBallMillProcedureTemplateBuilder,
+    InsertableBallMillProcedureTemplateExtensionAttributes,
+};
+mod ball_mill_procedures;
+pub use ball_mill_procedures::{
+    BallMillProcedureBuildable, InsertableBallMillProcedure, InsertableBallMillProcedureAttributes,
+    InsertableBallMillProcedureBuilder, InsertableBallMillProcedureExtensionAttributes,
+};
 mod beads_models;
 pub use beads_models::{
     BeadsModelBuildable, InsertableBeadsModel, InsertableBeadsModelAttributes,
@@ -241,6 +74,17 @@ pub use cameras::{
     CameraBuildable, InsertableCamera, InsertableCameraAttributes, InsertableCameraBuilder,
     InsertableCameraExtensionAttributes,
 };
+mod capping_procedure_templates;
+pub use capping_procedure_templates::{
+    CappingProcedureTemplateBuildable, InsertableCappingProcedureTemplate,
+    InsertableCappingProcedureTemplateAttributes, InsertableCappingProcedureTemplateBuilder,
+    InsertableCappingProcedureTemplateExtensionAttributes,
+};
+mod capping_procedures;
+pub use capping_procedures::{
+    CappingProcedureBuildable, InsertableCappingProcedure, InsertableCappingProcedureAttributes,
+    InsertableCappingProcedureBuilder, InsertableCappingProcedureExtensionAttributes,
+};
 mod caps_models;
 pub use caps_models::{
     CapsModelBuildable, InsertableCapsModel, InsertableCapsModelAttributes,
@@ -250,6 +94,18 @@ mod centrifuge_models;
 pub use centrifuge_models::{
     CentrifugeModelBuildable, InsertableCentrifugeModel, InsertableCentrifugeModelAttributes,
     InsertableCentrifugeModelBuilder, InsertableCentrifugeModelExtensionAttributes,
+};
+mod centrifuge_procedure_templates;
+pub use centrifuge_procedure_templates::{
+    CentrifugeProcedureTemplateBuildable, InsertableCentrifugeProcedureTemplate,
+    InsertableCentrifugeProcedureTemplateAttributes, InsertableCentrifugeProcedureTemplateBuilder,
+    InsertableCentrifugeProcedureTemplateExtensionAttributes,
+};
+mod centrifuge_procedures;
+pub use centrifuge_procedures::{
+    CentrifugeProcedureBuildable, InsertableCentrifugeProcedure,
+    InsertableCentrifugeProcedureAttributes, InsertableCentrifugeProcedureBuilder,
+    InsertableCentrifugeProcedureExtensionAttributes,
 };
 mod centrifuges;
 pub use centrifuges::{
@@ -453,6 +309,17 @@ pub use digital_assets::{
     DigitalAssetBuildable, InsertableDigitalAsset, InsertableDigitalAssetAttributes,
     InsertableDigitalAssetBuilder, InsertableDigitalAssetExtensionAttributes,
 };
+mod disposal_procedure_templates;
+pub use disposal_procedure_templates::{
+    DisposalProcedureTemplateBuildable, InsertableDisposalProcedureTemplate,
+    InsertableDisposalProcedureTemplateAttributes, InsertableDisposalProcedureTemplateBuilder,
+    InsertableDisposalProcedureTemplateExtensionAttributes,
+};
+mod disposal_procedures;
+pub use disposal_procedures::{
+    DisposalProcedureBuildable, InsertableDisposalProcedure, InsertableDisposalProcedureAttributes,
+    InsertableDisposalProcedureBuilder, InsertableDisposalProcedureExtensionAttributes,
+};
 mod documents;
 pub use documents::{
     DocumentBuildable, InsertableDocument, InsertableDocumentAttributes, InsertableDocumentBuilder,
@@ -461,6 +328,19 @@ mod email_providers;
 pub use email_providers::{
     EmailProviderBuildable, InsertableEmailProvider, InsertableEmailProviderAttributes,
     InsertableEmailProviderBuilder,
+};
+mod fractioning_procedure_templates;
+pub use fractioning_procedure_templates::{
+    FractioningProcedureTemplateBuildable, InsertableFractioningProcedureTemplate,
+    InsertableFractioningProcedureTemplateAttributes,
+    InsertableFractioningProcedureTemplateBuilder,
+    InsertableFractioningProcedureTemplateExtensionAttributes,
+};
+mod fractioning_procedures;
+pub use fractioning_procedures::{
+    FractioningProcedureBuildable, InsertableFractioningProcedure,
+    InsertableFractioningProcedureAttributes, InsertableFractioningProcedureBuilder,
+    InsertableFractioningProcedureExtensionAttributes,
 };
 mod freeze_dryer_models;
 pub use freeze_dryer_models::{
@@ -472,6 +352,19 @@ pub use freeze_dryers::{
     FreezeDryerBuildable, InsertableFreezeDryer, InsertableFreezeDryerAttributes,
     InsertableFreezeDryerBuilder, InsertableFreezeDryerExtensionAttributes,
 };
+mod freeze_drying_procedure_templates;
+pub use freeze_drying_procedure_templates::{
+    FreezeDryingProcedureTemplateBuildable, InsertableFreezeDryingProcedureTemplate,
+    InsertableFreezeDryingProcedureTemplateAttributes,
+    InsertableFreezeDryingProcedureTemplateBuilder,
+    InsertableFreezeDryingProcedureTemplateExtensionAttributes,
+};
+mod freeze_drying_procedures;
+pub use freeze_drying_procedures::{
+    FreezeDryingProcedureBuildable, InsertableFreezeDryingProcedure,
+    InsertableFreezeDryingProcedureAttributes, InsertableFreezeDryingProcedureBuilder,
+    InsertableFreezeDryingProcedureExtensionAttributes,
+};
 mod freezer_models;
 pub use freezer_models::{
     FreezerModelBuildable, InsertableFreezerModel, InsertableFreezerModelAttributes,
@@ -481,6 +374,30 @@ mod freezers;
 pub use freezers::{
     FreezerBuildable, InsertableFreezer, InsertableFreezerAttributes, InsertableFreezerBuilder,
     InsertableFreezerExtensionAttributes,
+};
+mod freezing_procedure_templates;
+pub use freezing_procedure_templates::{
+    FreezingProcedureTemplateBuildable, InsertableFreezingProcedureTemplate,
+    InsertableFreezingProcedureTemplateAttributes, InsertableFreezingProcedureTemplateBuilder,
+    InsertableFreezingProcedureTemplateExtensionAttributes,
+};
+mod freezing_procedures;
+pub use freezing_procedures::{
+    FreezingProcedureBuildable, InsertableFreezingProcedure, InsertableFreezingProcedureAttributes,
+    InsertableFreezingProcedureBuilder, InsertableFreezingProcedureExtensionAttributes,
+};
+mod geolocation_procedure_templates;
+pub use geolocation_procedure_templates::{
+    GeolocationProcedureTemplateBuildable, InsertableGeolocationProcedureTemplate,
+    InsertableGeolocationProcedureTemplateAttributes,
+    InsertableGeolocationProcedureTemplateBuilder,
+    InsertableGeolocationProcedureTemplateExtensionAttributes,
+};
+mod geolocation_procedures;
+pub use geolocation_procedures::{
+    GeolocationProcedureBuildable, InsertableGeolocationProcedure,
+    InsertableGeolocationProcedureAttributes, InsertableGeolocationProcedureBuilder,
+    InsertableGeolocationProcedureExtensionAttributes,
 };
 mod instrument_states;
 pub use instrument_states::{
@@ -526,6 +443,18 @@ pub use packaging_models::{
     InsertablePackagingModel, InsertablePackagingModelAttributes, InsertablePackagingModelBuilder,
     InsertablePackagingModelExtensionAttributes, PackagingModelBuildable,
 };
+mod packaging_procedure_templates;
+pub use packaging_procedure_templates::{
+    InsertablePackagingProcedureTemplate, InsertablePackagingProcedureTemplateAttributes,
+    InsertablePackagingProcedureTemplateBuilder,
+    InsertablePackagingProcedureTemplateExtensionAttributes, PackagingProcedureTemplateBuildable,
+};
+mod packaging_procedures;
+pub use packaging_procedures::{
+    InsertablePackagingProcedure, InsertablePackagingProcedureAttributes,
+    InsertablePackagingProcedureBuilder, InsertablePackagingProcedureExtensionAttributes,
+    PackagingProcedureBuildable,
+};
 mod parent_procedure_templates;
 pub use parent_procedure_templates::{
     InsertableParentProcedureTemplate, InsertableParentProcedureTemplateAttributes,
@@ -540,6 +469,18 @@ mod phone_models;
 pub use phone_models::{
     InsertablePhoneModel, InsertablePhoneModelAttributes, InsertablePhoneModelBuilder,
     InsertablePhoneModelExtensionAttributes, PhoneModelBuildable,
+};
+mod photograph_procedure_templates;
+pub use photograph_procedure_templates::{
+    InsertablePhotographProcedureTemplate, InsertablePhotographProcedureTemplateAttributes,
+    InsertablePhotographProcedureTemplateBuilder,
+    InsertablePhotographProcedureTemplateExtensionAttributes, PhotographProcedureTemplateBuildable,
+};
+mod photograph_procedures;
+pub use photograph_procedures::{
+    InsertablePhotographProcedure, InsertablePhotographProcedureAttributes,
+    InsertablePhotographProcedureBuilder, InsertablePhotographProcedureExtensionAttributes,
+    PhotographProcedureBuildable,
 };
 mod physical_asset_models;
 pub use physical_asset_models::{
@@ -580,6 +521,18 @@ pub use positioning_devices::{
     InsertablePositioningDeviceBuilder, InsertablePositioningDeviceExtensionAttributes,
     PositioningDeviceBuildable,
 };
+mod pouring_procedure_templates;
+pub use pouring_procedure_templates::{
+    InsertablePouringProcedureTemplate, InsertablePouringProcedureTemplateAttributes,
+    InsertablePouringProcedureTemplateBuilder,
+    InsertablePouringProcedureTemplateExtensionAttributes, PouringProcedureTemplateBuildable,
+};
+mod pouring_procedures;
+pub use pouring_procedures::{
+    InsertablePouringProcedure, InsertablePouringProcedureAttributes,
+    InsertablePouringProcedureBuilder, InsertablePouringProcedureExtensionAttributes,
+    PouringProcedureBuildable,
+};
 mod procedure_assets;
 pub use procedure_assets::{
     InsertableProcedureAsset, InsertableProcedureAssetAttributes, InsertableProcedureAssetBuilder,
@@ -589,6 +542,16 @@ mod procedure_template_asset_models;
 pub use procedure_template_asset_models::{
     InsertableProcedureTemplateAssetModel, InsertableProcedureTemplateAssetModelAttributes,
     InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelBuildable,
+};
+mod procedure_templates;
+pub use procedure_templates::{
+    InsertableProcedureTemplate, InsertableProcedureTemplateAttributes,
+    InsertableProcedureTemplateBuilder, ProcedureTemplateBuildable,
+};
+mod procedures;
+pub use procedures::{
+    InsertableProcedure, InsertableProcedureAttributes, InsertableProcedureBuilder,
+    ProcedureBuildable,
 };
 mod project_states;
 pub use project_states::{
@@ -636,6 +599,31 @@ pub use spectra_collections::{
     InsertableSpectraCollection, InsertableSpectraCollectionAttributes,
     InsertableSpectraCollectionBuilder, InsertableSpectraCollectionExtensionAttributes,
     SpectraCollectionBuildable,
+};
+mod storage_procedure_templates;
+pub use storage_procedure_templates::{
+    InsertableStorageProcedureTemplate, InsertableStorageProcedureTemplateAttributes,
+    InsertableStorageProcedureTemplateBuilder,
+    InsertableStorageProcedureTemplateExtensionAttributes, StorageProcedureTemplateBuildable,
+};
+mod storage_procedures;
+pub use storage_procedures::{
+    InsertableStorageProcedure, InsertableStorageProcedureAttributes,
+    InsertableStorageProcedureBuilder, InsertableStorageProcedureExtensionAttributes,
+    StorageProcedureBuildable,
+};
+mod supernatant_procedure_templates;
+pub use supernatant_procedure_templates::{
+    InsertableSupernatantProcedureTemplate, InsertableSupernatantProcedureTemplateAttributes,
+    InsertableSupernatantProcedureTemplateBuilder,
+    InsertableSupernatantProcedureTemplateExtensionAttributes,
+    SupernatantProcedureTemplateBuildable,
+};
+mod supernatant_procedures;
+pub use supernatant_procedures::{
+    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttributes,
+    InsertableSupernatantProcedureBuilder, InsertableSupernatantProcedureExtensionAttributes,
+    SupernatantProcedureBuildable,
 };
 mod taxa;
 pub use taxa::{
@@ -711,4 +699,16 @@ mod weighing_devices;
 pub use weighing_devices::{
     InsertableWeighingDevice, InsertableWeighingDeviceAttributes, InsertableWeighingDeviceBuilder,
     InsertableWeighingDeviceExtensionAttributes, WeighingDeviceBuildable,
+};
+mod weighing_procedure_templates;
+pub use weighing_procedure_templates::{
+    InsertableWeighingProcedureTemplate, InsertableWeighingProcedureTemplateAttributes,
+    InsertableWeighingProcedureTemplateBuilder,
+    InsertableWeighingProcedureTemplateExtensionAttributes, WeighingProcedureTemplateBuildable,
+};
+mod weighing_procedures;
+pub use weighing_procedures::{
+    InsertableWeighingProcedure, InsertableWeighingProcedureAttributes,
+    InsertableWeighingProcedureBuilder, InsertableWeighingProcedureExtensionAttributes,
+    WeighingProcedureBuildable,
 };

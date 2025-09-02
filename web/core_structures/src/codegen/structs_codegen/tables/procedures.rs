@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -13,6 +13,7 @@
 pub struct Procedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
+    pub most_concrete_table: String,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
@@ -134,6 +135,19 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::procedure_template.eq(procedure_template))
+            .order_by(procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(procedures::most_concrete_table.eq(most_concrete_table))
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }

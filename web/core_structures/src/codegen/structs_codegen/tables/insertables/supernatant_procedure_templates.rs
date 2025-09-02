@@ -512,12 +512,12 @@ pub struct InsertableSupernatantProcedureTemplateBuilder<
 pub trait SupernatantProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
-    /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.liters` column.
+    /// Sets the value of the `public.supernatant_procedure_templates.liters`
+    /// column.
     ///
     /// # Arguments
     /// * `liters`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.liters` column.
+    ///   `public.supernatant_procedure_templates.liters` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -539,13 +539,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         L: TryInto<f32>,
         validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
-    /// stratified_source_model` column.
+    /// `public.supernatant_procedure_templates.stratified_source_model` column.
     ///
     /// # Arguments
     /// * `stratified_source_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
-    ///   stratified_source_model` column.
+    ///   `public.supernatant_procedure_templates.stratified_source_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -564,13 +563,13 @@ pub trait SupernatantProcedureTemplateBuildable:
         stratified_source_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.supernatant_procedure_templates.foreign_procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.supernatant_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -589,12 +588,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
+    /// `public.supernatant_procedure_templates.
     /// procedure_template_stratified_source_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_stratified_source_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
+    ///   `public.supernatant_procedure_templates.
     ///   procedure_template_stratified_source_model` column.
     ///
     /// # Implementation details
@@ -614,13 +613,13 @@ pub trait SupernatantProcedureTemplateBuildable:
         procedure_template_stratified_source_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
-    /// supernatant_destination_model` column.
+    /// `public.supernatant_procedure_templates.supernatant_destination_model`
+    /// column.
     ///
     /// # Arguments
     /// * `supernatant_destination_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
-    ///   supernatant_destination_model` column.
+    ///   `public.supernatant_procedure_templates.supernatant_destination_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -639,12 +638,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         supernatant_destination_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
+    /// `public.supernatant_procedure_templates.
     /// procedure_template_supernatant_destination_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_supernatant_destination_model`: The value to set
-    ///   for the `procedure_templates.supernatant_procedure_templates.
+    ///   for the `public.supernatant_procedure_templates.
     ///   procedure_template_supernatant_destination_model` column.
     ///
     /// # Implementation details
@@ -664,13 +663,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         procedure_template_supernatant_destination_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
-    /// transferred_with_model` column.
+    /// `public.supernatant_procedure_templates.transferred_with_model` column.
     ///
     /// # Arguments
     /// * `transferred_with_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
-    ///   transferred_with_model` column.
+    ///   `public.supernatant_procedure_templates.transferred_with_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -689,12 +687,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         transferred_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
+    /// `public.supernatant_procedure_templates.
     /// procedure_template_transferred_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_transferred_with_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
+    ///   `public.supernatant_procedure_templates.
     ///   procedure_template_transferred_with_model` column.
     ///
     /// # Implementation details
@@ -714,13 +712,11 @@ pub trait SupernatantProcedureTemplateBuildable:
         procedure_template_transferred_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.pipette_tip_model`
-    /// column.
+    /// `public.supernatant_procedure_templates.pipette_tip_model` column.
     ///
     /// # Arguments
     /// * `pipette_tip_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
-    ///   pipette_tip_model` column.
+    ///   `public.supernatant_procedure_templates.pipette_tip_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -739,12 +735,12 @@ pub trait SupernatantProcedureTemplateBuildable:
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.supernatant_procedure_templates.
+    /// `public.supernatant_procedure_templates.
     /// procedure_template_pipette_tip_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_pipette_tip_model`: The value to set for the
-    ///   `procedure_templates.supernatant_procedure_templates.
+    ///   `public.supernatant_procedure_templates.
     ///   procedure_template_pipette_tip_model` column.
     ///
     /// # Implementation details
@@ -836,7 +832,7 @@ impl<
         >,
 > SupernatantProcedureTemplateBuildable
 for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.liters` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.liters` column.
     fn liters<L>(
         mut self,
         liters: L,
@@ -863,7 +859,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.liters = Some(liters);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.stratified_source_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.stratified_source_model` column.
     fn stratified_source_model(
         mut self,
         stratified_source_model: i32,
@@ -879,7 +875,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.stratified_source_model = Some(stratified_source_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -895,7 +891,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.procedure_template_stratified_source_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.procedure_template_stratified_source_model` column.
     fn procedure_template_stratified_source_model(
         mut self,
         procedure_template_stratified_source_model: i32,
@@ -913,7 +909,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.supernatant_destination_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.supernatant_destination_model` column.
     fn supernatant_destination_model(
         mut self,
         supernatant_destination_model: i32,
@@ -929,7 +925,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.supernatant_destination_model = Some(supernatant_destination_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.procedure_template_supernatant_destination_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.procedure_template_supernatant_destination_model` column.
     fn procedure_template_supernatant_destination_model(
         mut self,
         procedure_template_supernatant_destination_model: i32,
@@ -947,7 +943,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.transferred_with_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.transferred_with_model` column.
     fn transferred_with_model(
         mut self,
         transferred_with_model: i32,
@@ -963,7 +959,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.transferred_with_model = Some(transferred_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.procedure_template_transferred_with_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.procedure_template_transferred_with_model` column.
     fn procedure_template_transferred_with_model(
         mut self,
         procedure_template_transferred_with_model: i32,
@@ -981,7 +977,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.pipette_tip_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.pipette_tip_model` column.
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
@@ -997,7 +993,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.supernatant_procedure_templates.procedure_template_pipette_tip_model` column.
+    ///Sets the value of the `public.supernatant_procedure_templates.procedure_template_pipette_tip_model` column.
     fn procedure_template_pipette_tip_model(
         mut self,
         procedure_template_pipette_tip_model: i32,
@@ -1024,7 +1020,29 @@ impl<
 for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -1046,7 +1064,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -1068,7 +1086,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -1090,7 +1108,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -1112,7 +1130,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -1130,7 +1148,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -1154,7 +1172,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -1172,7 +1190,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

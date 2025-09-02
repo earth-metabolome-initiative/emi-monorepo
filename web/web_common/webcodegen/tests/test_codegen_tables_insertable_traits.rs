@@ -33,7 +33,6 @@ async fn test_codegen_tables_insertable_traits() {
         .set_output_directory("tests/codegen_tables_insertable_traits".as_ref())
         .enable_insertable_trait()
         .beautify()
-        .add_schema("public")
         .generate(&mut conn, &database_name);
     docker.stop().await.unwrap();
     outcome.unwrap();

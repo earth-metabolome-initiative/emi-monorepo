@@ -14,6 +14,7 @@
 )]
 pub struct ProcedureTemplate {
     pub procedure_template: i32,
+    pub most_concrete_table: String,
     pub name: String,
     pub description: String,
     pub deprecated: bool,
@@ -96,6 +97,19 @@ impl ProcedureTemplate {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+        Self::table()
+            .filter(procedure_templates::most_concrete_table.eq(most_concrete_table))
+            .order_by(procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

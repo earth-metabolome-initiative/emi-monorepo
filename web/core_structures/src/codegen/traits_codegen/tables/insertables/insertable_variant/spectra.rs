@@ -37,6 +37,9 @@ where
         C,
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::spectra::Spectrum;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum;
@@ -45,13 +48,17 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
+            self,
+            "spectra",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum = self
             .try_insert(user_id, conn)?;
         if !insertable_struct.spectra_collection(conn)?.can_update(user_id, conn)? {

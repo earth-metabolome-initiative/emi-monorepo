@@ -70,26 +70,6 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::PackagingModel(packaging_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -150,6 +130,26 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_sample_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = Some(procedure_templates);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = None;
                     updated = true;
                 }
             }

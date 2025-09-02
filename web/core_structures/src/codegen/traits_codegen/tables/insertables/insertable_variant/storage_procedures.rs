@@ -27,6 +27,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedure;
@@ -35,12 +38,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+            self,
+            "storage_procedures",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedure = self
             .try_insert(user_id, conn)?;
         Ok(

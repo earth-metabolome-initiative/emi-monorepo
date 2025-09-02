@@ -121,54 +121,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = Some(procedure_templates);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure == procedures.procedure {
-                    foreign_keys.procedure = Some(procedures);
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = Some(procedures);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::Procedure(procedures),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure == procedures.procedure {
-                    foreign_keys.procedure = None;
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::PipetteTipModel(pipette_tip_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -230,6 +182,54 @@ impl web_common_traits::prelude::HasForeignKeys
                     && self.pipette_tip_model == procedure_assets.asset_model
                 {
                     foreign_keys.aliquoting_procedures_procedure_pipette_tip_model_fkey = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.foreign_procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.foreign_procedure_template = Some(procedure_templates);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.foreign_procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.foreign_procedure_template = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure == procedures.procedure {
+                    foreign_keys.procedure = Some(procedures.clone());
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = Some(procedures.clone());
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::Procedure(procedures),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure == procedures.procedure {
+                    foreign_keys.procedure = None;
+                    updated = true;
+                }
+                if self.foreign_procedure == procedures.procedure {
+                    foreign_keys.foreign_procedure = None;
                     updated = true;
                 }
             }

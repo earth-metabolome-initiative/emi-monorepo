@@ -27,6 +27,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::centrifuges::Centrifuge;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifuge;
@@ -35,12 +38,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
+            self,
+            "centrifuges",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifuge = self
             .try_insert(user_id, conn)?;
         Ok(

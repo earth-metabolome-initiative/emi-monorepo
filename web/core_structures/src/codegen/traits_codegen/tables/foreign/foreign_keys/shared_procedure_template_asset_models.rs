@@ -132,46 +132,6 @@ for crate::codegen::structs_codegen::tables::shared_procedure_template_asset_mod
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.parent_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.parent_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
-                    updated = true;
-                }
-                if self.child_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.child_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.parent_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.parent_procedure_template = None;
-                    updated = true;
-                }
-                if self.child_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.child_procedure_template = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::AssetModelAncestor(
                     asset_model_ancestors,
                 ),
@@ -296,6 +256,46 @@ for crate::codegen::structs_codegen::tables::shared_procedure_template_asset_mod
                 }
                 if self.child_id == procedure_template_asset_models.id {
                     foreign_keys.child = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.parent_procedure_template
+                    == procedure_templates.procedure_template
+                {
+                    foreign_keys.parent_procedure_template = Some(
+                        procedure_templates.clone(),
+                    );
+                    updated = true;
+                }
+                if self.child_procedure_template
+                    == procedure_templates.procedure_template
+                {
+                    foreign_keys.child_procedure_template = Some(
+                        procedure_templates.clone(),
+                    );
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.parent_procedure_template
+                    == procedure_templates.procedure_template
+                {
+                    foreign_keys.parent_procedure_template = None;
+                    updated = true;
+                }
+                if self.child_procedure_template
+                    == procedure_templates.procedure_template
+                {
+                    foreign_keys.child_procedure_template = None;
                     updated = true;
                 }
             }

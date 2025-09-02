@@ -424,12 +424,12 @@ pub struct InsertableWeighingProcedureBuilder<
 pub trait WeighingProcedureBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    /// Sets the value of the
-    /// `procedures.weighing_procedures.procedure_template` column.
+    /// Sets the value of the `public.weighing_procedures.procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.weighing_procedures.procedure_template` column.
+    ///   `public.weighing_procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -448,11 +448,11 @@ pub trait WeighingProcedureBuildable:
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedures.weighing_procedures.foreign_procedure_template` column.
+    /// `public.weighing_procedures.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedures.weighing_procedures.foreign_procedure_template` column.
+    ///   `public.weighing_procedures.foreign_procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -470,12 +470,12 @@ pub trait WeighingProcedureBuildable:
         self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.weighing_procedures.foreign_procedure`
+    /// Sets the value of the `public.weighing_procedures.foreign_procedure`
     /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure`: The value to set for the
-    ///   `procedures.weighing_procedures.foreign_procedure` column.
+    ///   `public.weighing_procedures.foreign_procedure` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -494,12 +494,12 @@ pub trait WeighingProcedureBuildable:
         self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.weighing_procedures.weighed_container`
+    /// Sets the value of the `public.weighing_procedures.weighed_container`
     /// column.
     ///
     /// # Arguments
     /// * `weighed_container`: The value to set for the
-    ///   `procedures.weighing_procedures.weighed_container` column.
+    ///   `public.weighing_procedures.weighed_container` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -518,11 +518,11 @@ pub trait WeighingProcedureBuildable:
         self,
         weighed_container: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.weighing_procedures.kilograms` column.
+    /// Sets the value of the `public.weighing_procedures.kilograms` column.
     ///
     /// # Arguments
     /// * `kilograms`: The value to set for the
-    ///   `procedures.weighing_procedures.kilograms` column.
+    ///   `public.weighing_procedures.kilograms` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -543,12 +543,12 @@ pub trait WeighingProcedureBuildable:
     where
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
-    /// Sets the value of the
-    /// `procedures.weighing_procedures.weighed_with_model` column.
+    /// Sets the value of the `public.weighing_procedures.weighed_with_model`
+    /// column.
     ///
     /// # Arguments
     /// * `weighed_with_model`: The value to set for the
-    ///   `procedures.weighing_procedures.weighed_with_model` column.
+    ///   `public.weighing_procedures.weighed_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -566,12 +566,11 @@ pub trait WeighingProcedureBuildable:
         self,
         weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.weighing_procedures.weighed_with`
-    /// column.
+    /// Sets the value of the `public.weighing_procedures.weighed_with` column.
     ///
     /// # Arguments
     /// * `weighed_with`: The value to set for the
-    ///   `procedures.weighing_procedures.weighed_with` column.
+    ///   `public.weighing_procedures.weighed_with` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -644,7 +643,7 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > WeighingProcedureBuildable for InsertableWeighingProcedureBuilder<Procedure> {
-    ///Sets the value of the `procedures.weighing_procedures.procedure_template` column.
+    ///Sets the value of the `public.weighing_procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -703,7 +702,7 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.foreign_procedure_template` column.
+    ///Sets the value of the `public.weighing_procedures.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -732,7 +731,7 @@ impl<
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.foreign_procedure` column.
+    ///Sets the value of the `public.weighing_procedures.foreign_procedure` column.
     fn foreign_procedure(
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
@@ -748,7 +747,7 @@ impl<
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.weighed_container` column.
+    ///Sets the value of the `public.weighing_procedures.weighed_container` column.
     fn weighed_container(
         mut self,
         weighed_container: ::rosetta_uuid::Uuid,
@@ -764,7 +763,7 @@ impl<
         self.weighed_container = Some(weighed_container);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.kilograms` column.
+    ///Sets the value of the `public.weighing_procedures.kilograms` column.
     fn kilograms<K>(
         mut self,
         kilograms: K,
@@ -789,7 +788,7 @@ impl<
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.weighed_with_model` column.
+    ///Sets the value of the `public.weighing_procedures.weighed_with_model` column.
     fn weighed_with_model(
         mut self,
         weighed_with_model: i32,
@@ -805,7 +804,7 @@ impl<
         self.weighed_with_model = Some(weighed_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedures.weighing_procedures.weighed_with` column.
+    ///Sets the value of the `public.weighing_procedures.weighed_with` column.
     fn weighed_with(
         mut self,
         weighed_with: Option<::rosetta_uuid::Uuid>,
@@ -828,7 +827,7 @@ impl<
 for InsertableWeighingProcedureBuilder<Procedure> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureAttributes;
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure` column.
+    ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -846,7 +845,7 @@ for InsertableWeighingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///Sets the value of the `public.procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -879,7 +878,29 @@ for InsertableWeighingProcedureBuilder<Procedure> {
         )
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_by` column.
+    ///Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+                self.procedure,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -897,7 +918,7 @@ for InsertableWeighingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_at` column.
+    ///Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -921,7 +942,7 @@ for InsertableWeighingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_by` column.
+    ///Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -939,7 +960,7 @@ for InsertableWeighingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_at` column.
+    ///Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

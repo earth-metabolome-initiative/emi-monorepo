@@ -1,10 +1,10 @@
-CREATE TABLE IF NOT EXISTS procedure_templates.aliquoting_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS aliquoting_procedure_templates (
+	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The amount of liters that should be aliquoted.
 	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
 	-- Source container from which the aliquot is taken.
 	aliquoted_from_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template),
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
 	procedure_template_aliquoted_from_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- Destination container to which the aliquot is transferred.
 	aliquoted_into_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
@@ -54,23 +54,23 @@ CREATE TABLE IF NOT EXISTS procedure_templates.aliquoting_procedure_templates (
 		aliquoted_into_model
 	) REFERENCES procedure_template_asset_models(id, asset_model),
 	-- We define the same-as index to allow for foreign key references to check wether a
-	-- `aliquoting_procedure_templates.procedure_template` is associated with a given
-	-- `aliquoting_procedure_templates.foreign_procedure_template`.
+	-- `aliquoting_procedure_template` is associated with a given
+	-- `aliquoting_foreign_procedure_template`.
 	UNIQUE (procedure_template, foreign_procedure_template)
 );
-CREATE TABLE IF NOT EXISTS procedures.aliquoting_procedures (
-	procedure UUID PRIMARY KEY REFERENCES procedures.procedures(procedure) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS aliquoting_procedures (
+	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
 	-- We enforce that the model of this procedure must be an aliquoting procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates.aliquoting_procedure_templates(procedure_template),
+	procedure_template INTEGER NOT NULL REFERENCES aliquoting_procedure_templates(procedure_template),
 	-- The procedure template associated with the foreign procedure template.
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
 		)
 	),
 	-- The foreign procedure that has populated the container being aliquoted from (e.g., a sampling or fractioning procedure).
-	foreign_procedure UUID NOT NULL REFERENCES procedures.procedures(procedure) CHECK (
+	foreign_procedure UUID NOT NULL REFERENCES procedures(procedure) CHECK (
 		must_be_distinct_uuid(procedure, foreign_procedure)
 	),
 	-- The identifier of the instrument used for aliquoting.
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS procedures.aliquoting_procedures (
 	aliquoted_from UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is an aliquoting procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that there exists a `procedure_assets` entry for the instrument used in the procedure.
 	FOREIGN KEY (procedure, aliquoted_with) REFERENCES procedure_assets(procedure, asset) ON DELETE CASCADE,
 	-- We enforce that there exists a `procedure_assets` entry for the pipette tip used in the procedure.
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS procedures.aliquoting_procedures (
 	-- We enforce that the `aliquoted_from` is indeed a procedure trackable.
 	FOREIGN KEY (foreign_procedure, aliquoted_from) REFERENCES procedure_assets(procedure, asset) ON DELETE CASCADE,
 	-- We enforce that the `foreign_procedure` has indeed the `foreign_procedure_template`.
-	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the provided `foreign_procedure_template` is the one specified in the `aliquoting_procedure_templates` table.
-	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES procedure_templates.aliquoting_procedure_templates(procedure_template, foreign_procedure_template)
+	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES aliquoting_procedure_templates(procedure_template, foreign_procedure_template)
 );

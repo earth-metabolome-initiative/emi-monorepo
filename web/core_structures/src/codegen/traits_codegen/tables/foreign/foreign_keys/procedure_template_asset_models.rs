@@ -61,26 +61,6 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -97,6 +77,26 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
             ) => {
                 if self.asset_model == asset_models.id {
                     foreign_keys.asset_model = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = Some(procedure_templates);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = None;
                     updated = true;
                 }
             }

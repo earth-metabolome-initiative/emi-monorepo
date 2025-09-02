@@ -132,6 +132,31 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.procedure == procedure_assets.procedure
+                    && self.weighed_with_model == procedure_assets.asset_model
+                {
+                    foreign_keys.fractioning_procedures_procedure_weighed_with_model_fkey =
+                        Some(procedure_assets);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.procedure == procedure_assets.procedure
+                    && self.weighed_with_model == procedure_assets.asset_model
+                {
+                    foreign_keys.fractioning_procedures_procedure_weighed_with_model_fkey = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -158,11 +183,11 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = Some(procedures);
+                    foreign_keys.foreign_procedure = Some(procedures.clone());
                     updated = true;
                 }
                 if self.procedure == procedures.procedure {
-                    foreign_keys.procedure = Some(procedures);
+                    foreign_keys.procedure = Some(procedures.clone());
                     updated = true;
                 }
             }
@@ -176,31 +201,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.weighed_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.fractioning_procedures_procedure_weighed_with_model_fkey =
-                        Some(procedure_assets);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.weighed_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.fractioning_procedures_procedure_weighed_with_model_fkey = None;
                     updated = true;
                 }
             }

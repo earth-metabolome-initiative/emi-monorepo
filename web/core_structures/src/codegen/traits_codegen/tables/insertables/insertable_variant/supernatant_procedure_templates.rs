@@ -42,6 +42,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate;
@@ -50,13 +53,17 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+            self,
+            "supernatant_procedure_templates",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate = self
             .try_insert(user_id, conn)?;
         if !insertable_struct

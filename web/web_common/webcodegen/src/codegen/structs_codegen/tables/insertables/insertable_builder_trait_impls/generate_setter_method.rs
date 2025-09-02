@@ -91,14 +91,30 @@ impl Table {
             if let Some(_partial_builder_foreign_key) = column.requires_partial_builder(conn)? {
                 (
                     quote! {
-                        #column_snake_case_ident;
+                        self.#column_snake_case_ident = #column_snake_case_ident;
                     },
                     None,
+                )
+            } else if column.is_most_concrete_table(conn)? {
+                (
+                    quote! {
+                        if self.#column_snake_case_ident.is_none() {
+                            self.#column_snake_case_ident = Some(#column_snake_case_ident);
+                        }
+                    },
+                    Some(quote! {
+                        let #column_snake_case_ident = #column_snake_case_ident
+                            .try_into()
+                            .map_err(|err| {
+                                validation_errors::SingleFieldError::from(err)
+                                    .rename_field(#insertable_enum::#column_camel_case_ident)
+                            })?;
+                    }),
                 )
             } else if column.is_nullable() {
                 (
                     quote! {
-                        #column_snake_case_ident;
+                        self.#column_snake_case_ident = #column_snake_case_ident;
                     },
                     Some(quote! {
                         let #column_snake_case_ident = #column_snake_case_ident
@@ -112,7 +128,7 @@ impl Table {
             } else {
                 (
                     quote! {
-                        Some(#column_snake_case_ident);
+                        self.#column_snake_case_ident = Some(#column_snake_case_ident);
                     },
                     Some(quote! {
                         let #column_snake_case_ident = #column_snake_case_ident
@@ -132,7 +148,7 @@ impl Table {
                 #maybe_column_preprocessing
                 #(#same_as_assignments)*
                 #(#check_constraints)*
-                self.#column_snake_case_ident = #column_assignment;
+                #column_assignment;
                 Ok(self)
             },
             involved_columns,

@@ -32,8 +32,7 @@ async fn test_multiple_extensions() {
         .team_projects(&team_projects)
         .set_output_directory("tests/codegen_multiple_extensions".as_ref())
         .enable_insertable_trait()
-        .beautify()
-        .add_schema("public");
+        .beautify();
     let outcome = codegen.generate(&mut conn, &database_name);
     let network = codegen.table_extension_network().unwrap();
     let dot = network.to_dot();

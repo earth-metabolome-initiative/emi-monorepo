@@ -1,103 +1,13 @@
 impl From<super::Row> for crate::codegen::tables::rows::Rows {
     fn from(value: super::Row) -> Self {
         match value {
+            super::Row::Address(addresses) => crate::codegen::tables::rows::Rows::from(addresses),
             super::Row::AliquotingProcedureTemplate(aliquoting_procedure_templates) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedure_templates)
-            }
-            super::Row::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(ball_mill_procedure_templates)
-            }
-            super::Row::CappingProcedureTemplate(capping_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(capping_procedure_templates)
-            }
-            super::Row::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(centrifuge_procedure_templates)
-            }
-            super::Row::DisposalProcedureTemplate(disposal_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(disposal_procedure_templates)
-            }
-            super::Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(fractioning_procedure_templates)
-            }
-            super::Row::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(freeze_drying_procedure_templates)
-            }
-            super::Row::FreezingProcedureTemplate(freezing_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(freezing_procedure_templates)
-            }
-            super::Row::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(geolocation_procedure_templates)
-            }
-            super::Row::PackagingProcedureTemplate(packaging_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(packaging_procedure_templates)
-            }
-            super::Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(photograph_procedure_templates)
-            }
-            super::Row::PouringProcedureTemplate(pouring_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(pouring_procedure_templates)
-            }
-            super::Row::ProcedureTemplate(procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(procedure_templates)
-            }
-            super::Row::StorageProcedureTemplate(storage_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(storage_procedure_templates)
-            }
-            super::Row::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(supernatant_procedure_templates)
-            }
-            super::Row::WeighingProcedureTemplate(weighing_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(weighing_procedure_templates)
             }
             super::Row::AliquotingProcedure(aliquoting_procedures) => {
                 crate::codegen::tables::rows::Rows::from(aliquoting_procedures)
             }
-            super::Row::BallMillProcedure(ball_mill_procedures) => {
-                crate::codegen::tables::rows::Rows::from(ball_mill_procedures)
-            }
-            super::Row::CappingProcedure(capping_procedures) => {
-                crate::codegen::tables::rows::Rows::from(capping_procedures)
-            }
-            super::Row::CentrifugeProcedure(centrifuge_procedures) => {
-                crate::codegen::tables::rows::Rows::from(centrifuge_procedures)
-            }
-            super::Row::DisposalProcedure(disposal_procedures) => {
-                crate::codegen::tables::rows::Rows::from(disposal_procedures)
-            }
-            super::Row::FractioningProcedure(fractioning_procedures) => {
-                crate::codegen::tables::rows::Rows::from(fractioning_procedures)
-            }
-            super::Row::FreezeDryingProcedure(freeze_drying_procedures) => {
-                crate::codegen::tables::rows::Rows::from(freeze_drying_procedures)
-            }
-            super::Row::FreezingProcedure(freezing_procedures) => {
-                crate::codegen::tables::rows::Rows::from(freezing_procedures)
-            }
-            super::Row::GeolocationProcedure(geolocation_procedures) => {
-                crate::codegen::tables::rows::Rows::from(geolocation_procedures)
-            }
-            super::Row::PackagingProcedure(packaging_procedures) => {
-                crate::codegen::tables::rows::Rows::from(packaging_procedures)
-            }
-            super::Row::PhotographProcedure(photograph_procedures) => {
-                crate::codegen::tables::rows::Rows::from(photograph_procedures)
-            }
-            super::Row::PouringProcedure(pouring_procedures) => {
-                crate::codegen::tables::rows::Rows::from(pouring_procedures)
-            }
-            super::Row::Procedure(procedures) => {
-                crate::codegen::tables::rows::Rows::from(procedures)
-            }
-            super::Row::StorageProcedure(storage_procedures) => {
-                crate::codegen::tables::rows::Rows::from(storage_procedures)
-            }
-            super::Row::SupernatantProcedure(supernatant_procedures) => {
-                crate::codegen::tables::rows::Rows::from(supernatant_procedures)
-            }
-            super::Row::WeighingProcedure(weighing_procedures) => {
-                crate::codegen::tables::rows::Rows::from(weighing_procedures)
-            }
-            super::Row::Address(addresses) => crate::codegen::tables::rows::Rows::from(addresses),
             super::Row::AssetCompatibilityRule(asset_compatibility_rules) => {
                 crate::codegen::tables::rows::Rows::from(asset_compatibility_rules)
             }
@@ -114,6 +24,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::BallMillMachine(ball_mill_machines) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_machines)
             }
+            super::Row::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_procedure_templates)
+            }
+            super::Row::BallMillProcedure(ball_mill_procedures) => {
+                crate::codegen::tables::rows::Rows::from(ball_mill_procedures)
+            }
             super::Row::BeadsModel(beads_models) => {
                 crate::codegen::tables::rows::Rows::from(beads_models)
             }
@@ -122,11 +38,23 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(camera_models)
             }
             super::Row::Camera(cameras) => crate::codegen::tables::rows::Rows::from(cameras),
+            super::Row::CappingProcedureTemplate(capping_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(capping_procedure_templates)
+            }
+            super::Row::CappingProcedure(capping_procedures) => {
+                crate::codegen::tables::rows::Rows::from(capping_procedures)
+            }
             super::Row::CapsModel(caps_models) => {
                 crate::codegen::tables::rows::Rows::from(caps_models)
             }
             super::Row::CentrifugeModel(centrifuge_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_models)
+            }
+            super::Row::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(centrifuge_procedure_templates)
+            }
+            super::Row::CentrifugeProcedure(centrifuge_procedures) => {
+                crate::codegen::tables::rows::Rows::from(centrifuge_procedures)
             }
             super::Row::Centrifuge(centrifuges) => {
                 crate::codegen::tables::rows::Rows::from(centrifuges)
@@ -229,9 +157,21 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::DigitalAsset(digital_assets) => {
                 crate::codegen::tables::rows::Rows::from(digital_assets)
             }
+            super::Row::DisposalProcedureTemplate(disposal_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(disposal_procedure_templates)
+            }
+            super::Row::DisposalProcedure(disposal_procedures) => {
+                crate::codegen::tables::rows::Rows::from(disposal_procedures)
+            }
             super::Row::Document(documents) => crate::codegen::tables::rows::Rows::from(documents),
             super::Row::EmailProvider(email_providers) => {
                 crate::codegen::tables::rows::Rows::from(email_providers)
+            }
+            super::Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(fractioning_procedure_templates)
+            }
+            super::Row::FractioningProcedure(fractioning_procedures) => {
+                crate::codegen::tables::rows::Rows::from(fractioning_procedures)
             }
             super::Row::FreezeDryerModel(freeze_dryer_models) => {
                 crate::codegen::tables::rows::Rows::from(freeze_dryer_models)
@@ -239,10 +179,28 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::FreezeDryer(freeze_dryers) => {
                 crate::codegen::tables::rows::Rows::from(freeze_dryers)
             }
+            super::Row::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(freeze_drying_procedure_templates)
+            }
+            super::Row::FreezeDryingProcedure(freeze_drying_procedures) => {
+                crate::codegen::tables::rows::Rows::from(freeze_drying_procedures)
+            }
             super::Row::FreezerModel(freezer_models) => {
                 crate::codegen::tables::rows::Rows::from(freezer_models)
             }
             super::Row::Freezer(freezers) => crate::codegen::tables::rows::Rows::from(freezers),
+            super::Row::FreezingProcedureTemplate(freezing_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(freezing_procedure_templates)
+            }
+            super::Row::FreezingProcedure(freezing_procedures) => {
+                crate::codegen::tables::rows::Rows::from(freezing_procedures)
+            }
+            super::Row::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(geolocation_procedure_templates)
+            }
+            super::Row::GeolocationProcedure(geolocation_procedures) => {
+                crate::codegen::tables::rows::Rows::from(geolocation_procedures)
+            }
             super::Row::InstrumentState(instrument_states) => {
                 crate::codegen::tables::rows::Rows::from(instrument_states)
             }
@@ -266,6 +224,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PackagingModel(packaging_models) => {
                 crate::codegen::tables::rows::Rows::from(packaging_models)
             }
+            super::Row::PackagingProcedureTemplate(packaging_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(packaging_procedure_templates)
+            }
+            super::Row::PackagingProcedure(packaging_procedures) => {
+                crate::codegen::tables::rows::Rows::from(packaging_procedures)
+            }
             super::Row::ParentProcedureTemplate(parent_procedure_templates) => {
                 crate::codegen::tables::rows::Rows::from(parent_procedure_templates)
             }
@@ -274,6 +238,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::PhoneModel(phone_models) => {
                 crate::codegen::tables::rows::Rows::from(phone_models)
+            }
+            super::Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(photograph_procedure_templates)
+            }
+            super::Row::PhotographProcedure(photograph_procedures) => {
+                crate::codegen::tables::rows::Rows::from(photograph_procedures)
             }
             super::Row::PhysicalAssetModel(physical_asset_models) => {
                 crate::codegen::tables::rows::Rows::from(physical_asset_models)
@@ -294,11 +264,23 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PositioningDevice(positioning_devices) => {
                 crate::codegen::tables::rows::Rows::from(positioning_devices)
             }
+            super::Row::PouringProcedureTemplate(pouring_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(pouring_procedure_templates)
+            }
+            super::Row::PouringProcedure(pouring_procedures) => {
+                crate::codegen::tables::rows::Rows::from(pouring_procedures)
+            }
             super::Row::ProcedureAsset(procedure_assets) => {
                 crate::codegen::tables::rows::Rows::from(procedure_assets)
             }
             super::Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 crate::codegen::tables::rows::Rows::from(procedure_template_asset_models)
+            }
+            super::Row::ProcedureTemplate(procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(procedure_templates)
+            }
+            super::Row::Procedure(procedures) => {
+                crate::codegen::tables::rows::Rows::from(procedures)
             }
             super::Row::ProjectState(project_states) => {
                 crate::codegen::tables::rows::Rows::from(project_states)
@@ -322,6 +304,18 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::Spectrum(spectra) => crate::codegen::tables::rows::Rows::from(spectra),
             super::Row::SpectraCollection(spectra_collections) => {
                 crate::codegen::tables::rows::Rows::from(spectra_collections)
+            }
+            super::Row::StorageProcedureTemplate(storage_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(storage_procedure_templates)
+            }
+            super::Row::StorageProcedure(storage_procedures) => {
+                crate::codegen::tables::rows::Rows::from(storage_procedures)
+            }
+            super::Row::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(supernatant_procedure_templates)
+            }
+            super::Row::SupernatantProcedure(supernatant_procedures) => {
+                crate::codegen::tables::rows::Rows::from(supernatant_procedures)
             }
             super::Row::Taxon(taxa) => crate::codegen::tables::rows::Rows::from(taxa),
             super::Row::TeamMember(team_members) => {
@@ -362,6 +356,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::WeighingDevice(weighing_devices) => {
                 crate::codegen::tables::rows::Rows::from(weighing_devices)
+            }
+            super::Row::WeighingProcedureTemplate(weighing_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(weighing_procedure_templates)
+            }
+            super::Row::WeighingProcedure(weighing_procedures) => {
+                crate::codegen::tables::rows::Rows::from(weighing_procedures)
             }
         }
     }

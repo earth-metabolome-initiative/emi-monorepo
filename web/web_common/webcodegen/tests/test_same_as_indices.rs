@@ -21,8 +21,7 @@ fn inner_test_same_as_indices(
     let mut codegen = Codegen::default()
         .set_output_directory("tests/same_as_indices".as_ref())
         .enable_joinables()
-        .enable_tables_schema()
-        .add_schema("public");
+        .enable_tables_schema();
     codegen.generate(conn, &database_name)?;
     codegen.print_same_as_network(conn, &database_name, &format!("{}.dot", database_name))?;
 

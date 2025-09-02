@@ -399,13 +399,12 @@ pub struct InsertableFractioningProcedureTemplateBuilder<
 pub trait FractioningProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
-    /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.kilograms` column.
+    /// Sets the value of the `public.fractioning_procedure_templates.kilograms`
+    /// column.
     ///
     /// # Arguments
     /// * `kilograms`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.kilograms`
-    ///   column.
+    ///   `public.fractioning_procedure_templates.kilograms` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -427,13 +426,11 @@ pub trait FractioningProcedureTemplateBuildable:
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
-    /// tolerance_percentage` column.
+    /// `public.fractioning_procedure_templates.tolerance_percentage` column.
     ///
     /// # Arguments
     /// * `tolerance_percentage`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
-    ///   tolerance_percentage` column.
+    ///   `public.fractioning_procedure_templates.tolerance_percentage` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -455,13 +452,11 @@ pub trait FractioningProcedureTemplateBuildable:
         TP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<TP as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.weighed_with_model`
-    /// column.
+    /// `public.fractioning_procedure_templates.weighed_with_model` column.
     ///
     /// # Arguments
     /// * `weighed_with_model`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
-    ///   weighed_with_model` column.
+    ///   `public.fractioning_procedure_templates.weighed_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -480,12 +475,12 @@ pub trait FractioningProcedureTemplateBuildable:
         weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
+    /// `public.fractioning_procedure_templates.
     /// procedure_template_weighed_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_weighed_with_model`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
+    ///   `public.fractioning_procedure_templates.
     ///   procedure_template_weighed_with_model` column.
     ///
     /// # Implementation details
@@ -505,13 +500,13 @@ pub trait FractioningProcedureTemplateBuildable:
         procedure_template_weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
-    /// fragment_container_model` column.
+    /// `public.fractioning_procedure_templates.fragment_container_model`
+    /// column.
     ///
     /// # Arguments
     /// * `fragment_container_model`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
-    ///   fragment_container_model` column.
+    ///   `public.fractioning_procedure_templates.fragment_container_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -530,13 +525,13 @@ pub trait FractioningProcedureTemplateBuildable:
         fragment_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.fractioning_procedure_templates.foreign_procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.fractioning_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -555,12 +550,12 @@ pub trait FractioningProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
+    /// `public.fractioning_procedure_templates.
     /// procedure_template_fragment_container_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_fragment_container_model`: The value to set for
-    ///   the `procedure_templates.fractioning_procedure_templates.
+    ///   the `public.fractioning_procedure_templates.
     ///   procedure_template_fragment_container_model` column.
     ///
     /// # Implementation details
@@ -580,13 +575,13 @@ pub trait FractioningProcedureTemplateBuildable:
         procedure_template_fragment_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
-    /// fragment_placed_into_model` column.
+    /// `public.fractioning_procedure_templates.fragment_placed_into_model`
+    /// column.
     ///
     /// # Arguments
     /// * `fragment_placed_into_model`: The value to set for the
-    ///   `procedure_templates.fractioning_procedure_templates.
-    ///   fragment_placed_into_model` column.
+    ///   `public.fractioning_procedure_templates.fragment_placed_into_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -605,12 +600,12 @@ pub trait FractioningProcedureTemplateBuildable:
         fragment_placed_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.fractioning_procedure_templates.
+    /// `public.fractioning_procedure_templates.
     /// procedure_template_fragment_placed_into_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_fragment_placed_into_model`: The value to set for
-    ///   the `procedure_templates.fractioning_procedure_templates.
+    ///   the `public.fractioning_procedure_templates.
     ///   procedure_template_fragment_placed_into_model` column.
     ///
     /// # Implementation details
@@ -700,7 +695,7 @@ impl<
         >,
 > FractioningProcedureTemplateBuildable
 for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.kilograms` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.kilograms` column.
     fn kilograms<K>(
         mut self,
         kilograms: K,
@@ -727,7 +722,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.kilograms = Some(kilograms);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.tolerance_percentage` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.tolerance_percentage` column.
     fn tolerance_percentage<TP>(
         mut self,
         tolerance_percentage: TP,
@@ -763,7 +758,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.tolerance_percentage = Some(tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.weighed_with_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.weighed_with_model` column.
     fn weighed_with_model(
         mut self,
         weighed_with_model: i32,
@@ -779,7 +774,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.weighed_with_model = Some(weighed_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.procedure_template_weighed_with_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_weighed_with_model` column.
     fn procedure_template_weighed_with_model(
         mut self,
         procedure_template_weighed_with_model: i32,
@@ -797,7 +792,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.fragment_container_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.fragment_container_model` column.
     fn fragment_container_model(
         mut self,
         fragment_container_model: i32,
@@ -813,7 +808,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.fragment_container_model = Some(fragment_container_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -829,7 +824,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.procedure_template_fragment_container_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_fragment_container_model` column.
     fn procedure_template_fragment_container_model(
         mut self,
         procedure_template_fragment_container_model: i32,
@@ -847,7 +842,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.fragment_placed_into_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.fragment_placed_into_model` column.
     fn fragment_placed_into_model(
         mut self,
         fragment_placed_into_model: i32,
@@ -863,7 +858,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.fragment_placed_into_model = Some(fragment_placed_into_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.fractioning_procedure_templates.procedure_template_fragment_placed_into_model` column.
+    ///Sets the value of the `public.fractioning_procedure_templates.procedure_template_fragment_placed_into_model` column.
     fn procedure_template_fragment_placed_into_model(
         mut self,
         procedure_template_fragment_placed_into_model: i32,
@@ -890,7 +885,29 @@ impl<
 for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -912,7 +929,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -934,7 +951,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -956,7 +973,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -978,7 +995,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -996,7 +1013,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -1020,7 +1037,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -1038,7 +1055,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

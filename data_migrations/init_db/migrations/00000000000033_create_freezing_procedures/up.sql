@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS procedure_templates.freezing_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS freezing_procedure_templates (
+	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS procedure_templates.freezing_procedure_templates (
 	-- The container that is being stored in the freezer.
 	frozen_container_model INTEGER NOT NULL REFERENCES container_models(id),
 	-- The procedure template which originated the container being frozen (e.g., a sampling or fractioning procedure template).
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
@@ -47,24 +47,24 @@ CREATE TABLE IF NOT EXISTS procedure_templates.freezing_procedure_templates (
 	) REFERENCES procedure_template_asset_models(id, asset_model),
 	-- We check that the `frozen_with_model` is indeed a container that can hold the `frozen_container_model`.
 	CONSTRAINT freezing_pm_compatibility_rules FOREIGN KEY (frozen_with_model, frozen_container_model) REFERENCES asset_compatibility_rules(left_asset_model, right_asset_model),
-	-- We define a same-as index to allow for foreign key references to check whether a `freezing_procedure_templates.procedure_template`
-	-- is associated with a given `freezing_procedure_templates.foreign_procedure_template`.
+	-- We define a same-as index to allow for foreign key references to check whether a `freezing_procedure_template`
+	-- is associated with a given `freezing_foreign_procedure_template`.
 	UNIQUE (procedure_template, foreign_procedure_template)
 );
-CREATE TABLE IF NOT EXISTS procedures.freezing_procedures (
+CREATE TABLE IF NOT EXISTS freezing_procedures (
 	-- Identifier of the freezing procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures.procedures(procedure) ON DELETE CASCADE,
+	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
 	-- The template of this procedure should be a freezing procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates.freezing_procedure_templates(procedure_template),
+	procedure_template INTEGER NOT NULL REFERENCES freezing_procedure_templates(procedure_template),
 	-- The procedure template associated with the foreign procedure template.
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
 		)
 	),
 	-- The procedure that has populated the source container (e.g., a sampling procedure).
-	foreign_procedure UUID NOT NULL REFERENCES procedures.procedures(procedure) CHECK (
+	foreign_procedure UUID NOT NULL REFERENCES procedures(procedure) CHECK (
 		must_be_distinct_uuid(procedure, foreign_procedure)
 	),
 	-- The container that is being frozen, which must be a volumetric container.
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS procedures.freezing_procedures (
 	-- The model of the freezer used, which must be a freezer model.
 	frozen_with_model INTEGER NOT NULL REFERENCES freezer_models(id),
 	-- We enforce that the current `freezing_procedure_templates` has indeed the same `freezing_procedure_templates_template`.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the `foreign_procedure` has as `procedure_template` the specified `foreign_procedure_template`.
-	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- Additionally, we enforce that the `frozen_container` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (foreign_procedure, frozen_container) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the `frozen_with_model` is indeed a procedure asset model.
@@ -86,5 +86,5 @@ CREATE TABLE IF NOT EXISTS procedures.freezing_procedures (
 	-- We enforce that the `frozen_with` is indeed a weighing device of the correct model.
 	FOREIGN KEY (frozen_with, frozen_with_model) REFERENCES assets(id, model_id),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
-	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES procedure_templates.freezing_procedure_templates(procedure_template, foreign_procedure_template)
+	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES freezing_procedure_templates(procedure_template, foreign_procedure_template)
 );

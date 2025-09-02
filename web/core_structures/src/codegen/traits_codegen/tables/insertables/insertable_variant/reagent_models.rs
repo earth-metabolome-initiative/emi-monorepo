@@ -19,6 +19,9 @@ where
     >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel;
@@ -27,12 +30,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
+            self,
+            "reagent_models",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel = self
             .try_insert(user_id, conn)?;
         Ok(

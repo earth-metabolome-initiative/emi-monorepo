@@ -1,51 +1,27 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TableName {
-    AliquotingProcedureTemplate,
-    BallMillProcedureTemplate,
-    CappingProcedureTemplate,
-    CentrifugeProcedureTemplate,
-    DisposalProcedureTemplate,
-    FractioningProcedureTemplate,
-    FreezeDryingProcedureTemplate,
-    FreezingProcedureTemplate,
-    GeolocationProcedureTemplate,
-    PackagingProcedureTemplate,
-    PhotographProcedureTemplate,
-    PouringProcedureTemplate,
-    ProcedureTemplate,
-    StorageProcedureTemplate,
-    SupernatantProcedureTemplate,
-    WeighingProcedureTemplate,
-    AliquotingProcedure,
-    BallMillProcedure,
-    CappingProcedure,
-    CentrifugeProcedure,
-    DisposalProcedure,
-    FractioningProcedure,
-    FreezeDryingProcedure,
-    FreezingProcedure,
-    GeolocationProcedure,
-    PackagingProcedure,
-    PhotographProcedure,
-    PouringProcedure,
-    Procedure,
-    StorageProcedure,
-    SupernatantProcedure,
-    WeighingProcedure,
     Address,
+    AliquotingProcedureTemplate,
+    AliquotingProcedure,
     AssetCompatibilityRule,
     AssetModelAncestor,
     AssetModel,
     Asset,
     BallMillMachineModel,
     BallMillMachine,
+    BallMillProcedureTemplate,
+    BallMillProcedure,
     BeadsModel,
     Brand,
     CameraModel,
     Camera,
+    CappingProcedureTemplate,
+    CappingProcedure,
     CapsModel,
     CentrifugeModel,
+    CentrifugeProcedureTemplate,
+    CentrifugeProcedure,
     Centrifuge,
     City,
     Color,
@@ -81,12 +57,22 @@ pub enum TableName {
     Country,
     DigitalAssetModel,
     DigitalAsset,
+    DisposalProcedureTemplate,
+    DisposalProcedure,
     Document,
     EmailProvider,
+    FractioningProcedureTemplate,
+    FractioningProcedure,
     FreezeDryerModel,
     FreezeDryer,
+    FreezeDryingProcedureTemplate,
+    FreezeDryingProcedure,
     FreezerModel,
     Freezer,
+    FreezingProcedureTemplate,
+    FreezingProcedure,
+    GeolocationProcedureTemplate,
+    GeolocationProcedure,
     InstrumentState,
     LoginProvider,
     Material,
@@ -96,9 +82,13 @@ pub enum TableName {
     Organism,
     Organization,
     PackagingModel,
+    PackagingProcedureTemplate,
+    PackagingProcedure,
     ParentProcedureTemplate,
     PermanenceCategory,
     PhoneModel,
+    PhotographProcedureTemplate,
+    PhotographProcedure,
     PhysicalAssetModel,
     PhysicalAsset,
     PipetteModel,
@@ -106,8 +96,12 @@ pub enum TableName {
     Pipette,
     PositioningDeviceModel,
     PositioningDevice,
+    PouringProcedureTemplate,
+    PouringProcedure,
     ProcedureAsset,
     ProcedureTemplateAssetModel,
+    ProcedureTemplate,
+    Procedure,
     ProjectState,
     Project,
     Rank,
@@ -119,6 +113,10 @@ pub enum TableName {
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
+    StorageProcedureTemplate,
+    StorageProcedure,
+    SupernatantProcedureTemplate,
+    SupernatantProcedure,
     Taxon,
     TeamMember,
     TeamProject,
@@ -135,81 +133,17 @@ pub enum TableName {
     VolumetricContainer,
     WeighingDeviceModel,
     WeighingDevice,
+    WeighingProcedureTemplate,
+    WeighingProcedure,
 }
 impl core::fmt::Display for TableName {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            TableName::Address => write!(f, stringify!(Address)),
             TableName::AliquotingProcedureTemplate => {
                 write!(f, stringify!(AliquotingProcedureTemplate))
             }
-            TableName::BallMillProcedureTemplate => {
-                write!(f, stringify!(BallMillProcedureTemplate))
-            }
-            TableName::CappingProcedureTemplate => {
-                write!(f, stringify!(CappingProcedureTemplate))
-            }
-            TableName::CentrifugeProcedureTemplate => {
-                write!(f, stringify!(CentrifugeProcedureTemplate))
-            }
-            TableName::DisposalProcedureTemplate => {
-                write!(f, stringify!(DisposalProcedureTemplate))
-            }
-            TableName::FractioningProcedureTemplate => {
-                write!(f, stringify!(FractioningProcedureTemplate))
-            }
-            TableName::FreezeDryingProcedureTemplate => {
-                write!(f, stringify!(FreezeDryingProcedureTemplate))
-            }
-            TableName::FreezingProcedureTemplate => {
-                write!(f, stringify!(FreezingProcedureTemplate))
-            }
-            TableName::GeolocationProcedureTemplate => {
-                write!(f, stringify!(GeolocationProcedureTemplate))
-            }
-            TableName::PackagingProcedureTemplate => {
-                write!(f, stringify!(PackagingProcedureTemplate))
-            }
-            TableName::PhotographProcedureTemplate => {
-                write!(f, stringify!(PhotographProcedureTemplate))
-            }
-            TableName::PouringProcedureTemplate => {
-                write!(f, stringify!(PouringProcedureTemplate))
-            }
-            TableName::ProcedureTemplate => write!(f, stringify!(ProcedureTemplate)),
-            TableName::StorageProcedureTemplate => {
-                write!(f, stringify!(StorageProcedureTemplate))
-            }
-            TableName::SupernatantProcedureTemplate => {
-                write!(f, stringify!(SupernatantProcedureTemplate))
-            }
-            TableName::WeighingProcedureTemplate => {
-                write!(f, stringify!(WeighingProcedureTemplate))
-            }
             TableName::AliquotingProcedure => write!(f, stringify!(AliquotingProcedure)),
-            TableName::BallMillProcedure => write!(f, stringify!(BallMillProcedure)),
-            TableName::CappingProcedure => write!(f, stringify!(CappingProcedure)),
-            TableName::CentrifugeProcedure => write!(f, stringify!(CentrifugeProcedure)),
-            TableName::DisposalProcedure => write!(f, stringify!(DisposalProcedure)),
-            TableName::FractioningProcedure => {
-                write!(f, stringify!(FractioningProcedure))
-            }
-            TableName::FreezeDryingProcedure => {
-                write!(f, stringify!(FreezeDryingProcedure))
-            }
-            TableName::FreezingProcedure => write!(f, stringify!(FreezingProcedure)),
-            TableName::GeolocationProcedure => {
-                write!(f, stringify!(GeolocationProcedure))
-            }
-            TableName::PackagingProcedure => write!(f, stringify!(PackagingProcedure)),
-            TableName::PhotographProcedure => write!(f, stringify!(PhotographProcedure)),
-            TableName::PouringProcedure => write!(f, stringify!(PouringProcedure)),
-            TableName::Procedure => write!(f, stringify!(Procedure)),
-            TableName::StorageProcedure => write!(f, stringify!(StorageProcedure)),
-            TableName::SupernatantProcedure => {
-                write!(f, stringify!(SupernatantProcedure))
-            }
-            TableName::WeighingProcedure => write!(f, stringify!(WeighingProcedure)),
-            TableName::Address => write!(f, stringify!(Address)),
             TableName::AssetCompatibilityRule => {
                 write!(f, stringify!(AssetCompatibilityRule))
             }
@@ -220,12 +154,24 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(BallMillMachineModel))
             }
             TableName::BallMillMachine => write!(f, stringify!(BallMillMachine)),
+            TableName::BallMillProcedureTemplate => {
+                write!(f, stringify!(BallMillProcedureTemplate))
+            }
+            TableName::BallMillProcedure => write!(f, stringify!(BallMillProcedure)),
             TableName::BeadsModel => write!(f, stringify!(BeadsModel)),
             TableName::Brand => write!(f, stringify!(Brand)),
             TableName::CameraModel => write!(f, stringify!(CameraModel)),
             TableName::Camera => write!(f, stringify!(Camera)),
+            TableName::CappingProcedureTemplate => {
+                write!(f, stringify!(CappingProcedureTemplate))
+            }
+            TableName::CappingProcedure => write!(f, stringify!(CappingProcedure)),
             TableName::CapsModel => write!(f, stringify!(CapsModel)),
             TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
+            TableName::CentrifugeProcedureTemplate => {
+                write!(f, stringify!(CentrifugeProcedureTemplate))
+            }
+            TableName::CentrifugeProcedure => write!(f, stringify!(CentrifugeProcedure)),
             TableName::Centrifuge => write!(f, stringify!(Centrifuge)),
             TableName::City => write!(f, stringify!(City)),
             TableName::Color => write!(f, stringify!(Color)),
@@ -309,12 +255,38 @@ impl core::fmt::Display for TableName {
             TableName::Country => write!(f, stringify!(Country)),
             TableName::DigitalAssetModel => write!(f, stringify!(DigitalAssetModel)),
             TableName::DigitalAsset => write!(f, stringify!(DigitalAsset)),
+            TableName::DisposalProcedureTemplate => {
+                write!(f, stringify!(DisposalProcedureTemplate))
+            }
+            TableName::DisposalProcedure => write!(f, stringify!(DisposalProcedure)),
             TableName::Document => write!(f, stringify!(Document)),
             TableName::EmailProvider => write!(f, stringify!(EmailProvider)),
+            TableName::FractioningProcedureTemplate => {
+                write!(f, stringify!(FractioningProcedureTemplate))
+            }
+            TableName::FractioningProcedure => {
+                write!(f, stringify!(FractioningProcedure))
+            }
             TableName::FreezeDryerModel => write!(f, stringify!(FreezeDryerModel)),
             TableName::FreezeDryer => write!(f, stringify!(FreezeDryer)),
+            TableName::FreezeDryingProcedureTemplate => {
+                write!(f, stringify!(FreezeDryingProcedureTemplate))
+            }
+            TableName::FreezeDryingProcedure => {
+                write!(f, stringify!(FreezeDryingProcedure))
+            }
             TableName::FreezerModel => write!(f, stringify!(FreezerModel)),
             TableName::Freezer => write!(f, stringify!(Freezer)),
+            TableName::FreezingProcedureTemplate => {
+                write!(f, stringify!(FreezingProcedureTemplate))
+            }
+            TableName::FreezingProcedure => write!(f, stringify!(FreezingProcedure)),
+            TableName::GeolocationProcedureTemplate => {
+                write!(f, stringify!(GeolocationProcedureTemplate))
+            }
+            TableName::GeolocationProcedure => {
+                write!(f, stringify!(GeolocationProcedure))
+            }
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),
@@ -326,11 +298,19 @@ impl core::fmt::Display for TableName {
             TableName::Organism => write!(f, stringify!(Organism)),
             TableName::Organization => write!(f, stringify!(Organization)),
             TableName::PackagingModel => write!(f, stringify!(PackagingModel)),
+            TableName::PackagingProcedureTemplate => {
+                write!(f, stringify!(PackagingProcedureTemplate))
+            }
+            TableName::PackagingProcedure => write!(f, stringify!(PackagingProcedure)),
             TableName::ParentProcedureTemplate => {
                 write!(f, stringify!(ParentProcedureTemplate))
             }
             TableName::PermanenceCategory => write!(f, stringify!(PermanenceCategory)),
             TableName::PhoneModel => write!(f, stringify!(PhoneModel)),
+            TableName::PhotographProcedureTemplate => {
+                write!(f, stringify!(PhotographProcedureTemplate))
+            }
+            TableName::PhotographProcedure => write!(f, stringify!(PhotographProcedure)),
             TableName::PhysicalAssetModel => write!(f, stringify!(PhysicalAssetModel)),
             TableName::PhysicalAsset => write!(f, stringify!(PhysicalAsset)),
             TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
@@ -340,10 +320,16 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(PositioningDeviceModel))
             }
             TableName::PositioningDevice => write!(f, stringify!(PositioningDevice)),
+            TableName::PouringProcedureTemplate => {
+                write!(f, stringify!(PouringProcedureTemplate))
+            }
+            TableName::PouringProcedure => write!(f, stringify!(PouringProcedure)),
             TableName::ProcedureAsset => write!(f, stringify!(ProcedureAsset)),
             TableName::ProcedureTemplateAssetModel => {
                 write!(f, stringify!(ProcedureTemplateAssetModel))
             }
+            TableName::ProcedureTemplate => write!(f, stringify!(ProcedureTemplate)),
+            TableName::Procedure => write!(f, stringify!(Procedure)),
             TableName::ProjectState => write!(f, stringify!(ProjectState)),
             TableName::Project => write!(f, stringify!(Project)),
             TableName::Rank => write!(f, stringify!(Rank)),
@@ -357,6 +343,16 @@ impl core::fmt::Display for TableName {
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),
+            TableName::StorageProcedureTemplate => {
+                write!(f, stringify!(StorageProcedureTemplate))
+            }
+            TableName::StorageProcedure => write!(f, stringify!(StorageProcedure)),
+            TableName::SupernatantProcedureTemplate => {
+                write!(f, stringify!(SupernatantProcedureTemplate))
+            }
+            TableName::SupernatantProcedure => {
+                write!(f, stringify!(SupernatantProcedure))
+            }
             TableName::Taxon => write!(f, stringify!(Taxon)),
             TableName::TeamMember => write!(f, stringify!(TeamMember)),
             TableName::TeamProject => write!(f, stringify!(TeamProject)),
@@ -379,6 +375,10 @@ impl core::fmt::Display for TableName {
             TableName::VolumetricContainer => write!(f, stringify!(VolumetricContainer)),
             TableName::WeighingDeviceModel => write!(f, stringify!(WeighingDeviceModel)),
             TableName::WeighingDevice => write!(f, stringify!(WeighingDevice)),
+            TableName::WeighingProcedureTemplate => {
+                write!(f, stringify!(WeighingProcedureTemplate))
+            }
+            TableName::WeighingProcedure => write!(f, stringify!(WeighingProcedure)),
         }
     }
 }

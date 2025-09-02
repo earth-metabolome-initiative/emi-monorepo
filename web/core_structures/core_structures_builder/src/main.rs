@@ -4,7 +4,7 @@ use std::path::Path;
 use common_traits::builder::Builder;
 use diesel::PgConnection;
 use init_db::init_database;
-use procedure_codegen::{PROCEDURE_TEMPLATES_SCHEMA, PROCEDURES_SCHEMA, ProcedureCodegen};
+use procedure_codegen::ProcedureCodegen;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
 use webcodegen::{Codegen, PgExtension, PgStatStatement, Table, errors::WebCodeGenError};
@@ -48,10 +48,7 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
         .enable_upsertable_trait()
         .enable_crud_operations()
         .enable_yew()
-        .beautify()
-        .add_schema("public")
-        .add_schema(PROCEDURES_SCHEMA)
-        .add_schema(PROCEDURE_TEMPLATES_SCHEMA);
+        .beautify();
     codegen.print_same_as_network(conn, DATABASE_NAME, "columns_same_as_network.dot")?;
     time_tracker.extend(codegen.generate(conn, DATABASE_NAME)?);
 

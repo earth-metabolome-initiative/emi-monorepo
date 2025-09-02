@@ -598,6 +598,28 @@ impl WeighingProcedure {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedures::procedures, weighing_procedures::weighing_procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::most_concrete_table.eq(most_concrete_table))
+            .order_by(weighing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,

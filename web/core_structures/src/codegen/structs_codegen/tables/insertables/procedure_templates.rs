@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableProcedureTemplateAttributes {
     ProcedureTemplate,
+    MostConcreteTable,
     Name,
     Description,
     Deprecated,
@@ -15,6 +16,7 @@ impl core::str::FromStr for InsertableProcedureTemplateAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "Name" => Ok(Self::Name),
             "Description" => Ok(Self::Description),
             "Deprecated" => Ok(Self::Deprecated),
@@ -23,6 +25,7 @@ impl core::str::FromStr for InsertableProcedureTemplateAttributes {
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
+            "most_concrete_table" => Ok(Self::MostConcreteTable),
             "name" => Ok(Self::Name),
             "description" => Ok(Self::Description),
             "deprecated" => Ok(Self::Deprecated),
@@ -39,6 +42,7 @@ impl core::fmt::Display for InsertableProcedureTemplateAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::Name => write!(f, "name"),
             Self::Description => write!(f, "description"),
             Self::Deprecated => write!(f, "deprecated"),
@@ -59,6 +63,7 @@ impl core::fmt::Display for InsertableProcedureTemplateAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplate {
+    pub(crate) most_concrete_table: String,
     pub(crate) name: String,
     pub(crate) description: String,
     pub(crate) deprecated: bool,
@@ -137,6 +142,7 @@ impl InsertableProcedureTemplate {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplateBuilder {
+    pub(crate) most_concrete_table: Option<String>,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) deprecated: Option<bool>,
@@ -149,6 +155,7 @@ pub struct InsertableProcedureTemplateBuilder {
 impl Default for InsertableProcedureTemplateBuilder {
     fn default() -> Self {
         Self {
+            most_concrete_table: Default::default(),
             name: Default::default(),
             description: Default::default(),
             deprecated: Some(false),
@@ -165,12 +172,38 @@ impl Default for InsertableProcedureTemplateBuilder {
 pub trait ProcedureTemplateBuildable: std::marker::Sized {
     /// Attributes required to build the insertable.
     type Attributes;
-    /// Sets the value of the `procedure_templates.procedure_templates.name`
+    /// Sets the value of the `public.procedure_templates.most_concrete_table`
     /// column.
     ///
     /// # Arguments
-    /// * `name`: The value to set for the
-    ///   `procedure_templates.procedure_templates.name` column.
+    /// * `most_concrete_table`: The value to set for the
+    ///   `public.procedure_templates.most_concrete_table` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn most_concrete_table<MCT>(
+        self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>;
+    /// Sets the value of the `public.procedure_templates.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.procedure_templates.name`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -192,12 +225,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.description` column.
+    /// Sets the value of the `public.procedure_templates.description` column.
     ///
     /// # Arguments
     /// * `description`: The value to set for the
-    ///   `procedure_templates.procedure_templates.description` column.
+    ///   `public.procedure_templates.description` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -219,12 +251,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.deprecated` column.
+    /// Sets the value of the `public.procedure_templates.deprecated` column.
     ///
     /// # Arguments
     /// * `deprecated`: The value to set for the
-    ///   `procedure_templates.procedure_templates.deprecated` column.
+    ///   `public.procedure_templates.deprecated` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -245,12 +276,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>;
-    /// Sets the value of the `procedure_templates.procedure_templates.icon`
-    /// column.
+    /// Sets the value of the `public.procedure_templates.icon` column.
     ///
     /// # Arguments
-    /// * `icon`: The value to set for the
-    ///   `procedure_templates.procedure_templates.icon` column.
+    /// * `icon`: The value to set for the `public.procedure_templates.icon`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -272,12 +302,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.created_by` column.
+    /// Sets the value of the `public.procedure_templates.created_by` column.
     ///
     /// # Arguments
     /// * `created_by`: The value to set for the
-    ///   `procedure_templates.procedure_templates.created_by` column.
+    ///   `public.procedure_templates.created_by` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -295,12 +324,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
         self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.created_at` column.
+    /// Sets the value of the `public.procedure_templates.created_at` column.
     ///
     /// # Arguments
     /// * `created_at`: The value to set for the
-    ///   `procedure_templates.procedure_templates.created_at` column.
+    ///   `public.procedure_templates.created_at` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -323,12 +351,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.updated_by` column.
+    /// Sets the value of the `public.procedure_templates.updated_by` column.
     ///
     /// # Arguments
     /// * `updated_by`: The value to set for the
-    ///   `procedure_templates.procedure_templates.updated_by` column.
+    ///   `public.procedure_templates.updated_by` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -346,12 +373,11 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
         self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.updated_at` column.
+    /// Sets the value of the `public.procedure_templates.updated_at` column.
     ///
     /// # Arguments
     /// * `updated_at`: The value to set for the
-    ///   `procedure_templates.procedure_templates.updated_at` column.
+    ///   `public.procedure_templates.updated_at` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -378,6 +404,16 @@ pub trait ProcedureTemplateBuildable: std::marker::Sized {
 impl ProcedureTemplateBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes;
+    fn most_concrete_table<MCT>(
+        self,
+        _most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
     fn name<N>(
         self,
         _name: N,
@@ -456,8 +492,26 @@ impl ProcedureTemplateBuildable for Option<i32> {
 impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes;
-    /// Sets the value of the `procedure_templates.procedure_templates.name`
+    /// Sets the value of the `public.procedure_templates.most_concrete_table`
     /// column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        let most_concrete_table = most_concrete_table.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableProcedureTemplateAttributes::MostConcreteTable)
+        })?;
+        if self.most_concrete_table.is_none() {
+            self.most_concrete_table = Some(most_concrete_table);
+        }
+        Ok(self)
+    }
+    /// Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -490,8 +544,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.description` column.
+    /// Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -524,8 +577,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.deprecated` column.
+    /// Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -541,8 +593,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.deprecated = Some(deprecated);
         Ok(self)
     }
-    /// Sets the value of the `procedure_templates.procedure_templates.icon`
-    /// column.
+    /// Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -565,8 +616,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.icon = Some(icon);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.created_by` column.
+    /// Sets the value of the `public.procedure_templates.created_by` column.
     ///
     /// # Implementation notes
     /// This method also set the values of other columns, due to
@@ -595,8 +645,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.created_by = Some(created_by);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.created_at` column.
+    /// Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -623,8 +672,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.updated_by` column.
+    /// Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -636,8 +684,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `procedure_templates.procedure_templates.updated_at` column.
+    /// Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,
@@ -682,7 +729,8 @@ where
 {
     type Attributes = InsertableProcedureTemplateAttributes;
     fn is_complete(&self) -> bool {
-        self.name.is_some()
+        self.most_concrete_table.is_some()
+            && self.name.is_some()
             && self.description.is_some()
             && self.deprecated.is_some()
             && self.icon.is_some()

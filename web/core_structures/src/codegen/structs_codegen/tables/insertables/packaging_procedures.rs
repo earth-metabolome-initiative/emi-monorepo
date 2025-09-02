@@ -208,12 +208,12 @@ pub struct InsertablePackagingProcedureBuilder<
 pub trait PackagingProcedureBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    /// Sets the value of the
-    /// `procedures.packaging_procedures.procedure_template` column.
+    /// Sets the value of the `public.packaging_procedures.procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.packaging_procedures.procedure_template` column.
+    ///   `public.packaging_procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -231,12 +231,12 @@ pub trait PackagingProcedureBuildable:
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.packaging_procedures.packaged_with_model` column.
+    /// Sets the value of the `public.packaging_procedures.packaged_with_model`
+    /// column.
     ///
     /// # Arguments
     /// * `packaged_with_model`: The value to set for the
-    ///   `procedures.packaging_procedures.packaged_with_model` column.
+    ///   `public.packaging_procedures.packaged_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -274,7 +274,7 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > PackagingProcedureBuildable for InsertablePackagingProcedureBuilder<Procedure> {
-    ///Sets the value of the `procedures.packaging_procedures.procedure_template` column.
+    ///Sets the value of the `public.packaging_procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -320,7 +320,7 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.packaging_procedures.packaged_with_model` column.
+    ///Sets the value of the `public.packaging_procedures.packaged_with_model` column.
     fn packaged_with_model(
         mut self,
         packaged_with_model: i32,
@@ -345,7 +345,7 @@ impl<
 for InsertablePackagingProcedureBuilder<Procedure> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttributes;
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure` column.
+    ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -363,7 +363,7 @@ for InsertablePackagingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///Sets the value of the `public.procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -396,7 +396,29 @@ for InsertablePackagingProcedureBuilder<Procedure> {
         )
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_by` column.
+    ///Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+                self.procedure,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -414,7 +436,7 @@ for InsertablePackagingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_at` column.
+    ///Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -438,7 +460,7 @@ for InsertablePackagingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_by` column.
+    ///Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -456,7 +478,7 @@ for InsertablePackagingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_at` column.
+    ///Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

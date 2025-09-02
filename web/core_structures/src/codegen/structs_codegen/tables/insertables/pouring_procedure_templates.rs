@@ -384,13 +384,11 @@ pub trait PouringProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.measured_with_model`
-    /// column.
+    /// `public.pouring_procedure_templates.measured_with_model` column.
     ///
     /// # Arguments
     /// * `measured_with_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.measured_with_model`
-    ///   column.
+    ///   `public.pouring_procedure_templates.measured_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -409,12 +407,12 @@ pub trait PouringProcedureTemplateBuildable:
         measured_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.
+    /// `public.pouring_procedure_templates.
     /// procedure_template_measured_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_measured_with_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.
+    ///   `public.pouring_procedure_templates.
     ///   procedure_template_measured_with_model` column.
     ///
     /// # Implementation details
@@ -434,13 +432,11 @@ pub trait PouringProcedureTemplateBuildable:
         procedure_template_measured_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.poured_from_model`
-    /// column.
+    /// `public.pouring_procedure_templates.poured_from_model` column.
     ///
     /// # Arguments
     /// * `poured_from_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.poured_from_model`
-    ///   column.
+    ///   `public.pouring_procedure_templates.poured_from_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -459,13 +455,12 @@ pub trait PouringProcedureTemplateBuildable:
         poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.pouring_procedure_templates.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.pouring_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -484,12 +479,12 @@ pub trait PouringProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.
+    /// `public.pouring_procedure_templates.
     /// procedure_template_poured_from_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_poured_from_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.
+    ///   `public.pouring_procedure_templates.
     ///   procedure_template_poured_from_model` column.
     ///
     /// # Implementation details
@@ -509,13 +504,11 @@ pub trait PouringProcedureTemplateBuildable:
         procedure_template_poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.poured_into_model`
-    /// column.
+    /// `public.pouring_procedure_templates.poured_into_model` column.
     ///
     /// # Arguments
     /// * `poured_into_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.poured_into_model`
-    ///   column.
+    ///   `public.pouring_procedure_templates.poured_into_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -534,12 +527,12 @@ pub trait PouringProcedureTemplateBuildable:
         poured_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.
+    /// `public.pouring_procedure_templates.
     /// procedure_template_poured_into_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_poured_into_model`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.
+    ///   `public.pouring_procedure_templates.
     ///   procedure_template_poured_into_model` column.
     ///
     /// # Implementation details
@@ -558,12 +551,12 @@ pub trait PouringProcedureTemplateBuildable:
         self,
         procedure_template_poured_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedure_templates.pouring_procedure_templates.liters` column.
+    /// Sets the value of the `public.pouring_procedure_templates.liters`
+    /// column.
     ///
     /// # Arguments
     /// * `liters`: The value to set for the
-    ///   `procedure_templates.pouring_procedure_templates.liters` column.
+    ///   `public.pouring_procedure_templates.liters` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -645,7 +638,7 @@ impl<
         >,
 > PouringProcedureTemplateBuildable
 for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.measured_with_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.measured_with_model` column.
     fn measured_with_model(
         mut self,
         measured_with_model: i32,
@@ -661,7 +654,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         self.measured_with_model = Some(measured_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.procedure_template_measured_with_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.procedure_template_measured_with_model` column.
     fn procedure_template_measured_with_model(
         mut self,
         procedure_template_measured_with_model: i32,
@@ -679,7 +672,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.poured_from_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.poured_from_model` column.
     fn poured_from_model(
         mut self,
         poured_from_model: i32,
@@ -695,7 +688,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         self.poured_from_model = Some(poured_from_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.pouring_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -711,7 +704,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.procedure_template_poured_from_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.procedure_template_poured_from_model` column.
     fn procedure_template_poured_from_model(
         mut self,
         procedure_template_poured_from_model: i32,
@@ -729,7 +722,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.poured_into_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.poured_into_model` column.
     fn poured_into_model(
         mut self,
         poured_into_model: i32,
@@ -745,7 +738,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         self.poured_into_model = Some(poured_into_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.procedure_template_poured_into_model` column.
+    ///Sets the value of the `public.pouring_procedure_templates.procedure_template_poured_into_model` column.
     fn procedure_template_poured_into_model(
         mut self,
         procedure_template_poured_into_model: i32,
@@ -763,7 +756,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.pouring_procedure_templates.liters` column.
+    ///Sets the value of the `public.pouring_procedure_templates.liters` column.
     fn liters<L>(
         mut self,
         liters: L,
@@ -797,7 +790,29 @@ impl<
 for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -819,7 +834,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -841,7 +856,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -863,7 +878,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -885,7 +900,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -903,7 +918,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -927,7 +942,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -945,7 +960,7 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

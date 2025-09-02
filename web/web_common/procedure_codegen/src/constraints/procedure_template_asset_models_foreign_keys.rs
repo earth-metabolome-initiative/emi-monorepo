@@ -31,7 +31,7 @@ impl CustomColumnConstraint for ProcedureTemplateAssetModelsForeignKeysConstrain
         let table = column.table(conn)?;
 
         if Procedure::must_be_procedure_table(&table, conn).is_ok()
-            || ProcedureTemplate::must_be_procedure_template_table(&table).is_ok()
+            || ProcedureTemplate::must_be_procedure_template_table(&table, conn).is_ok()
         {
             if let Some(foreign_key) = is_procedure_template_asset_model_foreign_key(column, conn)?
             {

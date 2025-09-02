@@ -1,7 +1,6 @@
--- Schema for procedure template tables
-CREATE SCHEMA IF NOT EXISTS procedure_templates;
-CREATE TABLE IF NOT EXISTS procedure_templates.procedure_templates (
+CREATE TABLE IF NOT EXISTS procedure_templates (
 	procedure_template SERIAL PRIMARY KEY,
+	most_concrete_table TEXT NOT NULL,
 	name TEXT UNIQUE NOT NULL CHECK (must_be_paragraph(name)),
 	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
 	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
@@ -15,8 +14,8 @@ CREATE TABLE IF NOT EXISTS procedure_templates.procedure_templates (
 	CHECK (must_be_smaller_than_utc(created_at, updated_at))
 );
 CREATE TABLE IF NOT EXISTS parent_procedure_templates (
-	parent_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
-	child_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	parent_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	child_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	snoozable BOOLEAN NOT NULL DEFAULT FALSE,
 	copiable BOOLEAN NOT NULL DEFAULT FALSE,
 	repeatable BOOLEAN NOT NULL DEFAULT FALSE,
@@ -35,9 +34,9 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	)
 );
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
-	parent INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
-	current INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
-	successor_id INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	current INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	successor_id INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (parent, current, successor_id),
@@ -54,7 +53,7 @@ CREATE TABLE IF NOT EXISTS next_procedure_templates (
 CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -68,10 +67,10 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 CREATE TABLE IF NOT EXISTS shared_procedure_template_asset_models (
 	parent INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	parent_asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
-	parent_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	parent_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	child_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	child_asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
-	child_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+	child_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (parent, child_id),

@@ -15,6 +15,9 @@ where
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate;
@@ -23,12 +26,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+            self,
+            "procedure_templates",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate = self
             .try_insert(user_id, conn)?;
         Ok(
@@ -42,6 +49,13 @@ where
         _user_id: i32,
         _conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        let most_concrete_table = self
+            .most_concrete_table
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::MostConcreteTable,
+                ),
+            )?;
         let name = self
             .name
             .ok_or(
@@ -99,6 +113,7 @@ where
                 ),
             )?;
         Ok(Self::InsertableVariant {
+            most_concrete_table,
             name,
             description,
             deprecated,

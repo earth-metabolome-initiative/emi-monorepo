@@ -22,6 +22,9 @@ where
         C,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplateAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplate;
@@ -30,12 +33,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+            self,
+            "disposal_procedure_templates",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplate = self
             .try_insert(user_id, conn)?;
         Ok(

@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS procedure_templates.ball_mill_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates.procedure_templates(procedure_template) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
+	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
 	-- Tolerance percentage for the storage temperature.
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS procedure_templates.ball_mill_procedure_templates (
 	-- The container that is being milled.
 	milled_container_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- Foreign procedure template which originated the container being milled (e.g., a sampling or fractioning procedure template).
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
@@ -67,21 +67,21 @@ CREATE TABLE IF NOT EXISTS procedure_templates.ball_mill_procedure_templates (
 	CONSTRAINT ball_mill_pm_beads_compatibility_rules FOREIGN KEY (milled_with_model, bead_model) REFERENCES asset_compatibility_rules(left_asset_model, right_asset_model),
 	-- We check that the `bead_model` is indeed a beads model that can be used with the `milled_container_model`.
 	CONSTRAINT ball_mill_pm_beads_container_compatibility_rules FOREIGN KEY (bead_model, milled_container_model) REFERENCES asset_compatibility_rules(left_asset_model, right_asset_model),
-	-- We define the same-as index to allow for foreign key references to check wether a `ball_mill_procedure_templates.procedure_template` is associated with a given `ball_mill_procedure_templates.foreign_procedure_template`.
+	-- We define the same-as index to allow for foreign key references to check wether a `ball_mill_procedure_template` is associated with a given `ball_mill_foreign_procedure_template`.
 	UNIQUE (procedure_template, foreign_procedure_template)
 );
-CREATE TABLE IF NOT EXISTS procedures.ball_mill_procedures (
-	procedure UUID PRIMARY KEY REFERENCES procedures.procedures(procedure) ON DELETE CASCADE,
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates.ball_mill_procedure_templates(procedure_template),
+CREATE TABLE IF NOT EXISTS ball_mill_procedures (
+	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	procedure_template INTEGER NOT NULL REFERENCES ball_mill_procedure_templates(procedure_template),
 	-- The procedure template associated with the foreign procedure template.
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates.procedure_templates(procedure_template) CHECK (
+	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(
 			procedure_template,
 			foreign_procedure_template
 		)
 	),
 	-- The foreign procedure that has populated the container being centrifuged (e.g., a sampling or fractioning procedure).
-	foreign_procedure UUID NOT NULL REFERENCES procedures.procedures(procedure) CHECK (
+	foreign_procedure UUID NOT NULL REFERENCES procedures(procedure) CHECK (
 		must_be_distinct_uuid(procedure, foreign_procedure)
 	),
 	-- The beads model used for the procedure.
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS procedures.ball_mill_procedures (
 	milled_container UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a ball mill procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures.procedures(procedure, procedure_template),
+	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the `bead_model` is indeed a procedure asset of the correct model.
 	FOREIGN KEY (procedure, bead_model) REFERENCES procedure_assets(procedure, asset_model),
 	-- We enforce that the `milled_with_model` is indeed a procedure asset model.
@@ -105,5 +105,5 @@ CREATE TABLE IF NOT EXISTS procedures.ball_mill_procedures (
 	-- Additionally, we enforce that the `milled_container` is indeed a procedure asset.
 	FOREIGN KEY (foreign_procedure, milled_container) REFERENCES procedure_assets(procedure, asset),
 	-- We enforce that the associated procedure template requires the provided foreign procedure template.
-	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES procedure_templates.ball_mill_procedure_templates(procedure_template, foreign_procedure_template)
+	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES ball_mill_procedure_templates(procedure_template, foreign_procedure_template)
 );

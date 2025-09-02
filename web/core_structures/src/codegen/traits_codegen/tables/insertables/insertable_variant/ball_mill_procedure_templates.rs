@@ -27,6 +27,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplate;
@@ -35,12 +38,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+            self,
+            "ball_mill_procedure_templates",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplate = self
             .try_insert(user_id, conn)?;
         Ok(

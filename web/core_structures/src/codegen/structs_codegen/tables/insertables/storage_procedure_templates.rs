@@ -358,12 +358,12 @@ where
 pub trait StorageProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
-    /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.kelvin` column.
+    /// Sets the value of the `public.storage_procedure_templates.kelvin`
+    /// column.
     ///
     /// # Arguments
     /// * `kelvin`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.kelvin` column.
+    ///   `public.storage_procedure_templates.kelvin` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -385,13 +385,12 @@ pub trait StorageProcedureTemplateBuildable:
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.
-    /// kelvin_tolerance_percentage` column.
+    /// `public.storage_procedure_templates.kelvin_tolerance_percentage` column.
     ///
     /// # Arguments
     /// * `kelvin_tolerance_percentage`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.
-    ///   kelvin_tolerance_percentage` column.
+    ///   `public.storage_procedure_templates.kelvin_tolerance_percentage`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -413,13 +412,11 @@ pub trait StorageProcedureTemplateBuildable:
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.stored_into_model`
-    /// column.
+    /// `public.storage_procedure_templates.stored_into_model` column.
     ///
     /// # Arguments
     /// * `stored_into_model`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.stored_into_model`
-    ///   column.
+    ///   `public.storage_procedure_templates.stored_into_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -438,12 +435,12 @@ pub trait StorageProcedureTemplateBuildable:
         stored_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.
+    /// `public.storage_procedure_templates.
     /// procedure_template_stored_into_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_stored_into_model`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.
+    ///   `public.storage_procedure_templates.
     ///   procedure_template_stored_into_model` column.
     ///
     /// # Implementation details
@@ -463,13 +460,11 @@ pub trait StorageProcedureTemplateBuildable:
         procedure_template_stored_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.stored_asset_model`
-    /// column.
+    /// `public.storage_procedure_templates.stored_asset_model` column.
     ///
     /// # Arguments
     /// * `stored_asset_model`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.stored_asset_model`
-    ///   column.
+    ///   `public.storage_procedure_templates.stored_asset_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -488,13 +483,12 @@ pub trait StorageProcedureTemplateBuildable:
         stored_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.storage_procedure_templates.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.storage_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -513,12 +507,12 @@ pub trait StorageProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.storage_procedure_templates.
+    /// `public.storage_procedure_templates.
     /// procedure_template_stored_asset_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_stored_asset_model`: The value to set for the
-    ///   `procedure_templates.storage_procedure_templates.
+    ///   `public.storage_procedure_templates.
     ///   procedure_template_stored_asset_model` column.
     ///
     /// # Implementation details
@@ -596,7 +590,7 @@ impl<
         >,
 > StorageProcedureTemplateBuildable
 for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.kelvin` column.
+    ///Sets the value of the `public.storage_procedure_templates.kelvin` column.
     fn kelvin<K>(
         mut self,
         kelvin: K,
@@ -621,7 +615,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin = Some(kelvin);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.kelvin_tolerance_percentage` column.
+    ///Sets the value of the `public.storage_procedure_templates.kelvin_tolerance_percentage` column.
     fn kelvin_tolerance_percentage<KTP>(
         mut self,
         kelvin_tolerance_percentage: KTP,
@@ -660,7 +654,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.stored_into_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.stored_into_model` column.
     fn stored_into_model(
         mut self,
         stored_into_model: i32,
@@ -676,7 +670,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         self.stored_into_model = Some(stored_into_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.procedure_template_stored_into_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.procedure_template_stored_into_model` column.
     fn procedure_template_stored_into_model(
         mut self,
         procedure_template_stored_into_model: i32,
@@ -694,7 +688,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.stored_asset_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.stored_asset_model` column.
     fn stored_asset_model(
         mut self,
         stored_asset_model: i32,
@@ -710,7 +704,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         self.stored_asset_model = Some(stored_asset_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.storage_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -726,7 +720,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.storage_procedure_templates.procedure_template_stored_asset_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.procedure_template_stored_asset_model` column.
     fn procedure_template_stored_asset_model(
         mut self,
         procedure_template_stored_asset_model: i32,
@@ -753,7 +747,29 @@ impl<
 for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -775,7 +791,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -797,7 +813,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -819,7 +835,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -841,7 +857,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -859,7 +875,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -883,7 +899,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -901,7 +917,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

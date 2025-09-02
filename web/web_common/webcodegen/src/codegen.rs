@@ -125,8 +125,6 @@ pub struct Codegen<'a> {
     column_same_as_network: Option<ColumnSameAsNetwork>,
     /// Graph representing the "extend" relationships between tables.
     table_extension_network: Option<TableExtensionNetwork>,
-    /// The list of schemas to load tables from.
-    schemas: Vec<&'a str>,
 }
 
 impl<'a> Codegen<'a> {
@@ -162,13 +160,6 @@ impl<'a> Codegen<'a> {
     /// Sets to generate the derive traits for the `yew` framework.
     pub fn enable_yew(mut self) -> Self {
         self.enable_yew = true;
-        self
-    }
-
-    #[must_use]
-    /// Adds a new schema to load tables from.
-    pub fn add_schema(mut self, schema: &'a str) -> Self {
-        self.schemas.push(schema);
         self
     }
 
@@ -519,21 +510,13 @@ impl<'a> Codegen<'a> {
     ) -> Result<TimeTracker, WebCodeGenError> {
         let mut time_tracker = TimeTracker::new("Code generation");
 
-        if self.schemas.is_empty() {
-            return Err(WebCodeGenError::NoSchemaProvided);
-        }
-
         let task = Task::new("Retrieving tables");
-        let mut tables = Vec::new();
 
-        for schema in &self.schemas {
-            let schema_tables = Table::load_all(conn, table_catalog, schema)?
-                .into_iter()
-                .filter(|table| !(table.is_temporary() || table.is_view()))
-                .filter(|table| !self.tables_deny_list.contains(&table))
-                .collect::<Vec<Table>>();
-            tables.extend(schema_tables);
-        }
+        let mut tables = Table::load_all(conn, table_catalog, "public")?
+            .into_iter()
+            .filter(|table| !(table.is_temporary() || table.is_view()))
+            .filter(|table| !self.tables_deny_list.contains(&table))
+            .collect::<Vec<Table>>();
 
         tables.sort_unstable();
 
@@ -609,16 +592,11 @@ impl<'a> Codegen<'a> {
         output_path: &str,
     ) -> Result<(), WebCodeGenError> {
         if self.column_same_as_network.is_none() {
-            let mut tables = Vec::new();
-
-            for schema in &self.schemas {
-                let schema_tables = Table::load_all(conn, table_catalog, schema)?
-                    .into_iter()
-                    .filter(|table| !(table.is_temporary() || table.is_view()))
-                    .filter(|table| !self.tables_deny_list.contains(&table))
-                    .collect::<Vec<Table>>();
-                tables.extend(schema_tables);
-            }
+            let mut tables = Table::load_all(conn, table_catalog, "public")?
+                .into_iter()
+                .filter(|table| !(table.is_temporary() || table.is_view()))
+                .filter(|table| !self.tables_deny_list.contains(&table))
+                .collect::<Vec<Table>>();
 
             tables.sort_unstable();
             self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);

@@ -12,6 +12,7 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::assets::assets)]
 pub struct Asset {
     pub id: ::rosetta_uuid::Uuid,
+    pub most_concrete_table: String,
     pub name: Option<String>,
     pub description: Option<String>,
     pub model_id: i32,
@@ -125,6 +126,19 @@ impl Asset {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::most_concrete_table.eq(most_concrete_table))
+            .order_by(assets::id.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(

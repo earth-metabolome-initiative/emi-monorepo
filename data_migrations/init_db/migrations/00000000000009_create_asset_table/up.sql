@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS asset_models (
     id SERIAL PRIMARY KEY,
+    most_concrete_table TEXT NOT NULL,
     name VARCHAR(255) UNIQUE CHECK (must_be_paragraph(description)),
     description TEXT CHECK (must_be_paragraph(description)),
     parent_model_id INTEGER REFERENCES asset_models(id) ON DELETE CASCADE,
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS asset_models (
 );
 CREATE TABLE IF NOT EXISTS assets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    most_concrete_table TEXT NOT NULL,
     name VARCHAR(255) UNIQUE CHECK (must_be_paragraph(description)),
     description TEXT CHECK (must_be_paragraph(description)),
     model_id INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,

@@ -550,6 +550,27 @@ impl Codegen<'_> {
             let maybe_right_generics =
                 if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };
 
+            let mut maybe_mut = None;
+            let maybe_complete_most_concrete_table =
+                if let Some(most_concrete_column) = table.most_concrete_table_column(true, conn)? {
+                    let root_table = most_concrete_column.table(conn)?;
+                    let root_table_trait = root_table.builder_trait_ty()?;
+                    let current_table_name = table.table_name.clone();
+                    let most_concrete_column_setter = most_concrete_column.getter_ident()?;
+                    maybe_mut = Some(quote! {mut});
+                    additional_where_clause.push(quote! {
+                        Self: #root_table_trait<Attributes = #attributes_enum>
+                    });
+                    Some(quote! {
+                        self = <Self as #root_table_trait>::#most_concrete_column_setter(
+                            self,
+                            #current_table_name
+                        )?;
+                    })
+                } else {
+                    None
+                };
+
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
 				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_right_generics
                 where
@@ -566,7 +587,7 @@ impl Codegen<'_> {
                     type UserId = #user_id_type;
 
                     fn insert(
-                        self,
+                        #maybe_mut self,
                         user_id: Self::UserId,
                         conn: &mut C,
                     ) -> Result<Self::Row, Self::Error> {
@@ -574,6 +595,7 @@ impl Codegen<'_> {
                         use diesel::associations::HasTable;
                         #(#additional_imports)*
 
+                        #maybe_complete_most_concrete_table
                         let insertable_struct: #insertable_struct = self.try_insert(user_id, conn)?;
 
                         #parent_check

@@ -5,12 +5,9 @@ use diesel::PgConnection;
 use webcodegen::{KeyColumnUsage, Table};
 
 use crate::{
-    PROCEDURE_TEMPLATES_SCHEMA, ProcedureTemplate, errors::ProcedureError,
-    procedure_templates::PROCEDURE_TEMPLATES_TABLE_NAME,
+    ProcedureTemplate, errors::ProcedureError, procedure_templates::PROCEDURE_TEMPLATES_TABLE_NAME,
 };
 
-/// The schema in which procedure tables are defined.
-pub const PROCEDURES_SCHEMA: &str = "procedures";
 /// The name of the procedure table.
 pub const PROCEDURES_TABLE_NAME: &str = "procedures";
 
@@ -43,9 +40,7 @@ fn procedure_template_foreign_key(
     procedure_table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Option<KeyColumnUsage>, crate::errors::Error> {
-    if procedure_table.table_schema == PROCEDURES_SCHEMA
-        && procedure_table.table_name == PROCEDURES_TABLE_NAME
-    {
+    if procedure_table.table_name == PROCEDURES_TABLE_NAME {
         return Ok(None);
     }
 
@@ -62,7 +57,7 @@ fn procedure_template_foreign_key(
             continue;
         };
         // If the foreign table is not a procedure template table, continue searching.
-        if ProcedureTemplate::must_be_procedure_template_table(&foreign_table).is_err() {
+        if ProcedureTemplate::must_be_procedure_template_table(&foreign_table, conn).is_err() {
             continue;
         }
 
@@ -81,9 +76,7 @@ fn procedure_template_foreign_key(
             let Some(foreign_table) = same_as_constraint.foreign_table(conn)? else {
                 continue;
             };
-            if foreign_table.table_schema != PROCEDURES_SCHEMA
-                || foreign_table.table_name != PROCEDURES_TABLE_NAME
-            {
+            if foreign_table.table_name != PROCEDURES_TABLE_NAME {
                 continue;
             }
             let columns = same_as_constraint.columns(conn)?;
@@ -120,12 +113,15 @@ impl Procedure {
         table: &Table,
         conn: &mut PgConnection,
     ) -> Result<(), crate::errors::Error> {
-        if table.table_schema != PROCEDURES_SCHEMA {
-            return Err(ProcedureError::NotAProcedureTable(Box::new(table.clone())).into());
-        }
-
         if table.table_name == PROCEDURES_TABLE_NAME {
             return Ok(());
+        }
+
+        let procedure =
+            Table::load(conn, PROCEDURES_TABLE_NAME, "public", &table.table_catalog)?;
+
+        if !table.is_extending(&procedure, conn)? {
+            return Err(ProcedureError::NotAProcedureTable(Box::new(table.clone())).into());
         }
 
         procedure_template_foreign_key(table, conn)?;
@@ -163,17 +159,18 @@ impl Procedure {
         &self,
         conn: &mut PgConnection,
     ) -> Result<ProcedureTemplate, crate::errors::Error> {
-        ProcedureTemplate::try_from(
+        ProcedureTemplate::from_table(
             if let Some(foreign_key) = self.procedure_template_foreign_key(conn)? {
                 foreign_key.foreign_table(conn)?.expect("Foreign key must have a foreign table")
             } else {
                 Table::load(
                     conn,
                     PROCEDURE_TEMPLATES_TABLE_NAME,
-                    PROCEDURE_TEMPLATES_SCHEMA,
+                    "public",
                     &self.table.table_catalog,
                 )?
             },
+            conn
         )
     }
 
@@ -195,7 +192,7 @@ impl Procedure {
         table_name: &str,
         conn: &mut PgConnection,
     ) -> Result<Self, crate::errors::Error> {
-        let table = Table::load(conn, table_name, PROCEDURES_SCHEMA, table_catalog)?;
+        let table = Table::load(conn, table_name, "public", table_catalog)?;
         Self::must_be_procedure_table(&table, conn)?;
         Ok(Self { table })
     }
@@ -215,8 +212,11 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, crate::errors::Error> {
         let mut procedures = Vec::new();
-        for table in Table::load_all(conn, table_catalog, PROCEDURES_SCHEMA)? {
-            Self::must_be_procedure_table(&table, conn)?;
+
+        for table in Table::load_all(conn, table_catalog, "public")? {
+            if Self::must_be_procedure_table(&table, conn).is_err() {
+                continue;
+            }
             procedures.push(Self { table });
         }
         Ok(procedures)

@@ -416,12 +416,12 @@ pub struct InsertableFreezingProcedureBuilder<
 pub trait FreezingProcedureBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    /// Sets the value of the
-    /// `procedures.freezing_procedures.procedure_template` column.
+    /// Sets the value of the `public.freezing_procedures.procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.freezing_procedures.procedure_template` column.
+    ///   `public.freezing_procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -440,11 +440,11 @@ pub trait FreezingProcedureBuildable:
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedures.freezing_procedures.foreign_procedure_template` column.
+    /// `public.freezing_procedures.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedures.freezing_procedures.foreign_procedure_template` column.
+    ///   `public.freezing_procedures.foreign_procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -462,12 +462,12 @@ pub trait FreezingProcedureBuildable:
         self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.freezing_procedures.foreign_procedure`
+    /// Sets the value of the `public.freezing_procedures.foreign_procedure`
     /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure`: The value to set for the
-    ///   `procedures.freezing_procedures.foreign_procedure` column.
+    ///   `public.freezing_procedures.foreign_procedure` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -486,12 +486,12 @@ pub trait FreezingProcedureBuildable:
         self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.freezing_procedures.frozen_container`
+    /// Sets the value of the `public.freezing_procedures.frozen_container`
     /// column.
     ///
     /// # Arguments
     /// * `frozen_container`: The value to set for the
-    ///   `procedures.freezing_procedures.frozen_container` column.
+    ///   `public.freezing_procedures.frozen_container` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -510,12 +510,11 @@ pub trait FreezingProcedureBuildable:
         self,
         frozen_container: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.freezing_procedures.frozen_with`
-    /// column.
+    /// Sets the value of the `public.freezing_procedures.frozen_with` column.
     ///
     /// # Arguments
     /// * `frozen_with`: The value to set for the
-    ///   `procedures.freezing_procedures.frozen_with` column.
+    ///   `public.freezing_procedures.frozen_with` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -534,12 +533,12 @@ pub trait FreezingProcedureBuildable:
         self,
         frozen_with: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.freezing_procedures.frozen_with_model`
+    /// Sets the value of the `public.freezing_procedures.frozen_with_model`
     /// column.
     ///
     /// # Arguments
     /// * `frozen_with_model`: The value to set for the
-    ///   `procedures.freezing_procedures.frozen_with_model` column.
+    ///   `public.freezing_procedures.frozen_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -601,7 +600,7 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > FreezingProcedureBuildable for InsertableFreezingProcedureBuilder<Procedure> {
-    ///Sets the value of the `procedures.freezing_procedures.procedure_template` column.
+    ///Sets the value of the `public.freezing_procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -660,7 +659,7 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.freezing_procedures.foreign_procedure_template` column.
+    ///Sets the value of the `public.freezing_procedures.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -689,7 +688,7 @@ impl<
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.freezing_procedures.foreign_procedure` column.
+    ///Sets the value of the `public.freezing_procedures.foreign_procedure` column.
     fn foreign_procedure(
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
@@ -705,7 +704,7 @@ impl<
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
-    ///Sets the value of the `procedures.freezing_procedures.frozen_container` column.
+    ///Sets the value of the `public.freezing_procedures.frozen_container` column.
     fn frozen_container(
         mut self,
         frozen_container: ::rosetta_uuid::Uuid,
@@ -719,7 +718,7 @@ impl<
         self.frozen_container = Some(frozen_container);
         Ok(self)
     }
-    ///Sets the value of the `procedures.freezing_procedures.frozen_with` column.
+    ///Sets the value of the `public.freezing_procedures.frozen_with` column.
     fn frozen_with(
         mut self,
         frozen_with: Option<::rosetta_uuid::Uuid>,
@@ -733,7 +732,7 @@ impl<
         self.frozen_with = frozen_with;
         Ok(self)
     }
-    ///Sets the value of the `procedures.freezing_procedures.frozen_with_model` column.
+    ///Sets the value of the `public.freezing_procedures.frozen_with_model` column.
     fn frozen_with_model(
         mut self,
         frozen_with_model: i32,
@@ -756,7 +755,7 @@ impl<
 for InsertableFreezingProcedureBuilder<Procedure> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttributes;
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure` column.
+    ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -774,7 +773,7 @@ for InsertableFreezingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///Sets the value of the `public.procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -807,7 +806,29 @@ for InsertableFreezingProcedureBuilder<Procedure> {
         )
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_by` column.
+    ///Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+                self.procedure,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -825,7 +846,7 @@ for InsertableFreezingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_at` column.
+    ///Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -849,7 +870,7 @@ for InsertableFreezingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_by` column.
+    ///Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -867,7 +888,7 @@ for InsertableFreezingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_at` column.
+    ///Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

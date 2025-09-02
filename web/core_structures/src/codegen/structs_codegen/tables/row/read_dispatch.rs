@@ -1,102 +1,12 @@
 impl<C> web_common_traits::prelude::ReadDispatch<C> for super::Row
 where
+    crate::codegen::structs_codegen::tables::addresses::Address: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::addresses::Address: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: web_common_traits::database::Read<
@@ -117,6 +27,12 @@ where
     crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::beads_models::BeadsModel: web_common_traits::database::Read<
         C,
     >,
@@ -129,10 +45,22 @@ where
     crate::codegen::structs_codegen::tables::cameras::Camera: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::caps_models::CapsModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuges::Centrifuge: web_common_traits::database::Read<
@@ -240,10 +168,22 @@ where
     crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::documents::Document: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::email_providers::EmailProvider: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel: web_common_traits::database::Read<
@@ -252,10 +192,28 @@ where
     crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::freezers::Freezer: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::database::Read<
@@ -285,6 +243,12 @@ where
     crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
@@ -292,6 +256,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::phone_models::PhoneModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
@@ -315,10 +285,22 @@ where
     crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::project_states::ProjectState: web_common_traits::database::Read<
@@ -352,6 +334,18 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<
@@ -402,6 +396,12 @@ where
     crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure: web_common_traits::database::Read<
+        C,
+    >,
 {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn read(
@@ -411,6 +411,15 @@ where
         use web_common_traits::database::Read;
         Ok(
             match primary_key {
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Address(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::addresses::Address::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureTemplate(
                     primary_key,
                 ) => {
@@ -420,289 +429,10 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedure(
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::procedures::Procedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Address(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::addresses::Address::read(
                             primary_key,
                             conn,
                         )?
@@ -762,6 +492,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadsModel(
                     primary_key,
                 ) => {
@@ -798,6 +546,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapsModel(
                     primary_key,
                 ) => {
@@ -811,6 +577,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1131,6 +915,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Document(
                     primary_key,
                 ) => {
@@ -1144,6 +946,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::email_providers::EmailProvider::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1167,6 +987,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezerModel(
                     primary_key,
                 ) => {
@@ -1180,6 +1018,42 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::freezers::Freezer::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1266,6 +1140,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ParentProcedureTemplate(
                     primary_key,
                 ) => {
@@ -1288,6 +1180,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::phone_models::PhoneModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1356,6 +1266,24 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
                     primary_key,
                 ) => {
@@ -1369,6 +1297,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::procedures::Procedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1468,6 +1414,42 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1612,6 +1594,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure::read(
                             primary_key,
                             conn,
                         )?

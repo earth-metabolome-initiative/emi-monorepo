@@ -637,6 +637,48 @@ impl Table {
         Ok(false)
     }
 
+    /// Returns the most concrete table column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `include_ancestors` - Whether to include ancestor tables in the
+    ///   search.
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection is invalid.
+    pub fn most_concrete_table_column(
+        &self,
+        include_ancestors: bool,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Column>, WebCodeGenError> {
+        for column in self.columns(conn)? {
+            if column.is_most_concrete_table(conn)? {
+                return Ok(Some(column));
+            }
+        }
+
+        if include_ancestors {
+            let extension_tables = self.extension_tables(conn)?;
+            for table in &extension_tables {
+                if let Some(column) = table.most_concrete_table_column(true, conn)? {
+                    return Ok(Some(column));
+                }
+            }
+
+            // All tables in the extension hierarchy must have the
+            // most concrete table column in their root.
+            if !extension_tables.is_empty() {
+                unreachable!(
+                    "The current SQL schema is invalid: the extension hierarchy of table {self} does not have a `most concrete table` column.",
+                )
+            }
+        }
+
+        Ok(None)
+    }
+
     /// Returns the `updated_by` column of the table, if any.
     ///
     /// # Arguments
@@ -1024,6 +1066,19 @@ impl Table {
             .into_iter()
             .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok().flatten())
             .collect())
+    }
+
+    /// Returns whether the current table extends any other table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database connection is invalid.
+    pub fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
+        Ok(!self.extension_tables(conn)?.is_empty())
     }
 
     /// Returns the associated tables this table references via foreign keys, if

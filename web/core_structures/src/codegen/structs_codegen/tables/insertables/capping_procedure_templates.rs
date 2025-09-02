@@ -330,13 +330,11 @@ pub trait CappingProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
     /// Sets the value of the
-    /// `procedure_templates.capping_procedure_templates.container_model`
-    /// column.
+    /// `public.capping_procedure_templates.container_model` column.
     ///
     /// # Arguments
     /// * `container_model`: The value to set for the
-    ///   `procedure_templates.capping_procedure_templates.container_model`
-    ///   column.
+    ///   `public.capping_procedure_templates.container_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -355,13 +353,12 @@ pub trait CappingProcedureTemplateBuildable:
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.capping_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.capping_procedure_templates.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.capping_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.capping_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -380,12 +377,12 @@ pub trait CappingProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.capping_procedure_templates.
-    /// procedure_template_container_model` column.
+    /// `public.capping_procedure_templates.procedure_template_container_model`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template_container_model`: The value to set for the
-    ///   `procedure_templates.capping_procedure_templates.
+    ///   `public.capping_procedure_templates.
     ///   procedure_template_container_model` column.
     ///
     /// # Implementation details
@@ -405,13 +402,11 @@ pub trait CappingProcedureTemplateBuildable:
         procedure_template_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.capping_procedure_templates.capped_with_model`
-    /// column.
+    /// `public.capping_procedure_templates.capped_with_model` column.
     ///
     /// # Arguments
     /// * `capped_with_model`: The value to set for the
-    ///   `procedure_templates.capping_procedure_templates.capped_with_model`
-    ///   column.
+    ///   `public.capping_procedure_templates.capped_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -430,12 +425,12 @@ pub trait CappingProcedureTemplateBuildable:
         capped_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.capping_procedure_templates.
+    /// `public.capping_procedure_templates.
     /// procedure_template_capped_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_capped_with_model`: The value to set for the
-    ///   `procedure_templates.capping_procedure_templates.
+    ///   `public.capping_procedure_templates.
     ///   procedure_template_capped_with_model` column.
     ///
     /// # Implementation details
@@ -493,7 +488,7 @@ impl<
         >,
 > CappingProcedureTemplateBuildable
 for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.capping_procedure_templates.container_model` column.
+    ///Sets the value of the `public.capping_procedure_templates.container_model` column.
     fn container_model(
         mut self,
         container_model: i32,
@@ -509,7 +504,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         self.container_model = Some(container_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.capping_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.capping_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -525,7 +520,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.capping_procedure_templates.procedure_template_container_model` column.
+    ///Sets the value of the `public.capping_procedure_templates.procedure_template_container_model` column.
     fn procedure_template_container_model(
         mut self,
         procedure_template_container_model: i32,
@@ -543,7 +538,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.capping_procedure_templates.capped_with_model` column.
+    ///Sets the value of the `public.capping_procedure_templates.capped_with_model` column.
     fn capped_with_model(
         mut self,
         capped_with_model: i32,
@@ -559,7 +554,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         self.capped_with_model = Some(capped_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.capping_procedure_templates.procedure_template_capped_with_model` column.
+    ///Sets the value of the `public.capping_procedure_templates.procedure_template_capped_with_model` column.
     fn procedure_template_capped_with_model(
         mut self,
         procedure_template_capped_with_model: i32,
@@ -586,7 +581,29 @@ impl<
 for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -608,7 +625,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -630,7 +647,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -652,7 +669,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -674,7 +691,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -692,7 +709,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -716,7 +733,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -734,7 +751,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

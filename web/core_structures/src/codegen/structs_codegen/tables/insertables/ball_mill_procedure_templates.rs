@@ -533,12 +533,12 @@ where
 pub trait BallMillProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
-    /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.kelvin` column.
+    /// Sets the value of the `public.ball_mill_procedure_templates.kelvin`
+    /// column.
     ///
     /// # Arguments
     /// * `kelvin`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.kelvin` column.
+    ///   `public.ball_mill_procedure_templates.kelvin` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -560,13 +560,13 @@ pub trait BallMillProcedureTemplateBuildable:
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
-    /// kelvin_tolerance_percentage` column.
+    /// `public.ball_mill_procedure_templates.kelvin_tolerance_percentage`
+    /// column.
     ///
     /// # Arguments
     /// * `kelvin_tolerance_percentage`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
-    ///   kelvin_tolerance_percentage` column.
+    ///   `public.ball_mill_procedure_templates.kelvin_tolerance_percentage`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -587,12 +587,12 @@ pub trait BallMillProcedureTemplateBuildable:
     where
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.seconds` column.
+    /// Sets the value of the `public.ball_mill_procedure_templates.seconds`
+    /// column.
     ///
     /// # Arguments
     /// * `seconds`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.seconds` column.
+    ///   `public.ball_mill_procedure_templates.seconds` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -613,12 +613,12 @@ pub trait BallMillProcedureTemplateBuildable:
     where
         S: TryInto<f32>,
         validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.hertz` column.
+    /// Sets the value of the `public.ball_mill_procedure_templates.hertz`
+    /// column.
     ///
     /// # Arguments
     /// * `hertz`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.hertz` column.
+    ///   `public.ball_mill_procedure_templates.hertz` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -639,12 +639,12 @@ pub trait BallMillProcedureTemplateBuildable:
     where
         H: TryInto<f32>,
         validation_errors::SingleFieldError: From<<H as TryInto<f32>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.bead_model` column.
+    /// Sets the value of the `public.ball_mill_procedure_templates.bead_model`
+    /// column.
     ///
     /// # Arguments
     /// * `bead_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.bead_model` column.
+    ///   `public.ball_mill_procedure_templates.bead_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -663,13 +663,13 @@ pub trait BallMillProcedureTemplateBuildable:
         bead_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
-    /// procedure_template_bead_model` column.
+    /// `public.ball_mill_procedure_templates.procedure_template_bead_model`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template_bead_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
-    ///   procedure_template_bead_model` column.
+    ///   `public.ball_mill_procedure_templates.procedure_template_bead_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -688,13 +688,11 @@ pub trait BallMillProcedureTemplateBuildable:
         procedure_template_bead_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.number_of_beads`
-    /// column.
+    /// `public.ball_mill_procedure_templates.number_of_beads` column.
     ///
     /// # Arguments
     /// * `number_of_beads`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.number_of_beads`
-    ///   column.
+    ///   `public.ball_mill_procedure_templates.number_of_beads` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -716,13 +714,11 @@ pub trait BallMillProcedureTemplateBuildable:
         NOB: TryInto<i16>,
         validation_errors::SingleFieldError: From<<NOB as TryInto<i16>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.milled_with_model`
-    /// column.
+    /// `public.ball_mill_procedure_templates.milled_with_model` column.
     ///
     /// # Arguments
     /// * `milled_with_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.milled_with_model`
-    ///   column.
+    ///   `public.ball_mill_procedure_templates.milled_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -741,12 +737,12 @@ pub trait BallMillProcedureTemplateBuildable:
         milled_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
+    /// `public.ball_mill_procedure_templates.
     /// procedure_template_milled_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_milled_with_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
+    ///   `public.ball_mill_procedure_templates.
     ///   procedure_template_milled_with_model` column.
     ///
     /// # Implementation details
@@ -766,13 +762,11 @@ pub trait BallMillProcedureTemplateBuildable:
         procedure_template_milled_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
-    /// milled_container_model` column.
+    /// `public.ball_mill_procedure_templates.milled_container_model` column.
     ///
     /// # Arguments
     /// * `milled_container_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
-    ///   milled_container_model` column.
+    ///   `public.ball_mill_procedure_templates.milled_container_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -791,13 +785,13 @@ pub trait BallMillProcedureTemplateBuildable:
         milled_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.ball_mill_procedure_templates.foreign_procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.ball_mill_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -816,12 +810,12 @@ pub trait BallMillProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.ball_mill_procedure_templates.
+    /// `public.ball_mill_procedure_templates.
     /// procedure_template_milled_container_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_milled_container_model`: The value to set for the
-    ///   `procedure_templates.ball_mill_procedure_templates.
+    ///   `public.ball_mill_procedure_templates.
     ///   procedure_template_milled_container_model` column.
     ///
     /// # Implementation details
@@ -941,7 +935,7 @@ impl<
         >,
 > BallMillProcedureTemplateBuildable
 for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.kelvin` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.kelvin` column.
     fn kelvin<K>(
         mut self,
         kelvin: K,
@@ -966,7 +960,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin = Some(kelvin);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.kelvin_tolerance_percentage` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.kelvin_tolerance_percentage` column.
     fn kelvin_tolerance_percentage<KTP>(
         mut self,
         kelvin_tolerance_percentage: KTP,
@@ -1005,7 +999,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.seconds` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.seconds` column.
     fn seconds<S>(
         mut self,
         seconds: S,
@@ -1039,7 +1033,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.seconds = Some(seconds);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.hertz` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.hertz` column.
     fn hertz<H>(
         mut self,
         hertz: H,
@@ -1073,7 +1067,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.hertz = Some(hertz);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.bead_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.bead_model` column.
     fn bead_model(
         mut self,
         bead_model: i32,
@@ -1089,7 +1083,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.bead_model = Some(bead_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.procedure_template_bead_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.procedure_template_bead_model` column.
     fn procedure_template_bead_model(
         mut self,
         procedure_template_bead_model: i32,
@@ -1105,7 +1099,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.procedure_template_bead_model = Some(procedure_template_bead_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.number_of_beads` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.number_of_beads` column.
     fn number_of_beads<NOB>(
         mut self,
         number_of_beads: NOB,
@@ -1132,7 +1126,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.number_of_beads = Some(number_of_beads);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.milled_with_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.milled_with_model` column.
     fn milled_with_model(
         mut self,
         milled_with_model: i32,
@@ -1148,7 +1142,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.milled_with_model = Some(milled_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.procedure_template_milled_with_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.procedure_template_milled_with_model` column.
     fn procedure_template_milled_with_model(
         mut self,
         procedure_template_milled_with_model: i32,
@@ -1166,7 +1160,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.milled_container_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.milled_container_model` column.
     fn milled_container_model(
         mut self,
         milled_container_model: i32,
@@ -1182,7 +1176,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.milled_container_model = Some(milled_container_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -1198,7 +1192,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.ball_mill_procedure_templates.procedure_template_milled_container_model` column.
+    ///Sets the value of the `public.ball_mill_procedure_templates.procedure_template_milled_container_model` column.
     fn procedure_template_milled_container_model(
         mut self,
         procedure_template_milled_container_model: i32,
@@ -1225,7 +1219,29 @@ impl<
 for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -1247,7 +1263,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -1269,7 +1285,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -1291,7 +1307,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -1313,7 +1329,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -1331,7 +1347,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -1355,7 +1371,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -1373,7 +1389,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

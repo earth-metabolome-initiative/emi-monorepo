@@ -416,12 +416,12 @@ pub struct InsertablePhotographProcedureBuilder<
 pub trait PhotographProcedureBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    /// Sets the value of the
-    /// `procedures.photograph_procedures.procedure_template` column.
+    /// Sets the value of the `public.photograph_procedures.procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.photograph_procedures.procedure_template` column.
+    ///   `public.photograph_procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -440,11 +440,11 @@ pub trait PhotographProcedureBuildable:
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedures.photograph_procedures.foreign_procedure_template` column.
+    /// `public.photograph_procedures.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedures.photograph_procedures.foreign_procedure_template` column.
+    ///   `public.photograph_procedures.foreign_procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -462,12 +462,12 @@ pub trait PhotographProcedureBuildable:
         self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.photograph_procedures.foreign_procedure` column.
+    /// Sets the value of the `public.photograph_procedures.foreign_procedure`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure`: The value to set for the
-    ///   `procedures.photograph_procedures.foreign_procedure` column.
+    ///   `public.photograph_procedures.foreign_procedure` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -486,12 +486,12 @@ pub trait PhotographProcedureBuildable:
         self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.photograph_procedures.photographed_asset` column.
+    /// Sets the value of the `public.photograph_procedures.photographed_asset`
+    /// column.
     ///
     /// # Arguments
     /// * `photographed_asset`: The value to set for the
-    ///   `procedures.photograph_procedures.photographed_asset` column.
+    ///   `public.photograph_procedures.photographed_asset` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -510,12 +510,12 @@ pub trait PhotographProcedureBuildable:
         self,
         photographed_asset: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.photograph_procedures.photographed_with` column.
+    /// Sets the value of the `public.photograph_procedures.photographed_with`
+    /// column.
     ///
     /// # Arguments
     /// * `photographed_with`: The value to set for the
-    ///   `procedures.photograph_procedures.photographed_with` column.
+    ///   `public.photograph_procedures.photographed_with` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -535,11 +535,11 @@ pub trait PhotographProcedureBuildable:
         photographed_with: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedures.photograph_procedures.photographed_with_model` column.
+    /// `public.photograph_procedures.photographed_with_model` column.
     ///
     /// # Arguments
     /// * `photographed_with_model`: The value to set for the
-    ///   `procedures.photograph_procedures.photographed_with_model` column.
+    ///   `public.photograph_procedures.photographed_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -601,7 +601,7 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > PhotographProcedureBuildable for InsertablePhotographProcedureBuilder<Procedure> {
-    ///Sets the value of the `procedures.photograph_procedures.procedure_template` column.
+    ///Sets the value of the `public.photograph_procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -660,7 +660,7 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.photograph_procedures.foreign_procedure_template` column.
+    ///Sets the value of the `public.photograph_procedures.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -689,7 +689,7 @@ impl<
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.photograph_procedures.foreign_procedure` column.
+    ///Sets the value of the `public.photograph_procedures.foreign_procedure` column.
     fn foreign_procedure(
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
@@ -705,7 +705,7 @@ impl<
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
-    ///Sets the value of the `procedures.photograph_procedures.photographed_asset` column.
+    ///Sets the value of the `public.photograph_procedures.photographed_asset` column.
     fn photographed_asset(
         mut self,
         photographed_asset: ::rosetta_uuid::Uuid,
@@ -721,7 +721,7 @@ impl<
         self.photographed_asset = Some(photographed_asset);
         Ok(self)
     }
-    ///Sets the value of the `procedures.photograph_procedures.photographed_with` column.
+    ///Sets the value of the `public.photograph_procedures.photographed_with` column.
     fn photographed_with(
         mut self,
         photographed_with: Option<::rosetta_uuid::Uuid>,
@@ -737,7 +737,7 @@ impl<
         self.photographed_with = photographed_with;
         Ok(self)
     }
-    ///Sets the value of the `procedures.photograph_procedures.photographed_with_model` column.
+    ///Sets the value of the `public.photograph_procedures.photographed_with_model` column.
     fn photographed_with_model(
         mut self,
         photographed_with_model: i32,
@@ -762,7 +762,7 @@ impl<
 for InsertablePhotographProcedureBuilder<Procedure> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes;
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure` column.
+    ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -780,7 +780,7 @@ for InsertablePhotographProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///Sets the value of the `public.procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -813,7 +813,29 @@ for InsertablePhotographProcedureBuilder<Procedure> {
         )
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_by` column.
+    ///Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+                self.procedure,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -831,7 +853,7 @@ for InsertablePhotographProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_at` column.
+    ///Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -855,7 +877,7 @@ for InsertablePhotographProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_by` column.
+    ///Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -873,7 +895,7 @@ for InsertablePhotographProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_at` column.
+    ///Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

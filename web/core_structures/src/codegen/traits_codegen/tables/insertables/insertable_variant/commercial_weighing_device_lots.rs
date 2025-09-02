@@ -33,6 +33,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLot;
@@ -41,12 +44,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
+            self,
+            "commercial_weighing_device_lots",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLot = self
             .try_insert(user_id, conn)?;
         Ok(

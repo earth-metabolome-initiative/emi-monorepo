@@ -19,7 +19,7 @@ impl CustomTableConstraint for UnusedForeignProcedureTemplateConstraint {
         conn: &mut diesel::PgConnection,
         table: &webcodegen::Table,
     ) -> Result<(), Self::Error> {
-        if let Ok(procedure_template) = ProcedureTemplate::try_from(table.clone()) {
+        if let Ok(procedure_template) = ProcedureTemplate::from_table(table.clone(), conn) {
             let mut same_as_indices =
                 procedure_template.foreign_procedure_template_same_as_indices(conn)?;
 

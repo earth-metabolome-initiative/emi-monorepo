@@ -288,6 +288,28 @@ impl CommercialFreezeDryerLot {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, commercial_freeze_dryer_lots::commercial_freeze_dryer_lots,
+        };
+        Self::table()
+            .inner_join(
+                asset_models::table.on(commercial_freeze_dryer_lots::id.eq(asset_models::id)),
+            )
+            .filter(asset_models::most_concrete_table.eq(most_concrete_table))
+            .order_by(commercial_freeze_dryer_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,

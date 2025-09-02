@@ -1,9 +1,7 @@
 use crate::codegen::diesel_codegen::tables::{
     geolocation_procedure_templates::geolocation_procedure_templates,
-    procedure_templates::procedure_templates,
+    physical_asset_models::physical_asset_models,
 };
-diesel::allow_tables_to_appear_in_same_query!(geolocation_procedure_templates, procedure_templates);
-use crate::codegen::diesel_codegen::tables::physical_asset_models::physical_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(
     geolocation_procedure_templates,
     physical_asset_models
@@ -18,3 +16,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     geolocation_procedure_templates,
     procedure_template_asset_models
 );
+use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+diesel::allow_tables_to_appear_in_same_query!(geolocation_procedure_templates, procedure_templates);

@@ -1,51 +1,27 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TablePrimaryKey {
-    AliquotingProcedureTemplate(i32),
-    BallMillProcedureTemplate(i32),
-    CappingProcedureTemplate(i32),
-    CentrifugeProcedureTemplate(i32),
-    DisposalProcedureTemplate(i32),
-    FractioningProcedureTemplate(i32),
-    FreezeDryingProcedureTemplate(i32),
-    FreezingProcedureTemplate(i32),
-    GeolocationProcedureTemplate(i32),
-    PackagingProcedureTemplate(i32),
-    PhotographProcedureTemplate(i32),
-    PouringProcedureTemplate(i32),
-    ProcedureTemplate(i32),
-    StorageProcedureTemplate(i32),
-    SupernatantProcedureTemplate(i32),
-    WeighingProcedureTemplate(i32),
-    AliquotingProcedure(::rosetta_uuid::Uuid),
-    BallMillProcedure(::rosetta_uuid::Uuid),
-    CappingProcedure(::rosetta_uuid::Uuid),
-    CentrifugeProcedure(::rosetta_uuid::Uuid),
-    DisposalProcedure(::rosetta_uuid::Uuid),
-    FractioningProcedure(::rosetta_uuid::Uuid),
-    FreezeDryingProcedure(::rosetta_uuid::Uuid),
-    FreezingProcedure(::rosetta_uuid::Uuid),
-    GeolocationProcedure(::rosetta_uuid::Uuid),
-    PackagingProcedure(::rosetta_uuid::Uuid),
-    PhotographProcedure(::rosetta_uuid::Uuid),
-    PouringProcedure(::rosetta_uuid::Uuid),
-    Procedure(::rosetta_uuid::Uuid),
-    StorageProcedure(::rosetta_uuid::Uuid),
-    SupernatantProcedure(::rosetta_uuid::Uuid),
-    WeighingProcedure(::rosetta_uuid::Uuid),
     Address(i32),
+    AliquotingProcedureTemplate(i32),
+    AliquotingProcedure(::rosetta_uuid::Uuid),
     AssetCompatibilityRule((i32, i32)),
     AssetModelAncestor((i32, i32)),
     AssetModel(i32),
     Asset(::rosetta_uuid::Uuid),
     BallMillMachineModel(i32),
     BallMillMachine(::rosetta_uuid::Uuid),
+    BallMillProcedureTemplate(i32),
+    BallMillProcedure(::rosetta_uuid::Uuid),
     BeadsModel(i32),
     Brand(i32),
     CameraModel(i32),
     Camera(::rosetta_uuid::Uuid),
+    CappingProcedureTemplate(i32),
+    CappingProcedure(::rosetta_uuid::Uuid),
     CapsModel(i32),
     CentrifugeModel(i32),
+    CentrifugeProcedureTemplate(i32),
+    CentrifugeProcedure(::rosetta_uuid::Uuid),
     Centrifuge(::rosetta_uuid::Uuid),
     City(i32),
     Color(i16),
@@ -81,12 +57,22 @@ pub enum TablePrimaryKey {
     Country(::iso_codes::CountryCode),
     DigitalAssetModel(i32),
     DigitalAsset(::rosetta_uuid::Uuid),
+    DisposalProcedureTemplate(i32),
+    DisposalProcedure(::rosetta_uuid::Uuid),
     Document(::rosetta_uuid::Uuid),
     EmailProvider((i32, i16)),
+    FractioningProcedureTemplate(i32),
+    FractioningProcedure(::rosetta_uuid::Uuid),
     FreezeDryerModel(i32),
     FreezeDryer(::rosetta_uuid::Uuid),
+    FreezeDryingProcedureTemplate(i32),
+    FreezeDryingProcedure(::rosetta_uuid::Uuid),
     FreezerModel(i32),
     Freezer(::rosetta_uuid::Uuid),
+    FreezingProcedureTemplate(i32),
+    FreezingProcedure(::rosetta_uuid::Uuid),
+    GeolocationProcedureTemplate(i32),
+    GeolocationProcedure(::rosetta_uuid::Uuid),
     InstrumentState(i16),
     LoginProvider(i16),
     Material(i16),
@@ -96,9 +82,13 @@ pub enum TablePrimaryKey {
     Organism(::rosetta_uuid::Uuid),
     Organization(i16),
     PackagingModel(i32),
+    PackagingProcedureTemplate(i32),
+    PackagingProcedure(::rosetta_uuid::Uuid),
     ParentProcedureTemplate((i32, i32)),
     PermanenceCategory(i16),
     PhoneModel(i32),
+    PhotographProcedureTemplate(i32),
+    PhotographProcedure(::rosetta_uuid::Uuid),
     PhysicalAssetModel(i32),
     PhysicalAsset(::rosetta_uuid::Uuid),
     PipetteModel(i32),
@@ -106,8 +96,12 @@ pub enum TablePrimaryKey {
     Pipette(::rosetta_uuid::Uuid),
     PositioningDeviceModel(i32),
     PositioningDevice(::rosetta_uuid::Uuid),
+    PouringProcedureTemplate(i32),
+    PouringProcedure(::rosetta_uuid::Uuid),
     ProcedureAsset((::rosetta_uuid::Uuid, i32)),
     ProcedureTemplateAssetModel(i32),
+    ProcedureTemplate(i32),
+    Procedure(::rosetta_uuid::Uuid),
     ProjectState(i16),
     Project(i32),
     Rank(i16),
@@ -119,6 +113,10 @@ pub enum TablePrimaryKey {
     SpatialRefSy(i32),
     Spectrum(::rosetta_uuid::Uuid),
     SpectraCollection(::rosetta_uuid::Uuid),
+    StorageProcedureTemplate(i32),
+    StorageProcedure(::rosetta_uuid::Uuid),
+    SupernatantProcedureTemplate(i32),
+    SupernatantProcedure(::rosetta_uuid::Uuid),
     Taxon(i32),
     TeamMember((i32, i32)),
     TeamProject((i32, i32)),
@@ -135,108 +133,20 @@ pub enum TablePrimaryKey {
     VolumetricContainer(::rosetta_uuid::Uuid),
     WeighingDeviceModel(i32),
     WeighingDevice(::rosetta_uuid::Uuid),
+    WeighingProcedureTemplate(i32),
+    WeighingProcedure(::rosetta_uuid::Uuid),
 }
 impl web_common_traits::prelude::Tabular for TablePrimaryKey {
     type TableName = crate::codegen::tables::table_names::TableName;
     fn table_name(&self) -> Self::TableName {
         match self {
+            TablePrimaryKey::Address(_) => crate::codegen::tables::table_names::TableName::Address,
             TablePrimaryKey::AliquotingProcedureTemplate(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedureTemplate
-            }
-            TablePrimaryKey::BallMillProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillProcedureTemplate
-            }
-            TablePrimaryKey::CappingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::CappingProcedureTemplate
-            }
-            TablePrimaryKey::CentrifugeProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeProcedureTemplate
-            }
-            TablePrimaryKey::DisposalProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalProcedureTemplate
-            }
-            TablePrimaryKey::FractioningProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningProcedureTemplate
-            }
-            TablePrimaryKey::FreezeDryingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::FreezeDryingProcedureTemplate
-            }
-            TablePrimaryKey::FreezingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::FreezingProcedureTemplate
-            }
-            TablePrimaryKey::GeolocationProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::GeolocationProcedureTemplate
-            }
-            TablePrimaryKey::PackagingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingProcedureTemplate
-            }
-            TablePrimaryKey::PhotographProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::PhotographProcedureTemplate
-            }
-            TablePrimaryKey::PouringProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::PouringProcedureTemplate
-            }
-            TablePrimaryKey::ProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::ProcedureTemplate
-            }
-            TablePrimaryKey::StorageProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::StorageProcedureTemplate
-            }
-            TablePrimaryKey::SupernatantProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::SupernatantProcedureTemplate
-            }
-            TablePrimaryKey::WeighingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingProcedureTemplate
             }
             TablePrimaryKey::AliquotingProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::AliquotingProcedure
             }
-            TablePrimaryKey::BallMillProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::BallMillProcedure
-            }
-            TablePrimaryKey::CappingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::CappingProcedure
-            }
-            TablePrimaryKey::CentrifugeProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::CentrifugeProcedure
-            }
-            TablePrimaryKey::DisposalProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::DisposalProcedure
-            }
-            TablePrimaryKey::FractioningProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::FractioningProcedure
-            }
-            TablePrimaryKey::FreezeDryingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::FreezeDryingProcedure
-            }
-            TablePrimaryKey::FreezingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::FreezingProcedure
-            }
-            TablePrimaryKey::GeolocationProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::GeolocationProcedure
-            }
-            TablePrimaryKey::PackagingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::PackagingProcedure
-            }
-            TablePrimaryKey::PhotographProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::PhotographProcedure
-            }
-            TablePrimaryKey::PouringProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::PouringProcedure
-            }
-            TablePrimaryKey::Procedure(_) => {
-                crate::codegen::tables::table_names::TableName::Procedure
-            }
-            TablePrimaryKey::StorageProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::StorageProcedure
-            }
-            TablePrimaryKey::SupernatantProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::SupernatantProcedure
-            }
-            TablePrimaryKey::WeighingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::WeighingProcedure
-            }
-            TablePrimaryKey::Address(_) => crate::codegen::tables::table_names::TableName::Address,
             TablePrimaryKey::AssetCompatibilityRule(_) => {
                 crate::codegen::tables::table_names::TableName::AssetCompatibilityRule
             }
@@ -253,6 +163,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::BallMillMachine(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillMachine
             }
+            TablePrimaryKey::BallMillProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillProcedureTemplate
+            }
+            TablePrimaryKey::BallMillProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::BallMillProcedure
+            }
             TablePrimaryKey::BeadsModel(_) => {
                 crate::codegen::tables::table_names::TableName::BeadsModel
             }
@@ -261,11 +177,23 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::CameraModel
             }
             TablePrimaryKey::Camera(_) => crate::codegen::tables::table_names::TableName::Camera,
+            TablePrimaryKey::CappingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::CappingProcedureTemplate
+            }
+            TablePrimaryKey::CappingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::CappingProcedure
+            }
             TablePrimaryKey::CapsModel(_) => {
                 crate::codegen::tables::table_names::TableName::CapsModel
             }
             TablePrimaryKey::CentrifugeModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeModel
+            }
+            TablePrimaryKey::CentrifugeProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeProcedureTemplate
+            }
+            TablePrimaryKey::CentrifugeProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::CentrifugeProcedure
             }
             TablePrimaryKey::Centrifuge(_) => {
                 crate::codegen::tables::table_names::TableName::Centrifuge
@@ -366,11 +294,23 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::DigitalAsset(_) => {
                 crate::codegen::tables::table_names::TableName::DigitalAsset
             }
+            TablePrimaryKey::DisposalProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalProcedureTemplate
+            }
+            TablePrimaryKey::DisposalProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::DisposalProcedure
+            }
             TablePrimaryKey::Document(_) => {
                 crate::codegen::tables::table_names::TableName::Document
             }
             TablePrimaryKey::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
+            }
+            TablePrimaryKey::FractioningProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedureTemplate
+            }
+            TablePrimaryKey::FractioningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::FractioningProcedure
             }
             TablePrimaryKey::FreezeDryerModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryerModel
@@ -378,10 +318,28 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::FreezeDryer(_) => {
                 crate::codegen::tables::table_names::TableName::FreezeDryer
             }
+            TablePrimaryKey::FreezeDryingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDryingProcedureTemplate
+            }
+            TablePrimaryKey::FreezeDryingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::FreezeDryingProcedure
+            }
             TablePrimaryKey::FreezerModel(_) => {
                 crate::codegen::tables::table_names::TableName::FreezerModel
             }
             TablePrimaryKey::Freezer(_) => crate::codegen::tables::table_names::TableName::Freezer,
+            TablePrimaryKey::FreezingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::FreezingProcedureTemplate
+            }
+            TablePrimaryKey::FreezingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::FreezingProcedure
+            }
+            TablePrimaryKey::GeolocationProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::GeolocationProcedureTemplate
+            }
+            TablePrimaryKey::GeolocationProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::GeolocationProcedure
+            }
             TablePrimaryKey::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
             }
@@ -409,6 +367,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PackagingModel(_) => {
                 crate::codegen::tables::table_names::TableName::PackagingModel
             }
+            TablePrimaryKey::PackagingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingProcedureTemplate
+            }
+            TablePrimaryKey::PackagingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PackagingProcedure
+            }
             TablePrimaryKey::ParentProcedureTemplate(_) => {
                 crate::codegen::tables::table_names::TableName::ParentProcedureTemplate
             }
@@ -417,6 +381,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::PhoneModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhoneModel
+            }
+            TablePrimaryKey::PhotographProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PhotographProcedureTemplate
+            }
+            TablePrimaryKey::PhotographProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PhotographProcedure
             }
             TablePrimaryKey::PhysicalAssetModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhysicalAssetModel
@@ -437,11 +407,23 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PositioningDevice(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDevice
             }
+            TablePrimaryKey::PouringProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PouringProcedureTemplate
+            }
+            TablePrimaryKey::PouringProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PouringProcedure
+            }
             TablePrimaryKey::ProcedureAsset(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureAsset
             }
             TablePrimaryKey::ProcedureTemplateAssetModel(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureTemplateAssetModel
+            }
+            TablePrimaryKey::ProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::ProcedureTemplate
+            }
+            TablePrimaryKey::Procedure(_) => {
+                crate::codegen::tables::table_names::TableName::Procedure
             }
             TablePrimaryKey::ProjectState(_) => {
                 crate::codegen::tables::table_names::TableName::ProjectState
@@ -467,6 +449,18 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SpectraCollection(_) => {
                 crate::codegen::tables::table_names::TableName::SpectraCollection
+            }
+            TablePrimaryKey::StorageProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::StorageProcedureTemplate
+            }
+            TablePrimaryKey::StorageProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::StorageProcedure
+            }
+            TablePrimaryKey::SupernatantProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedureTemplate
+            }
+            TablePrimaryKey::SupernatantProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::SupernatantProcedure
             }
             TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             TablePrimaryKey::TeamMember(_) => {
@@ -507,6 +501,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::WeighingDevice(_) => {
                 crate::codegen::tables::table_names::TableName::WeighingDevice
+            }
+            TablePrimaryKey::WeighingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedureTemplate
+            }
+            TablePrimaryKey::WeighingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::WeighingProcedure
             }
         }
     }

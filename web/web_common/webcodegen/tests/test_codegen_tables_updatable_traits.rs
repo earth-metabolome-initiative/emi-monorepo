@@ -32,7 +32,6 @@ async fn test_codegen_tables_updatable_traits() {
         .set_output_directory("tests/codegen_tables_updatable_traits".as_ref())
         .enable_updatable_trait()
         .beautify()
-        .add_schema("public")
         .generate(&mut conn, &database_name);
     docker.stop().await.unwrap();
     outcome.unwrap();

@@ -183,6 +183,28 @@ impl<
 for InsertableCommercialFreezeDryerModelBuilder<CommercialProduct, FreezeDryerModel> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes;
     #[inline]
+    ///Sets the value of the `public.asset_models.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.commercial_freeze_dryer_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
+                self.commercial_freeze_dryer_models_id_fkey1,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
         mut self,

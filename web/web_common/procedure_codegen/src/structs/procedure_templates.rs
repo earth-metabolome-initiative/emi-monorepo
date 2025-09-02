@@ -6,8 +6,6 @@ use webcodegen::{Column, PgIndex, Table};
 
 use crate::Procedure;
 
-/// The schema in which procedure template tables are defined.
-pub const PROCEDURE_TEMPLATES_SCHEMA: &str = "procedure_templates";
 /// The name of the procedure templates table.
 pub const PROCEDURE_TEMPLATES_TABLE_NAME: &str = "procedure_templates";
 
@@ -24,21 +22,13 @@ impl AsRef<Table> for ProcedureTemplate {
     }
 }
 
-impl TryFrom<Table> for ProcedureTemplate {
-    type Error = crate::errors::Error;
-
-    fn try_from(value: Table) -> Result<Self, Self::Error> {
-        Self::must_be_procedure_template_table(&value)?;
-        Ok(Self { table: value })
-    }
-}
-
 impl ProcedureTemplate {
     /// Returns whether the given table is a procedure template table.
     ///
     /// # Arguments
     ///
     /// * `table` - The table to check.
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
     ///
     /// # Errors
     ///
@@ -47,8 +37,16 @@ impl ProcedureTemplate {
     ///   custom error.
     pub(crate) fn must_be_procedure_template_table(
         table: &Table,
+        conn: &mut PgConnection,
     ) -> Result<(), crate::errors::Error> {
-        if table.table_schema != PROCEDURE_TEMPLATES_SCHEMA {
+        if table.table_name == PROCEDURE_TEMPLATES_TABLE_NAME {
+            return Ok(());
+        }
+
+        let procedure_template =
+            Table::load(conn, PROCEDURE_TEMPLATES_TABLE_NAME, "public", &table.table_catalog)?;
+        
+        if !table.is_extending(&procedure_template, conn)? {
             return Err(crate::errors::ProcedureTemplateError::NotAProcedureTemplateTable(
                 Box::new(table.clone()),
             )
@@ -111,10 +109,33 @@ impl ProcedureTemplate {
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, crate::errors::Error> {
         let mut procedure_templates = Vec::new();
-        for table in Table::load_all(conn, table_catalog, PROCEDURE_TEMPLATES_SCHEMA)? {
-            procedure_templates.push(table.try_into()?);
+        for table in Table::load_all(conn, table_catalog, "public")? {
+            if Self::must_be_procedure_template_table(&table, conn).is_err() {
+                continue;
+            }
+            procedure_templates.push(Self { table });
         }
         Ok(procedure_templates)
+    }
+
+    /// Constructs a `ProcedureTemplate` from a `Table`.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `table` - The table to convert.
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    /// * If the table is not recognized as a procedure template, returns a
+    ///   custom error.
+    pub(crate) fn from_table(
+        table: Table,
+        conn: &mut PgConnection,
+    ) -> Result<Self, crate::errors::Error> {
+        Self::must_be_procedure_template_table(&table, conn)?;
+        Ok(Self { table })
     }
 
     /// Returns the primary key column of the procedure template table.
@@ -180,7 +201,7 @@ impl ProcedureTemplate {
                 let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
                     continue;
                 };
-                if Self::must_be_procedure_template_table(&foreign_table).is_ok() {
+                if Self::must_be_procedure_template_table(&foreign_table, conn).is_ok() {
                     foreign_same_as_indices.push(same_as_index.clone());
                     break;
                 }

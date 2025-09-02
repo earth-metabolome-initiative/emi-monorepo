@@ -22,7 +22,7 @@ impl CustomTableConstraint for ProcedureTemplatePrimaryKeyConstraint {
         conn: &mut diesel::PgConnection,
         table: &webcodegen::Table,
     ) -> Result<(), Self::Error> {
-        if ProcedureTemplate::must_be_procedure_template_table(table).is_ok() {
+        if ProcedureTemplate::must_be_procedure_template_table(table, conn).is_ok() {
             let mut primary_keys = table.primary_key_columns(conn)?;
             let first_primary_key = primary_keys.remove(0);
             if first_primary_key.column_name != "procedure_template" {

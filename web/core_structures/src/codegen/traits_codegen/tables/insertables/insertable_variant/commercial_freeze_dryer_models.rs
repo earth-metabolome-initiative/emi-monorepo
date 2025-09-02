@@ -25,6 +25,9 @@ where
         PrimaryKey = i32,
     >,
     FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModel;
@@ -33,12 +36,16 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::most_concrete_table(
+            self,
+            "commercial_freeze_dryer_models",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModel = self
             .try_insert(user_id, conn)?;
         Ok(

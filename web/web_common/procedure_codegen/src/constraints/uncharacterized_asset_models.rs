@@ -56,7 +56,7 @@ impl CustomColumnConstraint for UncharacterizedAssetModelsConstraint {
             return Err(crate::errors::Error::UncharacterizedAssetModelColumn(Box::new(
                 column.clone(),
             )));
-        } else if ProcedureTemplate::must_be_procedure_template_table(&table).is_ok() {
+        } else if ProcedureTemplate::must_be_procedure_template_table(&table, conn).is_ok() {
             for (same_as_foreign_key, _) in table.same_as_foreign_keys(conn)? {
                 let foreign_table = same_as_foreign_key.foreign_table(conn)?.expect(
                     "Failed to get foreign table for same-as foreign key on a procedure table",

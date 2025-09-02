@@ -13,8 +13,6 @@ use crate::{
 pub enum WebCodeGenError {
     /// A Diesel error, such as a connection error.
     DieselError(DieselError),
-    /// No schema was provided.
-    NoSchemaProvided,
     /// The table is missing.
     MissingTable(String),
     /// The extension is missing.
@@ -79,7 +77,6 @@ impl Display for WebCodeGenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             WebCodeGenError::DieselError(err) => write!(f, "Diesel error: {}", err),
-            WebCodeGenError::NoSchemaProvided => write!(f, "No schema was provided"),
             WebCodeGenError::MissingTable(table) => write!(f, "Missing table: {}", table),
             WebCodeGenError::MissingExtension(extension) => {
                 write!(f, "Missing extension: {}", extension)

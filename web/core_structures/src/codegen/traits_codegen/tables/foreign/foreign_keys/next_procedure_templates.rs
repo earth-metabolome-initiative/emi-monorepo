@@ -75,42 +75,6 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.parent == procedure_templates.procedure_template {
-                    foreign_keys.parent = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.current == procedure_templates.procedure_template {
-                    foreign_keys.current = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.successor_id == procedure_templates.procedure_template {
-                    foreign_keys.successor = Some(procedure_templates.clone());
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.parent == procedure_templates.procedure_template {
-                    foreign_keys.parent = None;
-                    updated = true;
-                }
-                if self.current == procedure_templates.procedure_template {
-                    foreign_keys.current = None;
-                    updated = true;
-                }
-                if self.successor_id == procedure_templates.procedure_template {
-                    foreign_keys.successor = None;
-                    updated = true;
-                }
-            }
-            (
                 crate::codegen::tables::row::Row::ParentProcedureTemplate(
                     parent_procedure_templates,
                 ),
@@ -149,6 +113,42 @@ impl web_common_traits::prelude::HasForeignKeys
                     && self.successor_id == parent_procedure_templates.child_procedure_template
                 {
                     foreign_keys.next_procedure_templates_parent_successor_id_fkey = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.parent == procedure_templates.procedure_template {
+                    foreign_keys.parent = Some(procedure_templates.clone());
+                    updated = true;
+                }
+                if self.current == procedure_templates.procedure_template {
+                    foreign_keys.current = Some(procedure_templates.clone());
+                    updated = true;
+                }
+                if self.successor_id == procedure_templates.procedure_template {
+                    foreign_keys.successor = Some(procedure_templates.clone());
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.parent == procedure_templates.procedure_template {
+                    foreign_keys.parent = None;
+                    updated = true;
+                }
+                if self.current == procedure_templates.procedure_template {
+                    foreign_keys.current = None;
+                    updated = true;
+                }
+                if self.successor_id == procedure_templates.procedure_template {
+                    foreign_keys.successor = None;
                     updated = true;
                 }
             }

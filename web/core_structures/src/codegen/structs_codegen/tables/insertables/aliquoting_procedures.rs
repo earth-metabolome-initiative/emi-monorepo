@@ -409,12 +409,12 @@ pub struct InsertableAliquotingProcedureBuilder<
 pub trait AliquotingProcedureBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
 {
-    /// Sets the value of the
-    /// `procedures.aliquoting_procedures.procedure_template` column.
+    /// Sets the value of the `public.aliquoting_procedures.procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.aliquoting_procedures.procedure_template` column.
+    ///   `public.aliquoting_procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -433,11 +433,11 @@ pub trait AliquotingProcedureBuildable:
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    /// `public.aliquoting_procedures.foreign_procedure_template` column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    ///   `public.aliquoting_procedures.foreign_procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -455,12 +455,12 @@ pub trait AliquotingProcedureBuildable:
         self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.aliquoting_procedures.foreign_procedure` column.
+    /// Sets the value of the `public.aliquoting_procedures.foreign_procedure`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure`: The value to set for the
-    ///   `procedures.aliquoting_procedures.foreign_procedure` column.
+    ///   `public.aliquoting_procedures.foreign_procedure` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -479,12 +479,12 @@ pub trait AliquotingProcedureBuildable:
         self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.aliquoting_procedures.aliquoted_with`
+    /// Sets the value of the `public.aliquoting_procedures.aliquoted_with`
     /// column.
     ///
     /// # Arguments
     /// * `aliquoted_with`: The value to set for the
-    ///   `procedures.aliquoting_procedures.aliquoted_with` column.
+    ///   `public.aliquoting_procedures.aliquoted_with` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -503,12 +503,12 @@ pub trait AliquotingProcedureBuildable:
         self,
         aliquoted_with: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `procedures.aliquoting_procedures.pipette_tip_model` column.
+    /// Sets the value of the `public.aliquoting_procedures.pipette_tip_model`
+    /// column.
     ///
     /// # Arguments
     /// * `pipette_tip_model`: The value to set for the
-    ///   `procedures.aliquoting_procedures.pipette_tip_model` column.
+    ///   `public.aliquoting_procedures.pipette_tip_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -526,12 +526,12 @@ pub trait AliquotingProcedureBuildable:
         self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.aliquoting_procedures.aliquoted_from`
+    /// Sets the value of the `public.aliquoting_procedures.aliquoted_from`
     /// column.
     ///
     /// # Arguments
     /// * `aliquoted_from`: The value to set for the
-    ///   `procedures.aliquoting_procedures.aliquoted_from` column.
+    ///   `public.aliquoting_procedures.aliquoted_from` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -594,7 +594,7 @@ impl<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         >,
 > AliquotingProcedureBuildable for InsertableAliquotingProcedureBuilder<Procedure> {
-    ///Sets the value of the `procedures.aliquoting_procedures.procedure_template` column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -653,7 +653,7 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.aliquoting_procedures.foreign_procedure_template` column.
+    ///Sets the value of the `public.aliquoting_procedures.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -682,7 +682,7 @@ impl<
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedures.aliquoting_procedures.foreign_procedure` column.
+    ///Sets the value of the `public.aliquoting_procedures.foreign_procedure` column.
     fn foreign_procedure(
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
@@ -698,7 +698,7 @@ impl<
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
-    ///Sets the value of the `procedures.aliquoting_procedures.aliquoted_with` column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_with` column.
     fn aliquoted_with(
         mut self,
         aliquoted_with: ::rosetta_uuid::Uuid,
@@ -712,7 +712,7 @@ impl<
         self.aliquoted_with = Some(aliquoted_with);
         Ok(self)
     }
-    ///Sets the value of the `procedures.aliquoting_procedures.pipette_tip_model` column.
+    ///Sets the value of the `public.aliquoting_procedures.pipette_tip_model` column.
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
@@ -728,7 +728,7 @@ impl<
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
-    ///Sets the value of the `procedures.aliquoting_procedures.aliquoted_from` column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_from` column.
     fn aliquoted_from(
         mut self,
         aliquoted_from: ::rosetta_uuid::Uuid,
@@ -751,7 +751,7 @@ impl<
 for InsertableAliquotingProcedureBuilder<Procedure> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes;
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure` column.
+    ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -769,7 +769,7 @@ for InsertableAliquotingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.procedure_template` column.
+    ///Sets the value of the `public.procedures.procedure_template` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -802,7 +802,29 @@ for InsertableAliquotingProcedureBuilder<Procedure> {
         )
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_by` column.
+    ///Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+                self.procedure,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -820,7 +842,7 @@ for InsertableAliquotingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.created_at` column.
+    ///Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -844,7 +866,7 @@ for InsertableAliquotingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_by` column.
+    ///Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -862,7 +884,7 @@ for InsertableAliquotingProcedureBuilder<Procedure> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedures.procedures.updated_at` column.
+    ///Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,

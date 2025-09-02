@@ -1082,6 +1082,26 @@ impl Column {
             }))
     }
 
+    /// Returns whether the column contains the most concrete table variant in
+    /// an extension hierarchy
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn is_most_concrete_table(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
+        Ok(self.column_name == "most_concrete_table"
+            && self.data_type == "text"
+            && !self.is_nullable()
+            && !self.table(conn)?.is_extension(conn)?)
+    }
+
     #[must_use]
     /// Returns whether the column is a timestamp which has to be updated at
     /// each update operation

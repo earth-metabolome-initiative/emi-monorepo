@@ -113,6 +113,26 @@ impl PositioningDeviceModel {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, positioning_device_models::positioning_device_models,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(positioning_device_models::id.eq(asset_models::id)))
+            .filter(asset_models::most_concrete_table.eq(most_concrete_table))
+            .order_by(positioning_device_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,

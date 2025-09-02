@@ -3,6 +3,7 @@
 pub enum InsertableProcedureAttributes {
     Procedure,
     ProcedureTemplate,
+    MostConcreteTable,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
@@ -14,12 +15,14 @@ impl core::str::FromStr for InsertableProcedureAttributes {
         match s {
             "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
+            "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
             "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
+            "most_concrete_table" => Ok(Self::MostConcreteTable),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
             "updated_by" => Ok(Self::UpdatedBy),
@@ -33,6 +36,7 @@ impl core::fmt::Display for InsertableProcedureAttributes {
         match self {
             Self::Procedure => write!(f, "procedure"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
             Self::UpdatedBy => write!(f, "updated_by"),
@@ -49,6 +53,7 @@ impl core::fmt::Display for InsertableProcedureAttributes {
 pub struct InsertableProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
+    pub(crate) most_concrete_table: String,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
@@ -157,6 +162,7 @@ impl InsertableProcedure {
 pub struct InsertableProcedureBuilder {
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_template: Option<i32>,
+    pub(crate) most_concrete_table: Option<String>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
@@ -167,6 +173,7 @@ impl Default for InsertableProcedureBuilder {
         Self {
             procedure: Some(rosetta_uuid::Uuid::new_v4()),
             procedure_template: Default::default(),
+            most_concrete_table: Default::default(),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
@@ -179,11 +186,11 @@ impl Default for InsertableProcedureBuilder {
 pub trait ProcedureBuildable: std::marker::Sized {
     /// Attributes required to build the insertable.
     type Attributes;
-    /// Sets the value of the `procedures.procedures.procedure` column.
+    /// Sets the value of the `public.procedures.procedure` column.
     ///
     /// # Arguments
-    /// * `procedure`: The value to set for the
-    ///   `procedures.procedures.procedure` column.
+    /// * `procedure`: The value to set for the `public.procedures.procedure`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -202,11 +209,11 @@ pub trait ProcedureBuildable: std::marker::Sized {
         self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.procedures.procedure_template` column.
+    /// Sets the value of the `public.procedures.procedure_template` column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `procedures.procedures.procedure_template` column.
+    ///   `public.procedures.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -224,11 +231,37 @@ pub trait ProcedureBuildable: std::marker::Sized {
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.procedures.created_by` column.
+    /// Sets the value of the `public.procedures.most_concrete_table` column.
     ///
     /// # Arguments
-    /// * `created_by`: The value to set for the
-    ///   `procedures.procedures.created_by` column.
+    /// * `most_concrete_table`: The value to set for the
+    ///   `public.procedures.most_concrete_table` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn most_concrete_table<MCT>(
+        self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>;
+    /// Sets the value of the `public.procedures.created_by` column.
+    ///
+    /// # Arguments
+    /// * `created_by`: The value to set for the `public.procedures.created_by`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -246,11 +279,11 @@ pub trait ProcedureBuildable: std::marker::Sized {
         self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.procedures.created_at` column.
+    /// Sets the value of the `public.procedures.created_at` column.
     ///
     /// # Arguments
-    /// * `created_at`: The value to set for the
-    ///   `procedures.procedures.created_at` column.
+    /// * `created_at`: The value to set for the `public.procedures.created_at`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -273,11 +306,11 @@ pub trait ProcedureBuildable: std::marker::Sized {
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-    /// Sets the value of the `procedures.procedures.updated_by` column.
+    /// Sets the value of the `public.procedures.updated_by` column.
     ///
     /// # Arguments
-    /// * `updated_by`: The value to set for the
-    ///   `procedures.procedures.updated_by` column.
+    /// * `updated_by`: The value to set for the `public.procedures.updated_by`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -295,11 +328,11 @@ pub trait ProcedureBuildable: std::marker::Sized {
         self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `procedures.procedures.updated_at` column.
+    /// Sets the value of the `public.procedures.updated_at` column.
     ///
     /// # Arguments
-    /// * `updated_at`: The value to set for the
-    ///   `procedures.procedures.updated_at` column.
+    /// * `updated_at`: The value to set for the `public.procedures.updated_at`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -340,6 +373,16 @@ impl ProcedureBuildable for Option<::rosetta_uuid::Uuid> {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         Ok(self)
     }
+    fn most_concrete_table<MCT>(
+        self,
+        _most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
     fn created_by(
         self,
         _created_by: i32,
@@ -378,7 +421,7 @@ impl ProcedureBuildable for Option<::rosetta_uuid::Uuid> {
 impl ProcedureBuildable for InsertableProcedureBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes;
-    /// Sets the value of the `procedures.procedures.procedure` column.
+    /// Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -390,7 +433,7 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
         self.procedure = Some(procedure);
         Ok(self)
     }
-    /// Sets the value of the `procedures.procedures.procedure_template` column.
+    /// Sets the value of the `public.procedures.procedure_template` column.
     fn procedure_template(
         mut self,
         procedure_template: i32,
@@ -402,7 +445,25 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `procedures.procedures.created_by` column.
+    /// Sets the value of the `public.procedures.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        let most_concrete_table = most_concrete_table.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableProcedureAttributes::MostConcreteTable)
+        })?;
+        if self.most_concrete_table.is_none() {
+            self.most_concrete_table = Some(most_concrete_table);
+        }
+        Ok(self)
+    }
+    /// Sets the value of the `public.procedures.created_by` column.
     ///
     /// # Implementation notes
     /// This method also set the values of other columns, due to
@@ -431,7 +492,7 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
         self.created_by = Some(created_by);
         Ok(self)
     }
-    /// Sets the value of the `procedures.procedures.created_at` column.
+    /// Sets the value of the `public.procedures.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -458,7 +519,7 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    /// Sets the value of the `procedures.procedures.updated_by` column.
+    /// Sets the value of the `public.procedures.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -470,7 +531,7 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    /// Sets the value of the `procedures.procedures.updated_at` column.
+    /// Sets the value of the `public.procedures.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,
@@ -518,6 +579,7 @@ where
     fn is_complete(&self) -> bool {
         self.procedure.is_some()
             && self.procedure_template.is_some()
+            && self.most_concrete_table.is_some()
             && self.created_by.is_some()
             && self.created_at.is_some()
             && self.updated_by.is_some()

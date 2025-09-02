@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InsertableAssetModelAttributes {
     Id,
+    MostConcreteTable,
     Name,
     Description,
     ParentModelId,
@@ -14,6 +15,7 @@ impl core::str::FromStr for InsertableAssetModelAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "Name" => Ok(Self::Name),
             "Description" => Ok(Self::Description),
             "ParentModelId" => Ok(Self::ParentModelId),
@@ -21,6 +23,7 @@ impl core::str::FromStr for InsertableAssetModelAttributes {
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
+            "most_concrete_table" => Ok(Self::MostConcreteTable),
             "name" => Ok(Self::Name),
             "description" => Ok(Self::Description),
             "parent_model_id" => Ok(Self::ParentModelId),
@@ -36,6 +39,7 @@ impl core::fmt::Display for InsertableAssetModelAttributes {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
+            Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::Name => write!(f, "name"),
             Self::Description => write!(f, "description"),
             Self::ParentModelId => write!(f, "parent_model_id"),
@@ -55,6 +59,7 @@ impl core::fmt::Display for InsertableAssetModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetModel {
+    pub(crate) most_concrete_table: String,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) parent_model_id: Option<i32>,
@@ -168,6 +173,7 @@ impl InsertableAssetModel {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetModelBuilder {
+    pub(crate) most_concrete_table: Option<String>,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) parent_model_id: Option<i32>,
@@ -179,6 +185,7 @@ pub struct InsertableAssetModelBuilder {
 impl Default for InsertableAssetModelBuilder {
     fn default() -> Self {
         Self {
+            most_concrete_table: Default::default(),
             name: Default::default(),
             description: Default::default(),
             parent_model_id: Default::default(),
@@ -194,6 +201,32 @@ impl Default for InsertableAssetModelBuilder {
 pub trait AssetModelBuildable: std::marker::Sized {
     /// Attributes required to build the insertable.
     type Attributes;
+    /// Sets the value of the `public.asset_models.most_concrete_table` column.
+    ///
+    /// # Arguments
+    /// * `most_concrete_table`: The value to set for the
+    ///   `public.asset_models.most_concrete_table` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn most_concrete_table<MCT>(
+        self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>;
     /// Sets the value of the `public.asset_models.name` column.
     ///
     /// # Arguments
@@ -369,6 +402,16 @@ pub trait AssetModelBuildable: std::marker::Sized {
 impl AssetModelBuildable for Option<i32> {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes;
+    fn most_concrete_table<MCT>(
+        self,
+        _most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        Ok(self)
+    }
     fn name<N>(
         self,
         _name: N,
@@ -433,6 +476,24 @@ impl AssetModelBuildable for Option<i32> {
 impl AssetModelBuildable for InsertableAssetModelBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes;
+    /// Sets the value of the `public.asset_models.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        let most_concrete_table = most_concrete_table.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(InsertableAssetModelAttributes::MostConcreteTable)
+        })?;
+        if self.most_concrete_table.is_none() {
+            self.most_concrete_table = Some(most_concrete_table);
+        }
+        Ok(self)
+    }
     /// Sets the value of the `public.asset_models.name` column.
     fn name<N>(
         mut self,
@@ -619,7 +680,8 @@ where
 {
     type Attributes = InsertableAssetModelAttributes;
     fn is_complete(&self) -> bool {
-        self.created_by.is_some()
+        self.most_concrete_table.is_some()
+            && self.created_by.is_some()
             && self.created_at.is_some()
             && self.updated_by.is_some()
             && self.updated_at.is_some()

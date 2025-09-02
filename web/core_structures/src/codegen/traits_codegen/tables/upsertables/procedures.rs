@@ -20,6 +20,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
+                    .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -51,6 +52,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
+                    .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

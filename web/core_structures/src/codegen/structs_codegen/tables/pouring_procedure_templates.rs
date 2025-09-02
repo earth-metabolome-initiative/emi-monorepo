@@ -525,6 +525,30 @@ impl PouringProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_most_concrete_table(
+        most_concrete_table: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            pouring_procedure_templates::pouring_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(pouring_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::most_concrete_table.eq(most_concrete_table))
+            .order_by(pouring_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,

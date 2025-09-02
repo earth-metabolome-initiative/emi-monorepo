@@ -243,6 +243,28 @@ for InsertablePhysicalAssetBuilder<Asset> {
         Ok(self)
     }
     #[inline]
+    ///Sets the value of the `public.assets.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.id = <Asset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
+                self.id,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
     ///Sets the value of the `public.assets.name` column.
     fn name<N>(
         mut self,

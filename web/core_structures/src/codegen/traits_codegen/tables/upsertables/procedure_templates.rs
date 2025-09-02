@@ -18,7 +18,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                most_concrete_table
+                    .ne(excluded(most_concrete_table))
+                    .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
                     .or(deprecated.ne(excluded(deprecated)))
                     .or(icon.ne(excluded(icon)))
@@ -51,7 +53,9 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                most_concrete_table
+                    .ne(excluded(most_concrete_table))
+                    .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
                     .or(deprecated.ne(excluded(deprecated)))
                     .or(icon.ne(excluded(icon)))

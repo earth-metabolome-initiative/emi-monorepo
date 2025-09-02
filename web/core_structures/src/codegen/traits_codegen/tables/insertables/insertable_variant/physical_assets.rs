@@ -42,6 +42,9 @@ where
         C,
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset;
@@ -50,13 +53,17 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::most_concrete_table(
+            self,
+            "physical_assets",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset = self
             .try_insert(user_id, conn)?;
         if !insertable_struct.model(conn)?.can_update(user_id, conn)? {

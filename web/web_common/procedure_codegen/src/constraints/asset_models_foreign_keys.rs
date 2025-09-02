@@ -26,7 +26,7 @@ impl CustomColumnConstraint for AssetModelsForeignKeysConstraint {
     ) -> Result<(), Self::Error> {
         let table = column.table(conn)?;
         let is_procedure_template_table =
-            ProcedureTemplate::must_be_procedure_template_table(&table).is_ok();
+            ProcedureTemplate::must_be_procedure_template_table(&table, conn).is_ok();
 
         if Procedure::must_be_procedure_table(&table, conn).is_ok() || is_procedure_template_table {
             if let Some(foreign_key) = is_asset_model_foreign_key(column, conn)? {

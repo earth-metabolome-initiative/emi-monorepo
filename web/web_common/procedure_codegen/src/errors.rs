@@ -8,10 +8,7 @@ pub use procedure_error::ProcedureError;
 pub use procedure_template_error::ProcedureTemplateError;
 use webcodegen::{Column, Table};
 
-use crate::{
-    PROCEDURE_TEMPLATES_SCHEMA, PROCEDURES_SCHEMA,
-    utils::{ASSET_MODELS_TABLE_NAME, ASSETS_TABLE_NAME},
-};
+use crate::utils::{ASSET_MODELS_TABLE_NAME, ASSETS_TABLE_NAME};
 
 #[derive(Debug)]
 /// Errors which may occur during procedure code generation.
@@ -75,14 +72,14 @@ impl std::fmt::Display for Error {
             Error::CascadingAssetModelForeignKey(column) => {
                 write!(
                     f,
-                    "Foreign key to `{ASSET_MODELS_TABLE_NAME}` in a `{PROCEDURES_SCHEMA}` or `{PROCEDURE_TEMPLATES_SCHEMA}` table should not be cascading: `{}.{}.{}`",
+                    "Foreign key to `{ASSET_MODELS_TABLE_NAME}` in a procedure or procedure template table should not be cascading: `{}.{}.{}`",
                     column.table_schema, column.table_name, column.column_name
                 )
             }
             Error::CascadingAssetForeignKey(column) => {
                 write!(
                     f,
-                    "Foreign key to `{ASSETS_TABLE_NAME}` table in a `{PROCEDURES_SCHEMA}` or `{PROCEDURE_TEMPLATES_SCHEMA}` table should not be cascading: `{}.{}.{}`",
+                    "Foreign key to `{ASSETS_TABLE_NAME}` table in a procedure or procedure template table should not be cascading: `{}.{}.{}`",
                     column.table_schema, column.table_name, column.column_name
                 )
             }

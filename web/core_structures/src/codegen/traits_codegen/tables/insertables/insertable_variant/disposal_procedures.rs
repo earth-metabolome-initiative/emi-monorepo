@@ -42,6 +42,9 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedure;
@@ -50,13 +53,17 @@ where
     >;
     type UserId = i32;
     fn insert(
-        self,
+        mut self,
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::Updatable;
+        self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::most_concrete_table(
+            self,
+            "disposal_procedures",
+        )?;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedure = self
             .try_insert(user_id, conn)?;
         if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {

@@ -385,12 +385,12 @@ where
 pub trait CentrifugeProcedureTemplateBuildable:
     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
 {
-    /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.kelvin` column.
+    /// Sets the value of the `public.centrifuge_procedure_templates.kelvin`
+    /// column.
     ///
     /// # Arguments
     /// * `kelvin`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.kelvin` column.
+    ///   `public.centrifuge_procedure_templates.kelvin` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -412,13 +412,13 @@ pub trait CentrifugeProcedureTemplateBuildable:
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
-    /// kelvin_tolerance_percentage` column.
+    /// `public.centrifuge_procedure_templates.kelvin_tolerance_percentage`
+    /// column.
     ///
     /// # Arguments
     /// * `kelvin_tolerance_percentage`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
-    ///   kelvin_tolerance_percentage` column.
+    ///   `public.centrifuge_procedure_templates.kelvin_tolerance_percentage`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -439,12 +439,12 @@ pub trait CentrifugeProcedureTemplateBuildable:
     where
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
-    /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.seconds` column.
+    /// Sets the value of the `public.centrifuge_procedure_templates.seconds`
+    /// column.
     ///
     /// # Arguments
     /// * `seconds`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.seconds` column.
+    ///   `public.centrifuge_procedure_templates.seconds` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -466,13 +466,11 @@ pub trait CentrifugeProcedureTemplateBuildable:
         S: TryInto<f32>,
         validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.rotation_per_minute`
-    /// column.
+    /// `public.centrifuge_procedure_templates.rotation_per_minute` column.
     ///
     /// # Arguments
     /// * `rotation_per_minute`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
-    ///   rotation_per_minute` column.
+    ///   `public.centrifuge_procedure_templates.rotation_per_minute` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -494,13 +492,11 @@ pub trait CentrifugeProcedureTemplateBuildable:
         RPM: TryInto<f32>,
         validation_errors::SingleFieldError: From<<RPM as TryInto<f32>>::Error>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
-    /// centrifuged_with_model` column.
+    /// `public.centrifuge_procedure_templates.centrifuged_with_model` column.
     ///
     /// # Arguments
     /// * `centrifuged_with_model`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
-    ///   centrifuged_with_model` column.
+    ///   `public.centrifuge_procedure_templates.centrifuged_with_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -519,12 +515,12 @@ pub trait CentrifugeProcedureTemplateBuildable:
         centrifuged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
+    /// `public.centrifuge_procedure_templates.
     /// procedure_template_centrifuged_with_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_centrifuged_with_model`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
+    ///   `public.centrifuge_procedure_templates.
     ///   procedure_template_centrifuged_with_model` column.
     ///
     /// # Implementation details
@@ -544,13 +540,13 @@ pub trait CentrifugeProcedureTemplateBuildable:
         procedure_template_centrifuged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
-    /// centrifuged_container_model` column.
+    /// `public.centrifuge_procedure_templates.centrifuged_container_model`
+    /// column.
     ///
     /// # Arguments
     /// * `centrifuged_container_model`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
-    ///   centrifuged_container_model` column.
+    ///   `public.centrifuge_procedure_templates.centrifuged_container_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -569,13 +565,13 @@ pub trait CentrifugeProcedureTemplateBuildable:
         centrifuged_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
-    /// foreign_procedure_template` column.
+    /// `public.centrifuge_procedure_templates.foreign_procedure_template`
+    /// column.
     ///
     /// # Arguments
     /// * `foreign_procedure_template`: The value to set for the
-    ///   `procedure_templates.centrifuge_procedure_templates.
-    ///   foreign_procedure_template` column.
+    ///   `public.centrifuge_procedure_templates.foreign_procedure_template`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -594,12 +590,12 @@ pub trait CentrifugeProcedureTemplateBuildable:
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `procedure_templates.centrifuge_procedure_templates.
+    /// `public.centrifuge_procedure_templates.
     /// procedure_template_centrifuged_container_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_centrifuged_container_model`: The value to set for
-    ///   the `procedure_templates.centrifuge_procedure_templates.
+    ///   the `public.centrifuge_procedure_templates.
     ///   procedure_template_centrifuged_container_model` column.
     ///
     /// # Implementation details
@@ -697,7 +693,7 @@ impl<
         >,
 > CentrifugeProcedureTemplateBuildable
 for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.kelvin` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.kelvin` column.
     fn kelvin<K>(
         mut self,
         kelvin: K,
@@ -724,7 +720,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin = Some(kelvin);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.kelvin_tolerance_percentage` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.kelvin_tolerance_percentage` column.
     fn kelvin_tolerance_percentage<KTP>(
         mut self,
         kelvin_tolerance_percentage: KTP,
@@ -763,7 +759,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.seconds` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.seconds` column.
     fn seconds<S>(
         mut self,
         seconds: S,
@@ -799,7 +795,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.seconds = Some(seconds);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.rotation_per_minute` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.rotation_per_minute` column.
     fn rotation_per_minute<RPM>(
         mut self,
         rotation_per_minute: RPM,
@@ -835,7 +831,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.rotation_per_minute = Some(rotation_per_minute);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.centrifuged_with_model` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.centrifuged_with_model` column.
     fn centrifuged_with_model(
         mut self,
         centrifuged_with_model: i32,
@@ -851,7 +847,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.centrifuged_with_model = Some(centrifuged_with_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.procedure_template_centrifuged_with_model` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.procedure_template_centrifuged_with_model` column.
     fn procedure_template_centrifuged_with_model(
         mut self,
         procedure_template_centrifuged_with_model: i32,
@@ -869,7 +865,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         );
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.centrifuged_container_model` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.centrifuged_container_model` column.
     fn centrifuged_container_model(
         mut self,
         centrifuged_container_model: i32,
@@ -885,7 +881,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.centrifuged_container_model = Some(centrifuged_container_model);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.foreign_procedure_template` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.foreign_procedure_template` column.
     fn foreign_procedure_template(
         mut self,
         foreign_procedure_template: i32,
@@ -901,7 +897,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `procedure_templates.centrifuge_procedure_templates.procedure_template_centrifuged_container_model` column.
+    ///Sets the value of the `public.centrifuge_procedure_templates.procedure_template_centrifuged_container_model` column.
     fn procedure_template_centrifuged_container_model(
         mut self,
         procedure_template_centrifuged_container_model: i32,
@@ -928,7 +924,29 @@ impl<
 for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttributes;
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.name` column.
+    ///Sets the value of the `public.procedure_templates.most_concrete_table` column.
+    fn most_concrete_table<MCT>(
+        mut self,
+        most_concrete_table: MCT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCT: TryInto<String>,
+        validation_errors::SingleFieldError: From<<MCT as TryInto<String>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::most_concrete_table(
+                self.procedure_template,
+                most_concrete_table,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -950,7 +968,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.description` column.
+    ///Sets the value of the `public.procedure_templates.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -972,7 +990,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.deprecated` column.
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
     fn deprecated<D>(
         mut self,
         deprecated: D,
@@ -994,7 +1012,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.icon` column.
+    ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
         icon: I,
@@ -1016,7 +1034,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -1034,7 +1052,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.created_at` column.
+    ///Sets the value of the `public.procedure_templates.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
@@ -1058,7 +1076,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_by` column.
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -1076,7 +1094,7 @@ for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `procedure_templates.procedure_templates.updated_at` column.
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,
