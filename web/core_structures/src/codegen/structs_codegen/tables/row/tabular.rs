@@ -275,6 +275,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::ReagentModel(_) => {
                 crate::codegen::tables::table_names::TableName::ReagentModel
             }
+            super::Row::RegisteringProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::RegisteringProcedureTemplate
+            }
+            super::Row::RegisteringProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::RegisteringProcedure
+            }
             super::Row::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             super::Row::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             super::Row::SampleState(_) => {

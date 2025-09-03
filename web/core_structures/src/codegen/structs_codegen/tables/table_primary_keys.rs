@@ -106,6 +106,8 @@ pub enum TablePrimaryKey {
     Project(i32),
     Rank(i16),
     ReagentModel(i32),
+    RegisteringProcedureTemplate(i32),
+    RegisteringProcedure(::rosetta_uuid::Uuid),
     Role(i16),
     Room(i32),
     SampleState(i16),
@@ -432,6 +434,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
             TablePrimaryKey::ReagentModel(_) => {
                 crate::codegen::tables::table_names::TableName::ReagentModel
+            }
+            TablePrimaryKey::RegisteringProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::RegisteringProcedureTemplate
+            }
+            TablePrimaryKey::RegisteringProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::RegisteringProcedure
             }
             TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,

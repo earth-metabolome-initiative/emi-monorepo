@@ -579,10 +579,10 @@ impl<
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v3 ["`geolocation_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    ///class v1 column-of-interest
     ///    v0@{shape: rounded, label: "foreign_procedure_template"}
     ///class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    ///class v1 column-of-interest
     ///end
     ///subgraph v4 ["`procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template"}

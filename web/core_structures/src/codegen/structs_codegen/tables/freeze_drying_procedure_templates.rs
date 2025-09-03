@@ -401,9 +401,9 @@ impl FreezeDryingProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_freeze_dried_container_model_and_procedure_template(
+    pub fn from_procedure_template_freeze_dried_container_model_and_foreign_procedure_template(
         procedure_template_freeze_dried_container_model: &i32,
-        procedure_template: &i32,
+        foreign_procedure_template: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -416,8 +416,8 @@ impl FreezeDryingProcedureTemplate {
                 freeze_drying_procedure_templates::procedure_template_freeze_dried_container_model
                     .eq(procedure_template_freeze_dried_container_model)
                     .and(
-                        freeze_drying_procedure_templates::procedure_template
-                            .eq(procedure_template),
+                        freeze_drying_procedure_templates::foreign_procedure_template
+                            .eq(foreign_procedure_template),
                     ),
             )
             .order_by(freeze_drying_procedure_templates::procedure_template.asc())

@@ -38,9 +38,7 @@ pub enum InsertableFreezeDryingProcedureTemplateAttributes {
     ),
     FreezeDriedContainerModel,
     ForeignProcedureTemplate,
-    ProcedureTemplateFreezeDriedContainerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
-    ),
+    ProcedureTemplateFreezeDriedContainerModel,
 }
 impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -61,11 +59,7 @@ impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
             "FreezeDriedContainerModel" => Ok(Self::FreezeDriedContainerModel),
             "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateFreezeDriedContainerModel" => {
-                Ok(
-                    Self::ProcedureTemplateFreezeDriedContainerModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
-                    ),
-                )
+                Ok(Self::ProcedureTemplateFreezeDriedContainerModel)
             }
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
@@ -82,11 +76,7 @@ impl core::str::FromStr for InsertableFreezeDryingProcedureTemplateAttributes {
             "freeze_dried_container_model" => Ok(Self::FreezeDriedContainerModel),
             "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_freeze_dried_container_model" => {
-                Ok(
-                    Self::ProcedureTemplateFreezeDriedContainerModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
-                    ),
-                )
+                Ok(Self::ProcedureTemplateFreezeDriedContainerModel)
             }
             _ => {
                 Err(
@@ -111,7 +101,9 @@ impl core::fmt::Display for InsertableFreezeDryingProcedureTemplateAttributes {
             Self::ProcedureTemplateFreezeDriedWithModel(e) => write!(f, "{e}"),
             Self::FreezeDriedContainerModel => write!(f, "freeze_dried_container_model"),
             Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplateFreezeDriedContainerModel(e) => write!(f, "{e}"),
+            Self::ProcedureTemplateFreezeDriedContainerModel => {
+                write!(f, "procedure_template_freeze_dried_container_model")
+            }
         }
     }
 }
@@ -379,7 +371,7 @@ pub struct InsertableFreezeDryingProcedureTemplateBuilder<
     pub(crate) procedure_template_freeze_dried_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     pub(crate) freeze_dried_container_model: Option<i32>,
     pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_freeze_dried_container_model: Option<i32>,
     pub(crate) procedure_template: ProcedureTemplate,
 }
 impl<ProcedureTemplate> Default
@@ -636,7 +628,7 @@ pub trait FreezeDryingProcedureTemplateBuildable: Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn procedure_template_freeze_dried_container_model(
         self,
-        procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+        procedure_template_freeze_dried_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
@@ -788,10 +780,10 @@ impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -799,8 +791,8 @@ impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn freeze_dried_with_model(
@@ -835,19 +827,19 @@ impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_freeze_dried_with_model(
@@ -886,49 +878,10 @@ impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
     /// Sets the value of the
     /// `public.freeze_drying_procedure_templates.freeze_dried_container_model`
     /// column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart LR
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`freeze_drying_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
-    /// class v0 column-of-interest
-    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
     fn freeze_dried_container_model(
         mut self,
         freeze_dried_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_freeze_dried_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
-                self.procedure_template_freeze_dried_container_model,
-                freeze_dried_container_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplateFreezeDriedContainerModel(
-                        attribute,
-                    )
-                })
-            })?;
         self.freeze_dried_container_model = Some(freeze_dried_container_model);
         Ok(self)
     }
@@ -956,57 +909,21 @@ impl<ProcedureTemplate> FreezeDryingProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`freeze_drying_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
-    /// class v1 column-of-interest
-    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
+    /// v0@{shape: rounded, label: "foreign_procedure_template"}
     /// class v0 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
+    /// v1@{shape: rounded, label: "freeze_dried_container_model"}
+    /// class v1 directly-involved-column
+    /// v2@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
+    /// class v2 column-of-interest
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
     /// ```
     fn procedure_template_freeze_dried_container_model(
         mut self,
-        mut procedure_template_freeze_dried_container_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+        procedure_template_freeze_dried_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) = (
-            self.freeze_dried_container_model,
-            procedure_template_freeze_dried_container_model.asset_model,
-        ) {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::FreezeDriedContainerModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) =
-            procedure_template_freeze_dried_container_model.asset_model
-        {
-            self.freeze_dried_container_model = Some(asset_model);
-        } else if let Some(local) = self.freeze_dried_container_model {
-            procedure_template_freeze_dried_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
-                    procedure_template_freeze_dried_container_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateFreezeDriedContainerModel(
-                            attribute,
-                        )
-                    })
-                })?;
-        }
         self.procedure_template_freeze_dried_container_model =
-            procedure_template_freeze_dried_container_model;
+            Some(procedure_template_freeze_dried_container_model);
         Ok(self)
     }
 }
@@ -1237,7 +1154,7 @@ where
             && self.procedure_template_freeze_dried_with_model.is_complete()
             && self.freeze_dried_container_model.is_some()
             && self.foreign_procedure_template.is_some()
-            && self.procedure_template_freeze_dried_container_model.is_complete()
+            && self.procedure_template_freeze_dried_container_model.is_some()
     }
     fn mint_primary_key(
         self,

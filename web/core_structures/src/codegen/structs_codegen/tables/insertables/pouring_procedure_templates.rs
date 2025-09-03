@@ -629,19 +629,19 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "measured_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn measured_with_model(
@@ -781,19 +781,19 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "poured_into_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "poured_into_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn poured_into_model(

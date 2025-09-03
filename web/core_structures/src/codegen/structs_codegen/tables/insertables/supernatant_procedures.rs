@@ -660,10 +660,10 @@ impl<
     ///class v0 directly-involved-column
     ///end
     ///subgraph v4 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template"}
-    ///class v2 column-of-interest
     ///    v1@{shape: rounded, label: "foreign_procedure_template"}
     ///class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 column-of-interest
     ///end
     ///v2 --->|"`ancestral same as`"| v0
     ///v2 -.->|"`foreign defines`"| v1

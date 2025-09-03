@@ -315,6 +315,12 @@ where
     crate::codegen::structs_codegen::tables::reagent_models::ReagentModel: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::roles::Role: web_common_traits::database::Read<
         C,
     >,
@@ -1351,6 +1357,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::reagent_models::ReagentModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::RegisteringProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::RegisteringProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure::read(
                             primary_key,
                             conn,
                         )?

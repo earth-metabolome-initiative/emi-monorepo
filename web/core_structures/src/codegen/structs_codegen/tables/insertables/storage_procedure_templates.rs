@@ -641,13 +641,13 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
@@ -688,13 +688,13 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "stored_into_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_into_model(

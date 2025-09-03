@@ -106,6 +106,8 @@ pub enum TableName {
     Project,
     Rank,
     ReagentModel,
+    RegisteringProcedureTemplate,
+    RegisteringProcedure,
     Role,
     Room,
     SampleState,
@@ -334,6 +336,12 @@ impl core::fmt::Display for TableName {
             TableName::Project => write!(f, stringify!(Project)),
             TableName::Rank => write!(f, stringify!(Rank)),
             TableName::ReagentModel => write!(f, stringify!(ReagentModel)),
+            TableName::RegisteringProcedureTemplate => {
+                write!(f, stringify!(RegisteringProcedureTemplate))
+            }
+            TableName::RegisteringProcedure => {
+                write!(f, stringify!(RegisteringProcedure))
+            }
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),

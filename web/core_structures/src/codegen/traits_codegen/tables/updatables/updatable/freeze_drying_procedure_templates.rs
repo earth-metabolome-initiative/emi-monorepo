@@ -53,12 +53,6 @@ where
         {
             return Ok(false);
         }
-        if !self
-            .procedure_template_freeze_dried_container_model(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Ok(false);
-        }
         Ok(true)
     }
 }

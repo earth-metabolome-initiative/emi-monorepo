@@ -41,12 +41,12 @@ pub fn init_dbgi_plan(
 
     let collection_preparation =
         dbgi_collection_preparation::init_dbgi_collection_preparation(user, conn)?;
+    let observation_procedure = init_organism_observation_procedure(user, conn)?;
+    let (part_of_organism_collection, cct) = init_part_of_organism_collection(user, conn)?;
     let sample_processing_procedure =
-        sample_processing_procedures::init_dbgi_sample_processing_procedures(user, conn)?;
+        sample_processing_procedures::init_dbgi_sample_processing_procedures(user, &cct, conn)?;
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn)?;
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn)?;
-    let observation_procedure = init_organism_observation_procedure(user, conn)?;
-    let part_of_organism_collection = init_part_of_organism_collection(user, conn)?;
     let data_enrichment = init_data_enrichment_procedure(user, conn)?;
 
     for procedure in [

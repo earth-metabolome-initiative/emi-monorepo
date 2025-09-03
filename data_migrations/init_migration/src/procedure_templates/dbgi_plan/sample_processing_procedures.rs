@@ -23,22 +23,17 @@ use crate::{
         instruments::freezer::freezer,
     },
     procedure_template_asset_models::{
-        ball_mill::safelock_ball_mill_builder,
-        centrifuge::safelock_centrifuge_builder,
-        conical_tubes::cct_builder,
-        conical_tubes_box::{cct_box_builder, cct_rack_builder},
-        freeze_dryer::freeze_dryer_builder,
-        freezer::freezer_builder,
-        pipette_tips::pipette_tips_1000ul_builder,
-        pipettes::pipette_1000ul_builder,
-        safelock::safelock_builder,
-        vial_caps::sealed_cap_vial_1_5ml_builder,
-        weighing_device::weighing_device_builder,
+        ball_mill::safelock_ball_mill_builder, centrifuge::safelock_centrifuge_builder,
+        conical_tubes_box::cct_rack_builder, freeze_dryer::freeze_dryer_builder,
+        freezer::freezer_builder, pipette_tips::pipette_tips_1000ul_builder,
+        pipettes::pipette_1000ul_builder, safelock::safelock_builder,
+        vial_caps::sealed_cap_vial_1_5ml_builder, weighing_device::weighing_device_builder,
     },
 };
 
 pub(super) fn init_dbgi_sample_processing_procedures(
     user: &core_structures::User,
+    cct: &ProcedureTemplateAssetModel,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
     let dbgi_sample_processing_procedure = ProcedureTemplate::new()
@@ -66,7 +61,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Freezing")?
         .description("Freezing procedure template")?
         .created_by(user.id)?
-        .procedure_template_frozen_container_model(cct_box_builder(user, conn)?)?
+        .procedure_template_frozen_container_model(cct.id)?
         .procedure_template_frozen_with_model(freezer_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -74,7 +69,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Freeze Drying")?
         .description("Freeze Drying procedure template")?
         .created_by(user.id)?
-        .procedure_template_freeze_dried_container_model(cct_builder(user, conn)?)?
+        .procedure_template_freeze_dried_container_model(cct.id)?
         .procedure_template_freeze_dried_with_model(freeze_dryer_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -85,7 +80,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .description("Falcon Storage procedure template")?
         .created_by(user.id)?
         .procedure_template_stored_into_model(cct_rack_builder(user, conn)?)?
-        .procedure_template_stored_asset_model(cct_builder(user, conn)?)?
+        .procedure_template_stored_asset_model(cct.id)?
         .insert(user.id, conn)?;
 
     let fractioning_procedure = FractioningProcedureTemplate::new()
@@ -94,16 +89,17 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .created_by(user.id)?
         .kilograms(50e-6)?
         .tolerance_percentage(5.0)?
-        .procedure_template_fragment_container_model(cct_builder(user, conn)?)?
+        .procedure_template_fragment_container_model(cct.id)?
         .procedure_template_fragment_placed_into_model(safelock_builder(user, conn)?)?
         .procedure_template_weighed_with_model(weighing_device_builder(user, conn)?)?
         .insert(user.id, conn)?;
+    let safelock = fractioning_procedure.procedure_template_fragment_placed_into_model;
 
     let first_ball_mill_procedure = BallMillProcedureTemplate::new()
         .name("Ball Mill 1")?
         .description("Ball Mill of lyophilized material procedure template")?
         .created_by(user.id)?
-        .procedure_template_milled_container_model(safelock_builder(user, conn)?)?
+        .procedure_template_milled_container_model(safelock)?
         .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -111,7 +107,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Ball Mill 2")?
         .description("Second Ball Mill to extract sample procedure template")?
         .created_by(user.id)?
-        .procedure_template_milled_container_model(safelock_builder(user, conn)?)?
+        .procedure_template_milled_container_model(safelock)?
         .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -119,7 +115,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Centrifuge")?
         .description("Centrifuge procedure template to separate solid material from supernatant")?
         .created_by(user.id)?
-        .procedure_template_centrifuged_container_model(safelock_builder(user, conn)?)?
+        .procedure_template_centrifuged_container_model(safelock)?
         .procedure_template_centrifuged_with_model(safelock_centrifuge_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -128,17 +124,20 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .description("Supernatant procedure template to collect supernatant")?
         .created_by(user.id)?
         .liters(1e-3)?
-        .procedure_template_stratified_source_model(safelock_builder(user, conn)?)?
+        .procedure_template_stratified_source_model(safelock)?
         .procedure_template_supernatant_destination_model(long_term_storage_vial_builder.clone())?
         .procedure_template_transferred_with_model(pipette_1000ul_builder(user, conn)?)?
         .procedure_template_pipette_tip_model(pipette_tips_1000ul_builder(user, conn)?)?
         .insert(user.id, conn)?;
+    let long_term_vial =
+        prelevate_supernatant_procedure.procedure_template_supernatant_destination_model;
+    let pipette_tip_1000 = prelevate_supernatant_procedure.procedure_template_pipette_tip_model;
 
     let capping_procedure = CappingProcedureTemplate::new()
         .name("Capping")?
         .description("Capping procedure template to cap the long term storage vial")?
         .created_by(user.id)?
-        .procedure_template_container_model(long_term_storage_vial_builder.clone())?
+        .procedure_template_container_model(long_term_vial)?
         .procedure_template_capped_with_model(sealed_cap_vial_1_5ml_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -148,21 +147,21 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .description("Long Term Storage Vial Storage procedure template")?
         .created_by(user.id)?
         .procedure_template_stored_into_model(long_term_storage_vial_box_builder.clone())?
-        .procedure_template_stored_asset_model(long_term_storage_vial_builder)?
+        .procedure_template_stored_asset_model(long_term_vial)?
         .insert(user.id, conn)?;
 
     let dispose_of_eppendorf_tube_procedure = DisposalProcedureTemplate::new()
         .name("Dispose of Eppendorf Tube")?
         .description("Disposal procedure template for Eppendorf tubes. You can separate the metal beads for further reuse at this step.")?
         .created_by(user.id)?
-        .procedure_template_disposed_asset_model(safelock_builder(user, conn)?)?
+        .procedure_template_disposed_asset_model(safelock)?
         .insert(user.id, conn)?;
 
     let dispose_of_pipette_tips_procedure = DisposalProcedureTemplate::new()
         .name("Dispose of Pipette Tips")?
         .description("Disposal procedure template for used pipette tips.")?
         .created_by(user.id)?
-        .procedure_template_disposed_asset_model(pipette_tips_1000ul_builder(user, conn)?)?
+        .procedure_template_disposed_asset_model(pipette_tip_1000)?
         .insert(user.id, conn)?;
 
     let subprocedures = vec![

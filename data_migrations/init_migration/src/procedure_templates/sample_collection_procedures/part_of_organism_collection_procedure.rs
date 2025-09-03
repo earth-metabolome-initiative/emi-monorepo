@@ -1,7 +1,8 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    PackagingProcedureTemplate, ProcedureTemplate, StorageProcedureTemplate, User,
+    PackagingProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
+    StorageProcedureTemplate, User,
     tables::insertables::{
         PackagingProcedureTemplateBuildable, ProcedureTemplateBuildable,
         StorageProcedureTemplateBuildable,
@@ -31,11 +32,14 @@ use crate::procedure_template_asset_models::{
 pub(crate) fn init_part_of_organism_collection(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> anyhow::Result<ProcedureTemplate> {
+) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
     let name = "Part of Organism Collection";
+    let storage_procedure_name = "Place in conical centrifugal tube";
 
     if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
-        return Ok(existing);
+        let storage_procedure = StorageProcedureTemplate::from_name(storage_procedure_name, conn)?;
+        let cct = storage_procedure.procedure_template_stored_into_model(conn)?;
+        return Ok((existing, cct));
     }
 
     let collection = ProcedureTemplate::new()
@@ -82,17 +86,19 @@ pub(crate) fn init_part_of_organism_collection(
         .procedure_template_packaged_with_model(coffee_wrapper_builder(user, conn)?)?
         .procedure_template_sample_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
+    let coffee_wrapper = coffee_filter_wrapping.procedure_template_packaged_with_model;
 
     // Placing the wrapped sample in the conical centrifugal tube
     let place_in_tube = StorageProcedureTemplate::new()
-        .name("Place in conical centrifugal tube")?
+        .name(storage_procedure_name)?
         .description(
             "Place the wrapped sample in a conical centrifugal tube for storage and transport.",
         )?
         .procedure_template_stored_into_model(cct_builder(user, conn)?)?
-        .procedure_template_stored_asset_model(coffee_wrapper_builder(user, conn)?)?
+        .procedure_template_stored_asset_model(coffee_wrapper)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
+    let cct = place_in_tube.procedure_template_stored_into_model(conn)?;
 
     // Put it in the storage box
     let place_in_storage_box = StorageProcedureTemplate::new()
@@ -103,7 +109,7 @@ pub(crate) fn init_part_of_organism_collection(
         .procedure_template_stored_into_model(
             cct_box_builder(user, conn)?
         )?
-        .procedure_template_stored_asset_model(cct_builder(user, conn)?)?
+        .procedure_template_stored_asset_model(cct.id)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -131,5 +137,5 @@ pub(crate) fn init_part_of_organism_collection(
         conn,
     )?;
 
-    Ok(collection)
+    Ok((collection, cct))
 }

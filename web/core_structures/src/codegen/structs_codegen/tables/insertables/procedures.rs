@@ -443,7 +443,7 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
 }
 impl web_common_traits::database::MostConcreteTable for InsertableProcedureBuilder {
     fn set_most_concrete_table(&mut self, table_name: &str) {
-        if self.most_concrete_table.is_some() {
+        if self.most_concrete_table.is_none() {
             self.most_concrete_table = Some(table_name.to_owned());
         }
     }

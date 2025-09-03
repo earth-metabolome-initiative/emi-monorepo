@@ -1,43 +1,43 @@
 # Time Report for Building Core Structures
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Init DB Transaction` which took 2 minutes (96.12% of all time).
+The slowest task was `Init DB Transaction` which took 2 minutes (95.65% of all time).
 
 | name                | time      | percentage | comment |
 |---------------------|-----------|------------|---------|
-| Init DB Transaction | 2 minutes | 96.12%     |         |
-| Code Generation     | now       | 3.88%      |         |
+| Init DB Transaction | 2 minutes | 95.65%     |         |
+| Code Generation     | now       | 3.62%      |         |
 
 ## Time Report for Init DB Transaction
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Consistency Constraint Checks` which took 2 minutes (95.97% of all time).
+The slowest task was `Consistency Constraint Checks` which took 2 minutes (96.97% of all time).
 
 | name                          | time      | percentage | comment |
 |-------------------------------|-----------|------------|---------|
-| Initialize CSVs               | now       | 2.42%      |         |
+| Initialize CSVs               | now       | 2.27%      |         |
 | Initialize Migrations         | now       | 0.00%      |         |
-| Consistency Constraint Checks | 2 minutes | 95.97%     |         |
+| Consistency Constraint Checks | 2 minutes | 96.97%     |         |
 
 ### Time Report for Consistency Constraint Checks
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Check constraints in schema 'public'` which took 2 minutes (98.32% of all time).
+The slowest task was `Check constraints in schema 'public'` which took 2 minutes (97.66% of all time).
 
 | name                                               | time      | percentage | comment |
 |----------------------------------------------------|-----------|------------|---------|
-| Check constraints in schema 'public'               | 2 minutes | 98.32%     |         |
+| Check constraints in schema 'public'               | 2 minutes | 97.66%     |         |
 | Procedure and procedure template check constraints | now       | 0.00%      |         |
-| Procedure and procedure template asset constraints | now       | 1.68%      |         |
+| Procedure and procedure template asset constraints | now       | 1.56%      |         |
 
 #### Time Report for Check constraints in schema 'public'
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Compatible foreign type constraints` which took 2 minutes (99.15% of all time).
+The slowest task was `Compatible foreign type constraints` which took 2 minutes (100.00% of all time).
 
 | name                                     | time      | percentage | comment |
 |------------------------------------------|-----------|------------|---------|
-| Compatible foreign type constraints      | 2 minutes | 99.15%     |         |
+| Compatible foreign type constraints      | 2 minutes | 100.00%    |         |
 | Lowercase column and table names         | now       | 0.00%      |         |
 | Standard column names and types          | now       | 0.00%      |         |
 | Not-null constraints on standard columns | now       | 0.00%      |         |
@@ -47,24 +47,24 @@ The slowest task was `Compatible foreign type constraints` which took 2 minutes 
 ## Time Report for Code Generation
 
 The total time spent on all tasks was now.
-The slowest task was `Code generation` which took now (100.00% of all time).
+The slowest task was `Code generation` which took now (80.00% of all time).
 
 | name              | time | percentage | comment |
 |-------------------|------|------------|---------|
-| Code generation   | now  | 100.00%    |         |
+| Code generation   | now  | 80.00%     |         |
 | Procedure Codegen | now  | 0.00%      |         |
 
 ### Time Report for Code generation
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Structs` which took now (80.00% of all time).
+The slowest task was `Generate Structs` which took now (100.00% of all time).
 
 | name                             | time | percentage | comment |
 |----------------------------------|------|------------|---------|
 | Retrieving tables                | now  | 0.00%      |         |
 | Creating table extension network | now  | 0.00%      |         |
 | Generating Diesel code           | now  | 0.00%      |         |
-| Generate Structs                 | now  | 80.00%     |         |
+| Generate Structs                 | now  | 100.00%    |         |
 | Generate Web Common Traits       | now  | 0.00%      |         |
 
 #### Time Report for Generating Diesel code

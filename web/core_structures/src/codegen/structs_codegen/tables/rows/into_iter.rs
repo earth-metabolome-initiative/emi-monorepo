@@ -498,6 +498,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::ReagentModel)
                     .collect::<Vec<_>>()
             }
+            super::Rows::RegisteringProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::RegisteringProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::RegisteringProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::RegisteringProcedure)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::Role(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Role).collect::<Vec<_>>()
             }

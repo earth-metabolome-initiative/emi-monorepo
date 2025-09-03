@@ -569,6 +569,19 @@ pub use reagent_models::{
     InsertableReagentModel, InsertableReagentModelAttributes, InsertableReagentModelBuilder,
     InsertableReagentModelExtensionAttributes, ReagentModelBuildable,
 };
+mod registering_procedure_templates;
+pub use registering_procedure_templates::{
+    InsertableRegisteringProcedureTemplate, InsertableRegisteringProcedureTemplateAttributes,
+    InsertableRegisteringProcedureTemplateBuilder,
+    InsertableRegisteringProcedureTemplateExtensionAttributes,
+    RegisteringProcedureTemplateBuildable,
+};
+mod registering_procedures;
+pub use registering_procedures::{
+    InsertableRegisteringProcedure, InsertableRegisteringProcedureAttributes,
+    InsertableRegisteringProcedureBuilder, InsertableRegisteringProcedureExtensionAttributes,
+    RegisteringProcedureBuildable,
+};
 mod roles;
 pub use roles::{InsertableRole, InsertableRoleAttributes, InsertableRoleBuilder, RoleBuildable};
 mod rooms;

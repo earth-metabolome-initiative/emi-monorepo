@@ -1,8 +1,9 @@
 use core_structures::{
-    GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate, User,
+    GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate,
+    RegisteringProcedureTemplate, User,
     tables::insertables::{
         GeolocationProcedureTemplateBuildable, PhotographProcedureTemplateBuildable,
-        ProcedureTemplateBuildable,
+        ProcedureTemplateBuildable, RegisteringProcedureTemplateBuildable,
     },
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
@@ -40,6 +41,14 @@ pub(crate) fn init_organism_observation_procedure(
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
+    let registering_procedure = RegisteringProcedureTemplate::new()
+        .name("Organism Registration Procedure")?
+        .description("Procedure for registering an organism.")?
+        .procedure_template_registered_asset_model(organism_builder(user, conn)?)?
+        .created_by(user.id)?
+        .insert(user.id, conn)?;
+    let organism = registering_procedure.procedure_template_registered_asset_model;
+
     // Place the colored cardboard arrow in the field pointing towards the organism
     let arrow_reminder = ProcedureTemplate::new()
         .name("Place Arrow")?
@@ -54,7 +63,7 @@ pub(crate) fn init_organism_observation_procedure(
         .name("Organism in Ecosystem Picture")?
         .description("Photograph of the organism in its surrounding ecosystem.")?
         .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
-        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -63,7 +72,7 @@ pub(crate) fn init_organism_observation_procedure(
         .name("Organism Picture")?
         .description("Photograph of the full organism for identification.")?
         .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
-        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -73,7 +82,7 @@ pub(crate) fn init_organism_observation_procedure(
         .name("Organism Details Picture")?
         .description("Photograph of details of the organism to facilitate identification.")?
         .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
-        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_photographed_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -82,7 +91,7 @@ pub(crate) fn init_organism_observation_procedure(
         .name("Organism Geolocation")?
         .description("Geolocation of the organism observation.")?
         .procedure_template_geolocated_with_model(phone_builder(user, conn)?)?
-        .procedure_template_geolocated_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_geolocated_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 

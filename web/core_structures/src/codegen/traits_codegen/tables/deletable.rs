@@ -55,6 +55,8 @@ mod procedure_templates;
 mod procedures;
 mod projects;
 mod reagent_models;
+mod registering_procedure_templates;
+mod registering_procedures;
 mod rooms;
 mod shared_procedure_template_asset_models;
 mod spectra;

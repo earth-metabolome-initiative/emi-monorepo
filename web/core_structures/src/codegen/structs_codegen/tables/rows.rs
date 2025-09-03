@@ -106,6 +106,8 @@ mod project_states;
 mod projects;
 mod ranks;
 mod reagent_models;
+mod registering_procedure_templates;
+mod registering_procedures;
 mod roles;
 mod rooms;
 mod sample_states;
@@ -541,6 +543,16 @@ pub enum Rows {
     Rank(Vec<crate::codegen::structs_codegen::tables::ranks::Rank>),
     ReagentModel(
         Vec<crate::codegen::structs_codegen::tables::reagent_models::ReagentModel>,
+    ),
+    RegisteringProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate,
+        >,
+    ),
+    RegisteringProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure,
+        >,
     ),
     Role(Vec<crate::codegen::structs_codegen::tables::roles::Role>),
     Room(Vec<crate::codegen::structs_codegen::tables::rooms::Room>),
@@ -1384,6 +1396,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::RegisteringProcedureTemplate(registering_procedure_templates) => {
+                registering_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::RegisteringProcedure(registering_procedures) => {
+                registering_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::Role(roles) => {
                 roles
                     .iter()
@@ -1796,6 +1822,12 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::Project(projects) => projects.primary_keys(),
             Rows::Rank(ranks) => ranks.primary_keys(),
             Rows::ReagentModel(reagent_models) => reagent_models.primary_keys(),
+            Rows::RegisteringProcedureTemplate(registering_procedure_templates) => {
+                registering_procedure_templates.primary_keys()
+            }
+            Rows::RegisteringProcedure(registering_procedures) => {
+                registering_procedures.primary_keys()
+            }
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),

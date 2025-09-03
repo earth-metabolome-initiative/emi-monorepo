@@ -352,7 +352,7 @@ impl Table {
                 quote! {
                     impl web_common_traits::database::MostConcreteTable for #builder_ident {
                         fn set_most_concrete_table(&mut self, table_name: &str) {
-                            if self.#column_snake_case_ident.is_some() {
+                            if self.#column_snake_case_ident.is_none() {
                                 self.#column_snake_case_ident = Some(table_name.to_owned());
                             }
                         }

@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedure_templates (
 			foreign_procedure_template
 		)
 	),
-	procedure_template_freeze_dried_container_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
+	procedure_template_freeze_dried_container_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- We check that the `procedure_template_freeze_dried_with_model` is indeed a trackable that is compatible with the procedure template.
 	FOREIGN KEY (
 		procedure_template_freeze_dried_with_model,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS freeze_drying_procedure_templates (
 	-- We check that the `procedure_template_freeze_dried_with_model` is indeed a trackable that is compatible with the procedure template.
 	FOREIGN KEY (
 		procedure_template_freeze_dried_container_model,
-		procedure_template
+		foreign_procedure_template
 	) REFERENCES procedure_template_asset_models(id, procedure_template),
 	-- We check that the `freeze_dried_with_model` is indeed a container that is compatible with the procedure template.
 	FOREIGN KEY (

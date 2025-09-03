@@ -105,6 +105,8 @@ mod projects;
 mod ranks;
 mod read_dispatch;
 mod reagent_models;
+mod registering_procedure_templates;
+mod registering_procedures;
 mod roles;
 mod rooms;
 mod sample_states;
@@ -393,6 +395,12 @@ pub enum Row {
     Project(crate::codegen::structs_codegen::tables::projects::Project),
     Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
     ReagentModel(crate::codegen::structs_codegen::tables::reagent_models::ReagentModel),
+    RegisteringProcedureTemplate(
+        crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate,
+    ),
+    RegisteringProcedure(
+        crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure,
+    ),
     Role(crate::codegen::structs_codegen::tables::roles::Role),
     Room(crate::codegen::structs_codegen::tables::rooms::Room),
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
@@ -707,6 +715,12 @@ impl Row {
             Row::Project(projects) => projects.upsert(conn)?.map(Row::from),
             Row::Rank(ranks) => ranks.upsert(conn)?.map(Row::from),
             Row::ReagentModel(reagent_models) => reagent_models.upsert(conn)?.map(Row::from),
+            Row::RegisteringProcedureTemplate(registering_procedure_templates) => {
+                registering_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::RegisteringProcedure(registering_procedures) => {
+                registering_procedures.upsert(conn)?.map(Row::from)
+            }
             Row::Role(roles) => roles.upsert(conn)?.map(Row::from),
             Row::Room(rooms) => rooms.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
@@ -968,6 +982,12 @@ impl web_common_traits::prelude::Row for Row {
             Row::Project(projects) => projects.primary_key(),
             Row::Rank(ranks) => ranks.primary_key(),
             Row::ReagentModel(reagent_models) => reagent_models.primary_key(),
+            Row::RegisteringProcedureTemplate(registering_procedure_templates) => {
+                registering_procedure_templates.primary_key()
+            }
+            Row::RegisteringProcedure(registering_procedures) => {
+                registering_procedures.primary_key()
+            }
             Row::Role(roles) => roles.primary_key(),
             Row::Room(rooms) => rooms.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),

@@ -1,7 +1,7 @@
 //! Test to check whether the database can indeed be initialized in the
 //! reference docker and populated with the `init_migration`.
 
-use core_structures::{LoginProvider, traits::ProcedureTemplateDot};
+use core_structures::LoginProvider;
 use core_structures_vis::MermaidDB;
 use init_db::init_database;
 use init_migration::{init_dbgi_plan, init_migration, init_root_user};
@@ -49,18 +49,11 @@ async fn test_init_migration() {
     let procedure_template =
         init_dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
 
-    let dot = procedure_template
-        .to_dot(&mut conn)
-        .expect("Failed to convert the procedure template to DOT format");
-
     let flowchart = procedure_template
         .to_mermaid(&mut conn)
         .expect("Failed to convert the procedure template to Mermaid format");
-    let er = core_structures_vis::trackables_hierarchy(&mut conn)
-        .expect("Failed to generate the trackables hierarchy ERD");
-
-    // We write out the DOT file to a file.
-    std::fs::write("test_init_migration.dot", dot).expect("Failed to write the DOT file");
+    let er = core_structures_vis::asset_model_hierarchy(&mut conn)
+        .expect("Failed to generate the asset model hierarchy ERD");
 
     // We write out the flowchart to a file.
     std::fs::write("test_init_migration_flowchart.mermaid", flowchart.to_string())
