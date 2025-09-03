@@ -252,10 +252,6 @@ impl InstrumentStateBuildable for InsertableInstrumentStateBuilder {
         mut self,
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let color_id = color_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableInstrumentStateAttributes::ColorId)
-        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }

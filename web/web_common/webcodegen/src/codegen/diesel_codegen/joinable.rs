@@ -40,9 +40,7 @@ impl Codegen<'_> {
             for foreign_key in table.foreign_keys(conn)? {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
-                let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-                    continue;
-                };
+                let foreign_table = foreign_key.foreign_table(conn)?;
 
                 // There is no need to implement this macro for the case of a foreign table that
                 // curresponds with the table itself.

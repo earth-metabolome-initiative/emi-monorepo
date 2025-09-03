@@ -167,10 +167,6 @@ impl UserOrganizationBuildable for InsertableUserOrganizationBuilder {
         mut self,
         user_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let user_id = user_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserOrganizationAttributes::UserId)
-        })?;
         self.user_id = Some(user_id);
         Ok(self)
     }
@@ -180,10 +176,6 @@ impl UserOrganizationBuildable for InsertableUserOrganizationBuilder {
         mut self,
         organization_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let organization_id = organization_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserOrganizationAttributes::OrganizationId)
-        })?;
         self.organization_id = Some(organization_id);
         Ok(self)
     }

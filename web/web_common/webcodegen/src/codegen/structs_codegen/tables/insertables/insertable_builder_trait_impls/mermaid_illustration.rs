@@ -47,7 +47,12 @@ pub(super) fn columns_to_mermaid_illustration(
 
     let mut inferred_columns = columns
         .iter()
-        .flat_map(|col| col.all_ancestral_same_as_columns(conn).unwrap_or_default())
+        .flat_map(|col| {
+            let mut same_as = col.all_ancestral_same_as_columns(conn).unwrap_or_default();
+            same_as.extend(col.associated_same_as_columns(conn).unwrap_or_default());
+            same_as.extend(col.triangular_same_as_columns(conn).unwrap_or_default());
+            same_as
+        })
         .filter(|col| !columns.contains(col))
         .collect::<Vec<_>>();
     inferred_columns.sort_unstable();

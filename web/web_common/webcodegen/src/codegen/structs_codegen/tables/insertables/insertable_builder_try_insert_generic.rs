@@ -81,9 +81,7 @@ impl Codegen<'_> {
 
             completeness_statements.push(
                 if let Some(partial_builder_constraint) = column.requires_partial_builder(conn)? {
-                    let foreign_table = partial_builder_constraint
-                        .foreign_table(conn)?
-                        .expect("Foreign table should be present");
+                    let foreign_table = partial_builder_constraint.foreign_table(conn)?;
                     if !try_insert_generic_where_constraint.contains(&foreign_table) {
                         let foreign_builder_type = foreign_table.insertable_builder_ty()?;
                         where_constraints.push(quote! {

@@ -269,8 +269,7 @@ impl Display for ConstraintError {
             } => {
                 write!(
                     f,
-                    "Foreign key on {column} has unexpected cascading behavior. Expected: `{}`, found: `{}`",
-                    expected_behavior, found_behavior
+                    "Foreign key on {column} has unexpected cascading behavior. Expected: `{expected_behavior}`, found: `{found_behavior}`",
                 )
             }
         }

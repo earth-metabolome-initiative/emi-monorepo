@@ -496,10 +496,6 @@ impl RoomBuildable for InsertableRoomBuilder {
         mut self,
         addresses_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let addresses_id = addresses_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::AddressesId)
-        })?;
         self.addresses_id = Some(addresses_id);
         Ok(self)
     }
@@ -542,10 +538,6 @@ impl RoomBuildable for InsertableRoomBuilder {
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self = self.updated_by(created_by)?;
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -581,10 +573,6 @@ impl RoomBuildable for InsertableRoomBuilder {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let updated_by = updated_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::UpdatedBy)
-        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

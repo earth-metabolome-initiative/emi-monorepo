@@ -482,10 +482,6 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
         mut self,
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let container_model = container_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCappingProcedureTemplateAttributes::ContainerModel)
-        })?;
         self.container_model = Some(container_model);
         Ok(self)
     }
@@ -495,11 +491,6 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableCappingProcedureTemplateAttributes::ForeignProcedureTemplate,
-            )
-        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
@@ -510,12 +501,6 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
         mut self,
         procedure_template_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_container_model =
-            procedure_template_container_model.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableCappingProcedureTemplateAttributes::ProcedureTemplateContainerModel,
-                )
-            })?;
         self.procedure_template_container_model = Some(procedure_template_container_model);
         Ok(self)
     }
@@ -532,27 +517,27 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`capping_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
-    /// class v1 directly-involved-column
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`capping_procedure_templates`"]
     ///    v0@{shape: rounded, label: "capped_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
+    /// class v1 directly-involved-column
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn capped_with_model(
         mut self,
         capped_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let capped_with_model = capped_with_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCappingProcedureTemplateAttributes::CappedWithModel)
-        })?;
         self.procedure_template_capped_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_capped_with_model,
                 capped_with_model,
@@ -579,18 +564,22 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`capping_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`capping_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
     /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "capped_with_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_capped_with_model(
         mut self,

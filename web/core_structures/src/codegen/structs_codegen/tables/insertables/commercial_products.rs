@@ -226,10 +226,6 @@ impl<PhysicalAssetModel> CommercialProductBuildable
         mut self,
         brand_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let brand_id = brand_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCommercialProductAttributes::BrandId)
-        })?;
         self.brand_id = Some(brand_id);
         Ok(self)
     }

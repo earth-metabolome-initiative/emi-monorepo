@@ -2,8 +2,7 @@
 
 use diesel::PgConnection;
 use procedure_codegen::constraints::{
-    AssetForeignKeysConstraint, AssetModelsForeignKeysConstraint,
-    ProcedureAssetsForeignKeysConstraint, ProcedurePrimaryKeyConstraint,
+    AssetForeignKeysConstraint, AssetModelsForeignKeysConstraint, ProcedurePrimaryKeyConstraint,
     ProcedureTemplateAssetModelsForeignKeysConstraint, ProcedureTemplatePrimaryKeyConstraint,
     ProcedureToProcedureTemplateForeignKeyConstraint, UncharacterizedAssetModelsConstraint,
     UncharacterizedAssetsConstraint, UnusedForeignProcedureTemplateConstraint,
@@ -88,7 +87,6 @@ pub(crate) fn execute_consistency_constraint_checks(
     ProcedureTemplatePrimaryKeyConstraint.check_all(database_name, schema, conn)?;
     ProcedureToProcedureTemplateForeignKeyConstraint.check_all(database_name, schema, conn)?;
     UnusedForeignProcedureTemplateConstraint.check_all(database_name, schema, conn)?;
-    ProcedureAssetsForeignKeysConstraint.check_all(database_name, schema, conn)?;
     time_tracker.add_completed_task(task);
 
     let task = Task::new("Procedure and procedure template asset constraints");

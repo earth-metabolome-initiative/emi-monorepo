@@ -200,12 +200,6 @@ impl<
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_model = parent_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableDigitalAssetModelAttributes::ParentModel)
-            })?;
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::parent_model(
                 self.id,
                 parent_model,

@@ -92,7 +92,7 @@ impl Codegen<'_> {
                     let extension_foreign_key = &extension_foreign_keys[0];
                     let extension_foreign_key_ident =
                         extension_foreign_key.constraint_ident(conn)?;
-                    let foreign_table = extension_foreign_key.foreign_table(conn)?.unwrap();
+                    let foreign_table = extension_foreign_key.foreign_table(conn)?;
                     let foreign_table_generic = foreign_table.struct_ident()?;
 
                     let foreign_columns = extension_foreign_key.foreign_columns(conn)?;
@@ -123,7 +123,7 @@ impl Codegen<'_> {
                     // and therefore unfortunately we need to use an if-else chain.
 
                     for extension_foreign_key in &extension_foreign_keys {
-                        let foreign_table = extension_foreign_key.foreign_table(conn)?.unwrap();
+                        let foreign_table = extension_foreign_key.foreign_table(conn)?;
                         let foreign_table_generic = foreign_table.struct_ident()?;
                         additional_where_requirements.push(quote! {
                             #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey=#primary_key_type>
@@ -285,7 +285,7 @@ impl Codegen<'_> {
         // in which case it is needful to group by the foreign keys by the local same-as
         // column.
         for (partial_builder_column, constraint) in table.partial_builder_columns(conn)? {
-            let foreign_table = constraint.foreign_table(conn)?.unwrap();
+            let foreign_table = constraint.foreign_table(conn)?;
 
             if !try_insert_generic_constraint.contains(&foreign_table) {
                 let foreign_builder = foreign_table.insertable_builder_ty()?;
@@ -392,7 +392,7 @@ impl Codegen<'_> {
 
             for parent_key in table.parent_keys(conn)? {
                 let parent_key_method = parent_key.constraint_ident(conn)?;
-                let parent_table = parent_key.foreign_table(conn)?.expect("Parent table not found");
+                let parent_table = parent_key.foreign_table(conn)?;
 
                 if !parent_table.allows_updatable(conn)? {
                     continue;

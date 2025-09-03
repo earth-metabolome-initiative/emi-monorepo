@@ -30,9 +30,7 @@ impl Table {
                 continue;
             }
 
-            let Some(foreign_key_table) = foreign_key_constraint.foreign_table(conn)? else {
-                return Ok(TokenStream::new());
-            };
+            let foreign_key_table = foreign_key_constraint.foreign_table(conn)?;
 
             let columns = foreign_key_constraint.columns(conn)?;
 

@@ -442,10 +442,6 @@ impl AssetModelBuildable for InsertableAssetModelBuilder {
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_model = parent_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttributes::ParentModel)
-        })?;
         self.parent_model = parent_model;
         Ok(self)
     }
@@ -471,10 +467,6 @@ impl AssetModelBuildable for InsertableAssetModelBuilder {
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self = self.updated_by(created_by)?;
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -510,10 +502,6 @@ impl AssetModelBuildable for InsertableAssetModelBuilder {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let updated_by = updated_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttributes::UpdatedBy)
-        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

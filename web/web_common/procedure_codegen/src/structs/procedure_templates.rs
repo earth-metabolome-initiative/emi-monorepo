@@ -207,9 +207,7 @@ impl ProcedureTemplate {
             // The second column of the index must be a foreign key referencing the primary
             // key column of another procedure template table.
             for foreign_key in columns[1].foreign_keys(conn)? {
-                let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-                    continue;
-                };
+                let foreign_table = foreign_key.foreign_table(conn)?;
                 if Self::must_be_procedure_template_table(&foreign_table, conn).is_ok() {
                     foreign_same_as_indices.push(same_as_index.clone());
                     break;

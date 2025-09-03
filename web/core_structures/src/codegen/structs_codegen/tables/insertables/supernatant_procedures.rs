@@ -655,29 +655,28 @@ impl<
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`procedures`"]
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
     ///class v0 directly-involved-column
     ///end
-    ///subgraph v3 ["`supernatant_procedures`"]
+    ///subgraph v4 ["`supernatant_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 column-of-interest
     ///end
     ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
+    ///v1 --->|"`associated same as`"| v2
+    ///v5 --->|"`extends`"| v3
+    ///v5 ---o|"`associated with`"| v4
     ///```
     fn procedure_template(
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template = procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::ProcedureTemplate,
-                    )
-            })?;
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -708,14 +707,6 @@ impl<
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
         if let Some(procedure_template) = self.procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -737,14 +728,6 @@ impl<
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure = foreign_procedure
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::ForeignProcedure,
-                    )
-            })?;
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
@@ -753,14 +736,6 @@ impl<
         mut self,
         stratified_source: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let stratified_source = stratified_source
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::StratifiedSource,
-                    )
-            })?;
         self.stratified_source = Some(stratified_source);
         Ok(self)
     }
@@ -769,14 +744,6 @@ impl<
         mut self,
         supernatant_destination: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let supernatant_destination = supernatant_destination
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::SupernatantDestination,
-                    )
-            })?;
         self.supernatant_destination = Some(supernatant_destination);
         Ok(self)
     }
@@ -785,14 +752,6 @@ impl<
         mut self,
         transferred_with: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let transferred_with = transferred_with
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::TransferredWith,
-                    )
-            })?;
         self.transferred_with = Some(transferred_with);
         Ok(self)
     }
@@ -801,14 +760,6 @@ impl<
         mut self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let pipette_tip_model = pipette_tip_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureAttributes::PipetteTipModel,
-                    )
-            })?;
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
@@ -856,16 +807,23 @@ where
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`procedures`"]
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
     ///class v0 column-of-interest
     ///end
-    ///subgraph v3 ["`supernatant_procedures`"]
+    ///subgraph v4 ["`supernatant_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 directly-involved-column
     ///end
     ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
+    ///v1 --->|"`associated same as`"| v2
+    ///v5 --->|"`extends`"| v3
+    ///v5 ---o|"`associated with`"| v4
     ///```
     fn procedure_template(
         self,

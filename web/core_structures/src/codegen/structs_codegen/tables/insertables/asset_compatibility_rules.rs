@@ -273,10 +273,6 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
         mut self,
         left_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let left_asset_model = left_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetCompatibilityRuleAttributes::LeftAssetModel)
-        })?;
         if let Some(right_asset_model) = self.right_asset_model {
             pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
                 .map_err(|e| {
@@ -296,10 +292,6 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
         mut self,
         right_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let right_asset_model = right_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetCompatibilityRuleAttributes::RightAssetModel)
-        })?;
         if let Some(left_asset_model) = self.left_asset_model {
             pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
                 .map_err(|e| {
@@ -319,10 +311,6 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetCompatibilityRuleAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

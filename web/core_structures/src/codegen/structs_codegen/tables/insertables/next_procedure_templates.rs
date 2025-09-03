@@ -400,10 +400,6 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
         mut self,
         parent: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent = parent.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableNextProcedureTemplateAttributes::Parent)
-        })?;
         self.parent = Some(parent);
         Ok(self)
     }
@@ -412,10 +408,6 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
         mut self,
         current: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let current = current.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableNextProcedureTemplateAttributes::Current)
-        })?;
         if let Some(successor_id) = self.successor_id {
             pgrx_validation::must_be_distinct_i32(current, successor_id)
                 .map_err(|e| {
@@ -435,10 +427,6 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
         mut self,
         successor_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let successor_id = successor_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableNextProcedureTemplateAttributes::SuccessorId)
-        })?;
         if let Some(current) = self.current {
             pgrx_validation::must_be_distinct_i32(current, successor_id)
                 .map_err(|e| {
@@ -458,10 +446,6 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableNextProcedureTemplateAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

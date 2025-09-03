@@ -258,12 +258,6 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let product_model = product_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableCommercialProductLotAttributes::ProductModel)
-            })?;
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
                 self.id,
                 Some(product_model),
@@ -490,9 +484,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
-    ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
         self,

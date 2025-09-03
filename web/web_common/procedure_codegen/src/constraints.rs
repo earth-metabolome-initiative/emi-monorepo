@@ -3,7 +3,6 @@
 
 mod asset_foreign_keys;
 mod asset_models_foreign_keys;
-mod procedure_assets_foreign_keys;
 mod procedure_primary_key;
 mod procedure_template_asset_models_foreign_keys;
 mod procedure_template_primary_key;
@@ -13,7 +12,6 @@ mod uncharacterized_assets;
 mod unused_foreign_procedure_template;
 pub use asset_foreign_keys::AssetForeignKeysConstraint;
 pub use asset_models_foreign_keys::AssetModelsForeignKeysConstraint;
-pub use procedure_assets_foreign_keys::ProcedureAssetsForeignKeysConstraint;
 pub use procedure_primary_key::ProcedurePrimaryKeyConstraint;
 pub use procedure_template_asset_models_foreign_keys::ProcedureTemplateAssetModelsForeignKeysConstraint;
 pub use procedure_template_primary_key::ProcedureTemplatePrimaryKeyConstraint;

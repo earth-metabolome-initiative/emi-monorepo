@@ -306,10 +306,6 @@ impl<ProcedureTemplate> DisposalProcedureTemplateBuildable
         mut self,
         disposed_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let disposed_asset_model = disposed_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableDisposalProcedureTemplateAttributes::DisposedAssetModel)
-        })?;
         self.disposed_asset_model = Some(disposed_asset_model);
         Ok(self)
     }
@@ -319,11 +315,6 @@ impl<ProcedureTemplate> DisposalProcedureTemplateBuildable
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableDisposalProcedureTemplateAttributes::ForeignProcedureTemplate,
-            )
-        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
@@ -334,14 +325,6 @@ impl<ProcedureTemplate> DisposalProcedureTemplateBuildable
         mut self,
         procedure_template_disposed_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_disposed_asset_model = procedure_template_disposed_asset_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableDisposalProcedureTemplateAttributes::ProcedureTemplateDisposedAssetModel,
-                    )
-            })?;
         self.procedure_template_disposed_asset_model =
             Some(procedure_template_disposed_asset_model);
         Ok(self)

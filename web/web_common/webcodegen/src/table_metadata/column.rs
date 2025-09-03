@@ -221,6 +221,23 @@ fn ancestral_same_as_constraints(
 }
 
 #[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
+fn triangular_same_as_constraints(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+    Ok(column
+        .foreign_keys(conn)?
+        .into_iter()
+        .filter(|foreign_key| {
+            foreign_key
+                .is_triangular_same_as_constraint(conn)
+                .map(|index| index.is_some())
+                .unwrap_or(false)
+        })
+        .collect())
+}
+
+#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn ancestral_same_as_reachable_set(
     column: &Column,
     conn: &mut PgConnection,
@@ -1447,7 +1464,7 @@ impl Column {
     pub fn foreign_primary_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
         Ok(self
             .foreign_keys(conn)?
             .into_iter()
@@ -1485,6 +1502,22 @@ impl Column {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         ancestral_same_as_constraints(self, conn)
+    }
+
+    /// Returns the triangular same-as constraints for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn triangular_same_as_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        triangular_same_as_constraints(self, conn)
     }
 
     /// Returns the associated same-as constraints for the column, if any.
@@ -1527,6 +1560,37 @@ impl Column {
     ) -> Result<Vec<Column>, WebCodeGenError> {
         Ok(self
             .ancestral_same_as_constraints(conn)?
+            .into_iter()
+            .map(|constraint| {
+                let local_columns = constraint.columns(conn)?;
+                let foreign_columns = constraint.foreign_columns(conn)?;
+                Ok(local_columns
+                    .iter()
+                    .zip(foreign_columns)
+                    .filter_map(|(local_column, foreign_column)| {
+                        if local_column == self { Some(foreign_column.clone()) } else { None }
+                    })
+                    .next()
+                    .unwrap())
+            })
+            .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+    }
+
+    /// Returns the triangular same-as columns for the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn triangular_same_as_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        Ok(self
+            .triangular_same_as_constraints(conn)?
             .into_iter()
             .map(|constraint| {
                 let local_columns = constraint.columns(conn)?;
@@ -1616,9 +1680,7 @@ impl Column {
 
         for key in self.foreign_keys(conn)? {
             if key.is_foreign_primary_key(conn)? {
-                let Some(foreign_table) = key.foreign_table(conn)? else {
-                    continue;
-                };
+                let foreign_table = key.foreign_table(conn)?;
                 referenced_tables.push(foreign_table);
             }
         }

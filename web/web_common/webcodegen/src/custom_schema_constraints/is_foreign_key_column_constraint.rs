@@ -33,7 +33,6 @@ impl CustomColumnConstraint for IsForeignKeyConstraint {
                 foreign_key
                     .foreign_table(conn)
                     .ok()
-                    .flatten()
                     .is_some_and(|table| table.table_name == self.table_name)
             })
         {

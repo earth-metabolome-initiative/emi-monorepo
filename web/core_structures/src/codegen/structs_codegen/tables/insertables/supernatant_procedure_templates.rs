@@ -828,11 +828,6 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         mut self,
         stratified_source_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let stratified_source_model = stratified_source_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSupernatantProcedureTemplateAttributes::StratifiedSourceModel,
-            )
-        })?;
         self.stratified_source_model = Some(stratified_source_model);
         Ok(self)
     }
@@ -843,11 +838,6 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSupernatantProcedureTemplateAttributes::ForeignProcedureTemplate,
-            )
-        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
@@ -858,14 +848,6 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         mut self,
         procedure_template_stratified_source_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_stratified_source_model = procedure_template_stratified_source_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableSupernatantProcedureTemplateAttributes::ProcedureTemplateStratifiedSourceModel,
-                    )
-            })?;
         self.procedure_template_stratified_source_model =
             Some(procedure_template_stratified_source_model);
         Ok(self)
@@ -884,29 +866,27 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v1 directly-involved-column
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v2@{shape: rounded, label: "supernatant_destination_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v1 directly-involved-column
     /// end
     /// v2 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn supernatant_destination_model(
         mut self,
         supernatant_destination_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let supernatant_destination_model =
-            supernatant_destination_model.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableSupernatantProcedureTemplateAttributes::SupernatantDestinationModel,
-                )
-            })?;
         self.procedure_template_supernatant_destination_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_supernatant_destination_model,
                 supernatant_destination_model,
@@ -935,18 +915,22 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "supernatant_destination_model"}
-    /// class v2 directly-involved-column
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "supernatant_destination_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_supernatant_destination_model(
         mut self,
@@ -997,28 +981,27 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "transferred_with_model"}
-    /// class v2 column-of-interest
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "transferred_with_model"}
+    /// class v2 column-of-interest
     /// end
+    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn transferred_with_model(
         mut self,
         transferred_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let transferred_with_model = transferred_with_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSupernatantProcedureTemplateAttributes::TransferredWithModel,
-            )
-        })?;
         self.procedure_template_transferred_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_transferred_with_model,
                 transferred_with_model,
@@ -1045,18 +1028,22 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "transferred_with_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_transferred_with_model(
         mut self,
@@ -1103,27 +1090,27 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
     /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v2 --->|"`associated same as`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let pipette_tip_model = pipette_tip_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSupernatantProcedureTemplateAttributes::PipetteTipModel)
-        })?;
         self.procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_pipette_tip_model,
                 pipette_tip_model,
@@ -1150,18 +1137,22 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`procedure_template_asset_models`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v4 ["`supernatant_procedure_templates`"]
+    /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
     /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v0
-    /// v4 ---o|"`associated with`"| v3
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_pipette_tip_model(
         mut self,

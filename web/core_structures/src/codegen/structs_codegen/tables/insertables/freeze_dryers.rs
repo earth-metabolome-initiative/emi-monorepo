@@ -194,9 +194,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
     ///v5 --->|"`extends`"| v3
@@ -205,12 +205,6 @@ impl<
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let model = model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableFreezeDryerAttributes::Model)
-            })?;
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
                 self.id,
                 model,
@@ -455,9 +449,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
-    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         self,

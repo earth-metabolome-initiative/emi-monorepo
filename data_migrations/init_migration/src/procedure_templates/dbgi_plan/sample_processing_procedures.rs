@@ -94,9 +94,9 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .created_by(user.id)?
         .kilograms(50e-6)?
         .tolerance_percentage(5.0)?
-        .procedure_fragment_source(cct_builder(user, conn)?)?
-        .procedure_fragment_placed_into(safelock_builder(user, conn)?)?
-        .procedure_weighed_with(weighing_device_builder(user, conn)?)?
+        .procedure_template_fragment_container_model(cct_builder(user, conn)?)?
+        .procedure_template_fragment_placed_into_model(safelock_builder(user, conn)?)?
+        .procedure_template_weighed_with_model(weighing_device_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
     let first_ball_mill_procedure = BallMillProcedureTemplate::new()

@@ -40,9 +40,7 @@ impl Codegen<'_> {
                 let attribute_ident = if let Some(extension_foreign_key) =
                     insertable_column.is_part_of_extension_primary_key(conn)?
                 {
-                    let foreign_table = extension_foreign_key
-                        .foreign_table(conn)?
-                        .expect("Foreign table should exist");
+                    let foreign_table = extension_foreign_key.foreign_table(conn)?;
                     let struct_ident = foreign_table.struct_ident()?;
                     defalt_where_requirements.push(quote::quote! {
                         #struct_ident: Default
@@ -95,13 +93,12 @@ impl Codegen<'_> {
                 }
                 let nullable_column = column.to_nullable();
                 let column_name = column.snake_case_ident().ok()?;
-                let column_type = if let Some(foreign_key) =
-                    column.requires_partial_builder(conn).ok()?
-                {
-                    foreign_key.foreign_table(conn).ok()?.unwrap().insertable_builder_ty().ok()?
-                } else {
-                    nullable_column.rust_data_type(conn).ok()?
-                };
+                let column_type =
+                    if let Some(foreign_key) = column.requires_partial_builder(conn).ok()? {
+                        foreign_key.foreign_table(conn).ok()?.insertable_builder_ty().ok()?
+                    } else {
+                        nullable_column.rust_data_type(conn).ok()?
+                    };
                 Some(Ok(quote::quote! {
                     pub(crate) #column_name: #column_type
                 }))
@@ -110,7 +107,7 @@ impl Codegen<'_> {
 
         insertable_builder_attributes.extend(
             table.extension_foreign_keys(conn)?.into_iter().filter_map(|foreign_key| {
-                let foreign_table = foreign_key.foreign_table(conn).ok().flatten()?;
+                let foreign_table = foreign_key.foreign_table(conn).ok()?;
                 let constraint_ident = foreign_key.constraint_ident(conn).ok()?;
                 let builder_generic_parameter = foreign_table.struct_ident().ok()?;
                 Some(quote::quote! {

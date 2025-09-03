@@ -627,27 +627,27 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`pouring_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
     ///    v0@{shape: rounded, label: "measured_with_model"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
     /// class v1 directly-involved-column
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn measured_with_model(
         mut self,
         measured_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let measured_with_model = measured_with_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePouringProcedureTemplateAttributes::MeasuredWithModel)
-        })?;
         self.procedure_template_measured_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_measured_with_model,
                 measured_with_model,
@@ -674,18 +674,22 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`pouring_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
     ///    v0@{shape: rounded, label: "measured_with_model"}
     /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
     /// class v1 column-of-interest
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_measured_with_model(
         mut self,
@@ -723,10 +727,6 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
         mut self,
         poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let poured_from_model = poured_from_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePouringProcedureTemplateAttributes::PouredFromModel)
-        })?;
         self.poured_from_model = Some(poured_from_model);
         Ok(self)
     }
@@ -736,11 +736,6 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertablePouringProcedureTemplateAttributes::ForeignProcedureTemplate,
-            )
-        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
@@ -751,12 +746,6 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
         mut self,
         procedure_template_poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_poured_from_model =
-            procedure_template_poured_from_model.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertablePouringProcedureTemplateAttributes::ProcedureTemplatePouredFromModel,
-                )
-            })?;
         self.procedure_template_poured_from_model = Some(procedure_template_poured_from_model);
         Ok(self)
     }
@@ -773,27 +762,27 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`pouring_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
     ///    v0@{shape: rounded, label: "poured_into_model"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v1 directly-involved-column
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn poured_into_model(
         mut self,
         poured_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let poured_into_model = poured_into_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePouringProcedureTemplateAttributes::PouredIntoModel)
-        })?;
         self.procedure_template_poured_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_poured_into_model,
                 poured_into_model,
@@ -820,18 +809,22 @@ impl<ProcedureTemplate> PouringProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`pouring_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
     ///    v0@{shape: rounded, label: "poured_into_model"}
     /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v1 column-of-interest
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_poured_into_model(
         mut self,

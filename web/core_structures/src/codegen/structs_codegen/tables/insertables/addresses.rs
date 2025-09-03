@@ -234,10 +234,6 @@ impl AddressBuildable for InsertableAddressBuilder {
         mut self,
         city_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let city_id = city_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAddressAttributes::CityId)
-        })?;
         self.city_id = Some(city_id);
         Ok(self)
     }

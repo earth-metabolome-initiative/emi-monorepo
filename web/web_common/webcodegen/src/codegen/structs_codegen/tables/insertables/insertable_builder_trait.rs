@@ -71,9 +71,7 @@ impl Table {
         if let Some(partial_builder_foreign_key) =
             insertable_column.requires_partial_builder(conn)?
         {
-            let foreign_table = partial_builder_foreign_key
-                .foreign_table(conn)?
-                .expect("The foreign table should be present");
+            let foreign_table = partial_builder_foreign_key.foreign_table(conn)?;
             let foreign_builder_type = foreign_table.insertable_builder_ty()?;
             Ok(quote! {#foreign_builder_type})
         } else if insertable_column.is_foreign_primary_key(conn)?

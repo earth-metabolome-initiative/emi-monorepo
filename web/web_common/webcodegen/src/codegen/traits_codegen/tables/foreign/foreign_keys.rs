@@ -101,7 +101,7 @@ impl Codegen<'_> {
             let mut foreign_tables = Vec::new();
 
             for foreign_key in &foreign_keys {
-                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let foreign_table = foreign_key.foreign_table(conn)?;
                 foreign_tables.push(foreign_table);
             }
 
@@ -264,7 +264,7 @@ impl Codegen<'_> {
                 let mut unique_foreign_keys = Vec::new();
 
                 for foreign_key in &foreign_keys {
-                    let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                    let foreign_table = foreign_key.foreign_table(conn)?;
                     if foreign_table == unique_foreign_table {
                         unique_foreign_keys.push(foreign_key);
                     }

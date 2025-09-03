@@ -88,59 +88,34 @@ impl Table {
 
         let column_camel_case_ident = column.camel_case_ident()?;
         let column_snake_case_ident = column.snake_case_ident()?;
+        let mut maybe_column_preprocessing = None;
 
-        let (column_assignment, maybe_column_preprocessing) =
+        let column_assignment =
             if let Some(_partial_builder_foreign_key) = column.requires_partial_builder(conn)? {
-                (
-                    quote! {
-                        self.#column_snake_case_ident = #column_snake_case_ident;
-                    },
-                    None,
-                )
-            } else if column.is_most_concrete_table(conn)? {
-                (
-                    quote! {
-                        if self.#column_snake_case_ident.is_none() {
-                            self.#column_snake_case_ident = Some(#column_snake_case_ident);
-                        }
-                    },
-                    Some(quote! {
-                        let #column_snake_case_ident = #column_snake_case_ident
-                            .try_into()
-                            .map_err(|err| {
-                                validation_errors::SingleFieldError::from(err)
-                                    .rename_field(#insertable_enum::#column_camel_case_ident)
-                            })?;
-                    }),
-                )
-            } else if column.is_nullable() {
-                (
-                    quote! {
-                        self.#column_snake_case_ident = #column_snake_case_ident;
-                    },
-                    Some(quote! {
-                        let #column_snake_case_ident = #column_snake_case_ident
-                            .try_into()
-                            .map_err(|err| {
-                                validation_errors::SingleFieldError::from(err)
-                                    .rename_field(#insertable_enum::#column_camel_case_ident)
-                            })?;
-                    }),
-                )
+                quote! {
+                    self.#column_snake_case_ident = #column_snake_case_ident;
+                }
             } else {
-                (
+                if column.foreign_primary_keys(conn)?.is_empty() {
+                    maybe_column_preprocessing = Some(quote! {
+                        let #column_snake_case_ident = #column_snake_case_ident
+                            .try_into()
+                            .map_err(|err| {
+                                validation_errors::SingleFieldError::from(err)
+                                    .rename_field(#insertable_enum::#column_camel_case_ident)
+                            })?;
+                    });
+                }
+
+                if column.is_nullable() {
+                    quote! {
+                        self.#column_snake_case_ident = #column_snake_case_ident;
+                    }
+                } else {
                     quote! {
                         self.#column_snake_case_ident = Some(#column_snake_case_ident);
-                    },
-                    Some(quote! {
-                        let #column_snake_case_ident = #column_snake_case_ident
-                            .try_into()
-                            .map_err(|err| {
-                                validation_errors::SingleFieldError::from(err)
-                                    .rename_field(#insertable_enum::#column_camel_case_ident)
-                            })?;
-                    }),
-                )
+                    }
+                }
             };
 
         Ok((

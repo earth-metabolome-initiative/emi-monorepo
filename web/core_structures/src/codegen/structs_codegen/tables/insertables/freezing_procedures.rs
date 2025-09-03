@@ -575,29 +575,28 @@ impl<
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`freezing_procedures`"]
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`freezing_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v4 ["`freezing_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
     ///class v0 column-of-interest
     ///end
-    ///subgraph v3 ["`procedures`"]
+    ///subgraph v5 ["`procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 directly-involved-column
     ///end
     ///v0 --->|"`ancestral same as`"| v1
-    ///v2 --->|"`extends`"| v3
+    ///v0 --->|"`associated same as`"| v2
+    ///v4 --->|"`extends`"| v5
+    ///v4 ---o|"`associated with`"| v3
     ///```
     fn procedure_template(
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template = procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezingProcedureAttributes::ProcedureTemplate,
-                    )
-            })?;
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -628,14 +627,6 @@ impl<
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezingProcedureAttributes::ForeignProcedureTemplate,
-                    )
-            })?;
         if let Some(procedure_template) = self.procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -657,14 +648,6 @@ impl<
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure = foreign_procedure
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableFreezingProcedureAttributes::ForeignProcedure,
-                    )
-            })?;
         self.foreign_procedure = Some(foreign_procedure);
         Ok(self)
     }
@@ -673,12 +656,6 @@ impl<
         mut self,
         frozen_container: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let frozen_container = frozen_container
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableFreezingProcedureAttributes::FrozenContainer)
-            })?;
         self.frozen_container = Some(frozen_container);
         Ok(self)
     }
@@ -687,12 +664,6 @@ impl<
         mut self,
         frozen_with: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let frozen_with = frozen_with
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableFreezingProcedureAttributes::FrozenWith)
-            })?;
         self.frozen_with = frozen_with;
         Ok(self)
     }
@@ -701,12 +672,6 @@ impl<
         mut self,
         frozen_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let frozen_with_model = frozen_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableFreezingProcedureAttributes::FrozenWithModel)
-            })?;
         self.frozen_with_model = Some(frozen_with_model);
         Ok(self)
     }
@@ -754,16 +719,23 @@ where
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`freezing_procedures`"]
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`freezing_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v4 ["`freezing_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 directly-involved-column
     ///end
-    ///subgraph v3 ["`procedures`"]
+    ///subgraph v5 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
     ///class v0 column-of-interest
     ///end
     ///v1 --->|"`ancestral same as`"| v0
-    ///v2 --->|"`extends`"| v3
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 --->|"`extends`"| v5
+    ///v4 ---o|"`associated with`"| v3
     ///```
     fn procedure_template(
         self,

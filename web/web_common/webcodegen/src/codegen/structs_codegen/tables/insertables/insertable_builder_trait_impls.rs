@@ -120,7 +120,7 @@ impl Table {
                         "There should exist a foreign key path from table {self} to column {insertable_column}",
                     ))[0];
                 let foreign_key_ident = foreign_key.constraint_ident(conn)?;
-                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let foreign_table = foreign_key.foreign_table(conn)?;
                 let foreign_table_ident = foreign_table.struct_ident()?;
                 extension_table_traits.get_mut(&foreign_table).unwrap().insert(table);
                 Ok((

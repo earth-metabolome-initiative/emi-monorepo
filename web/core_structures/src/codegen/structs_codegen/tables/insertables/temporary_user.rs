@@ -163,10 +163,6 @@ impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
         mut self,
         login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let login_provider_id = login_provider_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTemporaryUserAttributes::LoginProviderId)
-        })?;
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

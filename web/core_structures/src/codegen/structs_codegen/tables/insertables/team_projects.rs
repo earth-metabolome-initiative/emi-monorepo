@@ -166,10 +166,6 @@ impl TeamProjectBuildable for InsertableTeamProjectBuilder {
         mut self,
         team_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let team_id = team_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamProjectAttributes::TeamId)
-        })?;
         self.team_id = Some(team_id);
         Ok(self)
     }
@@ -178,10 +174,6 @@ impl TeamProjectBuildable for InsertableTeamProjectBuilder {
         mut self,
         project_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let project_id = project_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamProjectAttributes::ProjectId)
-        })?;
         self.project_id = Some(project_id);
         Ok(self)
     }

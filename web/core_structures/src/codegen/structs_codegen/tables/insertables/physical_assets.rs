@@ -192,12 +192,6 @@ impl<
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let model = model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertablePhysicalAssetAttributes::Model)
-            })?;
         self.id = <Asset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::model(
                 self.id,
                 model,

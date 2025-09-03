@@ -52,6 +52,7 @@ impl Table {
         let required_ancestor_columns: Vec<Column> =
             current_column.all_ancestral_same_as_columns(conn)?;
         involved_columns.extend(required_ancestor_columns.clone());
+        involved_columns.extend(current_column.triangular_same_as_columns(conn)?);
 
         // We iterate over the direct ancestor table, as the ancestors must fall
         // within two categories:
@@ -71,7 +72,7 @@ impl Table {
 
             let required_ancestor_table = required_ancestor_column.table(conn)?;
             let buildable_trait = required_ancestor_table.builder_trait_ty()?;
-            let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+            let foreign_table = foreign_key.foreign_table(conn)?;
             let generic_ident = foreign_table.struct_ident()?;
             let foreign_key_ident = foreign_key.constraint_ident(conn)?;
             let column_setter = required_ancestor_column.getter_ident()?;
@@ -102,7 +103,7 @@ impl Table {
         }
 
         if let Some(foreign_key) = current_column.requires_partial_builder(conn)? {
-            let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+            let foreign_table = foreign_key.foreign_table(conn)?;
 
             for foreign_key in self.associated_same_as_foreign_keys(conn)? {
                 let local_columns = foreign_key.columns(conn)?;
@@ -110,7 +111,7 @@ impl Table {
                     continue;
                 }
 
-                if foreign_key.foreign_table(conn)?.unwrap() != foreign_table {
+                if foreign_key.foreign_table(conn)? != foreign_table {
                     continue;
                 }
 
@@ -173,9 +174,7 @@ impl Table {
                     continue;
                 }
 
-                let foreign_table = associated_same_as_constraint.foreign_table(conn)?.expect(
-                "Partial builder foreign keys must have a foreign table, as they cannot be self-referential",
-            );
+                let foreign_table = associated_same_as_constraint.foreign_table(conn)?;
                 let foreign_builder = foreign_table.insertable_builder_ty()?;
                 let foreign_table_trait = foreign_table.builder_trait_ty()?;
 

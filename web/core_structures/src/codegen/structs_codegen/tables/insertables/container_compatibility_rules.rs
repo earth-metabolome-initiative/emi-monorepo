@@ -306,10 +306,6 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
         mut self,
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let container_model = container_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::ContainerModel)
-        })?;
         if let Some(contained_asset_model) = self.contained_asset_model {
             pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
@@ -329,10 +325,6 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
         mut self,
         contained_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let contained_asset_model = contained_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel)
-        })?;
         if let Some(container_model) = self.container_model {
             pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
@@ -378,10 +370,6 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

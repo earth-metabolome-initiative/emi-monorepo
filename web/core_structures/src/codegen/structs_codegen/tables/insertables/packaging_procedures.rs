@@ -288,14 +288,6 @@ impl<
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template = procedure_template
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertablePackagingProcedureAttributes::ProcedureTemplate,
-                    )
-            })?;
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -313,14 +305,6 @@ impl<
         mut self,
         packaged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let packaged_with_model = packaged_with_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertablePackagingProcedureAttributes::PackagedWithModel,
-                    )
-            })?;
         self.packaged_with_model = Some(packaged_with_model);
         Ok(self)
     }

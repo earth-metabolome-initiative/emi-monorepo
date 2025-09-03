@@ -196,20 +196,14 @@ impl<
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
-    ///v5 --->|"`extends`"| v3
     ///```
     fn container_model(
         mut self,
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let container_model = container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableContainerAttributes::ContainerModel)
-            })?;
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
                 self.id,
                 container_model,
@@ -451,12 +445,12 @@ where
     ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
-    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         self,

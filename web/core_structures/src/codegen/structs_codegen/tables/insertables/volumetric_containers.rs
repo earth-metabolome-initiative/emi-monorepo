@@ -165,10 +165,10 @@ pub trait VolumetricContainerBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Container: crate::codegen::structs_codegen::tables::insertables::ContainerBuildable<
+    Container: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
+        + crate::codegen::structs_codegen::tables::insertables::ContainerBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
         >,
 > VolumetricContainerBuildable for InsertableVolumetricContainerBuilder<Container> {
@@ -209,24 +209,16 @@ impl<
     ///v2 -.->|"`inferred ancestral same as`"| v0
     ///v2 -.->|"`inferred ancestral same as`"| v1
     ///v6 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v6
+    ///v5 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v5
     ///v7 -.->|"`descendant of`"| v4
     ///v7 -.->|"`descendant of`"| v6
-    ///v5 --->|"`extends`"| v6
-    ///v5 -.->|"`descendant of`"| v4
     ///```
     fn volumetric_container_model(
         mut self,
         volumetric_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let volumetric_container_model = volumetric_container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableVolumetricContainerAttributes::VolumetricContainerModel,
-                    )
-            })?;
         self.id = <Container as crate::codegen::structs_codegen::tables::insertables::ContainerBuildable>::container_model(
                 self.id,
                 volumetric_container_model,
@@ -478,9 +470,9 @@ where
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v3
     ///v5 -.->|"`descendant of`"| v4
+    ///v3 --->|"`extends`"| v4
     ///```
     fn container_model(
         self,
@@ -535,15 +527,15 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v6
-    ///v5 -.->|"`descendant of`"| v4
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v6 --->|"`extends`"| v4
     ///v7 --->|"`extends`"| v5
     ///v7 -.->|"`descendant of`"| v4
     ///v7 -.->|"`descendant of`"| v6
-    ///v6 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v6
+    ///v5 -.->|"`descendant of`"| v4
     ///```
     fn model(
         self,

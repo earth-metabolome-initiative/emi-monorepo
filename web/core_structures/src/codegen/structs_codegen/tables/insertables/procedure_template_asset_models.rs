@@ -430,10 +430,6 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template = procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::ProcedureTemplate)
-        })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
@@ -443,10 +439,6 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
         mut self,
         asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let asset_model = asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::AssetModel)
-        })?;
         self.asset_model = Some(asset_model);
         Ok(self)
     }
@@ -473,10 +465,6 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self = self.updated_by(created_by)?;
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -514,10 +502,6 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let updated_by = updated_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::UpdatedBy)
-        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

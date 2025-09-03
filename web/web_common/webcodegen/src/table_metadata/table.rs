@@ -527,10 +527,9 @@ impl Table {
     pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = Vec::new();
         for foreign_key in self.parent_keys(conn)? {
-            if let Some(foreign_table) = foreign_key.foreign_table(conn)? {
-                if !tables.contains(&foreign_table) {
-                    tables.push(foreign_table);
-                }
+            let foreign_table = foreign_key.foreign_table(conn)?;
+            if !tables.contains(&foreign_table) {
+                tables.push(foreign_table);
             }
         }
         Ok(tables)
@@ -551,10 +550,9 @@ impl Table {
     ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
         let mut homogeneous_parent_columns = Vec::new();
         for foreign_key in self.foreign_keys(conn)? {
-            if let Some(foreign_table) = foreign_key.foreign_table(conn)? {
-                if foreign_table == *self && foreign_key.is_foreign_primary_key(conn)? {
-                    homogeneous_parent_columns.push(foreign_key.columns(conn)?);
-                }
+            let foreign_table = foreign_key.foreign_table(conn)?;
+            if foreign_table == *self && foreign_key.is_foreign_primary_key(conn)? {
+                homogeneous_parent_columns.push(foreign_key.columns(conn)?);
             }
         }
 
@@ -595,9 +593,7 @@ impl Table {
     pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
         let mut tables = HashSet::new();
         for foreign_key_constraint in self.foreign_keys(conn)? {
-            if let Some(foreign_table) = foreign_key_constraint.foreign_table(conn)? {
-                tables.insert(foreign_table);
-            }
+            tables.insert(foreign_key_constraint.foreign_table(conn)?);
         }
         let mut tables = tables.into_iter().collect::<Vec<Table>>();
         tables.sort_unstable();
@@ -1083,7 +1079,7 @@ impl Table {
         Ok(self
             .extension_foreign_keys(conn)?
             .into_iter()
-            .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok().flatten())
+            .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok())
             .collect())
     }
 
@@ -1175,9 +1171,8 @@ impl Table {
     ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut associated_tables = Vec::new();
         for foreign_key in self.associated_same_as_foreign_keys(conn)? {
-            if let Some(foreign_table) = foreign_key.foreign_table(conn)? {
-                associated_tables.push(foreign_table);
-            }
+            let foreign_table = foreign_key.foreign_table(conn)?;
+            associated_tables.push(foreign_table);
         }
 
         associated_tables.sort_unstable();

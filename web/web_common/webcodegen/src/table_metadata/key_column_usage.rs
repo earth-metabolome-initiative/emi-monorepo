@@ -139,8 +139,8 @@ fn columns(
 fn foreign_table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<Option<Table>, diesel::result::Error> {
-    use diesel::{BoolExpressionMethods, JoinOnDsl, OptionalExtension, SelectableHelper};
+) -> Result<Table, diesel::result::Error> {
+    use diesel::{BoolExpressionMethods, JoinOnDsl, SelectableHelper};
 
     use crate::schema::{constraint_table_usage, tables};
 
@@ -158,7 +158,6 @@ fn foreign_table(
         .filter(constraint_table_usage::constraint_catalog.eq(&constraint.constraint_catalog))
         .select(Table::as_select())
         .first::<Table>(conn)
-        .optional()
 }
 
 /// Represents a row in the `key_column_usage` table, which contains information
@@ -202,14 +201,14 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_singleton_foreign_key(
+    pub(crate) fn is_singleton_foreign_key(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
         let table = self.table(conn)?;
         Ok(table.foreign_keys(conn)?.iter().all(|fk| {
-            fk == self || fk.foreign_table(conn).ok().flatten().as_ref() == foreign_table.as_ref()
+            fk == self || fk.foreign_table(conn).map(|t| t == foreign_table).unwrap_or(true)
         }))
     }
 
@@ -226,61 +225,6 @@ impl KeyColumnUsage {
         Ok(referential_constraint.delete_rule == "CASCADE")
     }
 
-    /// Load all the key column usages from the database
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was
-    /// successful, or a `WebCodeGenError` if an error occurred
-    ///
-    /// # Errors
-    /// If an error occurs while loading the key column usages from the database
-    pub fn load_all_key_column_usages(
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::key_column_usage;
-        key_column_usage::table.load::<KeyColumnUsage>(conn).map_err(WebCodeGenError::from)
-    }
-
-    /// Load all the key column usages from the database
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    /// * `table_name` - The name of the table to load the key column usages for
-    /// * `table_schema` - An optional schema name to filter the key column
-    ///   usages by
-    /// * `table_catalog` - The name of the catalog to filter the key column
-    ///   usages by
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was
-    /// successful, or a `WebCodeGenError` if an error occurred
-    ///
-    /// # Errors
-    ///
-    /// If an error occurs while loading the key column usages from the database
-    pub fn load_key_column_usages(
-        conn: &mut PgConnection,
-        table_name: &str,
-        table_schema: Option<&str>,
-        table_catalog: &str,
-    ) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::key_column_usage;
-        let table_schema = table_schema.unwrap_or("public");
-        key_column_usage::table
-            .filter(key_column_usage::table_name.eq(table_name))
-            .filter(key_column_usage::table_schema.eq(table_schema))
-            .filter(key_column_usage::table_catalog.eq(table_catalog))
-            .load::<KeyColumnUsage>(conn)
-            .map_err(WebCodeGenError::from)
-    }
-
     /// Returns the referential constraint associated with this key column usage
     ///
     /// # Arguments
@@ -291,7 +235,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the referential constraint from the
     ///   database
-    pub fn referential_constraint(
+    pub(crate) fn referential_constraint(
         &self,
         conn: &mut PgConnection,
     ) -> Result<ReferentialConstraint, diesel::result::Error> {
@@ -307,7 +251,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the table from the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+    pub(crate) fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         load_key_table(self, conn)
     }
 
@@ -317,11 +261,11 @@ impl KeyColumnUsage {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    pub fn is_self_referential(
+    pub(crate) fn is_self_referential(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        Ok(Some(self.table(conn)?) == self.foreign_table(conn)?)
+        Ok(self.table(conn)? == self.foreign_table(conn)?)
     }
 
     /// Returns the foreign table associated with this key column usage
@@ -333,10 +277,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the foreign table from the database
-    pub fn foreign_table(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Option<Table>, diesel::result::Error> {
+    pub fn foreign_table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         foreign_table(self, conn)
     }
 
@@ -364,7 +305,10 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn is_composite(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
+    pub(crate) fn is_composite(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
         self.columns(conn).map(|columns| columns.len() > 1)
     }
 
@@ -378,26 +322,11 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn is_nullable(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        self.columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
-    }
-
-    /// Returns whether any foreign column involved in the constraint is
-    /// nullable
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while loading the foreign key column usages from
-    ///   the database
-    pub fn foreign_is_nullable(
+    pub(crate) fn is_nullable(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        self.foreign_columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
+        self.columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
     }
 
     /// Returns the columns in the foreign table that are referenced by this key
@@ -433,14 +362,10 @@ impl KeyColumnUsage {
     ) -> Result<bool, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
 
-        if let Some(foreign_table) = foreign_table {
-            // Check if the foreign table has a primary key
-            let primary_keys = foreign_table.primary_key_columns(conn)?;
-            let foreign_columns = self.foreign_columns(conn)?;
-            Ok(primary_keys == foreign_columns)
-        } else {
-            Ok(false)
-        }
+        // Check if the foreign table has a primary key
+        let primary_keys = foreign_table.primary_key_columns(conn)?;
+        let foreign_columns = self.foreign_columns(conn)?;
+        Ok(primary_keys == foreign_columns)
     }
 
     /// Returns whether the key column usage refers to a local primary key
@@ -452,7 +377,10 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_local_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub(crate) fn is_local_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
         let table = self.table(conn)?;
 
         // Check if the table has a primary key
@@ -471,7 +399,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn includes_local_primary_key(
+    pub(crate) fn includes_local_primary_key(
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
@@ -479,6 +407,57 @@ impl KeyColumnUsage {
         let primary_keys = table.primary_key_columns(conn)?;
         let columns = self.columns(conn)?;
         Ok(primary_keys.iter().all(|pk| columns.contains(pk)))
+    }
+
+    /// Returns whether the key column usage includes the foreign primary key
+    /// columns
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn includes_foreign_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        let foreign_table = self.foreign_table(conn)?;
+        let primary_keys = foreign_table.primary_key_columns(conn)?;
+        let columns = self.columns(conn)?;
+        Ok(primary_keys.iter().all(|pk| columns.contains(pk)))
+    }
+
+    /// Returns whether the key column usage includes a foreign key to
+    /// the local or ancestral primary key columns
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Implementative details
+    ///
+    /// This function checks whether the current foreign key references
+    /// a foreign table which is an ancestor of the current table (or the
+    /// current table) but the local columns are not part of the local
+    /// primary key themselves.
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn includes_triangular_primary_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        let foreign_table = self.foreign_table(conn)?;
+        let local_table = self.table(conn)?;
+
+        if local_table != foreign_table && !local_table.is_extending(&foreign_table, conn)? {
+            return Ok(false);
+        }
+
+        Ok(!self.includes_local_primary_key(conn)? && self.includes_foreign_primary_key(conn)?)
     }
 
     /// Returns whether the key column usage refers to a foreign unique key
@@ -491,13 +470,11 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_foreign_unique_key(
+    pub(crate) fn is_foreign_unique_key(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
-        let Some(foreign_table) = self.foreign_table(conn)? else {
-            return Ok(None);
-        };
+        let foreign_table = self.foreign_table(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
 
         // Check if the foreign table has a unique key constraint
@@ -522,24 +499,10 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    pub(crate) fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.is_foreign_primary_key(conn)?
             && self.is_local_primary_key(conn)?
             && !self.is_self_referential(conn)?)
-    }
-
-    /// Returns the number of columns in this key column usage
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn number_of_columns(&self, conn: &mut PgConnection) -> Result<usize, WebCodeGenError> {
-        let columns = self.columns(conn)?;
-        Ok(columns.len())
     }
 
     /// Returns the identifier for this key column usage getter.
@@ -562,7 +525,10 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn constraint_ident(&self, conn: &mut PgConnection) -> Result<Ident, WebCodeGenError> {
+    pub(crate) fn constraint_ident(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Ident, WebCodeGenError> {
         let columns = self.columns(conn)?;
         if columns.len() == 1 {
             // We check whether there exist some other constraint which also refers
@@ -599,7 +565,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn where_statement(
+    pub(crate) fn where_statement(
         &self,
         foreign_table: bool,
         include_self: bool,
@@ -611,7 +577,7 @@ impl KeyColumnUsage {
 
         let columns = self.columns(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
-        let foreign_key_table = self.foreign_table(conn)?.unwrap();
+        let foreign_key_table = self.foreign_table(conn)?;
         let current_table = self.table(conn)?;
         let foreign_table_path = foreign_key_table.import_diesel_path()?;
         let current_table_path = current_table.import_diesel_path()?;
@@ -685,7 +651,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_same_as_constraint(
+    pub(crate) fn is_same_as_constraint(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
@@ -720,13 +686,32 @@ impl KeyColumnUsage {
             return Ok(None);
         }
 
-        let Some(foreign_table) = self.foreign_table(conn)? else {
-            return Ok(None);
-        };
+        let foreign_table = self.foreign_table(conn)?;
 
         let table = self.table(conn)?;
 
         if !table.is_extending(&foreign_table, conn)? {
+            return Ok(None);
+        }
+
+        self.is_same_as_constraint(conn)
+    }
+
+    /// Returns whether this key column usage is a triangular same-as
+    /// constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn is_triangular_same_as_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<PgIndex>, WebCodeGenError> {
+        if !self.includes_triangular_primary_key(conn)? {
             return Ok(None);
         }
 
@@ -751,9 +736,7 @@ impl KeyColumnUsage {
             return Ok(None);
         }
 
-        let Some(foreign_table) = self.foreign_table(conn)? else {
-            return Ok(None);
-        };
+        let foreign_table = self.foreign_table(conn)?;
 
         let table = self.table(conn)?;
 
@@ -774,7 +757,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_partial_builder_constraint(
+    pub(crate) fn is_partial_builder_constraint(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
@@ -782,9 +765,7 @@ impl KeyColumnUsage {
             return Ok(None);
         }
 
-        let Some(foreign_table) = self.foreign_table(conn)? else {
-            return Ok(None);
-        };
+        let foreign_table = self.foreign_table(conn)?;
 
         let table = self.table(conn)?;
         let ancestors = table.ancestral_extension_tables(conn)?;
@@ -797,9 +778,7 @@ impl KeyColumnUsage {
         // of the current table.
         let mut found_foreign_reference = false;
         for foreign_key in foreign_table.foreign_keys(conn)? {
-            let Some(foreign_key_table) = foreign_key.foreign_table(conn)? else {
-                continue;
-            };
+            let foreign_key_table = foreign_key.foreign_table(conn)?;
             if ancestors.contains(&foreign_key_table) {
                 found_foreign_reference = true;
                 break;

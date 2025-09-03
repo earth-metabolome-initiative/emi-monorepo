@@ -634,10 +634,6 @@ impl TeamBuildable for InsertableTeamBuilder {
         mut self,
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let color_id = color_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::ColorId)
-        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }
@@ -646,10 +642,6 @@ impl TeamBuildable for InsertableTeamBuilder {
         mut self,
         state_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let state_id = state_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::StateId)
-        })?;
         self.state_id = Some(state_id);
         Ok(self)
     }
@@ -658,10 +650,6 @@ impl TeamBuildable for InsertableTeamBuilder {
         mut self,
         parent_team_id: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_team_id = parent_team_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::ParentTeamId)
-        })?;
         if let (Some(id), Some(parent_team_id)) = (self.id, parent_team_id) {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id)
                 .map_err(|e| {
@@ -697,10 +685,6 @@ impl TeamBuildable for InsertableTeamBuilder {
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self = self.updated_by(created_by)?;
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -736,10 +720,6 @@ impl TeamBuildable for InsertableTeamBuilder {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let updated_by = updated_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::UpdatedBy)
-        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }

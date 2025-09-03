@@ -252,25 +252,17 @@ for InsertableCommercialPackagingModelBuilder<CommercialProduct, PackagingModel>
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
-    ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
         mut self,
         parent_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_model = parent_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableCommercialPackagingModelAttributes::ParentModel,
-                    )
-            })?;
         self.commercial_packaging_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
                 self.commercial_packaging_models_id_fkey1,
                 Some(parent_model),
@@ -556,9 +548,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
-    ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
         self,

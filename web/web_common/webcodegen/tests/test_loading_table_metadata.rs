@@ -40,7 +40,6 @@ async fn test_user_table() {
     let _all_columns = Column::load_all(&mut conn);
 
     let _all_table_constraints = TableConstraint::load_all(&mut conn);
-    let _all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
     let _all_referential_constraints =
         ReferentialConstraint::load_all_referential_constraints(&mut conn);
     let _all_constraint_column_usage =

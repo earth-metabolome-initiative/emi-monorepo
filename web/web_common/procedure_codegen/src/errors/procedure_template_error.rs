@@ -3,7 +3,7 @@
 
 use webcodegen::Table;
 
-use crate::utils::PROCEDURE_TEMPLATE_ASSETS_TABLE_NAME;
+use crate::utils::PROCEDURE_TEMPLATE_ASSET_MODELS_TABLE_NAME;
 
 #[derive(Debug)]
 /// Errors which may occur during procedure template code generation.
@@ -53,8 +53,7 @@ impl std::fmt::Display for ProcedureTemplateError {
             ProcedureTemplateError::ExpectedProcedureTemplateAssetModelForeignKey { column } => {
                 write!(
                     f,
-                    "Column `{}.{}.{}` is expected to be a foreign key to `{PROCEDURE_TEMPLATE_ASSETS_TABLE_NAME}`",
-                    column.table_schema, column.table_name, column.column_name
+                    "Column {column} is expected to be a foreign key to `{PROCEDURE_TEMPLATE_ASSET_MODELS_TABLE_NAME}`",
                 )
             }
         }

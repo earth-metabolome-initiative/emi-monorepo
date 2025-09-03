@@ -270,10 +270,6 @@ impl OrganismTaxonBuildable for InsertableOrganismTaxonBuilder {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganismTaxonAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -299,10 +295,6 @@ impl OrganismTaxonBuildable for InsertableOrganismTaxonBuilder {
         mut self,
         organism_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let organism_id = organism_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganismTaxonAttributes::OrganismId)
-        })?;
         self.organism_id = Some(organism_id);
         Ok(self)
     }
@@ -311,10 +303,6 @@ impl OrganismTaxonBuildable for InsertableOrganismTaxonBuilder {
         mut self,
         taxon_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let taxon_id = taxon_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganismTaxonAttributes::TaxonId)
-        })?;
         self.taxon_id = Some(taxon_id);
         Ok(self)
     }

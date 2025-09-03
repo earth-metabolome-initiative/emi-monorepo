@@ -1,43 +1,43 @@
 # Time Report for Building Core Structures
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Init DB Transaction` which took 2 minutes (95.38% of all time).
+The slowest task was `Init DB Transaction` which took 2 minutes (96.15% of all time).
 
 | name                | time      | percentage | comment |
 |---------------------|-----------|------------|---------|
-| Init DB Transaction | 2 minutes | 95.38%     |         |
+| Init DB Transaction | 2 minutes | 96.15%     |         |
 | Code Generation     | now       | 3.85%      |         |
 
 ## Time Report for Init DB Transaction
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Consistency Constraint Checks` which took 2 minutes (96.77% of all time).
+The slowest task was `Consistency Constraint Checks` which took 2 minutes (96.00% of all time).
 
 | name                          | time      | percentage | comment |
 |-------------------------------|-----------|------------|---------|
-| Initialize CSVs               | now       | 2.42%      |         |
+| Initialize CSVs               | now       | 2.40%      |         |
 | Initialize Migrations         | now       | 0.00%      |         |
-| Consistency Constraint Checks | 2 minutes | 96.77%     |         |
+| Consistency Constraint Checks | 2 minutes | 96.00%     |         |
 
 ### Time Report for Consistency Constraint Checks
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Check constraints in schema 'public'` which took 2 minutes (97.50% of all time).
+The slowest task was `Check constraints in schema 'public'` which took 2 minutes (98.33% of all time).
 
 | name                                               | time      | percentage | comment |
 |----------------------------------------------------|-----------|------------|---------|
-| Check constraints in schema 'public'               | 2 minutes | 97.50%     |         |
+| Check constraints in schema 'public'               | 2 minutes | 98.33%     |         |
 | Procedure and procedure template check constraints | now       | 0.00%      |         |
-| Procedure and procedure template asset constraints | now       | 0.83%      |         |
+| Procedure and procedure template asset constraints | now       | 1.67%      |         |
 
 #### Time Report for Check constraints in schema 'public'
 
 The total time spent on all tasks was 2 minutes.
-The slowest task was `Compatible foreign type constraints` which took 2 minutes (100.00% of all time).
+The slowest task was `Compatible foreign type constraints` which took 2 minutes (99.15% of all time).
 
 | name                                     | time      | percentage | comment |
 |------------------------------------------|-----------|------------|---------|
-| Compatible foreign type constraints      | 2 minutes | 100.00%    |         |
+| Compatible foreign type constraints      | 2 minutes | 99.15%     |         |
 | Lowercase column and table names         | now       | 0.00%      |         |
 | Standard column names and types          | now       | 0.00%      |         |
 | Not-null constraints on standard columns | now       | 0.00%      |         |

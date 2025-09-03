@@ -554,10 +554,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure = procedure.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::Procedure)
-        })?;
         self.procedure = Some(procedure);
         Ok(self)
     }
@@ -567,10 +563,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template = procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::ProcedureTemplate)
-        })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
@@ -579,10 +571,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let asset_model = asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::AssetModel)
-        })?;
         self.asset_model = Some(asset_model);
         Ok(self)
     }
@@ -591,10 +579,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         asset: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let asset = asset.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::Asset)
-        })?;
         self.asset = asset;
         Ok(self)
     }
@@ -604,11 +588,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         procedure_template_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_asset_model =
-            procedure_template_asset_model.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableProcedureAssetAttributes::ProcedureTemplateAssetModel)
-            })?;
         self.procedure_template_asset_model = Some(procedure_template_asset_model);
         Ok(self)
     }
@@ -617,10 +596,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         ancestor_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let ancestor_model = ancestor_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::AncestorModel)
-        })?;
         self.ancestor_model = Some(ancestor_model);
         Ok(self)
     }
@@ -629,10 +604,6 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

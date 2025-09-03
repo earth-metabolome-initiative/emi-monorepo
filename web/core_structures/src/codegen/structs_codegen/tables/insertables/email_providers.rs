@@ -166,10 +166,6 @@ impl EmailProviderBuildable for InsertableEmailProviderBuilder {
         mut self,
         email_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let email_id = email_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableEmailProviderAttributes::EmailId)
-        })?;
         self.email_id = Some(email_id);
         Ok(self)
     }
@@ -178,10 +174,6 @@ impl EmailProviderBuildable for InsertableEmailProviderBuilder {
         mut self,
         login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let login_provider_id = login_provider_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableEmailProviderAttributes::LoginProviderId)
-        })?;
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

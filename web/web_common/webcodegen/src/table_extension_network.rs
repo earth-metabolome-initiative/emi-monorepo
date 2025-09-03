@@ -534,7 +534,6 @@ impl TableExtensionNetwork {
                                 && fk
                                     .foreign_table(conn)
                                     .ok()
-                                    .flatten()
                                     .map_or(false, |fk_table| &fk_table == ancestor_table)
                         })
                         .unwrap();
@@ -595,9 +594,7 @@ impl TableExtensionNetwork {
         let extension_foreign_keys = table.extension_foreign_keys(conn)?;
         let mut sorted_extension_foreign_keys = extension_foreign_keys.clone();
         for extension_foreign_key in extension_foreign_keys {
-            let foreign_table = extension_foreign_key
-                .foreign_table(conn)?
-                .expect("Failed to get foreign table for the extension foreign key");
+            let foreign_table = extension_foreign_key.foreign_table(conn)?;
             let expected_position = extension_tables
                 .iter()
                 .position(|&t| t == &foreign_table)

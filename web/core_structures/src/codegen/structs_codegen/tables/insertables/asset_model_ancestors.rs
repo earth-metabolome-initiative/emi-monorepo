@@ -168,10 +168,6 @@ impl AssetModelAncestorBuildable for InsertableAssetModelAncestorBuilder {
         mut self,
         descendant_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let descendant_model = descendant_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAncestorAttributes::DescendantModel)
-        })?;
         self.descendant_model = Some(descendant_model);
         Ok(self)
     }
@@ -181,10 +177,6 @@ impl AssetModelAncestorBuildable for InsertableAssetModelAncestorBuilder {
         mut self,
         ancestor_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let ancestor_model = ancestor_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAncestorAttributes::AncestorModel)
-        })?;
         self.ancestor_model = Some(ancestor_model);
         Ok(self)
     }

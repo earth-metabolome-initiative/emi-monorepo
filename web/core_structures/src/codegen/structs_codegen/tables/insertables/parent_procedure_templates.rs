@@ -405,10 +405,6 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
         mut self,
         parent_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_procedure_template = parent_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::ParentProcedureTemplate)
-        })?;
         if let Some(child_procedure_template) = self.child_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     parent_procedure_template,
@@ -431,10 +427,6 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
         mut self,
         child_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let child_procedure_template = child_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::ChildProcedureTemplate)
-        })?;
         if let Some(parent_procedure_template) = self.parent_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     parent_procedure_template,
@@ -525,10 +517,6 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

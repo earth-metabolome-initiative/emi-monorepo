@@ -211,8 +211,7 @@ impl Table {
                     insertable_column.requires_partial_builder(conn)?
                 {
                     let foreign_table = partial_builder_constraint
-                        .foreign_table(conn)?
-                        .expect("Partial builder must have a foreign table");
+                        .foreign_table(conn)?;
                     assert!(!foreign_table.has_composite_primary_key(conn)?);
                     let foreign_primary_key_columns = foreign_table.primary_key_columns(conn)?;
 
@@ -295,8 +294,7 @@ impl Table {
             let enum_variant = insertable_column.camel_case_ident()?;
 
             if let Some(foreign_key) = insertable_column.requires_partial_builder(conn)? {
-                let foreign_table_enum =
-                    foreign_key.foreign_table(conn)?.unwrap().insertable_enum_ty()?;
+                let foreign_table_enum = foreign_key.foreign_table(conn)?.insertable_enum_ty()?;
                 insertable_enum_variants.push(quote::quote! {
                     #enum_variant(#foreign_table_enum)
                 });
@@ -335,7 +333,7 @@ impl Table {
         let from_implementations = singleton_foreign_keys
             .into_iter()
             .map(|foreign_key| {
-                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let foreign_table = foreign_key.foreign_table(conn)?;
                 let foreign_table_enum_ty = foreign_table.insertable_enum_ty()?;
                 let foreign_table_snake_case_ident = foreign_table.snake_case_ident()?;
                 let foreign_table_camel_case_ident = foreign_table.struct_ident()?;
@@ -452,7 +450,7 @@ impl Codegen<'_> {
             // generate a custom lambda that converts the attribute
             // to the current enum.
             if first_ancestor.is_extension(conn)? {
-                let foreign_table = first_ancestor.foreign_table(conn)?.unwrap();
+                let foreign_table = first_ancestor.foreign_table(conn)?;
                 table.into_extension_field_name_lambda(&foreign_table)?
             } else {
                 // If the first ancestor is not an extension, we can simply
@@ -513,7 +511,7 @@ impl Codegen<'_> {
                 let foreign_key = passing_through
                     .requires_partial_builder(conn)?
                     .expect("Passing through column must require a partial builder");
-                let foreign_table = foreign_key.foreign_table(conn)?.unwrap();
+                let foreign_table = foreign_key.foreign_table(conn)?;
                 assert_eq!(
                     foreign_table,
                     column.table(conn)?,

@@ -171,10 +171,6 @@ impl<DigitalAsset> SpectrumBuildable for InsertableSpectrumBuilder<DigitalAsset>
         mut self,
         spectra_collection_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let spectra_collection_id = spectra_collection_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpectrumAttributes::SpectraCollectionId)
-        })?;
         self.spectra_collection_id = Some(spectra_collection_id);
         Ok(self)
     }

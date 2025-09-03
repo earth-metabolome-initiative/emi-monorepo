@@ -38,9 +38,7 @@ impl CustomColumnConstraint for UncharacterizedAssetModelsConstraint {
 
         if Procedure::must_be_procedure_table(&table, conn).is_ok() {
             for (same_as_foreign_key, _) in table.same_as_foreign_keys(conn)? {
-                let foreign_table = same_as_foreign_key.foreign_table(conn)?.expect(
-                    "Failed to get foreign table for same-as foreign key on a procedure table",
-                );
+                let foreign_table = same_as_foreign_key.foreign_table(conn)?;
 
                 if foreign_table.table_name != "procedure_assets" {
                     continue;
@@ -58,9 +56,7 @@ impl CustomColumnConstraint for UncharacterizedAssetModelsConstraint {
             )));
         } else if ProcedureTemplate::must_be_procedure_template_table(&table, conn).is_ok() {
             for (same_as_foreign_key, _) in table.same_as_foreign_keys(conn)? {
-                let foreign_table = same_as_foreign_key.foreign_table(conn)?.expect(
-                    "Failed to get foreign table for same-as foreign key on a procedure table",
-                );
+                let foreign_table = same_as_foreign_key.foreign_table(conn)?;
 
                 if foreign_table.table_name != "procedure_template_asset_models" {
                     continue;

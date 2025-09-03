@@ -599,10 +599,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         parent: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent = parent.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSharedProcedureTemplateAssetModelAttributes::Parent)
-        })?;
         if let Some(child_id) = self.child_id {
             pgrx_validation::must_be_distinct_i32(parent, child_id)
                 .map_err(|e| {
@@ -623,11 +619,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         parent_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_asset_model = parent_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSharedProcedureTemplateAssetModelAttributes::ParentAssetModel,
-            )
-        })?;
         self.parent_asset_model = Some(parent_asset_model);
         Ok(self)
     }
@@ -638,11 +629,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         parent_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_procedure_template = parent_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSharedProcedureTemplateAssetModelAttributes::ParentProcedureTemplate,
-            )
-        })?;
         self.parent_procedure_template = Some(parent_procedure_template);
         Ok(self)
     }
@@ -652,10 +638,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         child_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let child_id = child_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSharedProcedureTemplateAssetModelAttributes::ChildId)
-        })?;
         if let Some(parent) = self.parent {
             pgrx_validation::must_be_distinct_i32(parent, child_id)
                 .map_err(|e| {
@@ -676,11 +658,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         child_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let child_asset_model = child_asset_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSharedProcedureTemplateAssetModelAttributes::ChildAssetModel,
-            )
-        })?;
         self.child_asset_model = Some(child_asset_model);
         Ok(self)
     }
@@ -691,11 +668,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         child_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let child_procedure_template = child_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableSharedProcedureTemplateAssetModelAttributes::ChildProcedureTemplate,
-            )
-        })?;
         self.child_procedure_template = Some(child_procedure_template);
         Ok(self)
     }
@@ -705,10 +677,6 @@ impl SharedProcedureTemplateAssetModelBuildable
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSharedProcedureTemplateAssetModelAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }

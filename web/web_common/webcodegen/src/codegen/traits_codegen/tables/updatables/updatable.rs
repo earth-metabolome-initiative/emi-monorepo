@@ -123,8 +123,7 @@ impl Codegen<'_> {
             let mut parent_check_trait_requirements = HashMap::new();
 
             for parent_key in table.parent_keys(conn)? {
-                let parent_table =
-                    parent_key.foreign_table(conn)?.expect("Parent table should exist");
+                let parent_table = parent_key.foreign_table(conn)?;
 
                 if !parent_table.allows_updatable(conn)? {
                     continue;

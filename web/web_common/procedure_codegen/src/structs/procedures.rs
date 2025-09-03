@@ -48,9 +48,7 @@ fn procedure_template_foreign_key(
         let local_columns = foreign_key.columns(conn)?;
         assert_eq!(local_columns.len(), 2);
         for foreign_key in local_columns[1].foreign_primary_keys(conn)? {
-            let Some(foreign_table) = foreign_key.foreign_table(conn)? else {
-                continue;
-            };
+            let foreign_table = foreign_key.foreign_table(conn)?;
             if ProcedureTemplate::from_table(foreign_table.clone(), conn).is_ok() {
                 return Ok(Some(foreign_key));
             }
@@ -129,7 +127,7 @@ impl Procedure {
     ) -> Result<ProcedureTemplate, crate::errors::Error> {
         ProcedureTemplate::from_table(
             if let Some(foreign_key) = self.procedure_template_foreign_key(conn)? {
-                foreign_key.foreign_table(conn)?.expect("Foreign key must have a foreign table")
+                foreign_key.foreign_table(conn)?
             } else {
                 Table::load(
                     conn,

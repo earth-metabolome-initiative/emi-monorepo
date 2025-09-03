@@ -235,10 +235,6 @@ impl TaxonBuildable for InsertableTaxonBuilder {
         mut self,
         rank_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let rank_id = rank_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTaxonAttributes::RankId)
-        })?;
         self.rank_id = Some(rank_id);
         Ok(self)
     }

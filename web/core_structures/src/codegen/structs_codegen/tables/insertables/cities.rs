@@ -153,10 +153,6 @@ impl CityBuildable for InsertableCityBuilder {
         mut self,
         iso: ::iso_codes::CountryCode,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let iso = iso.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCityAttributes::Iso)
-        })?;
         self.iso = Some(iso);
         Ok(self)
     }

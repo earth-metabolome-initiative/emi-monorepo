@@ -76,13 +76,7 @@ async fn test_key_column_usage() {
     assert_eq!(columns[1], expected_second_column, "Second column mismatch: {columns:?}");
 
     let foreign_table = match first_usage.foreign_table(&mut conn) {
-        Ok(Some(table)) => table,
-        Ok(None) => {
-            docker.stop().await.unwrap();
-            panic!(
-                "Expected foreign table to be Some, found None for key column usage: {first_usage:?}"
-            );
-        }
+        Ok(table) => table,
         Err(err) => {
             docker.stop().await.unwrap();
             panic!("Error getting foreign table for key column usage: {err}");
@@ -183,11 +177,7 @@ async fn test_key_column_usage() {
     // foreign table is `users`
     for fk in &composite_users_foreign_keys {
         let foreign_table = match fk.foreign_table(&mut conn) {
-            Ok(Some(table)) => table,
-            Ok(None) => {
-                docker.stop().await.unwrap();
-                panic!("Expected foreign table to be Some, found None for foreign key: {fk:?}");
-            }
+            Ok(table) => table,
             Err(err) => {
                 docker.stop().await.unwrap();
                 panic!("Error getting foreign table for foreign key: {err}");

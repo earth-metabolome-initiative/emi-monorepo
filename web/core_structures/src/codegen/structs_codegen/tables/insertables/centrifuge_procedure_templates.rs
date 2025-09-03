@@ -775,27 +775,27 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`centrifuge_procedure_templates`"]
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`centrifuge_procedure_templates`"]
     ///    v0@{shape: rounded, label: "centrifuged_with_model"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
     /// class v1 directly-involved-column
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn centrifuged_with_model(
         mut self,
         centrifuged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let centrifuged_with_model = centrifuged_with_model.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCentrifugeProcedureTemplateAttributes::CentrifugedWithModel)
-        })?;
         self.procedure_template_centrifuged_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
                 self.procedure_template_centrifuged_with_model,
                 centrifuged_with_model,
@@ -822,18 +822,22 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateBuildable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// subgraph v3 ["`centrifuge_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v1 column-of-interest
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`centrifuge_procedure_templates`"]
     ///    v0@{shape: rounded, label: "centrifuged_with_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v1 column-of-interest
     /// end
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
-    /// v3 ---o|"`associated with`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_centrifuged_with_model(
         mut self,
@@ -874,12 +878,6 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateBuildable
         mut self,
         centrifuged_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let centrifuged_container_model =
-            centrifuged_container_model.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableCentrifugeProcedureTemplateAttributes::CentrifugedContainerModel,
-                )
-            })?;
         self.centrifuged_container_model = Some(centrifuged_container_model);
         Ok(self)
     }
@@ -890,11 +888,6 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateBuildable
         mut self,
         foreign_procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let foreign_procedure_template = foreign_procedure_template.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(
-                InsertableCentrifugeProcedureTemplateAttributes::ForeignProcedureTemplate,
-            )
-        })?;
         self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
@@ -905,14 +898,6 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateBuildable
         mut self,
         procedure_template_centrifuged_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure_template_centrifuged_container_model = procedure_template_centrifuged_container_model
-            .try_into()
-            .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(
-                        InsertableCentrifugeProcedureTemplateAttributes::ProcedureTemplateCentrifugedContainerModel,
-                    )
-            })?;
         self.procedure_template_centrifuged_container_model =
             Some(procedure_template_centrifuged_container_model);
         Ok(self)

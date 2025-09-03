@@ -771,10 +771,6 @@ impl ProjectBuildable for InsertableProjectBuilder {
         mut self,
         state_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let state_id = state_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttributes::StateId)
-        })?;
         self.state_id = Some(state_id);
         Ok(self)
     }
@@ -806,10 +802,6 @@ impl ProjectBuildable for InsertableProjectBuilder {
         mut self,
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let color_id = color_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttributes::ColorId)
-        })?;
         self.color_id = Some(color_id);
         Ok(self)
     }
@@ -818,10 +810,6 @@ impl ProjectBuildable for InsertableProjectBuilder {
         mut self,
         parent_project_id: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let parent_project_id = parent_project_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttributes::ParentProjectId)
-        })?;
         if let (Some(id), Some(parent_project_id)) = (self.id, parent_project_id) {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id)
                 .map_err(|e| {
@@ -889,10 +877,6 @@ impl ProjectBuildable for InsertableProjectBuilder {
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self = self.updated_by(created_by)?;
-        let created_by = created_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttributes::CreatedBy)
-        })?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -928,10 +912,6 @@ impl ProjectBuildable for InsertableProjectBuilder {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let updated_by = updated_by.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttributes::UpdatedBy)
-        })?;
         self.updated_by = Some(updated_by);
         Ok(self)
     }
