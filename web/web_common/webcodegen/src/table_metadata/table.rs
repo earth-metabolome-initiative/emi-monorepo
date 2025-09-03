@@ -1116,9 +1116,6 @@ impl Table {
             }
         }
 
-        associated_foreign_key.sort_unstable();
-        associated_foreign_key.dedup();
-
         Ok(associated_foreign_key)
     }
 
@@ -1392,6 +1389,21 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
         Ok(self.primary_key_columns(conn)?.len() > 1)
+    }
+
+    /// Returns the subset of the table's columns which define other
+    /// columns' values via foreign key constraints.
+    pub(crate) fn foreign_definer_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut foreign_definer_columns = Vec::new();
+        for column in self.columns(conn)? {
+            if column.is_foreign_definer(conn)? {
+                foreign_definer_columns.push(column);
+            }
+        }
+        Ok(foreign_definer_columns)
     }
 
     /// Returns the check constraints for the table.

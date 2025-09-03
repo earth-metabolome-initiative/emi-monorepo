@@ -22,6 +22,9 @@ where
         C,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttributes,
+    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
@@ -41,6 +44,9 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
@@ -99,11 +105,29 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
+        use web_common_traits::database::Read;
+        if let Some(procedure_template_geolocated_asset_model) = self
+            .procedure_template_geolocated_asset_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_geolocated_asset_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateBuildable>::geolocated_asset_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateBuildable>::foreign_procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+            }
+        }
         let geolocated_with_model = self
             .geolocated_with_model
             .ok_or(

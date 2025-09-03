@@ -669,23 +669,19 @@ impl<
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`pouring_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "procedure_template"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`pouring_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`procedures`"]
+    ///subgraph v3 ["`pouring_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
-    ///class v1 directly-involved-column
+    ///class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "foreign_procedure_template"}
+    ///class v0 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v1
-    ///v0 --->|"`associated same as`"| v2
-    ///v4 --->|"`extends`"| v5
-    ///v4 ---o|"`associated with`"| v3
+    ///subgraph v4 ["`procedures`"]
+    ///    v2@{shape: rounded, label: "procedure_template"}
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v3 --->|"`extends`"| v4
     ///```
     fn procedure_template(
         mut self,
@@ -738,6 +734,23 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `public.pouring_procedures.foreign_procedure` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///v0@{shape: rounded, label: "foreign_procedure"}
+    ///class v0 column-of-interest
+    ///v1@{shape: rounded, label: "foreign_procedure_template"}
+    ///class v1 directly-involved-column
+    ///v0 -.->|"`foreign defines`"| v1
+    ///```
     fn foreign_procedure(
         mut self,
         foreign_procedure: ::rosetta_uuid::Uuid,
@@ -754,6 +767,23 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `public.pouring_procedures.measured_with` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart LR
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///v0@{shape: rounded, label: "measured_with"}
+    ///class v0 column-of-interest
+    ///v1@{shape: rounded, label: "measured_with_model"}
+    ///class v1 directly-involved-column
+    ///v0 -.->|"`foreign defines`"| v1
+    ///```
     fn measured_with(
         mut self,
         measured_with: Option<::rosetta_uuid::Uuid>,
@@ -813,23 +843,16 @@ where
     ///flowchart LR
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`pouring_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "procedure_template"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`pouring_procedures`"]
+    ///subgraph v2 ["`pouring_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 directly-involved-column
     ///end
-    ///subgraph v5 ["`procedures`"]
+    ///subgraph v3 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
     ///class v0 column-of-interest
     ///end
     ///v1 --->|"`ancestral same as`"| v0
-    ///v1 --->|"`associated same as`"| v2
-    ///v4 --->|"`extends`"| v5
-    ///v4 ---o|"`associated with`"| v3
+    ///v2 --->|"`extends`"| v3
     ///```
     fn procedure_template(
         self,

@@ -22,6 +22,9 @@ where
         C,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttributes,
+    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
@@ -41,6 +44,9 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
@@ -99,11 +105,29 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
+        use web_common_traits::database::Read;
+        if let Some(procedure_template_centrifuged_container_model) = self
+            .procedure_template_centrifuged_container_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_centrifuged_container_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateBuildable>::foreign_procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateBuildable>::centrifuged_container_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
         let kelvin = self
             .kelvin
             .ok_or(

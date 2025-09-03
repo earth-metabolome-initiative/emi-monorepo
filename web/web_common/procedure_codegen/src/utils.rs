@@ -5,7 +5,6 @@ use webcodegen::KeyColumnUsage;
 
 pub(crate) const ASSETS_TABLE_NAME: &str = "assets";
 pub(crate) const ASSET_MODELS_TABLE_NAME: &str = "asset_models";
-pub(crate) const PROCEDURE_ASSETS_TABLE_NAME: &str = "procedure_assets";
 pub(crate) const PROCEDURE_TEMPLATE_ASSET_MODELS_TABLE_NAME: &str =
     "procedure_template_asset_models";
 

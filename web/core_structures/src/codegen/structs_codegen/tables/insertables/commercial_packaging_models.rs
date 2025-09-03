@@ -255,9 +255,9 @@ for InsertableCommercialPackagingModelBuilder<CommercialProduct, PackagingModel>
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
+    ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
         mut self,

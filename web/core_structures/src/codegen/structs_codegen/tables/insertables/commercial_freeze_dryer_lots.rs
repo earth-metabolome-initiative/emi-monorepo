@@ -219,10 +219,10 @@ pub trait CommercialFreezeDryerLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
         >,
     FreezeDryerModel,
@@ -260,16 +260,16 @@ for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerM
     ///end
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
+    ///v7 --->|"`extends`"| v4
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -533,9 +533,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v3 -.->|"`descendant of`"| v5
     ///v4 --->|"`extends`"| v5
@@ -594,18 +594,18 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
+    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,

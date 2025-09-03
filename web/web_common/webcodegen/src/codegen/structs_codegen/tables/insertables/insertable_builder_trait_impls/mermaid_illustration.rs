@@ -50,7 +50,6 @@ pub(super) fn columns_to_mermaid_illustration(
         .flat_map(|col| {
             let mut same_as = col.all_ancestral_same_as_columns(conn).unwrap_or_default();
             same_as.extend(col.associated_same_as_columns(conn).unwrap_or_default());
-            same_as.extend(col.triangular_same_as_columns(conn).unwrap_or_default());
             same_as
         })
         .filter(|col| !columns.contains(col))
@@ -189,6 +188,28 @@ pub(super) fn columns_to_mermaid_illustration(
                             .unwrap()
                             .label("associated same as")
                             .unwrap()
+                            .right_arrow_shape(ArrowShape::Normal)
+                            .unwrap(),
+                    )
+                    .unwrap();
+            }
+        }
+
+        let foreign_associated_same_as_columns = column.foreign_defined_columns(conn)?;
+        for foreign_associated_same_as_column in &foreign_associated_same_as_columns {
+            if let Some(foreign_associated_column_node) =
+                column_nodes.get(&foreign_associated_same_as_column)
+            {
+                flowchart
+                    .edge(
+                        FlowchartEdgeBuilder::default()
+                            .source(column_node.clone())
+                            .unwrap()
+                            .destination(foreign_associated_column_node.clone())
+                            .unwrap()
+                            .label("foreign defines")
+                            .unwrap()
+                            .line_style(LineStyle::Dashed)
                             .right_arrow_shape(ArrowShape::Normal)
                             .unwrap(),
                     )

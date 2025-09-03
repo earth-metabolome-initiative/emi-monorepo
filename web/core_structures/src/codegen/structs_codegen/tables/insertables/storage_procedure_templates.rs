@@ -688,13 +688,13 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_into_model(
@@ -748,6 +748,26 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// Sets the value of the
     /// `public.storage_procedure_templates.
     /// procedure_template_stored_asset_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "foreign_procedure_template"}
+    /// class v0 directly-involved-column
+    /// v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v1 column-of-interest
+    /// v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 directly-involved-column
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
+    /// ```
     fn procedure_template_stored_asset_model(
         mut self,
         procedure_template_stored_asset_model: i32,

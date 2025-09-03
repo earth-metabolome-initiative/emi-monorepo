@@ -512,10 +512,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "geolocated_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_geolocated_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "geolocated_with_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -523,8 +523,8 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateBuildable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_geolocated_with_model(
@@ -579,6 +579,26 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateBuildable
     /// Sets the value of the
     /// `public.geolocation_procedure_templates.
     /// procedure_template_geolocated_asset_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "foreign_procedure_template"}
+    /// class v0 directly-involved-column
+    /// v1@{shape: rounded, label: "geolocated_asset_model"}
+    /// class v1 directly-involved-column
+    /// v2@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v2 column-of-interest
+    /// v2 -.->|"`foreign defines`"| v1
+    /// v2 -.->|"`foreign defines`"| v0
+    /// ```
     fn procedure_template_geolocated_asset_model(
         mut self,
         procedure_template_geolocated_asset_model: i32,

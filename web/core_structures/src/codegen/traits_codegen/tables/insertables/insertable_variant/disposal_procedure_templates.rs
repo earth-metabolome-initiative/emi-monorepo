@@ -22,6 +22,12 @@ where
         C,
         PrimaryKey = i32,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplateAttributes,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -70,10 +76,28 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(procedure_template_disposed_asset_model) = self
+            .procedure_template_disposed_asset_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_disposed_asset_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateBuildable>::foreign_procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateBuildable>::disposed_asset_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
         let disposed_asset_model = self
             .disposed_asset_model
             .ok_or(

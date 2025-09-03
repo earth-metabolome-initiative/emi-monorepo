@@ -295,6 +295,22 @@ impl KeyColumnUsage {
         columns(self, conn)
     }
 
+    /// Returns the column mapping between the local and foreign columns
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while loading the column mappings from the database
+    pub fn column_mappings(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Column, Column)>, diesel::result::Error> {
+        Ok(self.columns(conn)?.into_iter().zip(self.foreign_columns(conn)?.into_iter()).collect())
+    }
+
     /// Returns whether it is a composite key column usage
     ///
     /// # Arguments
@@ -425,39 +441,8 @@ impl KeyColumnUsage {
     ) -> Result<bool, WebCodeGenError> {
         let foreign_table = self.foreign_table(conn)?;
         let primary_keys = foreign_table.primary_key_columns(conn)?;
-        let columns = self.columns(conn)?;
-        Ok(primary_keys.iter().all(|pk| columns.contains(pk)))
-    }
-
-    /// Returns whether the key column usage includes a foreign key to
-    /// the local or ancestral primary key columns
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Implementative details
-    ///
-    /// This function checks whether the current foreign key references
-    /// a foreign table which is an ancestor of the current table (or the
-    /// current table) but the local columns are not part of the local
-    /// primary key themselves.
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub(crate) fn includes_triangular_primary_key(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
-        let foreign_table = self.foreign_table(conn)?;
-        let local_table = self.table(conn)?;
-
-        if local_table != foreign_table && !local_table.is_extending(&foreign_table, conn)? {
-            return Ok(false);
-        }
-
-        Ok(!self.includes_local_primary_key(conn)? && self.includes_foreign_primary_key(conn)?)
+        let foreign_columns = self.foreign_columns(conn)?;
+        Ok(primary_keys.iter().all(|pk| foreign_columns.contains(pk)))
     }
 
     /// Returns whether the key column usage refers to a foreign unique key
@@ -697,27 +682,6 @@ impl KeyColumnUsage {
         self.is_same_as_constraint(conn)
     }
 
-    /// Returns whether this key column usage is a triangular same-as
-    /// constraint.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub(crate) fn is_triangular_same_as_constraint(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Option<PgIndex>, WebCodeGenError> {
-        if !self.includes_triangular_primary_key(conn)? {
-            return Ok(None);
-        }
-
-        self.is_same_as_constraint(conn)
-    }
-
     /// Returns whether this key column usage is an associated same-as
     /// constraint.
     ///
@@ -733,6 +697,13 @@ impl KeyColumnUsage {
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
         if self.includes_local_primary_key(conn)? {
+            return Ok(None);
+        }
+        if !self
+            .columns(conn)?
+            .iter()
+            .any(|c| c.requires_partial_builder(conn).ok().flatten().is_some())
+        {
             return Ok(None);
         }
 

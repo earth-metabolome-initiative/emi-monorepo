@@ -12,6 +12,7 @@ use quote::quote;
 use syn::Ident;
 
 use crate::{Codegen, Table, errors::WebCodeGenError, traits::TableLike};
+mod foreign_defined_completions;
 
 impl Codegen<'_> {
     /// Returns the implementation of the `TryInsert` trait for the insertable
@@ -319,16 +320,38 @@ impl Codegen<'_> {
             });
         }
 
-        let (user_id_ident, conn_ident) = if right_generics.is_empty() {
-            (quote! {_user_id}, quote! {_conn})
+        let user_id_ident = if right_generics.is_empty() {
+            quote! {_user_id}
         } else {
-            (quote! {user_id}, quote! {conn})
+            quote! {user_id}
+        };
+
+        let (foreign_defined_completions, extra_requirements) =
+            self.foreign_defined_completions(table, conn)?;
+        additional_where_requirements.extend(extra_requirements);
+
+        if !foreign_defined_completions.is_empty() {
+            additional_use_imports.push(quote! {
+                use web_common_traits::database::Read;
+            });
+        }
+
+        let maybe_mut = if foreign_defined_completions.is_empty() {
+            quote! {}
+        } else {
+            quote! {mut}
+        };
+
+        let conn_ident = if right_generics.is_empty() && foreign_defined_completions.is_empty() {
+            quote! {_conn}
+        } else {
+            quote! {conn}
         };
 
         Ok((
             quote! {
                 fn try_insert(
-                    self,
+                    #maybe_mut self,
                     #user_id_ident: #user_id_type,
                     #conn_ident: &mut C
                 ) -> Result<
@@ -337,6 +360,7 @@ impl Codegen<'_> {
                 >
                 {
                     #(#additional_use_imports)*
+                    #(#foreign_defined_completions)*
                     #(#attribute_availability_checks)*
                     #generics_recursive_operation
                     #(#dependant_tables_completion)*

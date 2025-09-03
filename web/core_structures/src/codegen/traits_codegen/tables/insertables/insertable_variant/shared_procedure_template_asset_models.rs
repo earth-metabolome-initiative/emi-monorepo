@@ -15,6 +15,9 @@ where
         crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel,
     >,
     C: diesel::connection::LoadConnection,
+    Self: crate::codegen::structs_codegen::tables::insertables::SharedProcedureTemplateAssetModelBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSharedProcedureTemplateAssetModelAttributes,
+    >,
     crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -59,6 +62,12 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
@@ -146,10 +155,41 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         _user_id: i32,
-        _conn: &mut C,
+        conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(parent) = self.parent {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                parent,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SharedProcedureTemplateAssetModelBuildable>::parent_procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SharedProcedureTemplateAssetModelBuildable>::parent_asset_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let Some(child_id) = self.child_id {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                child_id,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SharedProcedureTemplateAssetModelBuildable>::child_procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SharedProcedureTemplateAssetModelBuildable>::child_asset_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
         let parent = self
             .parent
             .ok_or(

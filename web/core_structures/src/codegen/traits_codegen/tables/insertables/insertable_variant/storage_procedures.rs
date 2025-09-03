@@ -22,6 +22,9 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+    >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
     <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
@@ -36,6 +39,12 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
+        C,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
@@ -70,10 +79,33 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(procedure_template) = self.procedure_template {
+            if let Some(storage_procedure_templates) = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
+                procedure_template,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable>::foreign_procedure_template(
+                    self,
+                    storage_procedure_templates.foreign_procedure_template,
+                )?;
+            }
+        }
+        if let Some(foreign_procedure) = self.foreign_procedure {
+            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+                foreign_procedure,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable>::foreign_procedure_template(
+                    self,
+                    procedures.procedure_template,
+                )?;
+            }
+        }
         let procedure_template = self
             .procedure_template
             .ok_or(

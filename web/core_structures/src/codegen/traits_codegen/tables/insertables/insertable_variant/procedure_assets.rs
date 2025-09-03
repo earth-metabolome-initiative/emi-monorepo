@@ -15,6 +15,18 @@ where
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     C: diesel::connection::LoadConnection,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset;
@@ -38,10 +50,49 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         _user_id: i32,
-        _conn: &mut C,
+        conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(procedure) = self.procedure {
+            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+                procedure,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::procedure_template(
+                    self,
+                    procedures.procedure_template,
+                )?;
+            }
+        }
+        if let Some(asset) = self.asset {
+            if let Some(assets) = crate::codegen::structs_codegen::tables::assets::Asset::read(
+                asset,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::asset_model(
+                    self,
+                    assets.model,
+                )?;
+            }
+        }
+        if let Some(procedure_template_asset_model) = self.procedure_template_asset_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_asset_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::ancestor_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::procedure_template(
+                    self,
+                    procedure_template_asset_models.procedure_template,
+                )?;
+            }
+        }
         let procedure = self
             .procedure
             .ok_or(

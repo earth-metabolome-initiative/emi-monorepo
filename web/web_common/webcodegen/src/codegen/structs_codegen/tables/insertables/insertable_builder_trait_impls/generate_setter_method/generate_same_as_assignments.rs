@@ -52,7 +52,7 @@ impl Table {
         let required_ancestor_columns: Vec<Column> =
             current_column.all_ancestral_same_as_columns(conn)?;
         involved_columns.extend(required_ancestor_columns.clone());
-        involved_columns.extend(current_column.triangular_same_as_columns(conn)?);
+        involved_columns.extend(current_column.foreign_defined_columns(conn)?);
 
         // We iterate over the direct ancestor table, as the ancestors must fall
         // within two categories:
@@ -169,10 +169,8 @@ impl Table {
                 assert_eq!(local_columns.len(), 2,);
                 let local_column = &local_columns[0];
 
-                if local_column.requires_partial_builder(conn)?.is_none() {
-                    // This column is not handled by the current builder.
-                    continue;
-                }
+                involved_columns.push(foreign_column.clone());
+                involved_columns.push(local_column.clone());
 
                 let foreign_table = associated_same_as_constraint.foreign_table(conn)?;
                 let foreign_builder = foreign_table.insertable_builder_ty()?;
@@ -181,8 +179,6 @@ impl Table {
                 let local_column_ident = local_column.snake_case_ident()?;
                 let local_column_camel_case_ident = local_column.camel_case_ident()?;
 
-                involved_columns.push(foreign_column.clone());
-                involved_columns.push(local_column.clone());
                 let foreign_column_setter_ident = foreign_column.getter_ident()?;
 
                 let wrapper_current_column_ident =
