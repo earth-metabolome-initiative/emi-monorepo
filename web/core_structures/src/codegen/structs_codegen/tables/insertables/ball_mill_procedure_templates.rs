@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillProcedureTemplateExtensionAttributes {
+pub enum InsertableBallMillProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableBallMillProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableBallMillProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,20 +13,19 @@ impl core::fmt::Display for InsertableBallMillProcedureTemplateExtensionAttribut
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableBallMillProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableBallMillProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillProcedureTemplateAttributes {
-    Extension(InsertableBallMillProcedureTemplateExtensionAttributes),
+pub enum InsertableBallMillProcedureTemplateAttribute {
+    Extension(InsertableBallMillProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Kelvin,
     KelvinTolerancePercentage,
@@ -34,18 +33,18 @@ pub enum InsertableBallMillProcedureTemplateAttributes {
     Hertz,
     BeadModel,
     ProcedureTemplateBeadModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     NumberOfBeads,
     MilledWithModel,
     ProcedureTemplateMilledWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     MilledContainerModel,
     ForeignProcedureTemplate,
     ProcedureTemplateMilledContainerModel,
 }
-impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableBallMillProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -57,7 +56,7 @@ impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
             "ProcedureTemplateBeadModel" => {
                 Ok(
                     Self::ProcedureTemplateBeadModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -66,7 +65,7 @@ impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
             "ProcedureTemplateMilledWithModel" => {
                 Ok(
                     Self::ProcedureTemplateMilledWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -83,7 +82,7 @@ impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
             "procedure_template_bead_model" => {
                 Ok(
                     Self::ProcedureTemplateBeadModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -92,7 +91,7 @@ impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
             "procedure_template_milled_with_model" => {
                 Ok(
                     Self::ProcedureTemplateMilledWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -111,7 +110,7 @@ impl core::str::FromStr for InsertableBallMillProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableBallMillProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableBallMillProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -193,29 +192,29 @@ impl InsertableBallMillProcedureTemplate {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+            crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::beads_models::BeadsModel::table(),
+                crate::codegen::structs_codegen::tables::bead_models::BeadModel::table(),
                 self.bead_model,
             ),
             conn,
@@ -560,7 +559,7 @@ where
 }
 /// Trait defining setters for attributes of an instance of
 /// `BallMillProcedureTemplate` or descendant tables.
-pub trait BallMillProcedureTemplateBuildable: Sized {
+pub trait BallMillProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.ball_mill_procedure_templates.kelvin`
@@ -865,10 +864,10 @@ pub trait BallMillProcedureTemplateBuildable: Sized {
         procedure_template_milled_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
+impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute;
     /// Sets the value of the `public.ball_mill_procedure_templates.kelvin`
     /// column.
     fn kelvin<K>(
@@ -881,13 +880,13 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     {
         let kelvin = kelvin.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBallMillProcedureTemplateAttributes::Kelvin)
+                .rename_field(InsertableBallMillProcedureTemplateAttribute::Kelvin)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::Kelvin,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Kelvin,
                     )
             })?;
         self.kelvin = Some(kelvin);
@@ -907,14 +906,14 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
         let kelvin_tolerance_percentage =
             kelvin_tolerance_percentage.try_into().map_err(|err| {
                 validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableBallMillProcedureTemplateAttributes::KelvinTolerancePercentage,
+                    InsertableBallMillProcedureTemplateAttribute::KelvinTolerancePercentage,
                 )
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::KelvinTolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::KelvinTolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -925,7 +924,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::KelvinTolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::KelvinTolerancePercentage,
                             )
                     })
             })?;
@@ -944,13 +943,13 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     {
         let seconds = seconds.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBallMillProcedureTemplateAttributes::Seconds)
+                .rename_field(InsertableBallMillProcedureTemplateAttribute::Seconds)
         })?;
         pgrx_validation::must_be_strictly_smaller_than_f32(seconds, 900f32)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::Seconds,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Seconds,
                     )
             })
             .and_then(|_| {
@@ -958,7 +957,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::Seconds,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Seconds,
                             )
                     })
             })?;
@@ -977,13 +976,13 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     {
         let hertz = hertz.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBallMillProcedureTemplateAttributes::Hertz)
+                .rename_field(InsertableBallMillProcedureTemplateAttribute::Hertz)
         })?;
         pgrx_validation::must_be_strictly_smaller_than_f32(hertz, 50f32)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::Hertz,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Hertz,
                     )
             })
             .and_then(|_| {
@@ -991,7 +990,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::Hertz,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Hertz,
                             )
                     })
             })?;
@@ -1026,13 +1025,14 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn bead_model(
         mut self,
         bead_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_bead_model,
                 bead_model,
             )
@@ -1073,6 +1073,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_bead_model(
@@ -1092,7 +1093,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_bead_model.asset_model {
             self.bead_model = Some(asset_model);
         } else if let Some(local) = self.bead_model {
-            procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_bead_model,
                     local,
                 )
@@ -1117,13 +1118,13 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     {
         let number_of_beads = number_of_beads.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBallMillProcedureTemplateAttributes::NumberOfBeads)
+                .rename_field(InsertableBallMillProcedureTemplateAttribute::NumberOfBeads)
         })?;
         pgrx_validation::must_be_strictly_positive_i16(number_of_beads)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes::NumberOfBeads,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::NumberOfBeads,
                     )
             })?;
         self.number_of_beads = Some(number_of_beads);
@@ -1144,10 +1145,10 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "milled_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "milled_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1155,15 +1156,16 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_with_model(
         mut self,
         milled_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_milled_with_model,
                 milled_with_model,
             )
@@ -1191,10 +1193,10 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "milled_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "milled_with_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1202,8 +1204,9 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_milled_with_model(
@@ -1223,7 +1226,7 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_milled_with_model.asset_model {
             self.milled_with_model = Some(asset_model);
         } else if let Some(local) = self.milled_with_model {
-            procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_milled_with_model,
                     local,
                 )
@@ -1288,12 +1291,12 @@ impl<ProcedureTemplate> BallMillProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1304,7 +1307,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -1326,7 +1329,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -1348,7 +1351,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -1370,7 +1373,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -1388,7 +1391,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -1412,7 +1415,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -1430,7 +1433,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -1454,7 +1457,7 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -1495,7 +1498,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableBallMillProcedureTemplateAttributes,
+            InsertableBallMillProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -1506,7 +1509,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableBallMillProcedureTemplateAttributes;
+    type Attributes = InsertableBallMillProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kelvin.is_some()
             && self.kelvin_tolerance_percentage.is_some() && self.seconds.is_some()

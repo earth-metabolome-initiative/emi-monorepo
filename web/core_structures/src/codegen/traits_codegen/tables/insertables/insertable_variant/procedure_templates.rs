@@ -20,7 +20,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -49,63 +49,63 @@ where
             .most_concrete_table
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::MostConcreteTable,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::MostConcreteTable,
                 ),
             )?;
         let name = self
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Description,
                 ),
             )?;
         let deprecated = self
             .deprecated
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Deprecated,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Deprecated,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Icon,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

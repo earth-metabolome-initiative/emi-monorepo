@@ -12,13 +12,13 @@ pub enum TableName {
     BallMillMachine,
     BallMillProcedureTemplate,
     BallMillProcedure,
-    BeadsModel,
+    BeadModel,
     Brand,
     CameraModel,
     Camera,
+    CapModel,
     CappingProcedureTemplate,
     CappingProcedure,
-    CapsModel,
     CentrifugeModel,
     CentrifugeProcedureTemplate,
     CentrifugeProcedure,
@@ -27,10 +27,12 @@ pub enum TableName {
     Color,
     CommercialBallMillMachineLot,
     CommercialBallMillMachineModel,
-    CommercialBeadsLot,
-    CommercialBeadsModel,
+    CommercialBeadLot,
+    CommercialBeadModel,
     CommercialCameraLot,
     CommercialCameraModel,
+    CommercialCapLot,
+    CommercialCapModel,
     CommercialCentrifugeLot,
     CommercialCentrifugeModel,
     CommercialFreezeDryerLot,
@@ -111,7 +113,6 @@ pub enum TableName {
     Role,
     Room,
     SampleState,
-    SharedProcedureTemplateAssetModel,
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
@@ -160,15 +161,15 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(BallMillProcedureTemplate))
             }
             TableName::BallMillProcedure => write!(f, stringify!(BallMillProcedure)),
-            TableName::BeadsModel => write!(f, stringify!(BeadsModel)),
+            TableName::BeadModel => write!(f, stringify!(BeadModel)),
             TableName::Brand => write!(f, stringify!(Brand)),
             TableName::CameraModel => write!(f, stringify!(CameraModel)),
             TableName::Camera => write!(f, stringify!(Camera)),
+            TableName::CapModel => write!(f, stringify!(CapModel)),
             TableName::CappingProcedureTemplate => {
                 write!(f, stringify!(CappingProcedureTemplate))
             }
             TableName::CappingProcedure => write!(f, stringify!(CappingProcedure)),
-            TableName::CapsModel => write!(f, stringify!(CapsModel)),
             TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
             TableName::CentrifugeProcedureTemplate => {
                 write!(f, stringify!(CentrifugeProcedureTemplate))
@@ -183,14 +184,14 @@ impl core::fmt::Display for TableName {
             TableName::CommercialBallMillMachineModel => {
                 write!(f, stringify!(CommercialBallMillMachineModel))
             }
-            TableName::CommercialBeadsLot => write!(f, stringify!(CommercialBeadsLot)),
-            TableName::CommercialBeadsModel => {
-                write!(f, stringify!(CommercialBeadsModel))
-            }
+            TableName::CommercialBeadLot => write!(f, stringify!(CommercialBeadLot)),
+            TableName::CommercialBeadModel => write!(f, stringify!(CommercialBeadModel)),
             TableName::CommercialCameraLot => write!(f, stringify!(CommercialCameraLot)),
             TableName::CommercialCameraModel => {
                 write!(f, stringify!(CommercialCameraModel))
             }
+            TableName::CommercialCapLot => write!(f, stringify!(CommercialCapLot)),
+            TableName::CommercialCapModel => write!(f, stringify!(CommercialCapModel)),
             TableName::CommercialCentrifugeLot => {
                 write!(f, stringify!(CommercialCentrifugeLot))
             }
@@ -345,9 +346,6 @@ impl core::fmt::Display for TableName {
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
             TableName::SampleState => write!(f, stringify!(SampleState)),
-            TableName::SharedProcedureTemplateAssetModel => {
-                write!(f, stringify!(SharedProcedureTemplateAssetModel))
-            }
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),

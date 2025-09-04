@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainer;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .volumetric_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes::VolumetricContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute::VolumetricContainerModel,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerExtensionAttributes::Container(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerExtensionAttribute::Container(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute::Id,
                     ),
                 ))
             })?;

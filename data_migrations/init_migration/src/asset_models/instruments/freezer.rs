@@ -1,6 +1,6 @@
 //! Submodule to initialize the freezer in the database.
 
-use core_structures::{FreezerModel, User, tables::insertables::AssetModelBuildable};
+use core_structures::{FreezerModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -27,8 +27,8 @@ pub(crate) fn freezer(user: &User, conn: &mut PgConnection) -> anyhow::Result<Fr
     }
 
     Ok(FreezerModel::new()
-        .name(name.to_owned())?
-        .description("A Freezer -80°C used for long-term storage of samples or freezing of samples prior to freeze-drying steps".to_owned())?
+        .name(name)?
+        .description("A Freezer -80°C used for long-term storage of samples or freezing of samples prior to freeze-drying steps")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }

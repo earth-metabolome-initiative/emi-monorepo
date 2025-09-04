@@ -1,6 +1,6 @@
 use core_structures::{
     ReagentModel, User,
-    tables::insertables::{AssetModelBuildable, ReagentModelBuildable},
+    tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -27,8 +27,8 @@ pub(crate) fn formic_acid(user: &User, conn: &mut PgConnection) -> anyhow::Resul
     }
 
     Ok(ReagentModel::new()
-        .name(name.to_owned())?
-        .description("Formic acid, pure".to_owned())?
+        .name(name)?
+        .description("Formic acid, pure")?
         .purity(98.0)?
         .cas_code("64-18-6")?
         .molecular_formula("HCOOH")?

@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -84,7 +84,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_pipette_lots_id_fkey.is_complete() {
@@ -92,9 +92,9 @@ where
                 .commercial_pipette_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -103,9 +103,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttributes::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttribute::PipetteModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -115,9 +115,9 @@ where
                 .commercial_pipette_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttributes::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttribute::PipetteModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -126,9 +126,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;

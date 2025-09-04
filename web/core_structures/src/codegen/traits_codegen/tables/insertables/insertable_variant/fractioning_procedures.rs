@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::FractioningProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
@@ -54,7 +54,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -92,7 +92,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::foreign_procedure_template(
                     self,
                     fractioning_procedure_templates.foreign_procedure_template,
                 )?;
@@ -103,7 +103,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -114,7 +114,7 @@ where
                 weighed_with,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureBuildable>::weighed_with_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::weighed_with_model(
                     self,
                     assets.model,
                 )?;
@@ -124,58 +124,58 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let fragment_container = self
             .fragment_container
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::FragmentContainer,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::FragmentContainer,
                 ),
             )?;
         let fragment_placed_into = self
             .fragment_placed_into
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::FragmentPlacedInto,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::FragmentPlacedInto,
                 ),
             )?;
         let kilograms = self
             .kilograms
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::Kilograms,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::Kilograms,
                 ),
             )?;
         let weighed_with_model = self
             .weighed_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::WeighedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::WeighedWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

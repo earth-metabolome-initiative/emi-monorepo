@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialVolumeMeasuringDeviceModelForeignKeys {
-    pub parent_model: Option<
+    pub volume_measuring_device_model: Option<
         crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
     >,
     pub commercial_volume_measuring_device_models_id_fkey: Option<
@@ -23,7 +23,7 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDeviceModel(
-                        self.parent_model,
+                        self.volume_measuring_device_model,
                     ),
                 ),
             );
@@ -45,7 +45,7 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.parent_model.is_some()
+        foreign_keys.volume_measuring_device_model.is_some()
             && foreign_keys.commercial_volume_measuring_device_models_id_fkey.is_some()
             && foreign_keys.commercial_volume_measuring_device_models_id_fkey1.is_some()
     }
@@ -87,8 +87,12 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.parent_model == volume_measuring_device_models.id {
-                    foreign_keys.parent_model = Some(volume_measuring_device_models);
+                if self.volume_measuring_device_model
+                    == volume_measuring_device_models.id
+                {
+                    foreign_keys.volume_measuring_device_model = Some(
+                        volume_measuring_device_models,
+                    );
                     updated = true;
                 }
                 if self.id == volume_measuring_device_models.id {
@@ -104,8 +108,10 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.parent_model == volume_measuring_device_models.id {
-                    foreign_keys.parent_model = None;
+                if self.volume_measuring_device_model
+                    == volume_measuring_device_models.id
+                {
+                    foreign_keys.volume_measuring_device_model = None;
                     updated = true;
                 }
                 if self.id == volume_measuring_device_models.id {

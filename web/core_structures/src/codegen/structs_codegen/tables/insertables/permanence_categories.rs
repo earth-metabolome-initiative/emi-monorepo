@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePermanenceCategoryAttributes {
+pub enum InsertablePermanenceCategoryAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertablePermanenceCategoryAttributes {
+impl core::str::FromStr for InsertablePermanenceCategoryAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertablePermanenceCategoryAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertablePermanenceCategoryAttributes {
+impl core::fmt::Display for InsertablePermanenceCategoryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -92,7 +92,7 @@ pub struct InsertablePermanenceCategoryBuilder {
 }
 /// Trait defining setters for attributes of an instance of `PermanenceCategory`
 /// or descendant tables.
-pub trait PermanenceCategoryBuildable: Sized {
+pub trait PermanenceCategorySettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.permanence_categories.name` column.
@@ -196,8 +196,9 @@ pub trait PermanenceCategoryBuildable: Sized {
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl PermanenceCategoryBuildable for InsertablePermanenceCategoryBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttributes;
+impl PermanenceCategorySettable for InsertablePermanenceCategoryBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute;
     /// Sets the value of the `public.permanence_categories.name` column.
     fn name<N>(
         mut self,
@@ -209,7 +210,7 @@ impl PermanenceCategoryBuildable for InsertablePermanenceCategoryBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePermanenceCategoryAttributes::Name)
+                .rename_field(InsertablePermanenceCategoryAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -225,7 +226,7 @@ impl PermanenceCategoryBuildable for InsertablePermanenceCategoryBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePermanenceCategoryAttributes::Description)
+                .rename_field(InsertablePermanenceCategoryAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -241,7 +242,7 @@ impl PermanenceCategoryBuildable for InsertablePermanenceCategoryBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePermanenceCategoryAttributes::Icon)
+                .rename_field(InsertablePermanenceCategoryAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -269,11 +270,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
         Error = web_common_traits::database::InsertError<
-            InsertablePermanenceCategoryAttributes,
+            InsertablePermanenceCategoryAttribute,
         >,
     >,
 {
-    type Attributes = InsertablePermanenceCategoryAttributes;
+    type Attributes = InsertablePermanenceCategoryAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.description.is_some() && self.icon.is_some()
             && self.color_id.is_some()

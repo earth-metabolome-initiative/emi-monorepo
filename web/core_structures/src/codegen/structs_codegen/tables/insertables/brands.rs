@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBrandAttributes {
+pub enum InsertableBrandAttribute {
     Id,
     Name,
     CreatedBy,
@@ -8,7 +8,7 @@ pub enum InsertableBrandAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableBrandAttributes {
+impl core::str::FromStr for InsertableBrandAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -26,7 +26,7 @@ impl core::str::FromStr for InsertableBrandAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableBrandAttributes {
+impl core::fmt::Display for InsertableBrandAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -139,7 +139,7 @@ impl Default for InsertableBrandBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Brand` or
 /// descendant tables.
-pub trait BrandBuildable: Sized {
+pub trait BrandSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.brands.name` column.
@@ -266,9 +266,9 @@ pub trait BrandBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl BrandBuildable for InsertableBrandBuilder {
+impl BrandSettable for InsertableBrandBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute;
     /// Sets the value of the `public.brands.name` column.
     fn name<N>(
         mut self,
@@ -280,13 +280,13 @@ impl BrandBuildable for InsertableBrandBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBrandAttributes::Name)
+                .rename_field(InsertableBrandAttribute::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::Name,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::Name,
                     )
             })?;
         self.name = Some(name);
@@ -329,15 +329,15 @@ impl BrandBuildable for InsertableBrandBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBrandAttributes::CreatedAt)
+                .rename_field(InsertableBrandAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -364,15 +364,15 @@ impl BrandBuildable for InsertableBrandBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBrandAttributes::UpdatedAt)
+                .rename_field(InsertableBrandAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -392,10 +392,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::brands::Brand,
-            Error = web_common_traits::database::InsertError<InsertableBrandAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableBrandAttribute>,
         >,
 {
-    type Attributes = InsertableBrandAttributes;
+    type Attributes = InsertableBrandAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.created_by.is_some()

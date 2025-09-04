@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::users::User;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .first_name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::FirstName,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::FirstName,
                 ),
             )?;
         let last_name = self
             .last_name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::LastName,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::LastName,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::CreatedAt,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

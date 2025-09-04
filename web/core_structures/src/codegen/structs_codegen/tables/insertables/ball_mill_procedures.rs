@@ -1,28 +1,28 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillProcedureExtensionAttributes {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes),
+pub enum InsertableBallMillProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
 }
-impl core::fmt::Display for InsertableBallMillProcedureExtensionAttributes {
+impl core::fmt::Display for InsertableBallMillProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
-    for InsertableBallMillProcedureExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
+    for InsertableBallMillProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillProcedureAttributes {
-    Extension(InsertableBallMillProcedureExtensionAttributes),
+pub enum InsertableBallMillProcedureAttribute {
+    Extension(InsertableBallMillProcedureExtensionAttribute),
     Procedure,
     ProcedureTemplate,
     ForeignProcedureTemplate,
@@ -32,7 +32,7 @@ pub enum InsertableBallMillProcedureAttributes {
     MilledWith,
     MilledContainer,
 }
-impl core::str::FromStr for InsertableBallMillProcedureAttributes {
+impl core::str::FromStr for InsertableBallMillProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -54,7 +54,7 @@ impl core::str::FromStr for InsertableBallMillProcedureAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableBallMillProcedureAttributes {
+impl core::fmt::Display for InsertableBallMillProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -220,29 +220,29 @@ impl InsertableBallMillProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+            crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::beads_models::BeadsModel::table(),
+                crate::codegen::structs_codegen::tables::bead_models::BeadModel::table(),
                 self.bead_model,
             ),
             conn,
@@ -488,7 +488,7 @@ pub struct InsertableBallMillProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of `BallMillProcedure`
 /// or descendant tables.
-pub trait BallMillProcedureBuildable: Sized {
+pub trait BallMillProcedureSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.ball_mill_procedures.procedure_template`
@@ -655,11 +655,11 @@ pub trait BallMillProcedureBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> BallMillProcedureBuildable for InsertableBallMillProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes;
+> BallMillProcedureSettable for InsertableBallMillProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute;
     ///Sets the value of the `public.ball_mill_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -673,10 +673,10 @@ impl<
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v3 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "foreign_procedure_template"}
-    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
     ///class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "foreign_procedure_template"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v4 ["`procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template"}
@@ -690,7 +690,7 @@ impl<
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
@@ -707,8 +707,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -728,8 +728,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -795,26 +795,62 @@ impl<
     }
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableBallMillProcedureBuilder<Procedure>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::BallMillProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -852,10 +888,7 @@ where
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as BallMillProcedureBuildable>::procedure_template(
-            self,
-            procedure_template,
-        )
+        <Self as BallMillProcedureSettable>::procedure_template(self, procedure_template)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -863,7 +896,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
             )
@@ -887,7 +920,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                 self.procedure,
                 created_at,
             )
@@ -905,7 +938,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,
             )
@@ -929,7 +962,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
             )
@@ -969,11 +1002,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
-            Error = web_common_traits::database::InsertError<InsertableBallMillProcedureAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableBallMillProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableBallMillProcedureAttributes;
+    type Attributes = InsertableBallMillProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()

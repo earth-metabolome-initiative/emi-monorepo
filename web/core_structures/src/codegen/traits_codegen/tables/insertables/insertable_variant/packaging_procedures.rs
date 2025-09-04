@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,23 +78,23 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let packaged_with_model = self
             .packaged_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttributes::PackagedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute::PackagedWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::brands::Brand;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBrand;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,35 +46,35 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::Name,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBrandAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

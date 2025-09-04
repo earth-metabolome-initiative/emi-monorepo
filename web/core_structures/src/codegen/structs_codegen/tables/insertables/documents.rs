@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDocumentAttributes {
+pub enum InsertableDocumentAttribute {
     Id,
     MimeType,
     CreatedBy,
@@ -8,7 +8,7 @@ pub enum InsertableDocumentAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableDocumentAttributes {
+impl core::str::FromStr for InsertableDocumentAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -28,7 +28,7 @@ impl core::str::FromStr for InsertableDocumentAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableDocumentAttributes {
+impl core::fmt::Display for InsertableDocumentAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -144,7 +144,7 @@ impl Default for InsertableDocumentBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Document` or
 /// descendant tables.
-pub trait DocumentBuildable: Sized {
+pub trait DocumentSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.documents.id` column.
@@ -294,9 +294,9 @@ pub trait DocumentBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl DocumentBuildable for InsertableDocumentBuilder {
+impl DocumentSettable for InsertableDocumentBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute;
     /// Sets the value of the `public.documents.id` column.
     fn id(
         mut self,
@@ -304,7 +304,7 @@ impl DocumentBuildable for InsertableDocumentBuilder {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableDocumentAttributes::Id)
+                .rename_field(InsertableDocumentAttribute::Id)
         })?;
         self.id = Some(id);
         Ok(self)
@@ -320,7 +320,7 @@ impl DocumentBuildable for InsertableDocumentBuilder {
     {
         let mime_type = mime_type.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableDocumentAttributes::MimeType)
+                .rename_field(InsertableDocumentAttribute::MimeType)
         })?;
         self.mime_type = Some(mime_type);
         Ok(self)
@@ -362,15 +362,15 @@ impl DocumentBuildable for InsertableDocumentBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableDocumentAttributes::CreatedAt)
+                .rename_field(InsertableDocumentAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -397,15 +397,15 @@ impl DocumentBuildable for InsertableDocumentBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableDocumentAttributes::UpdatedAt)
+                .rename_field(InsertableDocumentAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -426,10 +426,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::documents::Document,
-            Error = web_common_traits::database::InsertError<InsertableDocumentAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableDocumentAttribute>,
         >,
 {
-    type Attributes = InsertableDocumentAttributes;
+    type Attributes = InsertableDocumentAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some()
             && self.mime_type.is_some()

@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelExtensionAttributes::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

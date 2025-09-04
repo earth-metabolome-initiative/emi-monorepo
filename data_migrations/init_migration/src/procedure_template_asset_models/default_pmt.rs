@@ -4,7 +4,7 @@
 use core_structures::{
     AssetModel, ProcedureTemplateAssetModel, User,
     tables::insertables::{
-        InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelBuildable,
+        InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelSettable,
     },
 };
 use web_common_traits::database::Insertable;
@@ -28,13 +28,8 @@ where
     T: AsRef<AssetModel>,
 {
     let asset_model = asset_model.as_ref();
-
-    let Some(name) = &asset_model.name else {
-        return Err(anyhow::anyhow!("AssetModel must have a name, provided: {:?}", asset_model));
-    };
-
     Ok(ProcedureTemplateAssetModel::new()
-        .name(name)?
+        .name(&asset_model.name)?
         .asset_model(asset_model.id)?
         .created_by(user.id)?)
 }

@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
@@ -54,7 +54,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -92,7 +92,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::foreign_procedure_template(
                     self,
                     pouring_procedure_templates.foreign_procedure_template,
                 )?;
@@ -103,7 +103,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -114,7 +114,7 @@ where
                 measured_with,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureBuildable>::measured_with_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::measured_with_model(
                     self,
                     assets.model,
                 )?;
@@ -124,51 +124,51 @@ where
             .poured_from
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::PouredFrom,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::PouredFrom,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let measured_with_model = self
             .measured_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::MeasuredWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::MeasuredWithModel,
                 ),
             )?;
         let poured_into = self
             .poured_into
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::PouredInto,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::PouredInto,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

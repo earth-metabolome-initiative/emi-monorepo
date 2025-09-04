@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
         C,
@@ -51,7 +51,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -89,7 +89,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::foreign_procedure_template(
                     self,
                     aliquoting_procedure_templates.foreign_procedure_template,
                 )?;
@@ -100,7 +100,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -110,51 +110,51 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let aliquoted_with = self
             .aliquoted_with
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::AliquotedWith,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::AliquotedWith,
                 ),
             )?;
         let pipette_tip_model = self
             .pipette_tip_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::PipetteTipModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::PipetteTipModel,
                 ),
             )?;
         let aliquoted_from = self
             .aliquoted_from
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::AliquotedFrom,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::AliquotedFrom,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

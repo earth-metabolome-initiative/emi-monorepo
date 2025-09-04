@@ -1,7 +1,7 @@
 //! Submodule creating the instrument commercial product model for the Ball Mill
 //! instrument.
 
-use core_structures::{PhoneModel, User, tables::insertables::AssetModelBuildable};
+use core_structures::{PhoneModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -28,10 +28,9 @@ pub(crate) fn phone(user: &User, conn: &mut PgConnection) -> anyhow::Result<Phon
     }
 
     Ok(PhoneModel::new()
-        .name(name.to_owned())?
+        .name(name)?
         .description(
-            "A phone (smartphone) which may be used to take pictures or as a positioning device."
-                .to_owned(),
+            "A phone (smartphone) which may be used to take pictures or as a positioning device.",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)

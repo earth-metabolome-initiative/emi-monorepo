@@ -39,7 +39,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -75,30 +75,30 @@ where
             .purity
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes::Purity,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::Purity,
                 ),
             )?;
         let cas_code = self
             .cas_code
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes::CasCode,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::CasCode,
                 ),
             )?;
         let molecular_formula = self
             .molecular_formula
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes::MolecularFormula,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::MolecularFormula,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelExtensionAttributes::AssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelExtensionAttribute::AssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Id,
                     ),
                 ))
             })?;

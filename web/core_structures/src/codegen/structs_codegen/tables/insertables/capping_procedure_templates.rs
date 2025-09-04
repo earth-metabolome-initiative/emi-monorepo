@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCappingProcedureTemplateExtensionAttributes {
+pub enum InsertableCappingProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCappingProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableCappingProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,30 +13,29 @@ impl core::fmt::Display for InsertableCappingProcedureTemplateExtensionAttribute
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableCappingProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableCappingProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCappingProcedureTemplateAttributes {
-    Extension(InsertableCappingProcedureTemplateExtensionAttributes),
+pub enum InsertableCappingProcedureTemplateAttribute {
+    Extension(InsertableCappingProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     ContainerModel,
     ForeignProcedureTemplate,
     ProcedureTemplateContainerModel,
     CappedWithModel,
     ProcedureTemplateCappedWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
 }
-impl core::str::FromStr for InsertableCappingProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableCappingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -49,7 +48,7 @@ impl core::str::FromStr for InsertableCappingProcedureTemplateAttributes {
             "ProcedureTemplateCappedWithModel" => {
                 Ok(
                     Self::ProcedureTemplateCappedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -62,7 +61,7 @@ impl core::str::FromStr for InsertableCappingProcedureTemplateAttributes {
             "procedure_template_capped_with_model" => {
                 Ok(
                     Self::ProcedureTemplateCappedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -76,7 +75,7 @@ impl core::str::FromStr for InsertableCappingProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCappingProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableCappingProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -240,29 +239,29 @@ impl InsertableCappingProcedureTemplate {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+            crate::codegen::structs_codegen::tables::cap_models::CapModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::caps_models::CapsModel::table(),
+                crate::codegen::structs_codegen::tables::cap_models::CapModel::table(),
                 self.capped_with_model,
             ),
             conn,
@@ -348,7 +347,7 @@ pub struct InsertableCappingProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CappingProcedureTemplate` or descendant tables.
-pub trait CappingProcedureTemplateBuildable: Sized {
+pub trait CappingProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -472,10 +471,10 @@ pub trait CappingProcedureTemplateBuildable: Sized {
         procedure_template_capped_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> CappingProcedureTemplateBuildable
+impl<ProcedureTemplate> CappingProcedureTemplateSettable
     for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.capping_procedure_templates.container_model` column.
     fn container_model(
@@ -539,10 +538,10 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`capping_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "capped_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -550,15 +549,16 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn capped_with_model(
         mut self,
         capped_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_capped_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_capped_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_capped_with_model,
                 capped_with_model,
             )
@@ -592,12 +592,13 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
@@ -618,7 +619,7 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_capped_with_model.asset_model {
             self.capped_with_model = Some(asset_model);
         } else if let Some(local) = self.capped_with_model {
-            procedure_template_capped_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_capped_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_capped_with_model,
                     local,
                 )
@@ -633,12 +634,12 @@ impl<ProcedureTemplate> CappingProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -649,7 +650,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -671,7 +672,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -693,7 +694,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -715,7 +716,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -733,7 +734,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -757,7 +758,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -775,7 +776,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -799,7 +800,7 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -840,7 +841,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableCappingProcedureTemplateAttributes,
+            InsertableCappingProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -851,7 +852,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableCappingProcedureTemplateAttributes;
+    type Attributes = InsertableCappingProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.container_model.is_some()
             && self.foreign_procedure_template.is_some()

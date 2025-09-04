@@ -14,7 +14,7 @@
 )]
 pub struct CommercialPositioningDeviceModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub positioning_device_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialPositioningDeviceModel {
     const TABLE_NAME: &'static str = "commercial_positioning_device_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialPositioningDeviceModel {
     }
 }
 impl CommercialPositioningDeviceModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn positioning_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -91,7 +91,7 @@ impl CommercialPositioningDeviceModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::table(),
-                self.parent_model,
+                self.positioning_device_model,
             ),
             conn,
         )
@@ -165,22 +165,25 @@ impl CommercialPositioningDeviceModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_positioning_device_model(
+        positioning_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_positioning_device_models::commercial_positioning_device_models;
         Self::table()
-            .filter(commercial_positioning_device_models::parent_model.eq(parent_model))
+            .filter(
+                commercial_positioning_device_models::positioning_device_model
+                    .eq(positioning_device_model),
+            )
             .order_by(commercial_positioning_device_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_positioning_device_model(
         id: &i32,
-        parent_model: &i32,
+        positioning_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,9 +193,10 @@ impl CommercialPositioningDeviceModel {
         use crate::codegen::diesel_codegen::tables::commercial_positioning_device_models::commercial_positioning_device_models;
         Self::table()
             .filter(
-                commercial_positioning_device_models::id
-                    .eq(id)
-                    .and(commercial_positioning_device_models::parent_model.eq(parent_model)),
+                commercial_positioning_device_models::id.eq(id).and(
+                    commercial_positioning_device_models::positioning_device_model
+                        .eq(positioning_device_model),
+                ),
             )
             .order_by(commercial_positioning_device_models::id.asc())
             .load::<Self>(conn)
@@ -241,6 +245,30 @@ impl CommercialPositioningDeviceModel {
                     .on(commercial_positioning_device_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_positioning_device_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_positioning_device_models::commercial_positioning_device_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_positioning_device_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_positioning_device_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

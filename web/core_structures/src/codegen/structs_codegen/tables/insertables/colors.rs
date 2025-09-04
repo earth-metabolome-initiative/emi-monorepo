@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableColorAttributes {
+pub enum InsertableColorAttribute {
     Name,
     HexadecimalValue,
     Description,
     Id,
 }
-impl core::str::FromStr for InsertableColorAttributes {
+impl core::str::FromStr for InsertableColorAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -20,7 +20,7 @@ impl core::str::FromStr for InsertableColorAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableColorAttributes {
+impl core::fmt::Display for InsertableColorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -51,7 +51,7 @@ pub struct InsertableColorBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Color` or
 /// descendant tables.
-pub trait ColorBuildable: Sized {
+pub trait ColorSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.colors.name` column.
@@ -132,9 +132,9 @@ pub trait ColorBuildable: Sized {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl ColorBuildable for InsertableColorBuilder {
+impl ColorSettable for InsertableColorBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableColorAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableColorAttribute;
     /// Sets the value of the `public.colors.name` column.
     fn name<N>(
         mut self,
@@ -146,7 +146,7 @@ impl ColorBuildable for InsertableColorBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableColorAttributes::Name)
+                .rename_field(InsertableColorAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -162,7 +162,7 @@ impl ColorBuildable for InsertableColorBuilder {
     {
         let hexadecimal_value = hexadecimal_value.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableColorAttributes::HexadecimalValue)
+                .rename_field(InsertableColorAttribute::HexadecimalValue)
         })?;
         self.hexadecimal_value = Some(hexadecimal_value);
         Ok(self)
@@ -178,7 +178,7 @@ impl ColorBuildable for InsertableColorBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableColorAttributes::Description)
+                .rename_field(InsertableColorAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -196,10 +196,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::colors::Color,
-            Error = web_common_traits::database::InsertError<InsertableColorAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableColorAttribute>,
         >,
 {
-    type Attributes = InsertableColorAttributes;
+    type Attributes = InsertableColorAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.hexadecimal_value.is_some() && self.description.is_some()
     }

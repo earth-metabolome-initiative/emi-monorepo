@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcedureAssetAttributes {
+pub enum InsertableProcedureAssetAttribute {
     Procedure,
     ProcedureTemplate,
     AssetModel,
@@ -10,7 +10,7 @@ pub enum InsertableProcedureAssetAttributes {
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableProcedureAssetAttributes {
+impl core::str::FromStr for InsertableProcedureAssetAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -34,7 +34,7 @@ impl core::str::FromStr for InsertableProcedureAssetAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableProcedureAssetAttributes {
+impl core::fmt::Display for InsertableProcedureAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure => write!(f, "procedure"),
@@ -357,7 +357,7 @@ impl Default for InsertableProcedureAssetBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ProcedureAsset` or
 /// descendant tables.
-pub trait ProcedureAssetBuildable: Sized {
+pub trait ProcedureAssetSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedure_assets.procedure` column.
@@ -546,9 +546,9 @@ pub trait ProcedureAssetBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
+impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute;
     /// Sets the value of the `public.procedure_assets.procedure` column.
     fn procedure(
         mut self,
@@ -619,7 +619,7 @@ impl ProcedureAssetBuildable for InsertableProcedureAssetBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttributes::CreatedAt)
+                .rename_field(InsertableProcedureAssetAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -637,10 +637,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            Error = web_common_traits::database::InsertError<InsertableProcedureAssetAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableProcedureAssetAttribute>,
         >,
 {
-    type Attributes = InsertableProcedureAssetAttributes;
+    type Attributes = InsertableProcedureAssetAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_some()
             && self.procedure_template.is_some()

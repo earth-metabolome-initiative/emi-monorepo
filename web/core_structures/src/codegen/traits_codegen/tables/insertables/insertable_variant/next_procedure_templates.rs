@@ -49,7 +49,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -113,35 +113,35 @@ where
             .parent
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::Parent,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Parent,
                 ),
             )?;
         let current = self
             .current
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::Current,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Current,
                 ),
             )?;
         let successor_id = self
             .successor_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::SuccessorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::SuccessorId,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

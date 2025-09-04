@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -84,7 +84,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_freezer_lots_id_fkey.is_complete() {
@@ -92,9 +92,9 @@ where
                 .commercial_freezer_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -103,9 +103,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttributes::FreezerModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttribute::FreezerModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -115,9 +115,9 @@ where
                 .commercial_freezer_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttributes::FreezerModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttribute::FreezerModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -126,9 +126,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;

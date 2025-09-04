@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,23 +78,23 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let registered_asset = self
             .registered_asset
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttributes::RegisteredAsset,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttribute::RegisteredAsset,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

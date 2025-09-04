@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -60,7 +60,7 @@ where
         self.set_most_concrete_table("commercial_camera_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.camera_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -86,11 +86,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let camera_model = self
+            .camera_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::CameraModel,
                 ),
             )?;
         let id = if self.commercial_camera_models_id_fkey.is_complete() {
@@ -98,9 +98,9 @@ where
                 .commercial_camera_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttributes::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -109,9 +109,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -121,9 +121,9 @@ where
                 .commercial_camera_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -132,9 +132,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttributes::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -142,7 +142,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            camera_model,
         })
     }
 }

@@ -1,28 +1,28 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureExtensionAttributes {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes),
+pub enum InsertableStorageProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
 }
-impl core::fmt::Display for InsertableStorageProcedureExtensionAttributes {
+impl core::fmt::Display for InsertableStorageProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
-    for InsertableStorageProcedureExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
+    for InsertableStorageProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureAttributes {
-    Extension(InsertableStorageProcedureExtensionAttributes),
+pub enum InsertableStorageProcedureAttribute {
+    Extension(InsertableStorageProcedureExtensionAttribute),
     Procedure,
     ProcedureTemplate,
     ForeignProcedureTemplate,
@@ -30,7 +30,7 @@ pub enum InsertableStorageProcedureAttributes {
     StoredAsset,
     StoredWith,
 }
-impl core::str::FromStr for InsertableStorageProcedureAttributes {
+impl core::str::FromStr for InsertableStorageProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -48,7 +48,7 @@ impl core::str::FromStr for InsertableStorageProcedureAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableStorageProcedureAttributes {
+impl core::fmt::Display for InsertableStorageProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -78,6 +78,54 @@ pub struct InsertableStorageProcedure {
     pub(crate) stored_with: ::rosetta_uuid::Uuid,
 }
 impl InsertableStorageProcedure {
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_foreign_procedure_stored_asset_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.foreign_procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.stored_asset),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.stored_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -270,54 +318,6 @@ impl InsertableStorageProcedure {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_foreign_procedure_stored_asset_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.foreign_procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.stored_asset),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_with_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.stored_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -333,7 +333,7 @@ pub struct InsertableStorageProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of `StorageProcedure`
 /// or descendant tables.
-pub trait StorageProcedureBuildable: Sized {
+pub trait StorageProcedureSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.storage_procedures.procedure_template`
@@ -454,11 +454,11 @@ pub trait StorageProcedureBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> StorageProcedureBuildable for InsertableStorageProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes;
+> StorageProcedureSettable for InsertableStorageProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute;
     ///Sets the value of the `public.storage_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -476,10 +476,10 @@ impl<
     ///class v0 directly-involved-column
     ///end
     ///subgraph v4 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "foreign_procedure_template"}
-    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template"}
     ///class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "foreign_procedure_template"}
+    ///class v1 directly-involved-column
     ///end
     ///v2 --->|"`ancestral same as`"| v0
     ///v2 -.->|"`foreign defines`"| v1
@@ -489,7 +489,7 @@ impl<
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
@@ -506,8 +506,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -527,8 +527,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -578,26 +578,62 @@ impl<
     }
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableStorageProcedureBuilder<Procedure>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -635,7 +671,7 @@ where
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as StorageProcedureBuildable>::procedure_template(self, procedure_template)
+        <Self as StorageProcedureSettable>::procedure_template(self, procedure_template)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -643,7 +679,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
             )
@@ -667,7 +703,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                 self.procedure,
                 created_at,
             )
@@ -685,7 +721,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,
             )
@@ -709,7 +745,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
             )
@@ -749,11 +785,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
-            Error = web_common_traits::database::InsertError<InsertableStorageProcedureAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableStorageProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableStorageProcedureAttributes;
+    type Attributes = InsertableStorageProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()

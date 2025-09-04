@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSupernatantProcedureTemplateExtensionAttributes {
+pub enum InsertableSupernatantProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableSupernatantProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableSupernatantProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,20 +13,19 @@ impl core::fmt::Display for InsertableSupernatantProcedureTemplateExtensionAttri
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableSupernatantProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableSupernatantProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSupernatantProcedureTemplateAttributes {
-    Extension(InsertableSupernatantProcedureTemplateExtensionAttributes),
+pub enum InsertableSupernatantProcedureTemplateAttribute {
+    Extension(InsertableSupernatantProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Liters,
     StratifiedSourceModel,
@@ -34,18 +33,18 @@ pub enum InsertableSupernatantProcedureTemplateAttributes {
     ProcedureTemplateStratifiedSourceModel,
     SupernatantDestinationModel,
     ProcedureTemplateSupernatantDestinationModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     TransferredWithModel,
     ProcedureTemplateTransferredWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     PipetteTipModel,
     ProcedureTemplatePipetteTipModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
 }
-impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -59,7 +58,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "ProcedureTemplateSupernatantDestinationModel" => {
                 Ok(
                     Self::ProcedureTemplateSupernatantDestinationModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -67,7 +66,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "ProcedureTemplateTransferredWithModel" => {
                 Ok(
                     Self::ProcedureTemplateTransferredWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -75,7 +74,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "ProcedureTemplatePipetteTipModel" => {
                 Ok(
                     Self::ProcedureTemplatePipetteTipModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -89,7 +88,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "procedure_template_supernatant_destination_model" => {
                 Ok(
                     Self::ProcedureTemplateSupernatantDestinationModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -97,7 +96,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "procedure_template_transferred_with_model" => {
                 Ok(
                     Self::ProcedureTemplateTransferredWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -105,7 +104,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
             "procedure_template_pipette_tip_model" => {
                 Ok(
                     Self::ProcedureTemplatePipetteTipModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -119,7 +118,7 @@ impl core::str::FromStr for InsertableSupernatantProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableSupernatantProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableSupernatantProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -543,7 +542,7 @@ pub struct InsertableSupernatantProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `SupernatantProcedureTemplate` or descendant tables.
-pub trait SupernatantProcedureTemplateBuildable: Sized {
+pub trait SupernatantProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.supernatant_procedure_templates.liters`
@@ -794,10 +793,10 @@ pub trait SupernatantProcedureTemplateBuildable: Sized {
         procedure_template_pipette_tip_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
+impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttribute;
     /// Sets the value of the `public.supernatant_procedure_templates.liters`
     /// column.
     fn liters<L>(
@@ -810,13 +809,13 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     {
         let liters = liters.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSupernatantProcedureTemplateAttributes::Liters)
+                .rename_field(InsertableSupernatantProcedureTemplateAttribute::Liters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttributes::Liters,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttribute::Liters,
                     )
             })?;
         self.liters = Some(liters);
@@ -900,6 +899,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// class v2 column-of-interest
     /// end
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
@@ -907,7 +907,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         mut self,
         supernatant_destination_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_supernatant_destination_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_supernatant_destination_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_supernatant_destination_model,
                 supernatant_destination_model,
             )
@@ -949,6 +949,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
@@ -972,7 +973,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         {
             self.supernatant_destination_model = Some(asset_model);
         } else if let Some(local) = self.supernatant_destination_model {
-            procedure_template_supernatant_destination_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_supernatant_destination_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_supernatant_destination_model,
                     local,
                 )
@@ -1016,13 +1017,14 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// end
     /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn transferred_with_model(
         mut self,
         transferred_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_transferred_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_transferred_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_transferred_with_model,
                 transferred_with_model,
             )
@@ -1050,19 +1052,20 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "transferred_with_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "transferred_with_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_transferred_with_model(
@@ -1082,7 +1085,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_transferred_with_model.asset_model {
             self.transferred_with_model = Some(asset_model);
         } else if let Some(local) = self.transferred_with_model {
-            procedure_template_transferred_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_transferred_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_transferred_with_model,
                     local,
                 )
@@ -1118,20 +1121,21 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_pipette_tip_model,
                 pipette_tip_model,
             )
@@ -1159,10 +1163,10 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
@@ -1171,6 +1175,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     /// class v2 column-of-interest
     /// end
     /// v1 --->|"`associated same as`"| v0
+    /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
@@ -1191,7 +1196,7 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_pipette_tip_model.asset_model {
             self.pipette_tip_model = Some(asset_model);
         } else if let Some(local) = self.pipette_tip_model {
-            procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_pipette_tip_model,
                     local,
                 )
@@ -1206,12 +1211,12 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1222,7 +1227,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -1244,7 +1249,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -1266,7 +1271,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -1288,7 +1293,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -1306,7 +1311,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -1330,7 +1335,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -1348,7 +1353,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -1372,7 +1377,7 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -1413,7 +1418,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableSupernatantProcedureTemplateAttributes,
+            InsertableSupernatantProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -1424,7 +1429,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableSupernatantProcedureTemplateAttributes;
+    type Attributes = InsertableSupernatantProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.liters.is_some()
             && self.stratified_source_model.is_some()

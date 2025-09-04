@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDevice;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceExtensionAttributes::PhysicalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceExtensionAttribute::PhysicalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute::Id,
                     ),
                 ))
             })?;

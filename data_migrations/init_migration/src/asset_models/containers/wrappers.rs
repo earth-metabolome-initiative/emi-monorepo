@@ -1,6 +1,6 @@
 //! Submodule to initialize the
 
-use core_structures::{ContainerModel, User, tables::insertables::AssetModelBuildable};
+use core_structures::{PackagingModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -22,18 +22,17 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 pub(crate) fn coffee_filter_wrapper(
     user: &User,
     conn: &mut PgConnection,
-) -> anyhow::Result<ContainerModel> {
+) -> anyhow::Result<PackagingModel> {
     let name = "Coffee Filter Wrapper";
 
-    if let Some(existing_wrapper) = ContainerModel::from_name(name, conn).optional()? {
+    if let Some(existing_wrapper) = PackagingModel::from_name(name, conn).optional()? {
         return Ok(existing_wrapper);
     }
 
-    Ok(ContainerModel::new()
-        .name(name.to_owned())?
+    Ok(PackagingModel::new()
+        .name(name)?
         .description(
-            "Coffee filters used to wrap sample in the field prior to storage in Falcon tubes"
-                .to_owned(),
+            "Coffee filters used to wrap sample in the field prior to storage in Falcon tubes",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)

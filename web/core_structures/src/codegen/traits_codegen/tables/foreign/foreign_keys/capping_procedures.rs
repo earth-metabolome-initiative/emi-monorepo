@@ -17,7 +17,7 @@ pub struct CappingProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
     pub capped_with_model: Option<
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
     >,
     pub capping_procedures_procedure_capped_with_model_fkey: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
@@ -56,7 +56,7 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapsModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
                 self.capped_with_model,
             ),
         ));
@@ -85,6 +85,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::CapModel(cap_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.capped_with_model == cap_models.id {
+                    foreign_keys.capped_with_model = Some(cap_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::CapModel(cap_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.capped_with_model == cap_models.id {
+                    foreign_keys.capped_with_model = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::CappingProcedureTemplate(
                     capping_procedure_templates,
                 ),
@@ -105,26 +125,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure_template == capping_procedure_templates.procedure_template {
                     foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::CapsModel(caps_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.capped_with_model == caps_models.id {
-                    foreign_keys.capped_with_model = Some(caps_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::CapsModel(caps_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.capped_with_model == caps_models.id {
-                    foreign_keys.capped_with_model = None;
                     updated = true;
                 }
             }

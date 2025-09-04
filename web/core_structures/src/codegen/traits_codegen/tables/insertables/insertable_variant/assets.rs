@@ -35,7 +35,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::assets::Asset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAsset;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -71,49 +71,49 @@ where
             .id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Id,
                 ),
             )?;
         let most_concrete_table = self
             .most_concrete_table
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::MostConcreteTable,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::MostConcreteTable,
                 ),
             )?;
         let model = self
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Model,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

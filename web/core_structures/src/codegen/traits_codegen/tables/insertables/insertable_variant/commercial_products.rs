@@ -27,7 +27,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProduct;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -56,16 +56,16 @@ where
             .brand_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::BrandId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::BrandId,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductExtensionAttributes::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

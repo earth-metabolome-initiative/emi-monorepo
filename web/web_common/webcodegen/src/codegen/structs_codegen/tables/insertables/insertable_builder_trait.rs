@@ -19,8 +19,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the name of the variant builder cannot be retrieved.
-    pub fn builder_trait_name(&self) -> Result<String, WebCodeGenError> {
-        Ok(format!("{}Buildable", self.struct_name()?))
+    pub fn setter_trait_name(&self) -> Result<String, WebCodeGenError> {
+        Ok(format!("{}Settable", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the variant builder
@@ -29,8 +29,8 @@ impl Table {
     /// # Errors
     ///
     /// * If the name of the variant builder cannot be retrieved.
-    pub fn builder_trait_ident(&self) -> Result<Ident, WebCodeGenError> {
-        Ok(Ident::new(&self.builder_trait_name()?, proc_macro2::Span::call_site()))
+    pub fn setter_trait_ident(&self) -> Result<Ident, WebCodeGenError> {
+        Ok(Ident::new(&self.setter_trait_name()?, proc_macro2::Span::call_site()))
     }
 
     /// Returns the [`Type`](syn::Type) for the variant builder trait.
@@ -38,10 +38,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the name of the variant builder cannot be retrieved.
-    pub fn builder_trait_ty(&self) -> Result<syn::Type, WebCodeGenError> {
+    pub fn setter_trait_ty(&self) -> Result<syn::Type, WebCodeGenError> {
         Ok(syn::parse_str(&format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.builder_trait_name()?
+            self.setter_trait_name()?
         ))?)
     }
 
@@ -122,7 +122,7 @@ impl Table {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
-        let trait_ident = self.builder_trait_ident()?;
+        let trait_ident = self.setter_trait_ident()?;
         let mut methods = Vec::new();
 
         for insertable_column in self.insertable_columns(conn, false)? {

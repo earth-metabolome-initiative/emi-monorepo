@@ -15,7 +15,9 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(
+                volume_measuring_device_model.ne(excluded(volume_measuring_device_model)),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +39,9 @@ for crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(
+                volume_measuring_device_model.ne(excluded(volume_measuring_device_model)),
+            )
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

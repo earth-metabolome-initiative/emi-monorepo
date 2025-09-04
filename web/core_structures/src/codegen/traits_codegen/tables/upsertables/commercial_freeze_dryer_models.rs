@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::Com
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(freeze_dryer_model.ne(excluded(freeze_dryer_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::Com
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(freeze_dryer_model.ne(excluded(freeze_dryer_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

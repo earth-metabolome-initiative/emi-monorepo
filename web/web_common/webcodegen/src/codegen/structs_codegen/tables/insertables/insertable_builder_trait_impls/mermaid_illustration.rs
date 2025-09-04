@@ -49,7 +49,12 @@ pub(super) fn columns_to_mermaid_illustration(
         .iter()
         .flat_map(|col| {
             let mut same_as = col.all_ancestral_same_as_columns(conn).unwrap_or_default();
-            same_as.extend(col.associated_same_as_columns(conn).unwrap_or_default());
+            same_as.extend(
+                col.associated_same_as_columns(true, conn)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|(col, _)| col),
+            );
             same_as
         })
         .filter(|col| !columns.contains(col))
@@ -176,7 +181,11 @@ pub(super) fn columns_to_mermaid_illustration(
             }
         }
 
-        let associated_same_as_columns = column.associated_same_as_columns(conn)?;
+        let associated_same_as_columns = column
+            .associated_same_as_columns(true, conn)?
+            .into_iter()
+            .map(|(col, _)| col)
+            .collect::<Vec<_>>();
         for associated_same_as_column in &associated_same_as_columns {
             if let Some(associated_column_node) = column_nodes.get(&associated_same_as_column) {
                 flowchart
@@ -289,7 +298,7 @@ pub(super) fn columns_to_mermaid_illustration(
                 }
             }
 
-            for associated_table in table.associated_tables(conn)? {
+            for associated_table in table.associated_tables(true, conn)? {
                 if let Some(associated_table_node) = table_nodes.get(&associated_table) {
                     flowchart
                         .edge(

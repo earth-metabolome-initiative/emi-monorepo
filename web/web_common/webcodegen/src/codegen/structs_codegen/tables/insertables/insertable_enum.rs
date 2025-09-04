@@ -23,7 +23,7 @@ impl Table {
     /// * If the name of the insertable variant builder attributes cannot be
     ///   retrieved.
     pub fn insertable_enum_name(&self) -> Result<String, WebCodeGenError> {
-        Ok(format!("Insertable{}Attributes", self.struct_name()?))
+        Ok(format!("Insertable{}Attribute", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the attributes that may be set in
@@ -39,7 +39,7 @@ impl Table {
 
     /// Returns the name for the extension attributes.
     pub fn insertable_extension_enum_name(&self) -> Result<String, WebCodeGenError> {
-        Ok(format!("Insertable{}ExtensionAttributes", self.struct_name()?))
+        Ok(format!("Insertable{}ExtensionAttribute", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the extension attributes.

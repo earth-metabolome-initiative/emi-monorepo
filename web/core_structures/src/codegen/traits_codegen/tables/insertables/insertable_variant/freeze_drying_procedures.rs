@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
@@ -54,7 +54,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -92,7 +92,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable>::foreign_procedure_template(
                     self,
                     freeze_drying_procedure_templates.foreign_procedure_template,
                 )?;
@@ -103,7 +103,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -114,7 +114,7 @@ where
                 freeze_dryed_with,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureBuildable>::freeze_dryed_with_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable>::freeze_dryed_with_model(
                     self,
                     assets.model,
                 )?;
@@ -124,44 +124,44 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let freeze_dryed_container = self
             .freeze_dryed_container
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::FreezeDryedContainer,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::FreezeDryedContainer,
                 ),
             )?;
         let freeze_dryed_with_model = self
             .freeze_dryed_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::FreezeDryedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::FreezeDryedWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

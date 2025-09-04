@@ -1,6 +1,6 @@
 use core_structures::{
     ReagentModel, User,
-    tables::insertables::{AssetModelBuildable, ReagentModelBuildable},
+    tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -27,8 +27,8 @@ pub(crate) fn methanol_hplc(user: &User, conn: &mut PgConnection) -> anyhow::Res
     }
 
     Ok(ReagentModel::new()
-        .name(name.to_owned())?
-        .description("Methanol, >= 99.8%, HPLC grade".to_owned())?
+        .name(name)?
+        .description("Methanol, >= 99.8%, HPLC grade")?
         .purity(99.8)?
         .cas_code("67-56-1")?
         .molecular_formula("CH3OH")?

@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionExtensionAttributes::DigitalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionExtensionAttribute::DigitalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute::Id,
                     ),
                 ))
             })?;

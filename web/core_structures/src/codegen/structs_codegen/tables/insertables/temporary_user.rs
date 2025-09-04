@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTemporaryUserAttributes {
+pub enum InsertableTemporaryUserAttribute {
     Id,
     Email,
     LoginProviderId,
 }
-impl core::str::FromStr for InsertableTemporaryUserAttributes {
+impl core::str::FromStr for InsertableTemporaryUserAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -17,7 +17,7 @@ impl core::str::FromStr for InsertableTemporaryUserAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTemporaryUserAttributes {
+impl core::fmt::Display for InsertableTemporaryUserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -80,7 +80,7 @@ pub struct InsertableTemporaryUserBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TemporaryUser` or
 /// descendant tables.
-pub trait TemporaryUserBuildable: Sized {
+pub trait TemporaryUserSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.temporary_user.email` column.
@@ -132,9 +132,9 @@ pub trait TemporaryUserBuildable: Sized {
         login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
+impl TemporaryUserSettable for InsertableTemporaryUserBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttribute;
     /// Sets the value of the `public.temporary_user.email` column.
     fn email<E>(
         mut self,
@@ -146,13 +146,13 @@ impl TemporaryUserBuildable for InsertableTemporaryUserBuilder {
     {
         let email = email.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTemporaryUserAttributes::Email)
+                .rename_field(InsertableTemporaryUserAttribute::Email)
         })?;
         pgrx_validation::must_be_email(email.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttributes::Email,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttribute::Email,
                     )
             })?;
         self.email = Some(email);
@@ -179,10 +179,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
-            Error = web_common_traits::database::InsertError<InsertableTemporaryUserAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTemporaryUserAttribute>,
         >,
 {
-    type Attributes = InsertableTemporaryUserAttributes;
+    type Attributes = InsertableTemporaryUserAttribute;
     fn is_complete(&self) -> bool {
         self.email.is_some() && self.login_provider_id.is_some()
     }

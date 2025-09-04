@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -63,7 +63,10 @@ where
         self.set_most_concrete_table("commercial_volume_measuring_device_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .volume_measuring_device_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,11 +92,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let volume_measuring_device_model = self
+            .volume_measuring_device_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute::VolumeMeasuringDeviceModel,
                 ),
             )?;
         let id = if self.commercial_volume_measuring_device_models_id_fkey1.is_complete()
@@ -102,9 +105,9 @@ where
                 .commercial_volume_measuring_device_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -113,9 +116,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttributes::VolumeMeasuringDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttribute::VolumeMeasuringDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -125,9 +128,9 @@ where
                 .commercial_volume_measuring_device_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttributes::VolumeMeasuringDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttribute::VolumeMeasuringDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -136,9 +139,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -146,7 +149,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            volume_measuring_device_model,
         })
     }
 }

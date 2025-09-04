@@ -1,34 +1,34 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFreezeDryerExtensionAttributes {
+pub enum InsertableFreezeDryerExtensionAttribute {
     PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ),
 }
-impl core::fmt::Display for InsertableFreezeDryerExtensionAttributes {
+impl core::fmt::Display for InsertableFreezeDryerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes>
-    for InsertableFreezeDryerExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
+    for InsertableFreezeDryerExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFreezeDryerAttributes {
-    Extension(InsertableFreezeDryerExtensionAttributes),
+pub enum InsertableFreezeDryerAttribute {
+    Extension(InsertableFreezeDryerExtensionAttribute),
     Id,
     Model,
 }
-impl core::str::FromStr for InsertableFreezeDryerAttributes {
+impl core::str::FromStr for InsertableFreezeDryerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableFreezeDryerAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableFreezeDryerAttributes {
+impl core::fmt::Display for InsertableFreezeDryerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -138,7 +138,7 @@ pub struct InsertableFreezeDryerBuilder<
 }
 /// Trait defining setters for attributes of an instance of `FreezeDryer` or
 /// descendant tables.
-pub trait FreezeDryerBuildable: Sized {
+pub trait FreezeDryerSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.freeze_dryers.model` column.
@@ -164,11 +164,11 @@ pub trait FreezeDryerBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> FreezeDryerBuildable for InsertableFreezeDryerBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes;
+> FreezeDryerSettable for InsertableFreezeDryerBuilder<PhysicalAsset> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute;
     ///Sets the value of the `public.freeze_dryers.model` column.
     ///
     ///# Implementation notes
@@ -194,9 +194,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
     ///v5 --->|"`extends`"| v3
@@ -205,7 +205,7 @@ impl<
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 model,
             )
@@ -219,24 +219,24 @@ impl<
     }
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableFreezeDryerBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
             )
@@ -258,7 +258,7 @@ where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
                 name,
             )
@@ -280,7 +280,7 @@ where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
                 description,
             )
@@ -320,7 +320,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
             self,
             model,
         )
@@ -331,7 +331,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -355,7 +355,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -373,7 +373,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -397,7 +397,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -412,14 +412,14 @@ where
 }
 impl<
     PhysicalAsset,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableFreezeDryerBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryerBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryerSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -446,18 +446,18 @@ where
     ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
-    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as FreezeDryerBuildable>::model(self, model)
+        <Self as FreezeDryerSettable>::model(self, model)
     }
 }
 impl<PhysicalAsset> web_common_traits::database::MostConcreteTable
@@ -487,12 +487,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
-            Error = web_common_traits::database::InsertError<InsertableFreezeDryerAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableFreezeDryerAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableFreezeDryerAttributes;
+    type Attributes = InsertableFreezeDryerAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.model.is_some()
     }

@@ -1,8 +1,10 @@
 //! Submodule to initialize the
 
 use core_structures::{
-    CommercialProduct, ContainerModel, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    CapModel, CommercialCapModel, User,
+    tables::insertables::{
+        AssetModelSettable, CommercialCapModelSettable, CommercialProductSettable,
+    },
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -27,16 +29,16 @@ use crate::brands::{advion_interchim, macherey_nagel};
 pub(crate) fn splitted_cap_vial_1_5ml(
     user: &User,
     conn: &mut PgConnection,
-) -> anyhow::Result<ContainerModel> {
+) -> anyhow::Result<CapModel> {
     let name = "Splitted Cap for Vial 1.5ml";
 
-    if let Some(existing_tube) = ContainerModel::from_name(name, conn).optional()? {
+    if let Some(existing_tube) = CapModel::from_name(name, conn).optional()? {
         return Ok(existing_tube);
     }
 
-    Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Splitted cap for Vial of 1.5 ml used for extracts storage".to_owned())?
+    Ok(CapModel::new()
+        .name(name)?
+        .description("Splitted cap for Vial of 1.5 ml used for extracts storage")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -58,14 +60,14 @@ pub(crate) fn splitted_cap_vial_1_5ml(
 pub(crate) fn sealed_cap_vial_1_5ml(
     user: &User,
     conn: &mut PgConnection,
-) -> anyhow::Result<ContainerModel> {
+) -> anyhow::Result<CapModel> {
     let name = "Sealed Cap for Vial 1.5ml";
-    if let Some(existing_tube) = ContainerModel::from_name(name, conn).optional()? {
+    if let Some(existing_tube) = CapModel::from_name(name, conn).optional()? {
         return Ok(existing_tube);
     }
-    Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Sealed cap for Vial of 1.5 ml used for extracts storage".to_owned())?
+    Ok(CapModel::new()
+        .name(name)?
+        .description("Sealed cap for Vial of 1.5 ml used for extracts storage")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -74,20 +76,20 @@ pub(crate) fn sealed_cap_vial_1_5ml(
 pub(crate) fn init_macherey_nagel_splitted_cap(
     user: &User,
     conn: &mut PgConnection,
-) -> anyhow::Result<CommercialProduct> {
-    let splitted_cap = "Machinery Nagel Splitted Cap 1.5ml";
-    if let Some(splitted_cap) = CommercialProduct::from_name(splitted_cap, conn).optional()? {
+) -> anyhow::Result<CommercialCapModel> {
+    let splitted_cap_name = "Machinery Nagel Splitted Cap 1.5ml";
+    if let Some(splitted_cap) = CommercialCapModel::from_name(splitted_cap_name, conn).optional()? {
         return Ok(splitted_cap);
     }
 
-    let splitted_cap_trackable = splitted_cap_vial_1_5ml(user, conn)?;
+    let splitted_cap = splitted_cap_vial_1_5ml(user, conn)?;
     let macherey_nagel = macherey_nagel(user, conn)?;
-    Ok(CommercialProduct::new()
-        .name(splitted_cap.to_owned())?
-        .description("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.".to_owned())?
+    Ok(CommercialCapModel::new()
+        .name(splitted_cap_name)?
+        .description("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.")?
         .created_by(user.id)?
         .brand(macherey_nagel.id)?
-        .parent_model(Some(splitted_cap_trackable.id))?
+        .cap_model(splitted_cap.id)?
         .insert(user.id, conn)?)
 }
 
@@ -95,21 +97,19 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
 pub(crate) fn init_advion_interchim_sealed_cap(
     user: &User,
     conn: &mut PgConnection,
-) -> anyhow::Result<CommercialProduct> {
-    let sealed_cap = "Avion Interchim Sealed Cap 1.5ml";
-    if let Some(sealed_cap) = CommercialProduct::from_name(sealed_cap, conn).optional()? {
+) -> anyhow::Result<CommercialCapModel> {
+    let sealed_cap_name = "Avion Interchim Sealed Cap 1.5ml";
+    if let Some(sealed_cap) = CommercialCapModel::from_name(sealed_cap_name, conn).optional()? {
         return Ok(sealed_cap);
     }
 
-    let sealed_cap_trackable = sealed_cap_vial_1_5ml(user, conn)?;
+    let sealed_cap = sealed_cap_vial_1_5ml(user, conn)?;
     let advion_interchim = advion_interchim(user, conn)?;
-    Ok(CommercialProduct::new()
-        .name(sealed_cap.to_owned())?
-        .description(
-            "Avion Interchim Sealed Cap 1.5ml, used to seal Vial 1.5ml for storage.".to_owned(),
-        )?
+    Ok(CommercialCapModel::new()
+        .name(sealed_cap_name)?
+        .description("Avion Interchim Sealed Cap 1.5ml, used to seal Vial 1.5ml for storage.")?
         .created_by(user.id)?
         .brand(advion_interchim.id)?
-        .parent_model(Some(sealed_cap_trackable.id))?
+        .cap_model(sealed_cap.id)?
         .insert(user.id, conn)?)
 }

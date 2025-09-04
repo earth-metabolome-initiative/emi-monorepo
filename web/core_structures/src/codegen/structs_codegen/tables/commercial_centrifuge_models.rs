@@ -14,7 +14,7 @@
 )]
 pub struct CommercialCentrifugeModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub centrifuge_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialCentrifugeModel {
     const TABLE_NAME: &'static str = "commercial_centrifuge_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialCentrifugeModel {
     }
 }
 impl CommercialCentrifugeModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn centrifuge_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -92,7 +92,7 @@ impl CommercialCentrifugeModel {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::table(
                 ),
-                self.parent_model,
+                self.centrifuge_model,
             ),
             conn,
         )
@@ -163,22 +163,22 @@ impl CommercialCentrifugeModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_centrifuge_model(
+        centrifuge_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models;
         Self::table()
-            .filter(commercial_centrifuge_models::parent_model.eq(parent_model))
+            .filter(commercial_centrifuge_models::centrifuge_model.eq(centrifuge_model))
             .order_by(commercial_centrifuge_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_centrifuge_model(
         id: &i32,
-        parent_model: &i32,
+        centrifuge_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,7 +190,7 @@ impl CommercialCentrifugeModel {
             .filter(
                 commercial_centrifuge_models::id
                     .eq(id)
-                    .and(commercial_centrifuge_models::parent_model.eq(parent_model)),
+                    .and(commercial_centrifuge_models::centrifuge_model.eq(centrifuge_model)),
             )
             .order_by(commercial_centrifuge_models::id.asc())
             .load::<Self>(conn)
@@ -239,6 +239,30 @@ impl CommercialCentrifugeModel {
                     .on(commercial_centrifuge_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_centrifuge_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_centrifuge_models::commercial_centrifuge_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_centrifuge_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_centrifuge_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

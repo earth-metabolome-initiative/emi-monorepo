@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainerModel,
                 ),
             )?;
         let contained_asset_model = self
             .contained_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainedAssetModel,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

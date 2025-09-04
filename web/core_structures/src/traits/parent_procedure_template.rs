@@ -2,19 +2,15 @@
 
 //! Submodule defining the `ParentProcedureTemplate` trait.
 
-use diesel::OptionalExtension;
 use web_common_traits::{
     database::{InsertError, Insertable, InsertableVariant, Read},
     prelude::ExtensionTable,
 };
 
 use crate::{
-    ProcedureTemplate, ProcedureTemplateAssetModel, SharedProcedureTemplateAssetModel,
-    codegen::structs_codegen::tables::insertables::{
-        ParentProcedureTemplateBuildable, ProcedureTemplateAssetModelBuildable,
-        SharedProcedureTemplateAssetModelBuildable,
-    },
-    tables::insertables::InsertableParentProcedureTemplateAttributes,
+    ProcedureTemplate,
+    codegen::structs_codegen::tables::insertables::ParentProcedureTemplateSettable,
+    tables::insertables::InsertableParentProcedureTemplateAttribute,
 };
 
 #[derive(Default, Copy, Clone, Hash, PartialEq, Eq)]
@@ -23,7 +19,6 @@ pub struct ChildOptions {
     copiable: bool,
     repeatable: bool,
     skippable: bool,
-    inherit_asset_models: bool,
 }
 
 impl ChildOptions {
@@ -48,12 +43,6 @@ impl ChildOptions {
     /// Sets the skippable option.
     pub fn skippable(mut self) -> Self {
         self.skippable = true;
-        self
-    }
-
-    /// Sets whether to inherit asset_models
-    pub fn inherit_asset_models(mut self) -> Self {
-        self.inherit_asset_models = true;
         self
     }
 }
@@ -83,7 +72,7 @@ where
         conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::ParentProcedureTemplate,
-        InsertError<InsertableParentProcedureTemplateAttributes>,
+        InsertError<InsertableParentProcedureTemplateAttribute>,
     >
     where
         C: ExtensionTable<ProcedureTemplate>,
@@ -101,54 +90,6 @@ where
             .skippable(options.skippable)?
             .created_by(user.id)?
             .insert(user.id, conn)?;
-
-        if options.inherit_asset_models {
-            for child_asset_model in ProcedureTemplateAssetModel::from_procedure_template(
-                &child_procedure.procedure_template,
-                conn,
-            )? {
-                let parent_asset_model = if let Some(parent_asset_model) =
-                    ProcedureTemplateAssetModel::from_name_and_procedure_template(
-                        &child_asset_model.name,
-                        self.id(),
-                        conn,
-                    )
-                    .optional()?
-                {
-                    parent_asset_model
-                } else {
-                    ProcedureTemplateAssetModel::new()
-                        .name(&child_asset_model.name)
-                        .unwrap()
-                        .procedure_template(*self.id())
-                        .unwrap()
-                        .asset_model(child_asset_model.asset_model)
-                        .unwrap()
-                        .created_by(user.id)
-                        .unwrap()
-                        .insert(user.id, conn)
-                        .unwrap()
-                };
-
-                SharedProcedureTemplateAssetModel::new()
-                    .parent(parent_asset_model.id)
-                    .unwrap()
-                    .child(child_asset_model.id)
-                    .unwrap()
-                    .parent_asset_model(parent_asset_model.asset_model)
-                    .unwrap()
-                    .child_asset_model(child_asset_model.asset_model)
-                    .unwrap()
-                    .parent_procedure_template(parent_asset_model.procedure_template)
-                    .unwrap()
-                    .child_procedure_template(child_asset_model.procedure_template)
-                    .unwrap()
-                    .created_by(user.id)
-                    .unwrap()
-                    .insert(user.id, conn)
-                    .unwrap();
-            }
-        }
 
         Ok(parent_procedure_template)
     }

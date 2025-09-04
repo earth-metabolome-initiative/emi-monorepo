@@ -1,35 +1,37 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialProductLotExtensionAttributes {
+pub enum InsertableCommercialProductLotExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialProductLotExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialProductLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
-> for InsertableCommercialProductLotExtensionAttributes {
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+    > for InsertableCommercialProductLotExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialProductLotAttributes {
-    Extension(InsertableCommercialProductLotExtensionAttributes),
+pub enum InsertableCommercialProductLotAttribute {
+    Extension(InsertableCommercialProductLotExtensionAttribute),
     Id,
     Lot,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialProductLotAttributes {
+impl core::str::FromStr for InsertableCommercialProductLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -41,7 +43,7 @@ impl core::str::FromStr for InsertableCommercialProductLotAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialProductLotAttributes {
+impl core::fmt::Display for InsertableCommercialProductLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -144,7 +146,7 @@ pub struct InsertableCommercialProductLotBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialProductLot` or descendant tables.
-pub trait CommercialProductLotBuildable: Sized {
+pub trait CommercialProductLotSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.commercial_product_lots.lot` column.
@@ -198,12 +200,12 @@ pub trait CommercialProductLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
         >,
-> CommercialProductLotBuildable
+> CommercialProductLotSettable
 for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute;
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
         mut self,
@@ -217,7 +219,7 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
             .try_into()
             .map_err(|err| {
                 validation_errors::SingleFieldError::from(err)
-                    .rename_field(InsertableCommercialProductLotAttributes::Lot)
+                    .rename_field(InsertableCommercialProductLotAttribute::Lot)
             })?;
         self.lot = Some(lot);
         Ok(self)
@@ -247,9 +249,9 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
     ///v5 --->|"`extends`"| v3
@@ -258,7 +260,7 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.id,
                 Some(product_model),
             )
@@ -272,17 +274,17 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
     }
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialProductLotBuilder<PhysicalAssetModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -290,10 +292,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
                 name,
             )
@@ -312,10 +314,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
                 description,
             )
@@ -355,7 +357,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -366,7 +368,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -390,7 +392,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -408,7 +410,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -432,7 +434,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -447,14 +449,14 @@ where
 }
 impl<
     PhysicalAssetModel,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialProductLotBuilder<PhysicalAssetModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -481,9 +483,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
     ///v5 --->|"`extends`"| v3
@@ -492,7 +494,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialProductLotBuildable>::product_model(
+        <Self as CommercialProductLotSettable>::product_model(
             self,
             parent_model
                 .ok_or(
@@ -531,7 +533,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialProductLotAttributes,
+            InsertableCommercialProductLotAttribute,
         >,
     >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
@@ -539,7 +541,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialProductLotAttributes;
+    type Attributes = InsertableCommercialProductLotAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.lot.is_some() && self.product_model.is_some()
     }

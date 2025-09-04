@@ -3,7 +3,7 @@
 use core_structures::{
     CommercialProduct, User, VolumetricContainerModel,
     tables::insertables::{
-        AssetModelBuildable, CommercialProductBuildable, VolumetricContainerModelBuildable,
+        AssetModelSettable, CommercialProductSettable, VolumetricContainerModelSettable,
     },
 };
 use diesel::{OptionalExtension, PgConnection};
@@ -20,8 +20,8 @@ pub(crate) fn safelock_tubes_2ml(
     }
 
     Ok(VolumetricContainerModel::new()
-        .name(name.to_owned())?
-        .description("Safelock tube of 2ml, used for sample extraction.".to_owned())?
+        .name(name)?
+        .description("Safelock tube of 2ml, used for sample extraction.")?
         .created_by(user.id)?
         .liters(0.002)?
         .insert(user.id, conn)?)
@@ -44,8 +44,8 @@ pub(crate) fn init_eppendorf_safelock_tube(
     let safelock_tube = safelock_tubes_2ml(user, conn)?;
     let eppendorf = eppendorf(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(eppendorf_safelock_tube.to_owned())?
-        .description("Eppendorf Safe-Lock Tube 2ml used for extraction.".to_owned())?
+        .name(eppendorf_safelock_tube)?
+        .description("Eppendorf Safe-Lock Tube 2ml used for extraction.")?
         .created_by(user.id)?
         .brand(eppendorf.id)?
         .parent_model(Some(safelock_tube.id))?

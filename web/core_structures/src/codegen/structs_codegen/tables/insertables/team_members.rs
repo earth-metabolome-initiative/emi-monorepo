@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamMemberAttributes {
+pub enum InsertableTeamMemberAttribute {
     TeamId,
     MemberId,
 }
-impl core::str::FromStr for InsertableTeamMemberAttributes {
+impl core::str::FromStr for InsertableTeamMemberAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableTeamMemberAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamMemberAttributes {
+impl core::fmt::Display for InsertableTeamMemberAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::TeamId => write!(f, "team_id"),
@@ -110,7 +110,7 @@ pub struct InsertableTeamMemberBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TeamMember` or
 /// descendant tables.
-pub trait TeamMemberBuildable: Sized {
+pub trait TeamMemberSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.team_members.team_id` column.
@@ -158,9 +158,9 @@ pub trait TeamMemberBuildable: Sized {
         member_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl TeamMemberBuildable for InsertableTeamMemberBuilder {
+impl TeamMemberSettable for InsertableTeamMemberBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttribute;
     /// Sets the value of the `public.team_members.team_id` column.
     fn team(
         mut self,
@@ -190,10 +190,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_members::TeamMember,
-            Error = web_common_traits::database::InsertError<InsertableTeamMemberAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTeamMemberAttribute>,
         >,
 {
-    type Attributes = InsertableTeamMemberAttributes;
+    type Attributes = InsertableTeamMemberAttribute;
     fn is_complete(&self) -> bool {
         self.team_id.is_some() && self.member_id.is_some()
     }

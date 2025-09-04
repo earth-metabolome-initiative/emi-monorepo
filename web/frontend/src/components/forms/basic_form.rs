@@ -22,8 +22,8 @@ use crate::{
 };
 
 /// Trait defining something that can be built by a form.
-pub(super) trait FormBuildable:
-    Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Debug
+pub(super) trait FormSettable:
+    Clone + PartialEq + Serialize + 'static + From<<Self as FormSettable>::Builder> + Debug
 {
     type Builder: FormBuilder;
 
@@ -50,7 +50,7 @@ pub(super) trait FormBuildable:
 #[derive(Clone, PartialEq, Properties)]
 pub(super) struct BasicFormProp<Data>
 where
-    Data: FormBuildable,
+    Data: FormSettable,
 {
     pub builder: Data::Builder,
     pub builder_dispatch: Dispatch<Data::Builder>,
@@ -85,7 +85,7 @@ impl From<ComponentMessage> for FormMessage {
 
 impl<Data> Component for BasicForm<Data>
 where
-    Data: FormBuildable,
+    Data: FormSettable,
 {
     type Message = FormMessage;
     type Properties = BasicFormProp<Data>;
@@ -142,14 +142,14 @@ where
                 if let Some(operation_name) = operation_name {
                     log::info!("Received a row from the backend for operation: {}", operation_name);
                     ctx.props().builder_dispatch.apply(
-                        <<Data as FormBuildable>::Builder as FormBuilder>::Actions::from_operation(
+                        <<Data as FormSettable>::Builder as FormBuilder>::Actions::from_operation(
                             operation_name,
                             row,
                         ),
                     )
                 } else {
                     log::info!("Received a row from the backend for an unknown operation");
-                    let richest_variant: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
+                    let richest_variant: <<Data as FormSettable>::Builder as FormBuilder>::RichVariant = bincode::deserialize(&row).unwrap();
 
                     // if ctx.props().method.is_update() {
                     //     if let Some(id) = ctx.props().builder.id() {
@@ -173,7 +173,7 @@ where
 
                     log::debug!("Updating the form with the received data, {:?}", richest_variant);
 
-                    <<Data as FormBuildable>::Builder as FormBuilder>::update(
+                    <<Data as FormSettable>::Builder as FormBuilder>::update(
                         &ctx.props().builder_dispatch,
                         richest_variant,
                     )
@@ -197,7 +197,7 @@ where
                         ctx.props().method.is_post() || ctx.props().method.is_update(),
                         "Received a row from the backend for a non-insert operation"
                     );
-                    let entry: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant =
+                    let entry: <<Data as FormSettable>::Builder as FormBuilder>::RichVariant =
                         bincode::deserialize(&row).unwrap();
                     ctx.link().navigator().unwrap().push(&entry.view_route());
                 } else {

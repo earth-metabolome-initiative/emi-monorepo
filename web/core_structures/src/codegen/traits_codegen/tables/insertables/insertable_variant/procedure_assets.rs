@@ -15,8 +15,8 @@ where
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     C: diesel::connection::LoadConnection,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
@@ -31,7 +31,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -60,7 +60,7 @@ where
                 procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -71,7 +71,7 @@ where
                 asset,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::asset_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     self,
                     assets.model,
                 )?;
@@ -83,11 +83,11 @@ where
                 procedure_template_asset_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::ancestor_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::ancestor_model(
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetBuildable>::procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
                     self,
                     procedure_template_asset_models.procedure_template,
                 )?;
@@ -97,49 +97,49 @@ where
             .procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::Procedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::Procedure,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::ProcedureTemplate,
                 ),
             )?;
         let asset_model = self
             .asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::AssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::AssetModel,
                 ),
             )?;
         let procedure_template_asset_model = self
             .procedure_template_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::ProcedureTemplateAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::ProcedureTemplateAssetModel,
                 ),
             )?;
         let ancestor_model = self
             .ancestor_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::AncestorModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::AncestorModel,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

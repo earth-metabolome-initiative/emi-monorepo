@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubject;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

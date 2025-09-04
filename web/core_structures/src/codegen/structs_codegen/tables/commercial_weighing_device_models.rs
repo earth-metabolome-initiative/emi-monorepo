@@ -14,7 +14,7 @@
 )]
 pub struct CommercialWeighingDeviceModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub weighing_device_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialWeighingDeviceModel {
     const TABLE_NAME: &'static str = "commercial_weighing_device_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialWeighingDeviceModel {
     }
 }
 impl CommercialWeighingDeviceModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -91,7 +91,7 @@ impl CommercialWeighingDeviceModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::table(),
-                self.parent_model,
+                self.weighing_device_model,
             ),
             conn,
         )
@@ -165,22 +165,24 @@ impl CommercialWeighingDeviceModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_weighing_device_model(
+        weighing_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models;
         Self::table()
-            .filter(commercial_weighing_device_models::parent_model.eq(parent_model))
+            .filter(
+                commercial_weighing_device_models::weighing_device_model.eq(weighing_device_model),
+            )
             .order_by(commercial_weighing_device_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_weighing_device_model(
         id: &i32,
-        parent_model: &i32,
+        weighing_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -189,11 +191,9 @@ impl CommercialWeighingDeviceModel {
 
         use crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models;
         Self::table()
-            .filter(
-                commercial_weighing_device_models::id
-                    .eq(id)
-                    .and(commercial_weighing_device_models::parent_model.eq(parent_model)),
-            )
+            .filter(commercial_weighing_device_models::id.eq(id).and(
+                commercial_weighing_device_models::weighing_device_model.eq(weighing_device_model),
+            ))
             .order_by(commercial_weighing_device_models::id.asc())
             .load::<Self>(conn)
     }
@@ -241,6 +241,30 @@ impl CommercialWeighingDeviceModel {
                     .on(commercial_weighing_device_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_weighing_device_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_weighing_device_models::commercial_weighing_device_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_weighing_device_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_weighing_device_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

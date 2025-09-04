@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::documents::Document;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDocument;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,42 +46,42 @@ where
             .id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::Id,
                 ),
             )?;
         let mime_type = self
             .mime_type
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::MimeType,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::MimeType,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDocumentAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

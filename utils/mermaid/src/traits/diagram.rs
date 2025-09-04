@@ -31,12 +31,8 @@ pub trait Diagram {
     fn style_classes(&self) -> impl Iterator<Item = &StyleClass>;
 
     /// Returns the reference to the requested node by label if it exists.
-    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
-    where
-        S: AsRef<str>;
+    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>>;
 
     /// Returns the reference to the requested style class by name if it exists.
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
-    where
-        S: AsRef<str>;
+    fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>>;
 }

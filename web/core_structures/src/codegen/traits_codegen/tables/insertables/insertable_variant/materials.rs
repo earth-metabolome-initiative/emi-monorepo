@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::materials::Material;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableMaterial;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttributes::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

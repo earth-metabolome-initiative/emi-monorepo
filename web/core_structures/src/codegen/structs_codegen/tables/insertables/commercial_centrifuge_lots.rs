@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeLotExtensionAttributes {
+pub enum InsertableCommercialCentrifugeLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ),
     CentrifugeModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeLotExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialCentrifugeLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -17,31 +17,31 @@ impl core::fmt::Display for InsertableCommercialCentrifugeLotExtensionAttributes
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
-> for InsertableCommercialCentrifugeLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+> for InsertableCommercialCentrifugeLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes>
-    for InsertableCommercialCentrifugeLotExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute>
+    for InsertableCommercialCentrifugeLotExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
     ) -> Self {
         Self::CentrifugeModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeLotAttributes {
-    Extension(InsertableCommercialCentrifugeLotExtensionAttributes),
+pub enum InsertableCommercialCentrifugeLotAttribute {
+    Extension(InsertableCommercialCentrifugeLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialCentrifugeLotAttributes {
+impl core::str::FromStr for InsertableCommercialCentrifugeLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableCommercialCentrifugeLotAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeLotAttributes {
+impl core::fmt::Display for InsertableCommercialCentrifugeLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -191,7 +191,7 @@ pub struct InsertableCommercialCentrifugeLotBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialCentrifugeLot` or descendant tables.
-pub trait CommercialCentrifugeLotBuildable: Sized {
+pub trait CommercialCentrifugeLotSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.commercial_centrifuge_lots.product_model`
@@ -219,15 +219,15 @@ pub trait CommercialCentrifugeLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+    CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
         >,
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
-> CommercialCentrifugeLotBuildable
+> CommercialCentrifugeLotSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
     ///Sets the value of the `public.commercial_centrifuge_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -258,23 +258,23 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
     ///class v2 directly-involved-column
     ///end
     ///v2 --->|"`ancestral same as`"| v3
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v7 --->|"`extends`"| v4
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_centrifuge_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::product_model(
+        self.commercial_centrifuge_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::product_model(
                 self.commercial_centrifuge_lots_id_fkey,
                 product_model,
             )
@@ -283,7 +283,7 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
                     attribute.into(),
                 ))
             })?;
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_centrifuge_lots_id_fkey1,
                 Some(product_model),
             )
@@ -297,18 +297,18 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
     }
 }
 impl<
-    CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+    CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
         >,
     CommercialProductLot,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -316,10 +316,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_centrifuge_lots_id_fkey1,
                 name,
             )
@@ -338,10 +338,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_centrifuge_lots_id_fkey1,
                 description,
             )
@@ -381,7 +381,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -392,7 +392,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_centrifuge_lots_id_fkey1,
                 created_by,
             )
@@ -416,7 +416,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.commercial_centrifuge_lots_id_fkey1,
                 created_at,
             )
@@ -434,7 +434,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_centrifuge_lots_id_fkey1,
                 updated_by,
             )
@@ -458,7 +458,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.commercial_centrifuge_lots_id_fkey1 = <CentrifugeModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.commercial_centrifuge_lots_id_fkey1,
                 updated_at,
             )
@@ -472,24 +472,24 @@ where
     }
 }
 impl<CentrifugeModel, CommercialProductLot>
-    crate::codegen::structs_codegen::tables::insertables::CentrifugeModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::CentrifugeModelSettable
     for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
 }
 impl<
     CentrifugeModel,
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -500,7 +500,7 @@ where
         L: TryInto<String>,
         validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
     {
-        self.commercial_centrifuge_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::lot(
+        self.commercial_centrifuge_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::lot(
                 self.commercial_centrifuge_lots_id_fkey,
                 lot,
             )
@@ -538,9 +538,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v3 -.->|"`descendant of`"| v5
     ///v4 --->|"`extends`"| v5
@@ -549,20 +549,20 @@ where
         self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialCentrifugeLotBuildable>::product_model(self, product_model)
+        <Self as CommercialCentrifugeLotSettable>::product_model(self, product_model)
     }
 }
 impl<
     CentrifugeModel,
     CommercialProductLot,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -593,16 +593,16 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
+    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
     ///```
@@ -610,7 +610,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialCentrifugeLotBuildable>::product_model(
+        <Self as CommercialCentrifugeLotSettable>::product_model(
             self,
             parent_model
                 .ok_or(
@@ -659,7 +659,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialCentrifugeLotAttributes,
+            InsertableCommercialCentrifugeLotAttribute,
         >,
     >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -668,7 +668,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialCentrifugeLotAttributes;
+    type Attributes = InsertableCommercialCentrifugeLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_centrifuge_lots_id_fkey1.is_complete()
             && self.commercial_centrifuge_lots_id_fkey.is_complete()

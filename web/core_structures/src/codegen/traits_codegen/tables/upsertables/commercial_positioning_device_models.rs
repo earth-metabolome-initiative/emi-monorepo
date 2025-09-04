@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_positioning_device_model
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(positioning_device_model.ne(excluded(positioning_device_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_positioning_device_model
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(positioning_device_model.ne(excluded(positioning_device_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

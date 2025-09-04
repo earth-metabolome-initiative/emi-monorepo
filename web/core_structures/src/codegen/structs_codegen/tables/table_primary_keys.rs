@@ -12,13 +12,13 @@ pub enum TablePrimaryKey {
     BallMillMachine(::rosetta_uuid::Uuid),
     BallMillProcedureTemplate(i32),
     BallMillProcedure(::rosetta_uuid::Uuid),
-    BeadsModel(i32),
+    BeadModel(i32),
     Brand(i32),
     CameraModel(i32),
     Camera(::rosetta_uuid::Uuid),
+    CapModel(i32),
     CappingProcedureTemplate(i32),
     CappingProcedure(::rosetta_uuid::Uuid),
-    CapsModel(i32),
     CentrifugeModel(i32),
     CentrifugeProcedureTemplate(i32),
     CentrifugeProcedure(::rosetta_uuid::Uuid),
@@ -27,10 +27,12 @@ pub enum TablePrimaryKey {
     Color(i16),
     CommercialBallMillMachineLot(i32),
     CommercialBallMillMachineModel(i32),
-    CommercialBeadsLot(i32),
-    CommercialBeadsModel(i32),
+    CommercialBeadLot(i32),
+    CommercialBeadModel(i32),
     CommercialCameraLot(i32),
     CommercialCameraModel(i32),
+    CommercialCapLot(i32),
+    CommercialCapModel(i32),
     CommercialCentrifugeLot(i32),
     CommercialCentrifugeModel(i32),
     CommercialFreezeDryerLot(i32),
@@ -111,7 +113,6 @@ pub enum TablePrimaryKey {
     Role(i16),
     Room(i32),
     SampleState(i16),
-    SharedProcedureTemplateAssetModel((i32, i32)),
     SpatialRefSy(i32),
     Spectrum(::rosetta_uuid::Uuid),
     SpectraCollection(::rosetta_uuid::Uuid),
@@ -171,22 +172,22 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::BallMillProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedure
             }
-            TablePrimaryKey::BeadsModel(_) => {
-                crate::codegen::tables::table_names::TableName::BeadsModel
+            TablePrimaryKey::BeadModel(_) => {
+                crate::codegen::tables::table_names::TableName::BeadModel
             }
             TablePrimaryKey::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
             TablePrimaryKey::CameraModel(_) => {
                 crate::codegen::tables::table_names::TableName::CameraModel
             }
             TablePrimaryKey::Camera(_) => crate::codegen::tables::table_names::TableName::Camera,
+            TablePrimaryKey::CapModel(_) => {
+                crate::codegen::tables::table_names::TableName::CapModel
+            }
             TablePrimaryKey::CappingProcedureTemplate(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureTemplate
             }
             TablePrimaryKey::CappingProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedure
-            }
-            TablePrimaryKey::CapsModel(_) => {
-                crate::codegen::tables::table_names::TableName::CapsModel
             }
             TablePrimaryKey::CentrifugeModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeModel
@@ -208,17 +209,23 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::CommercialBallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialBallMillMachineModel
             }
-            TablePrimaryKey::CommercialBeadsLot(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialBeadsLot
+            TablePrimaryKey::CommercialBeadLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialBeadLot
             }
-            TablePrimaryKey::CommercialBeadsModel(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialBeadsModel
+            TablePrimaryKey::CommercialBeadModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialBeadModel
             }
             TablePrimaryKey::CommercialCameraLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCameraLot
             }
             TablePrimaryKey::CommercialCameraModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCameraModel
+            }
+            TablePrimaryKey::CommercialCapLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialCapLot
+            }
+            TablePrimaryKey::CommercialCapModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialCapModel
             }
             TablePrimaryKey::CommercialCentrifugeLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCentrifugeLot
@@ -445,9 +452,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             TablePrimaryKey::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
-            }
-            TablePrimaryKey::SharedProcedureTemplateAssetModel(_) => {
-                crate::codegen::tables::table_names::TableName::SharedProcedureTemplateAssetModel
             }
             TablePrimaryKey::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy

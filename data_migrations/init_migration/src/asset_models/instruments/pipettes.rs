@@ -1,6 +1,6 @@
 use core_structures::{
     CommercialProduct, PipetteModel, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -30,10 +30,9 @@ pub(crate) fn pipette_200ul(user: &User, conn: &mut PgConnection) -> anyhow::Res
     }
 
     Ok(PipetteModel::new()
-        .name(name.to_owned())?
+        .name(name)?
         .description(
-            "A pipette used to manipulate liquids (needs to be equipped with a pipette tip)."
-                .to_owned(),
+            "A pipette used to manipulate liquids (needs to be equipped with a pipette tip).",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)
@@ -62,10 +61,9 @@ pub(crate) fn pipette_1000ul(user: &User, conn: &mut PgConnection) -> anyhow::Re
     }
 
     Ok(PipetteModel::new()
-        .name(name.to_owned())?
+        .name(name)?
         .description(
-            "A pipette used to manipulate liquids (needs to be equipped with a pipette tip)."
-                .to_owned(),
+            "A pipette used to manipulate liquids (needs to be equipped with a pipette tip).",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)
@@ -86,8 +84,8 @@ pub(crate) fn init_gilson_pipette_200(
     let brand = gilson(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description("Gilson pipette 200, used to precipitate solid material.".to_owned())?
+        .name(device_name)?
+        .description("Gilson pipette 200, used to precipitate solid material.")?
         .created_by(user.id)?
         .parent_model(Some(pipette.id))?
         .brand(brand.id)?
@@ -109,8 +107,8 @@ pub(crate) fn init_gilson_pipette_1000(
     let brand = gilson(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description("Gilson Pipette 1000μl to manipulate liquids.".to_owned())?
+        .name(device_name)?
+        .description("Gilson Pipette 1000μl to manipulate liquids.")?
         .created_by(user.id)?
         .parent_model(Some(pipette.id))?
         .brand(brand.id)?

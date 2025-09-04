@@ -3,7 +3,7 @@
 use core_structures::{
     CommercialProduct, User, VolumetricContainerModel,
     tables::insertables::{
-        AssetModelBuildable, CommercialProductBuildable, VolumetricContainerModelBuildable,
+        AssetModelSettable, CommercialProductSettable, VolumetricContainerModelSettable,
     },
 };
 use diesel::{OptionalExtension, PgConnection};
@@ -37,8 +37,8 @@ pub(crate) fn conical_centrifugal_tube_50ml(
     }
 
     Ok(VolumetricContainerModel::new()
-        .name(name.to_owned())?
-        .description("Conical tube of 50ml, used for sample collection.".to_owned())?
+        .name(name)?
+        .description("Conical tube of 50ml, used for sample collection.")?
         .created_by(user.id)?
         .liters(0.05)?
         .insert(user.id, conn)?)
@@ -58,8 +58,8 @@ pub(crate) fn init_greiner_cct(
     let conical_tube_50ml = conical_centrifugal_tube_50ml(user, conn)?;
     let greiner = greiner_bio_one(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(conical_tube.to_owned())?
-        .description("Conical sample tube of 50ml, used for sample collection.".to_owned())?
+        .name(conical_tube)?
+        .description("Conical sample tube of 50ml, used for sample collection.")?
         .created_by(user.id)?
         .brand(greiner.id)?
         .parent_model(Some(conical_tube_50ml.id))?

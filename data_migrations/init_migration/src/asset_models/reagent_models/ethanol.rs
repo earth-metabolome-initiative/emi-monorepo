@@ -1,6 +1,6 @@
 use core_structures::{
     ReagentModel, User,
-    tables::insertables::{AssetModelBuildable, ReagentModelBuildable},
+    tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -30,8 +30,8 @@ pub(crate) fn absolute_ethanol(
     }
 
     Ok(ReagentModel::new()
-        .name(name.to_owned())?
-        .description("Absolute Ethanol, >= 95%, with 5% isopropanol".to_owned())?
+        .name(name)?
+        .description("Absolute Ethanol, >= 95%, with 5% isopropanol")?
         .purity(95.0)?
         .cas_code("64-17-5")?
         .molecular_formula("CH3CH2OH")?

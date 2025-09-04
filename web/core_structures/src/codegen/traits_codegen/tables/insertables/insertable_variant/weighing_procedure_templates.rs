@@ -22,12 +22,12 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -68,7 +68,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -118,11 +118,11 @@ where
                 procedure_template_weighed_container_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateSettable>::foreign_procedure_template(
                     self,
                     procedure_template_asset_models.procedure_template,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateBuildable>::weighed_container_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateSettable>::weighed_container_model(
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
@@ -132,46 +132,55 @@ where
             .weighed_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::WeighedContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::WeighedContainerModel,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let procedure_template_weighed_container_model = self
             .procedure_template_weighed_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::ProcedureTemplateWeighedContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::ProcedureTemplateWeighedContainerModel,
                 ),
             )?;
         let weighed_with_model = self
             .weighed_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::WeighedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::WeighedWithModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateExtensionAttributes::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_weighed_with_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
+                )
             })?;
         let procedure_template_weighed_with_model = self
             .procedure_template_weighed_with_model
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttributes::ProcedureTemplateWeighedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
                 )
             })?;
         Ok(Self::InsertableVariant {

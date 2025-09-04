@@ -1,20 +1,21 @@
 #![cfg(feature = "postgres")]
 
-//! Submodule defining the `AppendProcedureTemplate` trait.
-
 use web_common_traits::{
     database::{InsertError, Insertable, InsertableVariant},
     prelude::ExtensionTable,
 };
 
 use crate::{
-    AssetCompatibilityRule, AssetModel,
-    codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleBuildable,
-    tables::insertables::InsertableAssetCompatibilityRuleAttributes,
+    AssetCompatibilityRule, AssetModel, ContainerCompatibilityRule, ContainerModel,
+    codegen::structs_codegen::tables::insertables::{
+        AssetCompatibilityRuleSettable, ContainerCompatibilityRuleSettable,
+    },
+    tables::insertables::{
+        InsertableAssetCompatibilityRuleAttribute, InsertableContainerCompatibilityRuleAttribute,
+    },
 };
 
-/// Trait defining the methods for managing parent-child relationships in
-/// procedure templates.
+/// A trait for asset models that can be compatible with other asset models.
 pub trait CompatibleWith: ExtensionTable<AssetModel>
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
@@ -34,15 +35,15 @@ where
     /// # Errors
     ///
     /// * If the insertion fails, an `InsertError` is returned.
-    fn compatible_with<T>(
+    fn compatible_with<AM>(
         &self,
-        other: &T,
+        other: &AM,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<AssetCompatibilityRule, InsertError<InsertableAssetCompatibilityRuleAttributes>>
+    ) -> Result<AssetCompatibilityRule, InsertError<InsertableAssetCompatibilityRuleAttribute>>
     where
-        T: ExtensionTable<AssetModel>,
-        for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,
+        AM: ExtensionTable<AssetModel>,
+        for<'a> &'a AM: diesel::Identifiable<Id = &'a i32>,
     {
         use diesel::Identifiable;
 
@@ -59,6 +60,60 @@ where
 impl<T> CompatibleWith for T
 where
     T: ExtensionTable<AssetModel>,
+    for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,
+{
+}
+
+/// A trait for container models that can contain other asset models.
+pub trait CanContain: ExtensionTable<ContainerModel>
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+    /// Creates a new `AssetCompatibilityRule` linking the current trackable
+    /// with another
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - A reference to another trackable item that this one is
+    ///   compatible with.
+    /// * `user` - The user performing the operation, used for tracking who
+    ///   created the compatibility rule.
+    /// * `conn` - A mutable reference to the database connection where the
+    ///   operation will be performed.
+    ///
+    /// # Errors
+    ///
+    /// * If the insertion fails, an `InsertError` is returned.
+    fn can_contain<AM>(
+        &self,
+        other: &AM,
+        quantity: i16,
+        user: &crate::User,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        ContainerCompatibilityRule,
+        InsertError<InsertableContainerCompatibilityRuleAttribute>,
+    >
+    where
+        AM: ExtensionTable<AssetModel>,
+        for<'a> &'a AM: diesel::Identifiable<Id = &'a i32>,
+    {
+        use diesel::Identifiable;
+
+        // Then, we create a new NextProcedureTemplate entry linking the parent
+        // procedure to the new child procedure.
+        ContainerCompatibilityRule::new()
+            .container_model(*self.id())?
+            .contained_asset_model(*other.id())?
+            .quantity(quantity)?
+            .created_by(user.id)?
+            .insert(user.id, conn)
+    }
+}
+
+impl<T> CanContain for T
+where
+    T: ExtensionTable<ContainerModel>,
     for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,
 {
 }

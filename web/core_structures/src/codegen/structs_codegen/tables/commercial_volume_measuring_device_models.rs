@@ -14,7 +14,7 @@
 )]
 pub struct CommercialVolumeMeasuringDeviceModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub volume_measuring_device_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialVolumeMeasuringDeviceModel {
     const TABLE_NAME: &'static str = "commercial_volume_measuring_device_models";
@@ -62,7 +62,7 @@ impl diesel::Identifiable for CommercialVolumeMeasuringDeviceModel {
     }
 }
 impl CommercialVolumeMeasuringDeviceModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn volume_measuring_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -89,7 +89,7 @@ impl CommercialVolumeMeasuringDeviceModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel::table(),
-                self.parent_model,
+                self.volume_measuring_device_model,
             ),
             conn,
         )
@@ -163,22 +163,25 @@ impl CommercialVolumeMeasuringDeviceModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_volume_measuring_device_model(
+        volume_measuring_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_models::commercial_volume_measuring_device_models;
         Self::table()
-            .filter(commercial_volume_measuring_device_models::parent_model.eq(parent_model))
+            .filter(
+                commercial_volume_measuring_device_models::volume_measuring_device_model
+                    .eq(volume_measuring_device_model),
+            )
             .order_by(commercial_volume_measuring_device_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_volume_measuring_device_model(
         id: &i32,
-        parent_model: &i32,
+        volume_measuring_device_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -188,9 +191,10 @@ impl CommercialVolumeMeasuringDeviceModel {
         use crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_models::commercial_volume_measuring_device_models;
         Self::table()
             .filter(
-                commercial_volume_measuring_device_models::id
-                    .eq(id)
-                    .and(commercial_volume_measuring_device_models::parent_model.eq(parent_model)),
+                commercial_volume_measuring_device_models::id.eq(id).and(
+                    commercial_volume_measuring_device_models::volume_measuring_device_model
+                        .eq(volume_measuring_device_model),
+                ),
             )
             .order_by(commercial_volume_measuring_device_models::id.asc())
             .load::<Self>(conn)
@@ -239,6 +243,33 @@ impl CommercialVolumeMeasuringDeviceModel {
                     .on(commercial_volume_measuring_device_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_volume_measuring_device_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_volume_measuring_device_models::commercial_volume_measuring_device_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(
+                        commercial_volume_measuring_device_models::id
+                            .eq(physical_asset_models::id),
+                    ),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_volume_measuring_device_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

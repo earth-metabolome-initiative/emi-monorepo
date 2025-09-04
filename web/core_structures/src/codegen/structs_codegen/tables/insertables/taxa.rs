@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTaxonAttributes {
+pub enum InsertableTaxonAttribute {
     Id,
     Name,
     ParentId,
     RankId,
 }
-impl core::str::FromStr for InsertableTaxonAttributes {
+impl core::str::FromStr for InsertableTaxonAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -22,7 +22,7 @@ impl core::str::FromStr for InsertableTaxonAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTaxonAttributes {
+impl core::fmt::Display for InsertableTaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -88,7 +88,7 @@ pub struct InsertableTaxonBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Taxon` or
 /// descendant tables.
-pub trait TaxonBuildable: Sized {
+pub trait TaxonSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.taxa.id` column.
@@ -183,9 +183,9 @@ pub trait TaxonBuildable: Sized {
         rank_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl TaxonBuildable for InsertableTaxonBuilder {
+impl TaxonSettable for InsertableTaxonBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttribute;
     /// Sets the value of the `public.taxa.id` column.
     fn id(
         mut self,
@@ -193,7 +193,7 @@ impl TaxonBuildable for InsertableTaxonBuilder {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTaxonAttributes::Id)
+                .rename_field(InsertableTaxonAttribute::Id)
         })?;
         self.id = Some(id);
         Ok(self)
@@ -209,7 +209,7 @@ impl TaxonBuildable for InsertableTaxonBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTaxonAttributes::Name)
+                .rename_field(InsertableTaxonAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -225,7 +225,7 @@ impl TaxonBuildable for InsertableTaxonBuilder {
     {
         let parent_id = parent_id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTaxonAttributes::ParentId)
+                .rename_field(InsertableTaxonAttribute::ParentId)
         })?;
         self.parent_id = parent_id;
         Ok(self)
@@ -251,10 +251,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
-            Error = web_common_traits::database::InsertError<InsertableTaxonAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTaxonAttribute>,
         >,
 {
-    type Attributes = InsertableTaxonAttributes;
+    type Attributes = InsertableTaxonAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some() && self.name.is_some() && self.rank_id.is_some()
     }

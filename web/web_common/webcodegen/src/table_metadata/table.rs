@@ -1100,6 +1100,8 @@ impl Table {
     ///
     /// # Arguments
     ///
+    /// * `include_local_primary_key` - Whether to include the local primary key
+    ///   in the constraint.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -1107,11 +1109,15 @@ impl Table {
     /// * If the table cannot be loaded from the database.
     pub fn associated_same_as_foreign_keys(
         &self,
+        include_local_primary_key: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut associated_foreign_key = Vec::new();
         for foreign_key in self.foreign_keys(conn)? {
-            if foreign_key.is_associated_same_as_constraint(conn)?.is_some() {
+            if foreign_key
+                .is_associated_same_as_constraint(include_local_primary_key, conn)?
+                .is_some()
+            {
                 associated_foreign_key.push(foreign_key);
             }
         }
@@ -1164,10 +1170,11 @@ impl Table {
     /// * If the table cannot be loaded from the database.
     pub(crate) fn associated_tables(
         &self,
+        include_local_primary_key: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<Table>, WebCodeGenError> {
         let mut associated_tables = Vec::new();
-        for foreign_key in self.associated_same_as_foreign_keys(conn)? {
+        for foreign_key in self.associated_same_as_foreign_keys(include_local_primary_key, conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
             associated_tables.push(foreign_table);
         }

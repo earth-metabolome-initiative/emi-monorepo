@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -63,7 +63,7 @@ where
         self.set_most_concrete_table("commercial_weighing_device_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.weighing_device_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,11 +89,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let weighing_device_model = self
+            .weighing_device_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute::WeighingDeviceModel,
                 ),
             )?;
         let id = if self.commercial_weighing_device_models_id_fkey1.is_complete() {
@@ -101,9 +101,9 @@ where
                 .commercial_weighing_device_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -112,9 +112,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttributes::WeighingDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttribute::WeighingDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -124,9 +124,9 @@ where
                 .commercial_weighing_device_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttributes::WeighingDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttribute::WeighingDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -135,9 +135,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -145,7 +145,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            weighing_device_model,
         })
     }
 }

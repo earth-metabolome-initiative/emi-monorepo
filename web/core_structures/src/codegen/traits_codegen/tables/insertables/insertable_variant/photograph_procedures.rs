@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::PhotographProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
@@ -54,7 +54,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -92,7 +92,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::foreign_procedure_template(
                     self,
                     photograph_procedure_templates.foreign_procedure_template,
                 )?;
@@ -103,7 +103,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -114,7 +114,7 @@ where
                 photographed_with,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureBuildable>::photographed_with_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::photographed_with_model(
                     self,
                     assets.model,
                 )?;
@@ -124,44 +124,44 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let photographed_asset = self
             .photographed_asset
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::PhotographedAsset,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::PhotographedAsset,
                 ),
             )?;
         let photographed_with_model = self
             .photographed_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::PhotographedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::PhotographedWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

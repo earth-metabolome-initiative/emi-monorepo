@@ -57,7 +57,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -99,16 +99,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetExtensionAttributes::Asset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetExtensionAttribute::Asset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Id,
                     ),
                 ))
             })?;

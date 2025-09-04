@@ -1,6 +1,8 @@
 //! Submodule to initialize the `instruments` in the database.
 
-use core_structures::{AssetModel, User, tables::insertables::AssetModelBuildable};
+use core_structures::{
+    AssetModel, PhysicalAssetModel, User, tables::insertables::AssetModelSettable,
+};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -14,16 +16,16 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<AssetModel> {
+pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<PhysicalAssetModel> {
     const ORGANISM: &str = "Organism";
 
-    if let Some(existing_organism) = AssetModel::from_name(ORGANISM, conn).optional()? {
+    if let Some(existing_organism) = PhysicalAssetModel::from_name(ORGANISM, conn).optional()? {
         return Ok(existing_organism);
     }
 
-    Ok(AssetModel::new()
-        .name(ORGANISM.to_owned())?
-        .description("Organisms used in laboratory procedures".to_owned())?
+    Ok(PhysicalAssetModel::new()
+        .name(ORGANISM)?
+        .description("Organisms used in laboratory procedures")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -46,8 +48,8 @@ pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<Ass
     }
 
     Ok(AssetModel::new()
-        .name(SAMPLE.to_owned())?
-        .description("Samples used in laboratory procedures".to_owned())?
+        .name(SAMPLE)?
+        .description("Samples used in laboratory procedures")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }

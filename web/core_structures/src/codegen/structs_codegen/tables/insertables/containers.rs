@@ -1,34 +1,34 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerExtensionAttributes {
+pub enum InsertableContainerExtensionAttribute {
     PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ),
 }
-impl core::fmt::Display for InsertableContainerExtensionAttributes {
+impl core::fmt::Display for InsertableContainerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes>
-    for InsertableContainerExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
+    for InsertableContainerExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerAttributes {
-    Extension(InsertableContainerExtensionAttributes),
+pub enum InsertableContainerAttribute {
+    Extension(InsertableContainerExtensionAttribute),
     Id,
     ContainerModel,
 }
-impl core::str::FromStr for InsertableContainerAttributes {
+impl core::str::FromStr for InsertableContainerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableContainerAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableContainerAttributes {
+impl core::fmt::Display for InsertableContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -136,7 +136,7 @@ pub struct InsertableContainerBuilder<
 }
 /// Trait defining setters for attributes of an instance of `Container` or
 /// descendant tables.
-pub trait ContainerBuildable: Sized {
+pub trait ContainerSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.containers.container_model` column.
@@ -163,11 +163,11 @@ pub trait ContainerBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> ContainerBuildable for InsertableContainerBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes;
+> ContainerSettable for InsertableContainerBuilder<PhysicalAsset> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
     ///Sets the value of the `public.containers.container_model` column.
     ///
     ///# Implementation notes
@@ -193,18 +193,18 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v5 --->|"`extends`"| v3
+    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
+    ///v5 --->|"`extends`"| v3
     ///```
     fn container_model(
         mut self,
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 container_model,
             )
@@ -218,24 +218,24 @@ impl<
     }
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableContainerBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
             )
@@ -257,7 +257,7 @@ where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
                 name,
             )
@@ -279,7 +279,7 @@ where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
                 description,
             )
@@ -319,7 +319,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
             self,
             model,
         )
@@ -330,7 +330,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -354,7 +354,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -372,7 +372,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -396,7 +396,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -411,14 +411,14 @@ where
 }
 impl<
     PhysicalAsset,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableContainerBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::ContainerBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -445,9 +445,9 @@ where
     ///    v0@{shape: rounded, label: "model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///v4 -.->|"`descendant of`"| v3
@@ -456,7 +456,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as ContainerBuildable>::container_model(self, model)
+        <Self as ContainerSettable>::container_model(self, model)
     }
 }
 impl<PhysicalAsset> web_common_traits::database::MostConcreteTable
@@ -486,12 +486,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::containers::Container,
-            Error = web_common_traits::database::InsertError<InsertableContainerAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableContainerAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableContainerAttributes;
+    type Attributes = InsertableContainerAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.container_model.is_some()
     }

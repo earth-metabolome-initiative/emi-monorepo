@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(centrifuge_model.ne(excluded(centrifuge_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::Comme
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(centrifuge_model.ne(excluded(centrifuge_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

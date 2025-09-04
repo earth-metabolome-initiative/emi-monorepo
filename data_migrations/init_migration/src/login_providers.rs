@@ -1,6 +1,6 @@
 //! Login providers migration
 
-use core_structures::{LoginProvider, User, tables::insertables::LoginProviderBuildable};
+use core_structures::{LoginProvider, User, tables::insertables::LoginProviderSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::prelude::*;
 

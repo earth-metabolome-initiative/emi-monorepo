@@ -2,7 +2,7 @@
 
 use core_structures::{
     CommercialProduct, ContainerModel, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -34,8 +34,8 @@ fn standard_rack(user: &User, conn: &mut PgConnection) -> anyhow::Result<Contain
     }
 
     Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Rack, a common container for organizing samples".to_owned())?
+        .name(name)?
+        .description("Rack, a common container for organizing samples")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -69,8 +69,8 @@ pub(crate) fn conical_centrifugal_tube_50ml_rack(
     let standard_rack = standard_rack(user, conn)?;
 
     Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Rack for storing conical centrifugal tubes of 50ml".to_owned())?
+        .name(name)?
+        .description("Rack for storing conical centrifugal tubes of 50ml")?
         .parent_model(Some(standard_rack.id))?
         .created_by(user.id)?
         .insert(user.id, conn)?)
@@ -90,10 +90,8 @@ pub(crate) fn init_fisherbrand_cct_rack(
     let conical_tube_rack_50ml = conical_centrifugal_tube_50ml(user, conn)?;
     let fisherbrand = fisherbrand(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(conical_tube.to_owned())?
-        .description(
-            "Rack for Conical sample tube of 50ml, used to store dried samples library.".to_owned(),
-        )?
+        .name(conical_tube)?
+        .description("Rack for Conical sample tube of 50ml, used to store dried samples library.")?
         .created_by(user.id)?
         .brand(fisherbrand.id)?
         .parent_model(Some(conical_tube_rack_50ml.id))?

@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::CappingProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
         C,
@@ -51,7 +51,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -89,7 +89,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::foreign_procedure_template(
                     self,
                     capping_procedure_templates.foreign_procedure_template,
                 )?;
@@ -100,7 +100,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -110,44 +110,44 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let capped_container = self
             .capped_container
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::CappedContainer,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::CappedContainer,
                 ),
             )?;
         let capped_with_model = self
             .capped_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::CappedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::CappedWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

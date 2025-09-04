@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerCompatibilityRuleAttributes {
+pub enum InsertableContainerCompatibilityRuleAttribute {
     ContainerModel,
     ContainedAssetModel,
     Quantity,
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableContainerCompatibilityRuleAttributes {
+impl core::str::FromStr for InsertableContainerCompatibilityRuleAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -25,7 +25,7 @@ impl core::str::FromStr for InsertableContainerCompatibilityRuleAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableContainerCompatibilityRuleAttributes {
+impl core::fmt::Display for InsertableContainerCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ContainerModel => write!(f, "container_model"),
@@ -171,7 +171,7 @@ impl Default for InsertableContainerCompatibilityRuleBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ContainerCompatibilityRule` or descendant tables.
-pub trait ContainerCompatibilityRuleBuildable: Sized {
+pub trait ContainerCompatibilityRuleSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -298,8 +298,8 @@ pub trait ContainerCompatibilityRuleBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRuleBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes;
+impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRuleBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute;
     /// Sets the value of the
     /// `public.container_compatibility_rules.container_model` column.
     fn container_model(
@@ -311,8 +311,8 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainerModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainedAssetModel,
                         )
                 })?;
         }
@@ -330,8 +330,8 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainerModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::ContainedAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainerModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainedAssetModel,
                         )
                 })?;
         }
@@ -350,14 +350,14 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
     {
         let quantity = quantity.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::Quantity)
+                .rename_field(InsertableContainerCompatibilityRuleAttribute::Quantity)
         })?;
         if let Some(quantity) = quantity {
             pgrx_validation::must_be_strictly_positive_i16(quantity)
                 .map_err(|e| {
                     e
                         .rename_field(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttributes::Quantity,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::Quantity,
                         )
                 })?;
         }
@@ -386,7 +386,7 @@ impl ContainerCompatibilityRuleBuildable for InsertableContainerCompatibilityRul
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttributes::CreatedAt)
+                .rename_field(InsertableContainerCompatibilityRuleAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -406,11 +406,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
         Error = web_common_traits::database::InsertError<
-            InsertableContainerCompatibilityRuleAttributes,
+            InsertableContainerCompatibilityRuleAttribute,
         >,
     >,
 {
-    type Attributes = InsertableContainerCompatibilityRuleAttributes;
+    type Attributes = InsertableContainerCompatibilityRuleAttribute;
     fn is_complete(&self) -> bool {
         self.container_model.is_some() && self.contained_asset_model.is_some()
             && self.created_by.is_some() && self.created_at.is_some()

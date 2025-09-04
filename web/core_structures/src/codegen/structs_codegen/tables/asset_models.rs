@@ -15,8 +15,8 @@
 pub struct AssetModel {
     pub id: i32,
     pub most_concrete_table: String,
-    pub name: Option<String>,
-    pub description: Option<String>,
+    pub name: String,
+    pub description: String,
     pub parent_model: Option<i32>,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,

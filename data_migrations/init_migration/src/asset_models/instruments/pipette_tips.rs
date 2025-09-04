@@ -1,6 +1,6 @@
 use core_structures::{
     CommercialProduct, PipetteTipModel, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -33,10 +33,9 @@ pub(crate) fn pipette_tip_200ul(
     }
 
     Ok(PipetteTipModel::new()
-        .name(name.to_owned())?
+        .name(name)?
         .description(
-            "A 200μl pipette tip used to manipulate and transfer liquids when adapted to a pipette"
-                .to_owned(),
+            "A 200μl pipette tip used to manipulate and transfer liquids when adapted to a pipette",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)
@@ -68,8 +67,8 @@ pub(crate) fn pipette_tip_1000ul(
     }
 
     Ok(PipetteTipModel::new()
-        .name(name.to_owned())?
-        .description("A 1000μl pipette tip used to manipulate and transfer liquids when adapted to a pipette".to_owned())?
+        .name(name)?
+        .description("A 1000μl pipette tip used to manipulate and transfer liquids when adapted to a pipette")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -89,8 +88,8 @@ pub(crate) fn init_sarstedt_pipette_tip_200(
     let brand = sarstedt(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description("Tip for Gilson Pipette 200µl to manipulate liquids".to_owned())?
+        .name(device_name)?
+        .description("Tip for Gilson Pipette 200µl to manipulate liquids")?
         .created_by(user.id)?
         .parent_model(Some(pipette_tip.id))?
         .brand(brand.id)?
@@ -112,8 +111,8 @@ pub(crate) fn init_sarstedt_pipette_tip_1000(
     let brand = sarstedt(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description("Sarstedt Tip for Gilson Pipette 1000μl.".to_owned())?
+        .name(device_name)?
+        .description("Sarstedt Tip for Gilson Pipette 1000μl.")?
         .created_by(user.id)?
         .parent_model(Some(pipette_tip.id))?
         .brand(brand.id)?

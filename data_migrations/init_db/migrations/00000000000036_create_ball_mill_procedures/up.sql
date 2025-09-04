@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
 		AND must_be_strictly_greater_than_f32(hertz, 15.0)
 	),
 	-- The beads model used for the procedure.
-	bead_model INTEGER NOT NULL REFERENCES beads_models(id),
+	bead_model INTEGER NOT NULL REFERENCES bead_models(id),
 	procedure_template_bead_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	--- The number of beads used in the procedure.
 	number_of_beads SMALLINT NOT NULL DEFAULT 3 CHECK (must_be_strictly_positive_i16(number_of_beads)),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 		must_be_distinct_uuid(procedure, foreign_procedure)
 	),
 	-- The beads model used for the procedure.
-	bead_model INTEGER NOT NULL REFERENCES beads_models(id),
+	bead_model INTEGER NOT NULL REFERENCES bead_models(id),
 	-- The device used for the ball mill procedure.
 	milled_with_model INTEGER NOT NULL REFERENCES ball_mill_machine_models(id),
 	milled_with UUID REFERENCES ball_mill_machines(id),

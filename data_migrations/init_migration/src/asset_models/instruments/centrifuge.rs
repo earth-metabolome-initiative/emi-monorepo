@@ -3,7 +3,7 @@
 
 use core_structures::{
     CentrifugeModel, CommercialProduct, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -36,8 +36,8 @@ pub(crate) fn safelock_centrifuge(
     }
 
     Ok(CentrifugeModel::new()
-        .name(name.to_owned())?
-        .description("Safelock centrifuge, used to precipitate solid material.".to_owned())?
+        .name(name)?
+        .description("Safelock centrifuge, used to precipitate solid material.")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -57,8 +57,8 @@ pub(crate) fn init_eppendorf_centrifuge(
     let brand = eppendorf(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description("Eppendorf centrifuge, used to precipitate solid material.".to_owned())?
+        .name(device_name)?
+        .description("Eppendorf centrifuge, used to precipitate solid material.")?
         .created_by(user.id)?
         .parent_model(Some(centrifuge.id))?
         .brand(brand.id)?

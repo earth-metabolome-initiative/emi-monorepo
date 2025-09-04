@@ -9,14 +9,14 @@ mod ball_mill_machine_models;
 mod ball_mill_machines;
 mod ball_mill_procedure_templates;
 mod ball_mill_procedures;
-mod beads_models;
+mod bead_models;
 mod bounded_read_dispatch;
 mod brands;
 mod camera_models;
 mod cameras;
+mod cap_models;
 mod capping_procedure_templates;
 mod capping_procedures;
-mod caps_models;
 mod centrifuge_models;
 mod centrifuge_procedure_templates;
 mod centrifuge_procedures;
@@ -25,10 +25,12 @@ mod cities;
 mod colors;
 mod commercial_ball_mill_machine_lots;
 mod commercial_ball_mill_machine_models;
-mod commercial_beads_lots;
-mod commercial_beads_models;
+mod commercial_bead_lots;
+mod commercial_bead_models;
 mod commercial_camera_lots;
 mod commercial_camera_models;
+mod commercial_cap_lots;
+mod commercial_cap_models;
 mod commercial_centrifuge_lots;
 mod commercial_centrifuge_models;
 mod commercial_freeze_dryer_lots;
@@ -111,7 +113,6 @@ mod registering_procedures;
 mod roles;
 mod rooms;
 mod sample_states;
-mod shared_procedure_template_asset_models;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
@@ -182,12 +183,13 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
         >,
     ),
-    BeadsModel(Vec<crate::codegen::structs_codegen::tables::beads_models::BeadsModel>),
+    BeadModel(Vec<crate::codegen::structs_codegen::tables::bead_models::BeadModel>),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
     CameraModel(
         Vec<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
     ),
     Camera(Vec<crate::codegen::structs_codegen::tables::cameras::Camera>),
+    CapModel(Vec<crate::codegen::structs_codegen::tables::cap_models::CapModel>),
     CappingProcedureTemplate(
         Vec<
             crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
@@ -198,7 +200,6 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
         >,
     ),
-    CapsModel(Vec<crate::codegen::structs_codegen::tables::caps_models::CapsModel>),
     CentrifugeModel(
         Vec<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
     ),
@@ -225,14 +226,14 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
         >,
     ),
-    CommercialBeadsLot(
+    CommercialBeadLot(
         Vec<
-            crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot,
+            crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
         >,
     ),
-    CommercialBeadsModel(
+    CommercialBeadModel(
         Vec<
-            crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel,
+            crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
         >,
     ),
     CommercialCameraLot(
@@ -243,6 +244,16 @@ pub enum Rows {
     CommercialCameraModel(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+        >,
+    ),
+    CommercialCapLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
+        >,
+    ),
+    CommercialCapModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
         >,
     ),
     CommercialCentrifugeLot(
@@ -559,11 +570,6 @@ pub enum Rows {
     SampleState(
         Vec<crate::codegen::structs_codegen::tables::sample_states::SampleState>,
     ),
-    SharedProcedureTemplateAssetModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel,
-        >,
-    ),
     SpatialRefSy(
         Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>,
     ),
@@ -736,8 +742,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BeadsModel(beads_models) => {
-                beads_models
+            Rows::BeadModel(bead_models) => {
+                bead_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -764,6 +770,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::CapModel(cap_models) => {
+                cap_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::CappingProcedureTemplate(capping_procedure_templates) => {
                 capping_procedure_templates
                     .iter()
@@ -773,13 +786,6 @@ impl Rows {
             }
             Rows::CappingProcedure(capping_procedures) => {
                 capping_procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::CapsModel(caps_models) => {
-                caps_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -841,15 +847,15 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CommercialBeadsLot(commercial_beads_lots) => {
-                commercial_beads_lots
+            Rows::CommercialBeadLot(commercial_bead_lots) => {
+                commercial_bead_lots
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CommercialBeadsModel(commercial_beads_models) => {
-                commercial_beads_models
+            Rows::CommercialBeadModel(commercial_bead_models) => {
+                commercial_bead_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -864,6 +870,20 @@ impl Rows {
             }
             Rows::CommercialCameraModel(commercial_camera_models) => {
                 commercial_camera_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCapLot(commercial_cap_lots) => {
+                commercial_cap_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCapModel(commercial_cap_models) => {
+                commercial_cap_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1431,13 +1451,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SharedProcedureTemplateAssetModel(shared_procedure_template_asset_models) => {
-                shared_procedure_template_asset_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::SpatialRefSy(spatial_ref_sys) => {
                 spatial_ref_sys
                     .iter()
@@ -1640,15 +1653,15 @@ impl web_common_traits::prelude::Rows for Rows {
                 ball_mill_procedure_templates.primary_keys()
             }
             Rows::BallMillProcedure(ball_mill_procedures) => ball_mill_procedures.primary_keys(),
-            Rows::BeadsModel(beads_models) => beads_models.primary_keys(),
+            Rows::BeadModel(bead_models) => bead_models.primary_keys(),
             Rows::Brand(brands) => brands.primary_keys(),
             Rows::CameraModel(camera_models) => camera_models.primary_keys(),
             Rows::Camera(cameras) => cameras.primary_keys(),
+            Rows::CapModel(cap_models) => cap_models.primary_keys(),
             Rows::CappingProcedureTemplate(capping_procedure_templates) => {
                 capping_procedure_templates.primary_keys()
             }
             Rows::CappingProcedure(capping_procedures) => capping_procedures.primary_keys(),
-            Rows::CapsModel(caps_models) => caps_models.primary_keys(),
             Rows::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_keys(),
             Rows::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
                 centrifuge_procedure_templates.primary_keys()
@@ -1665,9 +1678,9 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
                 commercial_ball_mill_machine_models.primary_keys()
             }
-            Rows::CommercialBeadsLot(commercial_beads_lots) => commercial_beads_lots.primary_keys(),
-            Rows::CommercialBeadsModel(commercial_beads_models) => {
-                commercial_beads_models.primary_keys()
+            Rows::CommercialBeadLot(commercial_bead_lots) => commercial_bead_lots.primary_keys(),
+            Rows::CommercialBeadModel(commercial_bead_models) => {
+                commercial_bead_models.primary_keys()
             }
             Rows::CommercialCameraLot(commercial_camera_lots) => {
                 commercial_camera_lots.primary_keys()
@@ -1675,6 +1688,8 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::CommercialCameraModel(commercial_camera_models) => {
                 commercial_camera_models.primary_keys()
             }
+            Rows::CommercialCapLot(commercial_cap_lots) => commercial_cap_lots.primary_keys(),
+            Rows::CommercialCapModel(commercial_cap_models) => commercial_cap_models.primary_keys(),
             Rows::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
                 commercial_centrifuge_lots.primary_keys()
             }
@@ -1831,9 +1846,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),
-            Rows::SharedProcedureTemplateAssetModel(shared_procedure_template_asset_models) => {
-                shared_procedure_template_asset_models.primary_keys()
-            }
             Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_keys(),
             Rows::Spectrum(spectra) => spectra.primary_keys(),
             Rows::SpectraCollection(spectra_collections) => spectra_collections.primary_keys(),

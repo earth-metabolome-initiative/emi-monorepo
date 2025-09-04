@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -60,7 +60,7 @@ where
         self.set_most_concrete_table("commercial_pipette_tip_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.pipette_tip_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -86,11 +86,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let pipette_tip_model = self
+            .pipette_tip_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute::PipetteTipModel,
                 ),
             )?;
         let id = if self.commercial_pipette_tip_models_id_fkey1.is_complete() {
@@ -98,9 +98,9 @@ where
                 .commercial_pipette_tip_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -109,9 +109,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttributes::PipetteTipModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttribute::PipetteTipModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -121,9 +121,9 @@ where
                 .commercial_pipette_tip_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttributes::PipetteTipModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttribute::PipetteTipModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -132,9 +132,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -142,7 +142,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            pipette_tip_model,
         })
     }
 }

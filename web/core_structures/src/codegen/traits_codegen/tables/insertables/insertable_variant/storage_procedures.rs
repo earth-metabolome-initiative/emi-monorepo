@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
@@ -51,7 +51,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -89,7 +89,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::foreign_procedure_template(
                     self,
                     storage_procedure_templates.foreign_procedure_template,
                 )?;
@@ -100,7 +100,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -110,44 +110,44 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let stored_asset = self
             .stored_asset
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::StoredAsset,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::StoredAsset,
                 ),
             )?;
         let stored_with = self
             .stored_with
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::StoredWith,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::StoredWith,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -84,7 +84,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_centrifuge_lots_id_fkey1.is_complete() {
@@ -92,9 +92,9 @@ where
                 .commercial_centrifuge_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttributes::CentrifugeModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttribute::CentrifugeModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -103,9 +103,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -115,9 +115,9 @@ where
                 .commercial_centrifuge_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -126,9 +126,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttributes::CentrifugeModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotExtensionAttribute::CentrifugeModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute::Id,
                         ),
                     ))
                 })?;

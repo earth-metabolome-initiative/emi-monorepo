@@ -1,28 +1,28 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableGeolocationProcedureExtensionAttributes {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes),
+pub enum InsertableGeolocationProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
 }
-impl core::fmt::Display for InsertableGeolocationProcedureExtensionAttributes {
+impl core::fmt::Display for InsertableGeolocationProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
-    for InsertableGeolocationProcedureExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
+    for InsertableGeolocationProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableGeolocationProcedureAttributes {
-    Extension(InsertableGeolocationProcedureExtensionAttributes),
+pub enum InsertableGeolocationProcedureAttribute {
+    Extension(InsertableGeolocationProcedureExtensionAttribute),
     Procedure,
     ProcedureTemplate,
     ForeignProcedureTemplate,
@@ -31,7 +31,7 @@ pub enum InsertableGeolocationProcedureAttributes {
     GeolocatedWith,
     GeolocatedWithModel,
 }
-impl core::str::FromStr for InsertableGeolocationProcedureAttributes {
+impl core::str::FromStr for InsertableGeolocationProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableGeolocationProcedureAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableGeolocationProcedureAttributes {
+impl core::fmt::Display for InsertableGeolocationProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -415,7 +415,7 @@ pub struct InsertableGeolocationProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `GeolocationProcedure` or descendant tables.
-pub trait GeolocationProcedureBuildable: Sized {
+pub trait GeolocationProcedureSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.geolocation_procedures.procedure_template`
@@ -561,11 +561,11 @@ pub trait GeolocationProcedureBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> GeolocationProcedureBuildable for InsertableGeolocationProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes;
+> GeolocationProcedureSettable for InsertableGeolocationProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute;
     ///Sets the value of the `public.geolocation_procedures.procedure_template` column.
     ///
     ///# Implementation notes
@@ -596,7 +596,7 @@ impl<
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
@@ -613,8 +613,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -634,8 +634,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -710,26 +710,62 @@ impl<
     }
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableGeolocationProcedureBuilder<Procedure>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -767,7 +803,7 @@ where
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as GeolocationProcedureBuildable>::procedure_template(
+        <Self as GeolocationProcedureSettable>::procedure_template(
             self,
             procedure_template,
         )
@@ -778,7 +814,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
             )
@@ -802,7 +838,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                 self.procedure,
                 created_at,
             )
@@ -820,7 +856,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,
             )
@@ -844,7 +880,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
             )
@@ -885,7 +921,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
         Error = web_common_traits::database::InsertError<
-            InsertableGeolocationProcedureAttributes,
+            InsertableGeolocationProcedureAttribute,
         >,
     >,
     Procedure: web_common_traits::database::TryInsertGeneric<
@@ -893,7 +929,7 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
-    type Attributes = InsertableGeolocationProcedureAttributes;
+    type Attributes = InsertableGeolocationProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete() && self.procedure_template.is_some()
             && self.foreign_procedure_template.is_some()

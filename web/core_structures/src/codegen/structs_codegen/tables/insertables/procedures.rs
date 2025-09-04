@@ -1,7 +1,9 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcedureAttributes {
+pub enum InsertableProcedureAttribute {
     Procedure,
+    ParentProcedure,
+    ParentProcedureTemplate,
     ProcedureTemplate,
     MostConcreteTable,
     CreatedBy,
@@ -9,11 +11,13 @@ pub enum InsertableProcedureAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableProcedureAttributes {
+impl core::str::FromStr for InsertableProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Procedure" => Ok(Self::Procedure),
+            "ParentProcedure" => Ok(Self::ParentProcedure),
+            "ParentProcedureTemplate" => Ok(Self::ParentProcedureTemplate),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "CreatedBy" => Ok(Self::CreatedBy),
@@ -21,6 +25,8 @@ impl core::str::FromStr for InsertableProcedureAttributes {
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
             "procedure" => Ok(Self::Procedure),
+            "parent_procedure" => Ok(Self::ParentProcedure),
+            "parent_procedure_template" => Ok(Self::ParentProcedureTemplate),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "most_concrete_table" => Ok(Self::MostConcreteTable),
             "created_by" => Ok(Self::CreatedBy),
@@ -31,10 +37,12 @@ impl core::str::FromStr for InsertableProcedureAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableProcedureAttributes {
+impl core::fmt::Display for InsertableProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure => write!(f, "procedure"),
+            Self::ParentProcedure => write!(f, "parent_procedure"),
+            Self::ParentProcedureTemplate => write!(f, "parent_procedure_template"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
             Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::CreatedBy => write!(f, "created_by"),
@@ -52,6 +60,8 @@ impl core::fmt::Display for InsertableProcedureAttributes {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
+    pub(crate) parent_procedure: Option<::rosetta_uuid::Uuid>,
+    pub(crate) parent_procedure_template: Option<i32>,
     pub(crate) procedure_template: i32,
     pub(crate) most_concrete_table: String,
     pub(crate) created_by: i32,
@@ -60,6 +70,80 @@ pub struct InsertableProcedure {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedure {
+    pub fn parent_procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure) = self.parent_procedure else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                parent_procedure,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure_template) = self.parent_procedure_template else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                    parent_procedure_template,
+                ),
+                conn,
+            )
+            .map(Some)
+    }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -156,11 +240,53 @@ impl InsertableProcedure {
             conn,
         )
     }
+    pub fn procedures_parent_procedure_template_procedure_template_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure_template) = self.parent_procedure_template else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
+                    (parent_procedure_template, self.procedure_template),
+                ),
+                conn,
+            )
+            .map(Some)
+    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureBuilder {
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,
+    pub(crate) parent_procedure: Option<::rosetta_uuid::Uuid>,
+    pub(crate) parent_procedure_template: Option<i32>,
     pub(crate) procedure_template: Option<i32>,
     pub(crate) most_concrete_table: Option<String>,
     pub(crate) created_by: Option<i32>,
@@ -172,6 +298,8 @@ impl Default for InsertableProcedureBuilder {
     fn default() -> Self {
         Self {
             procedure: Some(rosetta_uuid::Uuid::new_v4()),
+            parent_procedure: Default::default(),
+            parent_procedure_template: Default::default(),
             procedure_template: Default::default(),
             most_concrete_table: Default::default(),
             created_by: Default::default(),
@@ -183,7 +311,7 @@ impl Default for InsertableProcedureBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Procedure` or
 /// descendant tables.
-pub trait ProcedureBuildable: Sized {
+pub trait ProcedureSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedures.procedure` column.
@@ -208,6 +336,52 @@ pub trait ProcedureBuildable: Sized {
     fn procedure(
         self,
         procedure: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.procedures.parent_procedure` column.
+    ///
+    /// # Arguments
+    /// * `parent_procedure`: The value to set for the
+    ///   `public.procedures.parent_procedure` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn parent_procedure(
+        self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.procedures.parent_procedure_template`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `parent_procedure_template`: The value to set for the
+    ///   `public.procedures.parent_procedure_template` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn parent_procedure_template(
+        self,
+        parent_procedure_template: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the `public.procedures.procedure_template` column.
     ///
@@ -330,9 +504,9 @@ pub trait ProcedureBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureBuildable for InsertableProcedureBuilder {
+impl ProcedureSettable for InsertableProcedureBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute;
     /// Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
@@ -340,9 +514,43 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let procedure = procedure.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAttributes::Procedure)
+                .rename_field(InsertableProcedureAttribute::Procedure)
         })?;
         self.procedure = Some(procedure);
+        Ok(self)
+    }
+    /// Sets the value of the `public.procedures.parent_procedure` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "parent_procedure"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "parent_procedure_template"}
+    /// class v1 directly-involved-column
+    /// v0 -.->|"`foreign defines`"| v1
+    /// ```
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.parent_procedure = parent_procedure;
+        Ok(self)
+    }
+    /// Sets the value of the `public.procedures.parent_procedure_template`
+    /// column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.parent_procedure_template = parent_procedure_template;
         Ok(self)
     }
     /// Sets the value of the `public.procedures.procedure_template` column.
@@ -390,15 +598,15 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAttributes::CreatedAt)
+                .rename_field(InsertableProcedureAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -425,15 +633,15 @@ impl ProcedureBuildable for InsertableProcedureBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAttributes::UpdatedAt)
+                .rename_field(InsertableProcedureAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -461,10 +669,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedures::Procedure,
-            Error = web_common_traits::database::InsertError<InsertableProcedureAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableProcedureAttribute>,
         >,
 {
-    type Attributes = InsertableProcedureAttributes;
+    type Attributes = InsertableProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_some()
             && self.procedure_template.is_some()

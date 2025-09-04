@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelExtensionAttributes::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

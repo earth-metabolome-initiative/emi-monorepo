@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableEmailProvider;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,14 +46,14 @@ where
             .email_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttributes::EmailId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttribute::EmailId,
                 ),
             )?;
         let login_provider_id = self
             .login_provider_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttributes::LoginProviderId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttribute::LoginProviderId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

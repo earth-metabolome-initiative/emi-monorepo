@@ -1,7 +1,7 @@
 //! Submodule creating the instrument commercial product model for the Pipette
 //! 200 instrument.
 
-use core_structures::{User, WeighingDeviceModel, tables::insertables::AssetModelBuildable};
+use core_structures::{User, WeighingDeviceModel, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 /// Returns the weighing scale.
@@ -30,8 +30,8 @@ pub(crate) fn weighing_scale(
     }
 
     Ok(WeighingDeviceModel::new()
-        .name(name.to_owned())?
-        .description("A weighing scale used to measure the amount of samples.".to_owned())?
+        .name(name)?
+        .description("A weighing scale used to measure the amount of samples.")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }

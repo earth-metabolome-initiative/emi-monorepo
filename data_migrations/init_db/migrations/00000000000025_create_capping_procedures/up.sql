@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS capping_procedure_templates (
 	),
 	procedure_template_container_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The cap to be used for the container.
-	capped_with_model INTEGER NOT NULL REFERENCES caps_models(id),
+	capped_with_model INTEGER NOT NULL REFERENCES cap_models(id),
 	procedure_template_capped_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	-- We check that the `procedure_template_container_model` is indeed a trackable that is compatible with the procedure template.
 	FOREIGN KEY (
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS capping_procedures (
 	-- The container being capped, which must be a volumetric container.
 	capped_container UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The cap being used, which must be a cap model.
-	capped_with_model INTEGER NOT NULL REFERENCES caps_models(id),
+	capped_with_model INTEGER NOT NULL REFERENCES cap_models(id),
 	-- We ensure that the parent table's procedure_template is indeed a capping_
 	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that the `foreign_procedure` has as `procedure_template` the specified `foreign_procedure_template`.

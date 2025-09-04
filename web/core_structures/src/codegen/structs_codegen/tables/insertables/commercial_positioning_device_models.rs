@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPositioningDeviceModelExtensionAttributes {
+pub enum InsertableCommercialPositioningDeviceModelExtensionAttribute {
     PositioningDeviceModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
     ),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialPositioningDeviceModelExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialPositioningDeviceModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PositioningDeviceModel(e) => write!(f, "{e}"),
@@ -17,48 +17,47 @@ impl core::fmt::Display for InsertableCommercialPositioningDeviceModelExtensionA
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
-> for InsertableCommercialPositioningDeviceModelExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
+> for InsertableCommercialPositioningDeviceModelExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
     ) -> Self {
         Self::PositioningDeviceModel(attribute)
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
-    > for InsertableCommercialPositioningDeviceModelExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
+    for InsertableCommercialPositioningDeviceModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPositioningDeviceModelAttributes {
-    Extension(InsertableCommercialPositioningDeviceModelExtensionAttributes),
+pub enum InsertableCommercialPositioningDeviceModelAttribute {
+    Extension(InsertableCommercialPositioningDeviceModelExtensionAttribute),
     Id,
-    ParentModel,
+    PositioningDeviceModel,
 }
-impl core::str::FromStr for InsertableCommercialPositioningDeviceModelAttributes {
+impl core::str::FromStr for InsertableCommercialPositioningDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ParentModel" => Ok(Self::ParentModel),
-            "parent_model" => Ok(Self::ParentModel),
+            "PositioningDeviceModel" => Ok(Self::PositioningDeviceModel),
+            "positioning_device_model" => Ok(Self::PositioningDeviceModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialPositioningDeviceModelAttributes {
+impl core::fmt::Display for InsertableCommercialPositioningDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Id => write!(f, "id"),
-            Self::ParentModel => write!(f, "parent_model"),
+            Self::PositioningDeviceModel => write!(f, "positioning_device_model"),
         }
     }
 }
@@ -72,10 +71,10 @@ impl core::fmt::Display for InsertableCommercialPositioningDeviceModelAttributes
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialPositioningDeviceModel {
     pub(crate) id: i32,
-    pub(crate) parent_model: i32,
+    pub(crate) positioning_device_model: i32,
 }
 impl InsertableCommercialPositioningDeviceModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn positioning_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -102,7 +101,7 @@ impl InsertableCommercialPositioningDeviceModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::table(),
-                self.parent_model,
+                self.positioning_device_model,
             ),
             conn,
         )
@@ -190,21 +189,23 @@ pub struct InsertableCommercialPositioningDeviceModelBuilder<
             Option<i32>,
         >,
 > {
-    pub(crate) parent_model: Option<i32>,
+    pub(crate) positioning_device_model: Option<i32>,
     pub(crate) commercial_positioning_device_models_id_fkey: PositioningDeviceModel,
     pub(crate) commercial_positioning_device_models_id_fkey1: CommercialProduct,
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialPositioningDeviceModel` or descendant tables.
-pub trait CommercialPositioningDeviceModelBuildable: Sized {
+pub trait CommercialPositioningDeviceModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
-    /// `public.commercial_positioning_device_models.parent_model` column.
+    /// `public.commercial_positioning_device_models.positioning_device_model`
+    /// column.
     ///
     /// # Arguments
-    /// * `parent_model`: The value to set for the
-    ///   `public.commercial_positioning_device_models.parent_model` column.
+    /// * `positioning_device_model`: The value to set for the
+    ///   `public.commercial_positioning_device_models.positioning_device_model`
+    ///   column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -218,23 +219,23 @@ pub trait CommercialPositioningDeviceModelBuildable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent_model(
+    fn positioning_device_model(
         self,
-        parent_model: i32,
+        positioning_device_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
         >,
     PositioningDeviceModel,
-> CommercialPositioningDeviceModelBuildable
+> CommercialPositioningDeviceModelSettable
 for InsertableCommercialPositioningDeviceModelBuilder<
     CommercialProduct,
     PositioningDeviceModel,
 > {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes;
-    ///Sets the value of the `public.commercial_positioning_device_models.parent_model` column.
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute;
+    ///Sets the value of the `public.commercial_positioning_device_models.positioning_device_model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -252,53 +253,53 @@ for InsertableCommercialPositioningDeviceModelBuilder<
     ///class v2 undirectly-involved-column
     ///end
     ///subgraph v4 ["`commercial_positioning_device_models`"]
-    ///    v0@{shape: rounded, label: "parent_model"}
+    ///    v0@{shape: rounded, label: "positioning_device_model"}
     ///class v0 column-of-interest
     ///end
     ///subgraph v5 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model(
+    fn positioning_device_model(
         mut self,
-        parent_model: i32,
+        positioning_device_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_positioning_device_models_id_fkey1,
-                Some(parent_model),
+                Some(positioning_device_model),
             )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
                     attribute.into(),
                 ))
             })?;
-        self.parent_model = Some(parent_model);
+        self.positioning_device_model = Some(positioning_device_model);
         Ok(self)
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
         >,
     PositioningDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialPositioningDeviceModelBuilder<
     CommercialProduct,
     PositioningDeviceModel,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -306,10 +307,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_positioning_device_models_id_fkey1,
                 name,
             )
@@ -328,10 +329,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_positioning_device_models_id_fkey1,
                 description,
             )
@@ -371,7 +372,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -382,7 +383,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_positioning_device_models_id_fkey1,
                 created_by,
             )
@@ -406,7 +407,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.commercial_positioning_device_models_id_fkey1,
                 created_at,
             )
@@ -424,7 +425,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_positioning_device_models_id_fkey1,
                 updated_by,
             )
@@ -448,7 +449,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.commercial_positioning_device_models_id_fkey1,
                 updated_at,
             )
@@ -462,16 +463,16 @@ where
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes,
+    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
         >,
     PositioningDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductBuildable
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialPositioningDeviceModelBuilder<
     CommercialProduct,
     PositioningDeviceModel,
 > {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -484,7 +485,7 @@ for InsertableCommercialPositioningDeviceModelBuilder<
             <DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
         >,
     {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::CommercialProductBuildable>::deprecation_date(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable>::deprecation_date(
                 self.commercial_positioning_device_models_id_fkey1,
                 deprecation_date,
             )
@@ -502,7 +503,7 @@ for InsertableCommercialPositioningDeviceModelBuilder<
         mut self,
         brand_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::CommercialProductBuildable>::brand(
+        self.commercial_positioning_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable>::brand(
                 self.commercial_positioning_device_models_id_fkey1,
                 brand_id,
             )
@@ -518,17 +519,17 @@ for InsertableCommercialPositioningDeviceModelBuilder<
 impl<
     CommercialProduct,
     PositioningDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialPositioningDeviceModelBuilder<
     CommercialProduct,
     PositioningDeviceModel,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -548,7 +549,7 @@ where
     ///class v2 undirectly-involved-column
     ///end
     ///subgraph v4 ["`commercial_positioning_device_models`"]
-    ///    v1@{shape: rounded, label: "parent_model"}
+    ///    v1@{shape: rounded, label: "positioning_device_model"}
     ///class v1 directly-involved-column
     ///end
     ///subgraph v5 ["`physical_asset_models`"]
@@ -566,22 +567,22 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialPositioningDeviceModelBuildable>::parent_model(
+        <Self as CommercialPositioningDeviceModelSettable>::positioning_device_model(
             self,
             parent_model
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::ParentModel,
+                        Self::Attributes::PositioningDeviceModel,
                     ),
                 )?,
         )
     }
 }
 impl<CommercialProduct, PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelSettable
     for InsertableCommercialPositioningDeviceModelBuilder<CommercialProduct, PositioningDeviceModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute;
 }
 impl<PositioningDeviceModel, CommercialProduct> web_common_traits::database::MostConcreteTable
     for InsertableCommercialPositioningDeviceModelBuilder<PositioningDeviceModel, CommercialProduct>
@@ -624,7 +625,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialPositioningDeviceModelAttributes,
+            InsertableCommercialPositioningDeviceModelAttribute,
         >,
     >,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -636,11 +637,11 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialPositioningDeviceModelAttributes;
+    type Attributes = InsertableCommercialPositioningDeviceModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_positioning_device_models_id_fkey1.is_complete()
             && self.commercial_positioning_device_models_id_fkey.is_complete()
-            && self.parent_model.is_some()
+            && self.positioning_device_model.is_some()
     }
     fn mint_primary_key(
         self,

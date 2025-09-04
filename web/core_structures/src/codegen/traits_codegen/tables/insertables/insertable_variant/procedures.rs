@@ -15,12 +15,18 @@ where
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     C: diesel::connection::LoadConnection,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::procedures::Procedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -41,61 +47,75 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         _user_id: i32,
-        _conn: &mut C,
+        conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(parent_procedure) = self.parent_procedure {
+            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+                parent_procedure,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                    self,
+                    Some(procedures.procedure_template),
+                )?;
+            }
+        }
         let procedure = self
             .procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let most_concrete_table = self
             .most_concrete_table
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::MostConcreteTable,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::MostConcreteTable,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {
             procedure,
+            parent_procedure: self.parent_procedure,
+            parent_procedure_template: self.parent_procedure_template,
             procedure_template,
             most_concrete_table,
             created_by,

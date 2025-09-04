@@ -14,7 +14,7 @@ pub struct BallMillProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub bead_model: Option<
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
     >,
     pub milled_with_model: Option<
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
@@ -60,9 +60,7 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadsModel(
-                self.bead_model,
-            ),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.bead_model),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
@@ -181,21 +179,21 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::BeadsModel(beads_models),
+                crate::codegen::tables::row::Row::BeadModel(bead_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.bead_model == beads_models.id {
-                    foreign_keys.bead_model = Some(beads_models);
+                if self.bead_model == bead_models.id {
+                    foreign_keys.bead_model = Some(bead_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::BeadsModel(beads_models),
+                crate::codegen::tables::row::Row::BeadModel(bead_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.bead_model == beads_models.id {
+                if self.bead_model == bead_models.id {
                     foreign_keys.bead_model = None;
                     updated = true;
                 }

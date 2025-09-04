@@ -50,6 +50,7 @@ impl Codegen<'_> {
         };
         let user_id_type = user_table.primary_key_type(conn)?;
         let insertable_enum = table.insertable_enum_ty()?;
+        let mut maybe_mut_self = false;
         let table_extension_network = self.table_extension_network().unwrap();
         let extension_tables = table_extension_network.extension_tables(table);
         let mut additional_use_imports = Vec::new();
@@ -286,26 +287,60 @@ impl Codegen<'_> {
         // in which case it is needful to group by the foreign keys by the local same-as
         // column.
         for (partial_builder_column, constraint) in table.partial_builder_columns(conn)? {
-            let foreign_table = constraint.foreign_table(conn)?;
+            let partial_builder_table = constraint.foreign_table(conn)?;
+            let foreign_builder = partial_builder_table.insertable_builder_ty()?;
+            let partial_builder_table_trait = partial_builder_table.setter_trait_ty()?;
 
-            if !try_insert_generic_constraint.contains(&foreign_table) {
-                let foreign_builder = foreign_table.insertable_builder_ty()?;
-                let foreign_attributes = foreign_table.insertable_enum_ty()?;
-                let foreign_table_primary_key_type = foreign_table.primary_key_type(conn)?;
+            if !try_insert_generic_constraint.contains(&partial_builder_table) {
+                let foreign_attributes = partial_builder_table.insertable_enum_ty()?;
+                let partial_builder_table_primary_key_type =
+                    partial_builder_table.primary_key_type(conn)?;
                 additional_where_requirements.push(quote! {
                     #foreign_builder: web_common_traits::database::TryInsertGeneric<
                         C,
                         Attributes = #foreign_attributes,
-                        PrimaryKey = #foreign_table_primary_key_type
+                        PrimaryKey = #partial_builder_table_primary_key_type
                     >
                 });
-                try_insert_generic_constraint.insert(foreign_table);
+                try_insert_generic_constraint.insert(partial_builder_table);
             }
 
             let local_column_ident = partial_builder_column.snake_case_ident()?;
             let camel_cased_column_ident = partial_builder_column.camel_case_ident()?;
 
+            let missing_same_as_assignments = table
+                .primary_key_columns(conn)?
+                .into_iter()
+                .map(|primary_key_column| {
+                    let column_ident = primary_key_column.snake_case_ident()?;
+                    Ok(primary_key_column
+                        .associated_same_as_columns(true, conn)?
+                        .into_iter()
+                        .filter_map(|(remote_column, associated_same_as_constraint)| {
+                            let local_columns = associated_same_as_constraint.columns(conn).ok()?;
+                            if !local_columns.contains(&partial_builder_column) {
+                                return None;
+                            }
+                            let remote_column_setter = remote_column.snake_case_ident().ok()?;
+                            Some(quote!{
+                                self.#local_column_ident = <#foreign_builder as #partial_builder_table_trait>::#remote_column_setter(
+                                    self.#local_column_ident,
+                                    #column_ident
+                                ).map_err(|err| {
+                                    err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                })?;
+                            })
+                        })
+                        .collect())
+                })
+                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+
+            if !missing_same_as_assignments.is_empty() {
+                maybe_mut_self = true;
+            }
+
             dependant_tables_completion.push(quote! {
+                #(#missing_same_as_assignments)*
                 let #local_column_ident = self.#local_column_ident
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
@@ -334,12 +369,13 @@ impl Codegen<'_> {
             additional_use_imports.push(quote! {
                 use web_common_traits::database::Read;
             });
+            maybe_mut_self = true;
         }
 
-        let maybe_mut = if foreign_defined_completions.is_empty() {
-            quote! {}
-        } else {
+        let maybe_mut_self = if maybe_mut_self {
             quote! {mut}
+        } else {
+            quote! {}
         };
 
         let conn_ident = if right_generics.is_empty() && foreign_defined_completions.is_empty() {
@@ -351,7 +387,7 @@ impl Codegen<'_> {
         Ok((
             quote! {
                 fn try_insert(
-                    #maybe_mut self,
+                    #maybe_mut_self self,
                     #user_id_ident: #user_id_type,
                     #conn_ident: &mut C
                 ) -> Result<

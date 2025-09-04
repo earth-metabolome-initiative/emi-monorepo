@@ -22,12 +22,12 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -68,7 +68,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -118,11 +118,11 @@ where
                 procedure_template_stored_asset_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateSettable>::foreign_procedure_template(
                     self,
                     procedure_template_asset_models.procedure_template,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateBuildable>::stored_asset_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateSettable>::stored_asset_model(
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
@@ -132,60 +132,69 @@ where
             .kelvin
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::Kelvin,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::Kelvin,
                 ),
             )?;
         let kelvin_tolerance_percentage = self
             .kelvin_tolerance_percentage
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::KelvinTolerancePercentage,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                 ),
             )?;
         let stored_into_model = self
             .stored_into_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::StoredIntoModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::StoredIntoModel,
                 ),
             )?;
         let stored_asset_model = self
             .stored_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::StoredAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::StoredAssetModel,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let procedure_template_stored_asset_model = self
             .procedure_template_stored_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::ProcedureTemplateStoredAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::ProcedureTemplateStoredAssetModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateExtensionAttributes::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        self.procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_stored_into_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::ProcedureTemplateStoredIntoModel,
+                )
             })?;
         let procedure_template_stored_into_model = self
             .procedure_template_stored_into_model
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::ProcedureTemplateStoredIntoModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::ProcedureTemplateStoredIntoModel,
                 )
             })?;
         Ok(Self::InsertableVariant {

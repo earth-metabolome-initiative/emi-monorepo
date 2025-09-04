@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::sample_states::SampleState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSampleState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttributes::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

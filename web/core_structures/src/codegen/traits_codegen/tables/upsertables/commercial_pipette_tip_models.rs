@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::Comm
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(pipette_tip_model.ne(excluded(pipette_tip_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::Comm
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(pipette_tip_model.ne(excluded(pipette_tip_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

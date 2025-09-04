@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryer;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerExtensionAttributes::PhysicalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerExtensionAttribute::PhysicalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute::Id,
                     ),
                 ))
             })?;

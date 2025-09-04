@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAssetModelAncestorAttributes {
+pub enum InsertableAssetModelAncestorAttribute {
     DescendantModel,
     AncestorModel,
 }
-impl core::str::FromStr for InsertableAssetModelAncestorAttributes {
+impl core::str::FromStr for InsertableAssetModelAncestorAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableAssetModelAncestorAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableAssetModelAncestorAttributes {
+impl core::fmt::Display for InsertableAssetModelAncestorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::DescendantModel => write!(f, "descendant_model"),
@@ -110,7 +110,7 @@ pub struct InsertableAssetModelAncestorBuilder {
 }
 /// Trait defining setters for attributes of an instance of `AssetModelAncestor`
 /// or descendant tables.
-pub trait AssetModelAncestorBuildable: Sized {
+pub trait AssetModelAncestorSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`
@@ -160,8 +160,9 @@ pub trait AssetModelAncestorBuildable: Sized {
         ancestor_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl AssetModelAncestorBuildable for InsertableAssetModelAncestorBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttributes;
+impl AssetModelAncestorSettable for InsertableAssetModelAncestorBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttribute;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`
     /// column.
     fn descendant_model(
@@ -195,11 +196,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
         Error = web_common_traits::database::InsertError<
-            InsertableAssetModelAncestorAttributes,
+            InsertableAssetModelAncestorAttribute,
         >,
     >,
 {
-    type Attributes = InsertableAssetModelAncestorAttributes;
+    type Attributes = InsertableAssetModelAncestorAttribute;
     fn is_complete(&self) -> bool {
         self.descendant_model.is_some() && self.ancestor_model.is_some()
     }

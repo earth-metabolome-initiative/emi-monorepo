@@ -56,18 +56,12 @@ where
         self.style_classes.iter().map(AsRef::as_ref)
     }
 
-    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
-    where
-        S: AsRef<str>,
-    {
-        self.nodes.iter().find(|node| node.label() == label.as_ref()).cloned()
+    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>> {
+        self.nodes.iter().find(|node| node.label() == label).cloned()
     }
 
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
-    where
-        S: AsRef<str>,
-    {
-        self.style_classes.iter().find(|sc| sc.name() == name.as_ref()).cloned()
+    fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>> {
+        self.style_classes.iter().find(|sc| sc.name() == name).cloned()
     }
 }
 
@@ -173,17 +167,11 @@ where
         Ok(rc)
     }
 
-    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>> {
         self.generic_diagram.get_node_by_label(label)
     }
 
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>> {
         self.generic_diagram.get_style_class_by_name(name)
     }
 

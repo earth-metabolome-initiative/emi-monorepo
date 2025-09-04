@@ -1,28 +1,28 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePouringProcedureExtensionAttributes {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes),
+pub enum InsertablePouringProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
 }
-impl core::fmt::Display for InsertablePouringProcedureExtensionAttributes {
+impl core::fmt::Display for InsertablePouringProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes>
-    for InsertablePouringProcedureExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
+    for InsertablePouringProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePouringProcedureAttributes {
-    Extension(InsertablePouringProcedureExtensionAttributes),
+pub enum InsertablePouringProcedureAttribute {
+    Extension(InsertablePouringProcedureExtensionAttribute),
     Procedure,
     PouredFrom,
     ProcedureTemplate,
@@ -32,7 +32,7 @@ pub enum InsertablePouringProcedureAttributes {
     MeasuredWith,
     PouredInto,
 }
-impl core::str::FromStr for InsertablePouringProcedureAttributes {
+impl core::str::FromStr for InsertablePouringProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -54,7 +54,7 @@ impl core::str::FromStr for InsertablePouringProcedureAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertablePouringProcedureAttributes {
+impl core::fmt::Display for InsertablePouringProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -477,7 +477,7 @@ pub struct InsertablePouringProcedureBuilder<
 }
 /// Trait defining setters for attributes of an instance of `PouringProcedure`
 /// or descendant tables.
-pub trait PouringProcedureBuildable: Sized {
+pub trait PouringProcedureSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.pouring_procedures.poured_from` column.
@@ -644,11 +644,11 @@ pub trait PouringProcedureBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> PouringProcedureBuildable for InsertablePouringProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes;
+> PouringProcedureSettable for InsertablePouringProcedureBuilder<Procedure> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute;
     ///Sets the value of the `public.pouring_procedures.poured_from` column.
     fn poured_from(
         mut self,
@@ -687,7 +687,7 @@ impl<
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure_template(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
@@ -704,8 +704,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -725,8 +725,8 @@ impl<
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes::ForeignProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute::ForeignProcedureTemplate,
                         )
                 })?;
         }
@@ -801,26 +801,62 @@ impl<
     }
 }
 impl<
-    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes,
+    Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertablePouringProcedureBuilder<Procedure>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::procedure(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -858,7 +894,7 @@ where
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as PouringProcedureBuildable>::procedure_template(self, procedure_template)
+        <Self as PouringProcedureSettable>::procedure_template(self, procedure_template)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -866,7 +902,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
             )
@@ -890,7 +926,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::created_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                 self.procedure,
                 created_at,
             )
@@ -908,7 +944,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_by(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,
             )
@@ -932,7 +968,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureBuildable>::updated_at(
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
             )
@@ -972,11 +1008,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
-            Error = web_common_traits::database::InsertError<InsertablePouringProcedureAttributes>,
+            Error = web_common_traits::database::InsertError<InsertablePouringProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertablePouringProcedureAttributes;
+    type Attributes = InsertablePouringProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.poured_from.is_some()

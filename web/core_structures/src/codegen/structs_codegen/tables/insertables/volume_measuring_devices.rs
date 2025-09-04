@@ -1,34 +1,34 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumeMeasuringDeviceExtensionAttributes {
+pub enum InsertableVolumeMeasuringDeviceExtensionAttribute {
     PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ),
 }
-impl core::fmt::Display for InsertableVolumeMeasuringDeviceExtensionAttributes {
+impl core::fmt::Display for InsertableVolumeMeasuringDeviceExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes>
-    for InsertableVolumeMeasuringDeviceExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
+    for InsertableVolumeMeasuringDeviceExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumeMeasuringDeviceAttributes {
-    Extension(InsertableVolumeMeasuringDeviceExtensionAttributes),
+pub enum InsertableVolumeMeasuringDeviceAttribute {
+    Extension(InsertableVolumeMeasuringDeviceExtensionAttribute),
     Id,
     Model,
 }
-impl core::str::FromStr for InsertableVolumeMeasuringDeviceAttributes {
+impl core::str::FromStr for InsertableVolumeMeasuringDeviceAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableVolumeMeasuringDeviceAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumeMeasuringDeviceAttributes {
+impl core::fmt::Display for InsertableVolumeMeasuringDeviceAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -138,7 +138,7 @@ pub struct InsertableVolumeMeasuringDeviceBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `VolumeMeasuringDevice` or descendant tables.
-pub trait VolumeMeasuringDeviceBuildable: Sized {
+pub trait VolumeMeasuringDeviceSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.volume_measuring_devices.model` column.
@@ -165,12 +165,12 @@ pub trait VolumeMeasuringDeviceBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> VolumeMeasuringDeviceBuildable
+> VolumeMeasuringDeviceSettable
 for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute;
     ///Sets the value of the `public.volume_measuring_devices.model` column.
     ///
     ///# Implementation notes
@@ -196,9 +196,9 @@ for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset> {
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///v5 -.->|"`descendant of`"| v3
@@ -207,7 +207,7 @@ for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset> {
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 model,
             )
@@ -221,24 +221,24 @@ for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset> {
     }
 }
 impl<
-    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes,
+    PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
             )
@@ -260,7 +260,7 @@ where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
                 name,
             )
@@ -282,7 +282,7 @@ where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
                 description,
             )
@@ -322,7 +322,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
             self,
             model,
         )
@@ -333,7 +333,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -357,7 +357,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -375,7 +375,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -399,7 +399,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+        self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -414,14 +414,14 @@ where
 }
 impl<
     PhysicalAsset,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -451,15 +451,15 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///v5 -.->|"`descendant of`"| v3
-    ///v4 --->|"`extends`"| v3
     ///```
     fn model(
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as VolumeMeasuringDeviceBuildable>::model(self, model)
+        <Self as VolumeMeasuringDeviceSettable>::model(self, model)
     }
 }
 impl<PhysicalAsset> web_common_traits::database::MostConcreteTable
@@ -490,7 +490,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
         Error = web_common_traits::database::InsertError<
-            InsertableVolumeMeasuringDeviceAttributes,
+            InsertableVolumeMeasuringDeviceAttribute,
         >,
     >,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
@@ -498,7 +498,7 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
-    type Attributes = InsertableVolumeMeasuringDeviceAttributes;
+    type Attributes = InsertableVolumeMeasuringDeviceAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.model.is_some()
     }

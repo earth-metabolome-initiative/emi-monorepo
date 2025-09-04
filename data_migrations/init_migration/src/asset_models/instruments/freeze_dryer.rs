@@ -1,6 +1,6 @@
 //! Submodule to initialize the freeze dryer in the database.
 
-use core_structures::{FreezeDryerModel, User, tables::insertables::AssetModelBuildable};
+use core_structures::{FreezeDryerModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -30,10 +30,9 @@ pub(crate) fn freeze_dryer(
     }
 
     Ok(FreezeDryerModel::new()
-        .name(name.to_owned())?
+        .name(name)?
         .description(
-            "A freeze dryer (or lyophilisator) used to sublimate water content of samples."
-                .to_owned(),
+            "A freeze dryer (or lyophilisator) used to sublimate water content of samples.",
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?)

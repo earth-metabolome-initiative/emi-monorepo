@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -87,7 +87,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_ball_mill_machine_lots_id_fkey1.is_complete() {
@@ -95,9 +95,9 @@ where
                 .commercial_ball_mill_machine_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttributes::BallMillMachineModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttribute::BallMillMachineModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -106,9 +106,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -118,9 +118,9 @@ where
                 .commercial_ball_mill_machine_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttributes::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -129,9 +129,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttributes::BallMillMachineModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotExtensionAttribute::BallMillMachineModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute::Id,
                         ),
                     ))
                 })?;

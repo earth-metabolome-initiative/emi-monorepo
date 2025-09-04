@@ -9,8 +9,8 @@ use web_common_traits::{
 
 use crate::{
     AssetModel, ProcedureTemplate,
-    codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable,
-    tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+    codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable,
+    tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
 };
 
 /// Trait defining the methods for managing parent-child relationships in
@@ -37,7 +37,7 @@ where
         conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::ProcedureTemplateAssetModel,
-        InsertError<InsertableProcedureTemplateAssetModelAttributes>,
+        InsertError<InsertableProcedureTemplateAssetModelAttribute>,
     >
     where
         T: ExtensionTable<AssetModel>,

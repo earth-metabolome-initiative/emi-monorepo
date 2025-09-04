@@ -22,12 +22,12 @@ where
         C,
         PrimaryKey = i32,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -68,7 +68,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -136,11 +136,11 @@ where
                 procedure_template_aliquoted_from_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateSettable>::foreign_procedure_template(
                     self,
                     procedure_template_asset_models.procedure_template,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateBuildable>::aliquoted_from_model(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureTemplateSettable>::aliquoted_from_model(
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
@@ -150,67 +150,85 @@ where
             .liters
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::Liters,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::Liters,
                 ),
             )?;
         let aliquoted_from_model = self
             .aliquoted_from_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::AliquotedFromModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::AliquotedFromModel,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let procedure_template_aliquoted_from_model = self
             .procedure_template_aliquoted_from_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedFromModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplateAliquotedFromModel,
                 ),
             )?;
         let aliquoted_into_model = self
             .aliquoted_into_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::AliquotedIntoModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::AliquotedIntoModel,
                 ),
             )?;
         let aliquoted_with_model = self
             .aliquoted_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::AliquotedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::AliquotedWithModel,
                 ),
             )?;
         let pipette_tip_model = self
             .pipette_tip_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::PipetteTipModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::PipetteTipModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateExtensionAttributes::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        self.procedure_template_aliquoted_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_aliquoted_into_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplateAliquotedIntoModel,
+                )
             })?;
         let procedure_template_aliquoted_into_model = self
             .procedure_template_aliquoted_into_model
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedIntoModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplateAliquotedIntoModel,
+                )
+            })?;
+        self.procedure_template_aliquoted_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_aliquoted_with_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplateAliquotedWithModel,
                 )
             })?;
         let procedure_template_aliquoted_with_model = self
@@ -218,7 +236,16 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplateAliquotedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplateAliquotedWithModel,
+                )
+            })?;
+        self.procedure_template_pipette_tip_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_pipette_tip_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplatePipetteTipModel,
                 )
             })?;
         let procedure_template_pipette_tip_model = self
@@ -226,7 +253,7 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttributes::ProcedureTemplatePipetteTipModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateAttribute::ProcedureTemplatePipetteTipModel,
                 )
             })?;
         Ok(Self::InsertableVariant {

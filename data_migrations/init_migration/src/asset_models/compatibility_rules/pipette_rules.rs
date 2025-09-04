@@ -25,13 +25,13 @@ pub(super) fn init_pipette_rules(
     let pipette_tip_1000ul = pipette_tip_1000ul(user, conn)?;
 
     // A 1000ul pipette is compatible with a 1000ul pipette tip.
-    pipette_1000ul.compatible_with_quantity(&pipette_tip_1000ul, 1, user, conn)?;
+    pipette_1000ul.compatible_with(&pipette_tip_1000ul, user, conn)?;
 
     let pipette_200ul = pipette_200ul(user, conn)?;
     let pipette_tip_200ul = pipette_tip_200ul(user, conn)?;
 
     // A 200ul pipette is compatible with a 200ul pipette tip.
-    pipette_200ul.compatible_with_quantity(&pipette_tip_200ul, 1, user, conn)?;
+    pipette_200ul.compatible_with(&pipette_tip_200ul, user, conn)?;
 
     Ok(())
 }

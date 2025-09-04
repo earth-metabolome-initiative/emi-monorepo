@@ -52,15 +52,7 @@ fn to_mermaid_node(
         } else {
             for procedure_template_trackable in procedure_trackables {
                 let style_class = trackable_classes
-                    .get(
-                        &root_procedure_template
-                            .procedure_template_trackable_equivalent(
-                                &procedure_template_trackable,
-                                None,
-                                conn,
-                            )?
-                            .expect("Trackable not found"),
-                    )
+                    .get(&procedure_template_trackable)
                     .expect("Style class not found");
                 node_builder = node_builder.subnode(
                     builder.node(

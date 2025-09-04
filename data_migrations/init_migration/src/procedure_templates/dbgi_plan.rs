@@ -2,7 +2,7 @@
 
 use core_structures::{
     ProcedureTemplate, User,
-    tables::insertables::ProcedureTemplateBuildable,
+    tables::insertables::ProcedureTemplateSettable,
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -58,7 +58,7 @@ pub fn init_dbgi_plan(
         &negative_lcms_procedure,
         &data_enrichment,
     ] {
-        dbgi_plan.child(procedure, ChildOptions::default().inherit_asset_models(), user, conn)?;
+        dbgi_plan.child(procedure, ChildOptions::default(), user, conn)?;
     }
 
     dbgi_plan.extend(

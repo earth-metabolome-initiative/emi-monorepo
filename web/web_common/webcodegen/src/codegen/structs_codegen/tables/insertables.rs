@@ -130,7 +130,7 @@ impl Codegen<'_> {
             };
             let insertable_variant_ident = table.insertable_variant_ident()?;
             let insertable_builder_ident = table.insertable_builder_ident()?;
-            let buildable_trait_ident = table.builder_trait_ident()?;
+            let buildable_trait_ident = table.setter_trait_ident()?;
             let enum_implementation = table.insertable_enum_definition(conn)?;
             let insertable_variant_definition = table.insertable_variant_definition(conn)?;
 

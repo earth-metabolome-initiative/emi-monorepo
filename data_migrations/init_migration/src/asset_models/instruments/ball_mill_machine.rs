@@ -3,7 +3,7 @@
 
 use core_structures::{
     BallMillMachineModel, CommercialProduct, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -36,8 +36,8 @@ pub(crate) fn ball_mill_machine(
     }
 
     Ok(BallMillMachineModel::new()
-        .name(name.to_owned())?
-        .description("A Ball Mill Machine used to grind samples into powder.".to_owned())?
+        .name(name)?
+        .description("A Ball Mill Machine used to grind samples into powder.")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -57,10 +57,8 @@ pub(crate) fn init_retsch_mm400(
     let brand = retsch(user, conn)?;
 
     Ok(CommercialProduct::new()
-        .name(device_name.to_owned())?
-        .description(
-            "Retsch MM 400 Ball Mill, used to reduce solid material into powder.".to_owned(),
-        )?
+        .name(device_name)?
+        .description("Retsch MM 400 Ball Mill, used to reduce solid material into powder.")?
         .created_by(user.id)?
         .parent_model(Some(ball_mill.id))?
         .brand(brand.id)?

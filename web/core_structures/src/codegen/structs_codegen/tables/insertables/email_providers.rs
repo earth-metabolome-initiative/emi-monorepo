@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableEmailProviderAttributes {
+pub enum InsertableEmailProviderAttribute {
     EmailId,
     LoginProviderId,
 }
-impl core::str::FromStr for InsertableEmailProviderAttributes {
+impl core::str::FromStr for InsertableEmailProviderAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableEmailProviderAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableEmailProviderAttributes {
+impl core::fmt::Display for InsertableEmailProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::EmailId => write!(f, "email_id"),
@@ -110,7 +110,7 @@ pub struct InsertableEmailProviderBuilder {
 }
 /// Trait defining setters for attributes of an instance of `EmailProvider` or
 /// descendant tables.
-pub trait EmailProviderBuildable: Sized {
+pub trait EmailProviderSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.email_providers.email_id` column.
@@ -158,9 +158,9 @@ pub trait EmailProviderBuildable: Sized {
         login_provider_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl EmailProviderBuildable for InsertableEmailProviderBuilder {
+impl EmailProviderSettable for InsertableEmailProviderBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttribute;
     /// Sets the value of the `public.email_providers.email_id` column.
     fn email(
         mut self,
@@ -190,10 +190,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
-            Error = web_common_traits::database::InsertError<InsertableEmailProviderAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableEmailProviderAttribute>,
         >,
 {
-    type Attributes = InsertableEmailProviderAttributes;
+    type Attributes = InsertableEmailProviderAttribute;
     fn is_complete(&self) -> bool {
         self.email_id.is_some() && self.login_provider_id.is_some()
     }

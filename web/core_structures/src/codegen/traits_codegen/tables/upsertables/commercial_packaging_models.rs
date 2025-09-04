@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_packaging_models::Commer
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(packaging_model.ne(excluded(packaging_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_packaging_models::Commer
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(packaging_model.ne(excluded(packaging_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

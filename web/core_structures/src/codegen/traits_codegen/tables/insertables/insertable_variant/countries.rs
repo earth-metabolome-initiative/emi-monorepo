@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::countries::Country;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCountry;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,14 +46,14 @@ where
             .iso
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes::Iso,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttribute::Iso,
                 ),
             )?;
         let name = self
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttribute::Name,
                 ),
             )?;
         Ok(Self::InsertableVariant {

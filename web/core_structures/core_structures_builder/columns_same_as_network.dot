@@ -323,9 +323,9 @@ subgraph cluster_volume_measuring_devices {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_commercial_beads_models {
-  C130 [color="blue", fillcolor="#ffffff", label="commercial_beads_models\nparent_model"];
-  label="commercial_beads_models";
+subgraph cluster_commercial_bead_models {
+  C130 [color="blue", fillcolor="#ffffff", label="commercial_bead_models\nparent_model"];
+  label="commercial_bead_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }

@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureTemplateExtensionAttributes {
+pub enum InsertableStorageProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableStorageProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableStorageProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,32 +13,31 @@ impl core::fmt::Display for InsertableStorageProcedureTemplateExtensionAttribute
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableStorageProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableStorageProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureTemplateAttributes {
-    Extension(InsertableStorageProcedureTemplateExtensionAttributes),
+pub enum InsertableStorageProcedureTemplateAttribute {
+    Extension(InsertableStorageProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Kelvin,
     KelvinTolerancePercentage,
     StoredIntoModel,
     ProcedureTemplateStoredIntoModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     StoredAssetModel,
     ForeignProcedureTemplate,
     ProcedureTemplateStoredAssetModel,
 }
-impl core::str::FromStr for InsertableStorageProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableStorageProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -48,7 +47,7 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttributes {
             "ProcedureTemplateStoredIntoModel" => {
                 Ok(
                     Self::ProcedureTemplateStoredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -63,7 +62,7 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttributes {
             "procedure_template_stored_into_model" => {
                 Ok(
                     Self::ProcedureTemplateStoredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -82,7 +81,7 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableStorageProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableStorageProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -377,7 +376,7 @@ where
 }
 /// Trait defining setters for attributes of an instance of
 /// `StorageProcedureTemplate` or descendant tables.
-pub trait StorageProcedureTemplateBuildable: Sized {
+pub trait StorageProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.storage_procedure_templates.kelvin`
@@ -554,10 +553,10 @@ pub trait StorageProcedureTemplateBuildable: Sized {
         procedure_template_stored_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> StorageProcedureTemplateBuildable
+impl<ProcedureTemplate> StorageProcedureTemplateSettable
     for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute;
     /// Sets the value of the `public.storage_procedure_templates.kelvin`
     /// column.
     fn kelvin<K>(
@@ -570,13 +569,13 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     {
         let kelvin = kelvin.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableStorageProcedureTemplateAttributes::Kelvin)
+                .rename_field(InsertableStorageProcedureTemplateAttribute::Kelvin)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::Kelvin,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::Kelvin,
                     )
             })?;
         self.kelvin = Some(kelvin);
@@ -595,14 +594,14 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
         let kelvin_tolerance_percentage =
             kelvin_tolerance_percentage.try_into().map_err(|err| {
                 validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableStorageProcedureTemplateAttributes::KelvinTolerancePercentage,
+                    InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                 )
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::KelvinTolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -613,7 +612,7 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes::KelvinTolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                             )
                     })
             })?;
@@ -641,20 +640,21 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
+    /// class v1 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
         mut self,
         stored_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_stored_into_model,
                 stored_into_model,
             )
@@ -682,10 +682,10 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
     ///    v2@{shape: rounded, label: "stored_into_model"}
@@ -694,6 +694,7 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     /// class v1 column-of-interest
     /// end
     /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
@@ -714,7 +715,7 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_stored_into_model.asset_model {
             self.stored_into_model = Some(asset_model);
         } else if let Some(local) = self.stored_into_model {
-            procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_stored_into_model,
                     local,
                 )
@@ -777,12 +778,12 @@ impl<ProcedureTemplate> StorageProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -793,7 +794,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -815,7 +816,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -837,7 +838,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -859,7 +860,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -877,7 +878,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -901,7 +902,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -919,7 +920,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -943,7 +944,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -984,7 +985,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableStorageProcedureTemplateAttributes,
+            InsertableStorageProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -995,7 +996,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableStorageProcedureTemplateAttributes;
+    type Attributes = InsertableStorageProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kelvin.is_some()
             && self.kelvin_tolerance_percentage.is_some()

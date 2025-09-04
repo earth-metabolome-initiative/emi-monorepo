@@ -3,7 +3,7 @@
 use core_structures::{
     CommercialProduct, User, VolumetricContainerModel,
     tables::insertables::{
-        AssetModelBuildable, CommercialProductBuildable, VolumetricContainerModelBuildable,
+        AssetModelSettable, CommercialProductSettable, VolumetricContainerModelSettable,
     },
 };
 use diesel::{OptionalExtension, PgConnection};
@@ -37,8 +37,8 @@ pub(crate) fn vial_insert_200ul(
     }
 
     Ok(VolumetricContainerModel::new()
-        .name(name.to_owned())?
-        .description("Vial insert of 200μl, used to hold samples in vials.".to_owned())?
+        .name(name)?
+        .description("Vial insert of 200μl, used to hold samples in vials.")?
         .created_by(user.id)?
         .liters(0.0002)?
         .insert(user.id, conn)?)
@@ -57,8 +57,8 @@ pub(crate) fn init_vici_schweiz_insert(
     let insert_trackable = vial_insert_200ul(user, conn)?;
     let vici_schweiz = vici_schweiz(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(insert.to_owned())?
-        .description("VICI Schweiz insert, used to decrease needed amount of extract for mass spectrometry analysis.".to_owned())?
+        .name(insert)?
+        .description("VICI Schweiz insert, used to decrease needed amount of extract for mass spectrometry analysis.")?
         .created_by(user.id)?
         .brand(vici_schweiz.id)?
         .parent_model(Some(insert_trackable.id))?

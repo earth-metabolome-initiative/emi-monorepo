@@ -6,12 +6,12 @@ use core_structures::{
     FreezingProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
     StorageProcedureTemplate, SupernatantProcedureTemplate,
     tables::insertables::{
-        BallMillProcedureTemplateBuildable, CappingProcedureTemplateBuildable,
-        CentrifugeProcedureTemplateBuildable, DisposalProcedureTemplateBuildable,
-        FractioningProcedureTemplateBuildable, FreezeDryingProcedureTemplateBuildable,
-        FreezingProcedureTemplateBuildable, ProcedureTemplateAssetModelBuildable,
-        ProcedureTemplateBuildable, StorageProcedureTemplateBuildable,
-        SupernatantProcedureTemplateBuildable,
+        BallMillProcedureTemplateSettable, CappingProcedureTemplateSettable,
+        CentrifugeProcedureTemplateSettable, DisposalProcedureTemplateSettable,
+        FractioningProcedureTemplateSettable, FreezeDryingProcedureTemplateSettable,
+        FreezingProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
+        ProcedureTemplateSettable, StorageProcedureTemplateSettable,
+        SupernatantProcedureTemplateSettable,
     },
     traits::{AppendProcedureTemplate, ParentProcedureTemplate},
 };
@@ -23,11 +23,12 @@ use crate::{
         instruments::freezer::freezer,
     },
     procedure_template_asset_models::{
-        ball_mill::safelock_ball_mill_builder, centrifuge::safelock_centrifuge_builder,
-        conical_tubes_box::cct_rack_builder, freeze_dryer::freeze_dryer_builder,
-        freezer::freezer_builder, pipette_tips::pipette_tips_1000ul_builder,
-        pipettes::pipette_1000ul_builder, safelock::safelock_builder,
-        vial_caps::sealed_cap_vial_1_5ml_builder, weighing_device::weighing_device_builder,
+        ball_mill::safelock_ball_mill_builder, bead::bead_3mm_builder,
+        centrifuge::safelock_centrifuge_builder, conical_tubes_box::cct_rack_builder,
+        freeze_dryer::freeze_dryer_builder, freezer::freezer_builder,
+        pipette_tips::pipette_tips_1000ul_builder, pipettes::pipette_1000ul_builder,
+        safelock::safelock_builder, vial_caps::sealed_cap_vial_1_5ml_builder,
+        weighing_device::weighing_device_builder,
     },
 };
 
@@ -99,6 +100,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Ball Mill 1")?
         .description("Ball Mill of lyophilized material procedure template")?
         .created_by(user.id)?
+        .procedure_template_bead_model(bead_3mm_builder(user, conn)?)?
         .procedure_template_milled_container_model(safelock)?
         .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
         .insert(user.id, conn)?;
@@ -107,6 +109,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Ball Mill 2")?
         .description("Second Ball Mill to extract sample procedure template")?
         .created_by(user.id)?
+        .procedure_template_bead_model(bead_3mm_builder(user, conn)?)?
         .procedure_template_milled_container_model(safelock)?
         .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
         .insert(user.id, conn)?;
@@ -188,7 +191,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
     for subprocedure in &subprocedures {
         dbgi_sample_processing_procedure.child(
             subprocedure,
-            core_structures::traits::ChildOptions::default().inherit_asset_models(),
+            core_structures::traits::ChildOptions::default(),
             user,
             conn,
         )?;

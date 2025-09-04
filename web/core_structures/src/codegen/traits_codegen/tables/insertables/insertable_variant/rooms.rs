@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::rooms::Room;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRoom;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,63 +46,63 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Description,
                 ),
             )?;
         let qrcode = self
             .qrcode
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Qrcode,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Qrcode,
                 ),
             )?;
         let addresses_id = self
             .addresses_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::AddressesId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::AddressesId,
                 ),
             )?;
         let geolocation = self
             .geolocation
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Geolocation,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Geolocation,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

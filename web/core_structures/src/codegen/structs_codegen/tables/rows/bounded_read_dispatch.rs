@@ -33,7 +33,7 @@ where
     crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::beads_models::BeadsModel: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::bead_models::BeadModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::brands::Brand: web_common_traits::prelude::BoundedRead<
@@ -45,13 +45,13 @@ where
     crate::codegen::structs_codegen::tables::cameras::Camera: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::cap_models::CapModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::caps_models::CapsModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::prelude::BoundedRead<
@@ -78,16 +78,22 @@ where
     crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot: web_common_traits::prelude::BoundedRead<
@@ -330,9 +336,6 @@ where
     crate::codegen::structs_codegen::tables::sample_states::SampleState: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -506,8 +509,8 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::BeadsModel => {
-                crate::codegen::structs_codegen::tables::beads_models::BeadsModel::bounded_read(
+            crate::codegen::tables::table_names::TableName::BeadModel => {
+                crate::codegen::structs_codegen::tables::bead_models::BeadModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -538,6 +541,14 @@ where
                     )
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::CapModel => {
+                crate::codegen::structs_codegen::tables::cap_models::CapModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::CappingProcedureTemplate => {
                 crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::bounded_read(
                         offset,
@@ -548,14 +559,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::CappingProcedure => {
                 crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::CapsModel => {
-                crate::codegen::structs_codegen::tables::caps_models::CapsModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -626,16 +629,16 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::CommercialBeadsLot => {
-                crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot::bounded_read(
+            crate::codegen::tables::table_names::TableName::CommercialBeadLot => {
+                crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot::bounded_read(
                         offset,
                         limit,
                         conn,
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::CommercialBeadsModel => {
-                crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel::bounded_read(
+            crate::codegen::tables::table_names::TableName::CommercialBeadModel => {
+                crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -652,6 +655,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::CommercialCameraModel => {
                 crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CommercialCapLot => {
+                crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CommercialCapModel => {
+                crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -1292,14 +1311,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::SampleState => {
                 crate::codegen::structs_codegen::tables::sample_states::SampleState::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::SharedProcedureTemplateAssetModel => {
-                crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel::bounded_read(
                         offset,
                         limit,
                         conn,

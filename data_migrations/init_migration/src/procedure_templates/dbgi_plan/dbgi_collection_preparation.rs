@@ -2,7 +2,7 @@
 
 use core_structures::{
     ProcedureTemplate, User,
-    tables::insertables::ProcedureTemplateBuildable,
+    tables::insertables::ProcedureTemplateSettable,
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -39,19 +39,9 @@ pub(super) fn init_dbgi_collection_preparation(
     let make_ethanol_70 = init_ethanol_70_percent(user, conn)?;
     let make_solvent = init_sample_extraction_solvent_procedure(user, conn)?;
 
-    dbgi_collection_preparation.child(
-        &make_ethanol_70,
-        ChildOptions::default().inherit_asset_models(),
-        user,
-        conn,
-    )?;
+    dbgi_collection_preparation.child(&make_ethanol_70, ChildOptions::default(), user, conn)?;
 
-    dbgi_collection_preparation.child(
-        &make_solvent,
-        ChildOptions::default().inherit_asset_models(),
-        user,
-        conn,
-    )?;
+    dbgi_collection_preparation.child(&make_solvent, ChildOptions::default(), user, conn)?;
 
     dbgi_collection_preparation.extend(&[&make_ethanol_70, &make_solvent], user, conn)?;
 

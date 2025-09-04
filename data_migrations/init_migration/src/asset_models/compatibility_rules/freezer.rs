@@ -2,7 +2,10 @@
 
 use core_structures::traits::CompatibleWith;
 
-use crate::asset_models::{containers::boxes::polystyrene_box, instruments::freezer::freezer};
+use crate::asset_models::{
+    containers::conical_centrifugal_tubes::conical_centrifugal_tube_50ml,
+    instruments::freezer::freezer,
+};
 
 /// Initializes the compatibility rules for freezers.
 ///
@@ -19,10 +22,10 @@ pub(super) fn init_freezer_rules(
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<()> {
     let freezer = freezer(user, conn)?;
-    let polystyrene_box = polystyrene_box(user, conn)?;
+    let cct = conical_centrifugal_tube_50ml(user, conn)?;
 
-    // A freezer can accomodate a polystyrene box.
-    freezer.compatible_with(&polystyrene_box, user, conn)?;
+    // A freezer can accomodate a conical centrifugal tube.
+    freezer.compatible_with(&cct, user, conn)?;
 
     Ok(())
 }

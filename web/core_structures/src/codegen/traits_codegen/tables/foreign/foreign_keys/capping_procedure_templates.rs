@@ -14,7 +14,7 @@ pub struct CappingProcedureTemplateForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub capped_with_model: Option<
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
     >,
     pub procedure_template_capped_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
@@ -66,7 +66,7 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapsModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
                         self.capped_with_model,
                     ),
                 ),
@@ -139,21 +139,21 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
                 }
             }
             (
-                crate::codegen::tables::row::Row::CapsModel(caps_models),
+                crate::codegen::tables::row::Row::CapModel(cap_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.capped_with_model == caps_models.id {
-                    foreign_keys.capped_with_model = Some(caps_models);
+                if self.capped_with_model == cap_models.id {
+                    foreign_keys.capped_with_model = Some(cap_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::CapsModel(caps_models),
+                crate::codegen::tables::row::Row::CapModel(cap_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.capped_with_model == caps_models.id {
+                if self.capped_with_model == cap_models.id {
                     foreign_keys.capped_with_model = None;
                     updated = true;
                 }

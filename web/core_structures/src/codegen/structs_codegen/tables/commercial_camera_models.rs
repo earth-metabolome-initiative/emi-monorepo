@@ -14,7 +14,7 @@
 )]
 pub struct CommercialCameraModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub camera_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialCameraModel {
     const TABLE_NAME: &'static str = "commercial_camera_models";
@@ -66,7 +66,7 @@ impl diesel::Identifiable for CommercialCameraModel {
     }
 }
 impl CommercialCameraModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn camera_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -93,7 +93,7 @@ impl CommercialCameraModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::camera_models::CameraModel::table(),
-                self.parent_model,
+                self.camera_model,
             ),
             conn,
         )
@@ -163,22 +163,22 @@ impl CommercialCameraModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_camera_model(
+        camera_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_camera_models::commercial_camera_models;
         Self::table()
-            .filter(commercial_camera_models::parent_model.eq(parent_model))
+            .filter(commercial_camera_models::camera_model.eq(camera_model))
             .order_by(commercial_camera_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_camera_model(
         id: &i32,
-        parent_model: &i32,
+        camera_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,7 +190,7 @@ impl CommercialCameraModel {
             .filter(
                 commercial_camera_models::id
                     .eq(id)
-                    .and(commercial_camera_models::parent_model.eq(parent_model)),
+                    .and(commercial_camera_models::camera_model.eq(camera_model)),
             )
             .order_by(commercial_camera_models::id.asc())
             .load::<Self>(conn)
@@ -239,6 +239,30 @@ impl CommercialCameraModel {
                     .on(commercial_camera_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_camera_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_camera_models::commercial_camera_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_camera_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_camera_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

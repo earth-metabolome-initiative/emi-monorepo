@@ -1,6 +1,6 @@
 //! Submodule defining the compatibility rules for vials.
 
-use core_structures::traits::CompatibleWith;
+use core_structures::traits::{CanContain, CompatibleWith};
 
 use crate::asset_models::containers::{
     boxes::vial_rack_1_5ml,
@@ -30,13 +30,13 @@ pub(super) fn init_vial_rules(
     let vial_rack = vial_rack_1_5ml(user, conn)?;
 
     // A vial is compatible with one sealed cap.
-    vial_1_5ml.compatible_with_quantity(&vial_1_5ml_sealed_cap, 1, user, conn)?;
+    vial_1_5ml.compatible_with(&vial_1_5ml_sealed_cap, user, conn)?;
     // A vial is compatible with one splitted cap.
-    vial_1_5ml.compatible_with_quantity(&vial_1_5ml_splitted_cap, 1, user, conn)?;
+    vial_1_5ml.compatible_with(&vial_1_5ml_splitted_cap, user, conn)?;
     // A vial is compatible with one insert.
-    vial_1_5ml.compatible_with_quantity(&vial_insert, 1, user, conn)?;
+    vial_1_5ml.compatible_with(&vial_insert, user, conn)?;
     // A Vial rack can hold 81 vials.
-    vial_rack.compatible_with_quantity(&vial_1_5ml, 81, user, conn)?;
+    vial_rack.can_contain(&vial_1_5ml, 81, user, conn)?;
 
     Ok(())
 }

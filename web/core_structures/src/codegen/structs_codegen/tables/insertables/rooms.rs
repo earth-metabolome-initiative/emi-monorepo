@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableRoomAttributes {
+pub enum InsertableRoomAttribute {
     Id,
     Name,
     Description,
@@ -12,7 +12,7 @@ pub enum InsertableRoomAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableRoomAttributes {
+impl core::str::FromStr for InsertableRoomAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableRoomAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableRoomAttributes {
+impl core::fmt::Display for InsertableRoomAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -199,7 +199,7 @@ impl Default for InsertableRoomBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Room` or descendant
 /// tables.
-pub trait RoomBuildable: Sized {
+pub trait RoomSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.rooms.name` column.
@@ -426,9 +426,8 @@ pub trait RoomBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl RoomBuildable for InsertableRoomBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes;
+impl RoomSettable for InsertableRoomBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute;
     /// Sets the value of the `public.rooms.name` column.
     fn name<N>(
         mut self,
@@ -440,15 +439,13 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::Name)
+                .rename_field(InsertableRoomAttribute::Name)
         })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Name,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Name,
+            )
+        })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -463,13 +460,13 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::Description)
+                .rename_field(InsertableRoomAttribute::Description)
         })?;
         pgrx_validation::must_be_paragraph(description.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Description,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::Description,
                     )
             })?;
         self.description = Some(description);
@@ -486,7 +483,7 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let qrcode = qrcode.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::Qrcode)
+                .rename_field(InsertableRoomAttribute::Qrcode)
         })?;
         self.qrcode = Some(qrcode);
         Ok(self)
@@ -511,7 +508,7 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let geolocation = geolocation.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::Geolocation)
+                .rename_field(InsertableRoomAttribute::Geolocation)
         })?;
         self.geolocation = Some(geolocation);
         Ok(self)
@@ -553,15 +550,15 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::CreatedAt)
+                .rename_field(InsertableRoomAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -588,15 +585,15 @@ impl RoomBuildable for InsertableRoomBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRoomAttributes::UpdatedAt)
+                .rename_field(InsertableRoomAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -616,10 +613,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::rooms::Room,
-            Error = web_common_traits::database::InsertError<InsertableRoomAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableRoomAttribute>,
         >,
 {
-    type Attributes = InsertableRoomAttributes;
+    type Attributes = InsertableRoomAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

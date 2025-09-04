@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -63,7 +63,7 @@ where
         self.set_most_concrete_table("commercial_ball_mill_machine_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.ball_mill_machine_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,11 +89,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let ball_mill_machine_model = self
+            .ball_mill_machine_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute::BallMillMachineModel,
                 ),
             )?;
         let id = if self.commercial_ball_mill_machine_models_id_fkey.is_complete() {
@@ -101,9 +101,9 @@ where
                 .commercial_ball_mill_machine_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttributes::BallMillMachineModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttribute::BallMillMachineModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -112,9 +112,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -124,9 +124,9 @@ where
                 .commercial_ball_mill_machine_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -135,9 +135,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttributes::BallMillMachineModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelExtensionAttribute::BallMillMachineModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -145,7 +145,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            ball_mill_machine_model,
         })
     }
 }

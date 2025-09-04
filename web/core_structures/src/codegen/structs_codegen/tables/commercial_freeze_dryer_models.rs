@@ -14,7 +14,7 @@
 )]
 pub struct CommercialFreezeDryerModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub freeze_dryer_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialFreezeDryerModel {
     const TABLE_NAME: &'static str = "commercial_freeze_dryer_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialFreezeDryerModel {
     }
 }
 impl CommercialFreezeDryerModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn freeze_dryer_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -91,7 +91,7 @@ impl CommercialFreezeDryerModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel::table(),
-                self.parent_model,
+                self.freeze_dryer_model,
             ),
             conn,
         )
@@ -163,22 +163,22 @@ impl CommercialFreezeDryerModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_freeze_dryer_model(
+        freeze_dryer_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_freeze_dryer_models::commercial_freeze_dryer_models;
         Self::table()
-            .filter(commercial_freeze_dryer_models::parent_model.eq(parent_model))
+            .filter(commercial_freeze_dryer_models::freeze_dryer_model.eq(freeze_dryer_model))
             .order_by(commercial_freeze_dryer_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_freeze_dryer_model(
         id: &i32,
-        parent_model: &i32,
+        freeze_dryer_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,7 +190,7 @@ impl CommercialFreezeDryerModel {
             .filter(
                 commercial_freeze_dryer_models::id
                     .eq(id)
-                    .and(commercial_freeze_dryer_models::parent_model.eq(parent_model)),
+                    .and(commercial_freeze_dryer_models::freeze_dryer_model.eq(freeze_dryer_model)),
             )
             .order_by(commercial_freeze_dryer_models::id.asc())
             .load::<Self>(conn)
@@ -239,6 +239,30 @@ impl CommercialFreezeDryerModel {
                     .on(commercial_freeze_dryer_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_freeze_dryer_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_freeze_dryer_models::commercial_freeze_dryer_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_freeze_dryer_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_freeze_dryer_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

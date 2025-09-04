@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableRankAttributes {
+pub enum InsertableRankAttribute {
     Name,
     Description,
     Id,
 }
-impl core::str::FromStr for InsertableRankAttributes {
+impl core::str::FromStr for InsertableRankAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -17,7 +17,7 @@ impl core::str::FromStr for InsertableRankAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableRankAttributes {
+impl core::fmt::Display for InsertableRankAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -45,7 +45,7 @@ pub struct InsertableRankBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Rank` or descendant
 /// tables.
-pub trait RankBuildable: Sized {
+pub trait RankSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.ranks.name` column.
@@ -100,9 +100,8 @@ pub trait RankBuildable: Sized {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl RankBuildable for InsertableRankBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableRankAttributes;
+impl RankSettable for InsertableRankBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRankAttribute;
     /// Sets the value of the `public.ranks.name` column.
     fn name<N>(
         mut self,
@@ -114,7 +113,7 @@ impl RankBuildable for InsertableRankBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRankAttributes::Name)
+                .rename_field(InsertableRankAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -130,7 +129,7 @@ impl RankBuildable for InsertableRankBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableRankAttributes::Description)
+                .rename_field(InsertableRankAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -148,10 +147,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::ranks::Rank,
-            Error = web_common_traits::database::InsertError<InsertableRankAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableRankAttribute>,
         >,
 {
-    type Attributes = InsertableRankAttributes;
+    type Attributes = InsertableRankAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.description.is_some()
     }

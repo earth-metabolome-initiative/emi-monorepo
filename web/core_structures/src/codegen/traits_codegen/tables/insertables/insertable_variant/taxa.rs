@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::taxa::Taxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTaxon;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,21 +46,21 @@ where
             .id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes::Id,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttribute::Id,
                 ),
             )?;
         let name = self
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttribute::Name,
                 ),
             )?;
         let rank_id = self
             .rank_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttributes::RankId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTaxonAttribute::RankId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

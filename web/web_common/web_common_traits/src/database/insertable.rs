@@ -139,8 +139,19 @@ pub enum InsertError<FieldName> {
     ValidationError(validation_errors::Error<FieldName>),
     /// A diesel error occurred.
     DieselError(String),
-    /// A compatibility rule was violated.
-    CompatibilityRule(String, FieldName, FieldName),
+    /// A foreign key was violated.
+    ForeignKeyViolation {
+        /// The name of the table where the row is being inserted.
+        table: String,
+        /// The name of the table where the foreign key points to.
+        foreign_table: String,
+        /// The name of the foreign key constraint that was violated.
+        foreign_key: String,
+        /// The names of the columns involved in the foreign key violation.
+        columns: Vec<FieldName>,
+        /// The expected values of the columns.
+        expected_values: Vec<String>,
+    },
     /// Unknown attribute error.
     UnknownAttribute(String),
     /// A server error occurred.
@@ -162,8 +173,20 @@ impl<FieldName> InsertError<FieldName> {
                 InsertError::ValidationError(error.into_field_name(convert))
             }
             InsertError::DieselError(error) => InsertError::DieselError(error),
-            InsertError::CompatibilityRule(constraint_name, left, right) => {
-                InsertError::CompatibilityRule(constraint_name, convert(left), convert(right))
+            InsertError::ForeignKeyViolation {
+                table,
+                foreign_table,
+                foreign_key,
+                columns,
+                expected_values,
+            } => {
+                InsertError::ForeignKeyViolation {
+                    table,
+                    foreign_table,
+                    foreign_key,
+                    columns: columns.into_iter().map(convert).collect(),
+                    expected_values,
+                }
             }
             InsertError::UnknownAttribute(attribute) => InsertError::UnknownAttribute(attribute),
             InsertError::ServerError(error) => InsertError::ServerError(error),
@@ -188,10 +211,22 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
             InsertError::DieselError(error) => {
                 write!(f, "Diesel error: {error}")
             }
-            InsertError::CompatibilityRule(constraint_name, left, right) => {
+            InsertError::ForeignKeyViolation {
+                table,
+                foreign_table,
+                foreign_key,
+                columns,
+                expected_values,
+            } => {
                 write!(
                     f,
-                    "Compatibility rule `{constraint_name}` missing: provided `{left}` is not known to be compatible with `{right}`"
+                    "Foreign key \"{foreign_key}\" violated while attempting to insert a row in table \"{foreign_table}\": there is no row in table \"{table}\" with the requested values {{{}}}. Possibly you forgot to insert a required row first, or you misplaced it?",
+                    columns
+                        .iter()
+                        .zip(expected_values.iter())
+                        .map(|(col, val)| format!("{}: {}", col, val))
+                        .collect::<Vec<_>>()
+                        .join(", ")
                 )
             }
             InsertError::UnknownAttribute(attribute) => {
@@ -204,7 +239,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
     }
 }
 
-impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
+impl<FieldName: core::fmt::Debug + core::fmt::Display> core::fmt::Debug for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertError::BuilderError(error) => {
@@ -216,12 +251,7 @@ impl<FieldName: core::fmt::Debug> core::fmt::Debug for InsertError<FieldName> {
             InsertError::DieselError(error) => {
                 write!(f, "Diesel error: {error:?}")
             }
-            InsertError::CompatibilityRule(constraint_name, left, right) => {
-                write!(
-                    f,
-                    "Compatibility rule `{constraint_name}` missing: provided `{left:?}` is not known to be compatible with `{right:?}`"
-                )
-            }
+            InsertError::ForeignKeyViolation { .. } => <Self as core::fmt::Display>::fmt(self, f),
             InsertError::UnknownAttribute(attribute) => {
                 write!(f, "Unknown attribute error: `{attribute:?}`")
             }
@@ -271,46 +301,51 @@ where
         ) = &error
         {
             if let Some(detail) = info.details() {
-                if detail.contains("compatibility_rules") {
-                    // We retrieve the names of the two columns involved in the
-                    // compatibility rule violation.
-                    //
-                    // An example of a detail is:
-                    //
-                    // Some("Key (frozen_with,
-                    // frozen_container_id)=(af54ac83-a40f-4b83-940c-998fc70332ac,
-                    // c11af75e-42cd-4972-bdd0-2edce335b5af) is not present in table
-                    // \"compatibility_rules\".")
-                    //
-                    // First, we split the detail by the `=` character to get the
-                    // part that contains the two columns.
-                    if let Some(first_part) = detail.split('=').next() {
-                        // Then, we remove the leading `Key (` and trailing `)` characters.
-                        let first_part =
-                            first_part.trim_start_matches("Key (").trim_end_matches(')');
+                // We retrieve the names of the columns involved in the
+                // foreign key violation.
+                //
+                // An example of a detail is:
+                //
+                // Some("Key (frozen_with,
+                // frozen_container_id)=(af54ac83-a40f-4b83-940c-998fc70332ac,
+                // c11af75e-42cd-4972-bdd0-2edce335b5af) is not present in table
+                // \"compatibility_rules\".")
+                //
 
-                        // Now, we split the first part by the `,` character to get the two
-                        // column names, which need to be trimmed of any whitespace.
-                        if let Ok(mut field_names) = first_part
-                            .split(',')
+                // We extract the names of the columns, their values and the name
+                // of the associated table.
+
+                let mut equal_split = detail.split('=');
+                let before_equal = equal_split.next().and_then(|s| {
+                    Some(
+                        s.strip_suffix(")")?
+                            .split_once("(")?
+                            .1
+                            .split(",")
                             .map(str::trim)
-                            .map(|s| s.parse::<FieldName>())
-                            .collect::<Result<Vec<FieldName>, _>>()
-                        {
-                            if let (Some(second), Some(first)) =
-                                (field_names.pop(), field_names.pop())
-                            {
-                                // We return a compatibility rule error with the two field names.
-                                return InsertError::CompatibilityRule(
-                                    info.constraint_name()
-                                        .unwrap_or("Unknown constraint")
-                                        .to_owned(),
-                                    first,
-                                    second,
-                                );
-                            }
-                        }
-                    }
+                            .map(FieldName::from_str)
+                            .collect::<Result<Vec<_>, _>>()
+                            .ok()?,
+                    )
+                });
+                let after_equal = equal_split
+                    .next()
+                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(")").last()?.split(",")));
+                let table_name = detail.rsplit_once("table \"").and_then(|(_, after)| {
+                    after.strip_suffix("\".") // We remove the trailing quote and dot.
+                });
+                if let (Some(columns), Some(expected_values), Some(table), Some(foreign_table)) =
+                    (before_equal, after_equal, table_name, info.table_name())
+                {
+                    let expected_values =
+                        expected_values.map(str::trim).map(String::from).collect();
+                    return InsertError::ForeignKeyViolation {
+                        table: table.to_owned(),
+                        foreign_table: foreign_table.to_owned(),
+                        foreign_key: info.constraint_name().unwrap_or("unknown").to_string(),
+                        columns,
+                        expected_values,
+                    };
                 }
             }
         }

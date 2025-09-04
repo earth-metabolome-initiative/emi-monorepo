@@ -1,6 +1,6 @@
 //! Submodule defining the init migrations for the users.
 
-use core_structures::{User, tables::insertables::UserBuildable};
+use core_structures::{User, tables::insertables::UserSettable};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant, Read};
 

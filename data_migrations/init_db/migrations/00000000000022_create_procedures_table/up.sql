@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS procedures (
 	procedure UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	parent_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE,
+	parent_procedure_template INTEGER REFERENCES procedure_templates(procedure_template),
 	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
 	most_concrete_table TEXT NOT NULL,
 	created_by INTEGER NOT NULL REFERENCES users(id),
@@ -7,7 +9,9 @@ CREATE TABLE IF NOT EXISTS procedures (
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CHECK (must_be_smaller_than_utc(created_at, updated_at)),
-	UNIQUE (procedure, procedure_template)
+	UNIQUE (procedure, procedure_template),
+	FOREIGN KEY (parent_procedure, parent_procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (parent_procedure_template, procedure_template) REFERENCES parent_procedure_templates(parent_procedure_template, child_procedure_template)
 );
 CREATE TABLE IF NOT EXISTS procedure_assets (
 	procedure UUID NOT NULL REFERENCES procedures(procedure),

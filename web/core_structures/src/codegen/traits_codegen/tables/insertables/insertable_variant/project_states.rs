@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::project_states::ProjectState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProjectState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttributes::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

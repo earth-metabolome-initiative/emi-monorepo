@@ -19,7 +19,7 @@ impl Codegen<'_> {
         let mut foreign_defined_completions = Vec::new();
         let mut extra_requirements = Vec::new();
 
-        let buildable_trait = table.builder_trait_ty()?;
+        let buildable_trait = table.setter_trait_ty()?;
         for foreign_define_column in table.foreign_definer_columns(conn)? {
             let mut foreign_definer_ops = Vec::new();
             let foreign_define_column_ident = foreign_define_column.snake_case_ident()?;
@@ -38,10 +38,21 @@ impl Codegen<'_> {
                         }
                         let local_column_setter = local_column.getter_ident()?;
                         let foreign_column_ident = foreign_column.snake_case_ident()?;
+
+                        let maybe_some = if local_column.is_nullable() {
+                            quote! {
+                                Some(#foreign_table_snake_case.#foreign_column_ident)
+                            }
+                        } else {
+                            quote! {
+                                #foreign_table_snake_case.#foreign_column_ident
+                            }
+                        };
+
                         assignments.push(quote! {
                             self = <Self as #buildable_trait>::#local_column_setter(
                                 self,
-                                #foreign_table_snake_case.#foreign_column_ident
+                                #maybe_some
                             )?;
                         });
                     }

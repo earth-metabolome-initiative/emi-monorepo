@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpatialRefSyAttributes {
+pub enum InsertableSpatialRefSyAttribute {
     Srid,
     AuthName,
     AuthSrid,
     Srtext,
     Proj4text,
 }
-impl core::str::FromStr for InsertableSpatialRefSyAttributes {
+impl core::str::FromStr for InsertableSpatialRefSyAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -25,7 +25,7 @@ impl core::str::FromStr for InsertableSpatialRefSyAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableSpatialRefSyAttributes {
+impl core::fmt::Display for InsertableSpatialRefSyAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Srid => write!(f, "srid"),
@@ -63,7 +63,7 @@ pub struct InsertableSpatialRefSyBuilder {
 }
 /// Trait defining setters for attributes of an instance of `SpatialRefSy` or
 /// descendant tables.
-pub trait SpatialRefSyBuildable: Sized {
+pub trait SpatialRefSySettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.spatial_ref_sys.srid` column.
@@ -191,9 +191,9 @@ pub trait SpatialRefSyBuildable: Sized {
         P: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
 }
-impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
+impl SpatialRefSySettable for InsertableSpatialRefSyBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyAttribute;
     /// Sets the value of the `public.spatial_ref_sys.srid` column.
     fn srid(
         mut self,
@@ -201,7 +201,7 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let srid = srid.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpatialRefSyAttributes::Srid)
+                .rename_field(InsertableSpatialRefSyAttribute::Srid)
         })?;
         self.srid = Some(srid);
         Ok(self)
@@ -217,7 +217,7 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     {
         let auth_name = auth_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpatialRefSyAttributes::AuthName)
+                .rename_field(InsertableSpatialRefSyAttribute::AuthName)
         })?;
         self.auth_name = auth_name;
         Ok(self)
@@ -233,7 +233,7 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     {
         let auth_srid = auth_srid.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpatialRefSyAttributes::AuthSrid)
+                .rename_field(InsertableSpatialRefSyAttribute::AuthSrid)
         })?;
         self.auth_srid = auth_srid;
         Ok(self)
@@ -249,7 +249,7 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     {
         let srtext = srtext.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpatialRefSyAttributes::Srtext)
+                .rename_field(InsertableSpatialRefSyAttribute::Srtext)
         })?;
         self.srtext = srtext;
         Ok(self)
@@ -265,7 +265,7 @@ impl SpatialRefSyBuildable for InsertableSpatialRefSyBuilder {
     {
         let proj4text = proj4text.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSpatialRefSyAttributes::Proj4text)
+                .rename_field(InsertableSpatialRefSyAttribute::Proj4text)
         })?;
         self.proj4text = proj4text;
         Ok(self)
@@ -283,10 +283,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
-            Error = web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableSpatialRefSyAttribute>,
         >,
 {
-    type Attributes = InsertableSpatialRefSyAttributes;
+    type Attributes = InsertableSpatialRefSyAttribute;
     fn is_complete(&self) -> bool {
         self.srid.is_some()
     }

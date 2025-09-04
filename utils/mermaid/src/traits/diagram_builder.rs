@@ -84,14 +84,10 @@ where
     fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error>;
 
     /// Returns a reference to the requested node by label if it exists.
-    fn get_node_by_label<S>(&self, label: S) -> Option<Rc<Self::Node>>
-    where
-        S: AsRef<str>;
+    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>>;
 
     /// Returns a reference to the request style class by name if it exists.
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<Rc<StyleClass>>
-    where
-        S: AsRef<str>;
+    fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>>;
 
     /// Builds and adds an edge to the diagram being built.
     ///

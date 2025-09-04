@@ -2,7 +2,7 @@
 
 use core_structures::{
     CommercialProduct, ContainerModel, User,
-    tables::insertables::{AssetModelBuildable, CommercialProductBuildable},
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -35,8 +35,8 @@ pub(crate) fn polystyrene_box(
     }
 
     Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Polystyrene box, a container typically used for liquid nitrogen".to_owned())?
+        .name(name)?
+        .description("Polystyrene box, a container typically used for liquid nitrogen")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -67,8 +67,8 @@ pub(crate) fn vial_rack_1_5ml(
     }
 
     Ok(ContainerModel::new()
-        .name(name.to_owned())?
-        .description("Vial box, a container typically used for storing vials".to_owned())?
+        .name(name)?
+        .description("Vial box, a container typically used for storing vials")?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }
@@ -91,8 +91,8 @@ pub(crate) fn init_fisherbrand_kryobox_vial_rack(
     let vial_box_trackable = vial_rack_1_5ml(user, conn)?;
     let fisherbrand = fisherbrand(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(name.to_owned())?
-        .description("Fisherbrand Kryobox Vial Rack, used to store vials.".to_owned())?
+        .name(name)?
+        .description("Fisherbrand Kryobox Vial Rack, used to store vials.")?
         .created_by(user.id)?
         .brand(fisherbrand.id)?
         .parent_model(Some(vial_box_trackable.id))?

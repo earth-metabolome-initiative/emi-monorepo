@@ -24,7 +24,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -62,7 +62,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -99,7 +99,7 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
@@ -108,25 +108,34 @@ where
             .registered_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes::RegisteredAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute::RegisteredAssetModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateExtensionAttributes::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        self.procedure_template_registered_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_registered_asset_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute::ProcedureTemplateRegisteredAssetModel,
+                )
             })?;
         let procedure_template_registered_asset_model = self
             .procedure_template_registered_asset_model
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes::ProcedureTemplateRegisteredAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute::ProcedureTemplateRegisteredAssetModel,
                 )
             })?;
         Ok(Self::InsertableVariant {

@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxon;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute::CreatedAt,
                 ),
             )?;
         let organism_id = self
             .organism_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::OrganismId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute::OrganismId,
                 ),
             )?;
         let taxon_id = self
             .taxon_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes::TaxonId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute::TaxonId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

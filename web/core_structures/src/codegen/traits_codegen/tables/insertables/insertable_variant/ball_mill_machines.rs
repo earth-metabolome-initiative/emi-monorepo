@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachine;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineExtensionAttributes::PhysicalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineExtensionAttribute::PhysicalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute::Id,
                     ),
                 ))
             })?;

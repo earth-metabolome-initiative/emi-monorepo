@@ -237,24 +237,28 @@ fn ancestral_same_as_reachable_set(
 #[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn associated_same_as_columns(
     column: &Column,
+    include_local_primary_key: bool,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, WebCodeGenError> {
-    Ok(column
-        .associated_same_as_constraints(conn)?
+) -> Result<Vec<(Column, KeyColumnUsage)>, WebCodeGenError> {
+    column
+        .associated_same_as_constraints(include_local_primary_key, conn)?
         .into_iter()
         .map(|constraint| {
             let local_columns = constraint.columns(conn)?;
             let foreign_columns = constraint.foreign_columns(conn)?;
-            Ok(local_columns
-                .iter()
-                .zip(foreign_columns)
-                .filter_map(|(local_column, foreign_column)| {
-                    if local_column == column { Some(foreign_column.clone()) } else { None }
-                })
-                .next()
-                .unwrap())
+            Ok((
+                local_columns
+                    .iter()
+                    .zip(foreign_columns)
+                    .filter_map(|(local_column, foreign_column)| {
+                        if local_column == column { Some(foreign_column.clone()) } else { None }
+                    })
+                    .next()
+                    .unwrap(),
+                constraint,
+            ))
         })
-        .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+        .collect()
 }
 
 #[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
@@ -1515,6 +1519,8 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `include_local_primary_key` - Whether to include the local primary key
+    ///   in the constraint
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1522,12 +1528,16 @@ impl Column {
     /// * If an error occurs while querying the database
     pub fn associated_same_as_constraints(
         &self,
+        include_local_primary_key: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut associated_same_as_constraints = Vec::new();
 
         for foreign_key in self.foreign_keys(conn)? {
-            if foreign_key.is_associated_same_as_constraint(conn)?.is_none() {
+            if foreign_key
+                .is_associated_same_as_constraint(include_local_primary_key, conn)?
+                .is_none()
+            {
                 continue;
             }
             associated_same_as_constraints.push(foreign_key);
@@ -1659,6 +1669,8 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `include_local_primary_key` - Whether to include the local primary key
+    ///   in the constraint
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1666,9 +1678,10 @@ impl Column {
     /// * If an error occurs while querying the database
     pub(crate) fn associated_same_as_columns(
         &self,
+        include_local_primary_key: bool,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, WebCodeGenError> {
-        associated_same_as_columns(self, conn)
+    ) -> Result<Vec<(Column, KeyColumnUsage)>, WebCodeGenError> {
+        associated_same_as_columns(self, include_local_primary_key, conn)
     }
 
     /// Returns the normal and inferred ancestral same-as constraints for the

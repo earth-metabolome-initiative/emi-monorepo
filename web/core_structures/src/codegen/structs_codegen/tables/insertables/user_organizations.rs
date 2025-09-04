@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableUserOrganizationAttributes {
+pub enum InsertableUserOrganizationAttribute {
     UserId,
     OrganizationId,
 }
-impl core::str::FromStr for InsertableUserOrganizationAttributes {
+impl core::str::FromStr for InsertableUserOrganizationAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableUserOrganizationAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableUserOrganizationAttributes {
+impl core::fmt::Display for InsertableUserOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::UserId => write!(f, "user_id"),
@@ -110,7 +110,7 @@ pub struct InsertableUserOrganizationBuilder {
 }
 /// Trait defining setters for attributes of an instance of `UserOrganization`
 /// or descendant tables.
-pub trait UserOrganizationBuildable: Sized {
+pub trait UserOrganizationSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.user_organizations.user_id` column.
@@ -159,9 +159,9 @@ pub trait UserOrganizationBuildable: Sized {
         organization_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl UserOrganizationBuildable for InsertableUserOrganizationBuilder {
+impl UserOrganizationSettable for InsertableUserOrganizationBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttribute;
     /// Sets the value of the `public.user_organizations.user_id` column.
     fn user(
         mut self,
@@ -192,10 +192,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-            Error = web_common_traits::database::InsertError<InsertableUserOrganizationAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableUserOrganizationAttribute>,
         >,
 {
-    type Attributes = InsertableUserOrganizationAttributes;
+    type Attributes = InsertableUserOrganizationAttribute;
     fn is_complete(&self) -> bool {
         self.user_id.is_some() && self.organization_id.is_some()
     }

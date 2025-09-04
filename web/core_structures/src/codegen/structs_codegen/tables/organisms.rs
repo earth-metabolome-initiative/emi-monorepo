@@ -94,24 +94,6 @@ impl Organism {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
-        Self::table()
-            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
-            .filter(assets::name.eq(name))
-            .order_by(organisms::id.asc())
-            .select(Self::as_select())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_model_and_id(
         model: &i32,
         id: &::rosetta_uuid::Uuid,
@@ -131,6 +113,25 @@ impl Organism {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_name_and_model(
+        name: &str,
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
+        Self::table()
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::name.eq(name).and(assets::model.eq(model)))
+            .order_by(organisms::id.asc())
+            .select(Self::as_select())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -144,6 +145,24 @@ impl Organism {
         Self::table()
             .inner_join(assets::table.on(organisms::id.eq(assets::id)))
             .filter(assets::most_concrete_table.eq(most_concrete_table))
+            .order_by(organisms::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
+        Self::table()
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

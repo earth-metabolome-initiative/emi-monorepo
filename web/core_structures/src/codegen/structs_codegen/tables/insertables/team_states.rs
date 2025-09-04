@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamStateAttributes {
+pub enum InsertableTeamStateAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableTeamStateAttributes {
+impl core::str::FromStr for InsertableTeamStateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableTeamStateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamStateAttributes {
+impl core::fmt::Display for InsertableTeamStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -90,7 +90,7 @@ pub struct InsertableTeamStateBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TeamState` or
 /// descendant tables.
-pub trait TeamStateBuildable: Sized {
+pub trait TeamStateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.team_states.name` column.
@@ -192,9 +192,9 @@ pub trait TeamStateBuildable: Sized {
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl TeamStateBuildable for InsertableTeamStateBuilder {
+impl TeamStateSettable for InsertableTeamStateBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute;
     /// Sets the value of the `public.team_states.name` column.
     fn name<N>(
         mut self,
@@ -206,7 +206,7 @@ impl TeamStateBuildable for InsertableTeamStateBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamStateAttributes::Name)
+                .rename_field(InsertableTeamStateAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -222,7 +222,7 @@ impl TeamStateBuildable for InsertableTeamStateBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamStateAttributes::Description)
+                .rename_field(InsertableTeamStateAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -238,7 +238,7 @@ impl TeamStateBuildable for InsertableTeamStateBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamStateAttributes::Icon)
+                .rename_field(InsertableTeamStateAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -264,10 +264,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_states::TeamState,
-            Error = web_common_traits::database::InsertError<InsertableTeamStateAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTeamStateAttribute>,
         >,
 {
-    type Attributes = InsertableTeamStateAttributes;
+    type Attributes = InsertableTeamStateAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

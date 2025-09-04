@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableNextProcedureTemplateAttributes {
+pub enum InsertableNextProcedureTemplateAttribute {
     Parent,
     Current,
     SuccessorId,
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableNextProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableNextProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -25,7 +25,7 @@ impl core::str::FromStr for InsertableNextProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableNextProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableNextProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Parent => write!(f, "parent"),
@@ -271,7 +271,7 @@ impl Default for InsertableNextProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `NextProcedureTemplate` or descendant tables.
-pub trait NextProcedureTemplateBuildable: Sized {
+pub trait NextProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.next_procedure_templates.parent` column.
@@ -393,8 +393,8 @@ pub trait NextProcedureTemplateBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes;
+impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute;
     /// Sets the value of the `public.next_procedure_templates.parent` column.
     fn parent(
         mut self,
@@ -413,8 +413,8 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::Current,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::SuccessorId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Current,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::SuccessorId,
                         )
                 })?;
         }
@@ -432,8 +432,8 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::Current,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttributes::SuccessorId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Current,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::SuccessorId,
                         )
                 })?;
         }
@@ -462,7 +462,7 @@ impl NextProcedureTemplateBuildable for InsertableNextProcedureTemplateBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableNextProcedureTemplateAttributes::CreatedAt)
+                .rename_field(InsertableNextProcedureTemplateAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -482,11 +482,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableNextProcedureTemplateAttributes,
+            InsertableNextProcedureTemplateAttribute,
         >,
     >,
 {
-    type Attributes = InsertableNextProcedureTemplateAttributes;
+    type Attributes = InsertableNextProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.parent.is_some() && self.current.is_some() && self.successor_id.is_some()
             && self.created_by.is_some() && self.created_at.is_some()

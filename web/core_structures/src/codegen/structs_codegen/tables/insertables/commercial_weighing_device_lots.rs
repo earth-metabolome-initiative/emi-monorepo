@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialWeighingDeviceLotExtensionAttributes {
+pub enum InsertableCommercialWeighingDeviceLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ),
     WeighingDeviceModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialWeighingDeviceLotExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialWeighingDeviceLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -17,31 +17,31 @@ impl core::fmt::Display for InsertableCommercialWeighingDeviceLotExtensionAttrib
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
-> for InsertableCommercialWeighingDeviceLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+> for InsertableCommercialWeighingDeviceLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttributes,
-> for InsertableCommercialWeighingDeviceLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute,
+> for InsertableCommercialWeighingDeviceLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute,
     ) -> Self {
         Self::WeighingDeviceModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialWeighingDeviceLotAttributes {
-    Extension(InsertableCommercialWeighingDeviceLotExtensionAttributes),
+pub enum InsertableCommercialWeighingDeviceLotAttribute {
+    Extension(InsertableCommercialWeighingDeviceLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialWeighingDeviceLotAttributes {
+impl core::str::FromStr for InsertableCommercialWeighingDeviceLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableCommercialWeighingDeviceLotAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialWeighingDeviceLotAttributes {
+impl core::fmt::Display for InsertableCommercialWeighingDeviceLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -194,7 +194,7 @@ pub struct InsertableCommercialWeighingDeviceLotBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialWeighingDeviceLot` or descendant tables.
-pub trait CommercialWeighingDeviceLotBuildable: Sized {
+pub trait CommercialWeighingDeviceLotSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -222,19 +222,19 @@ pub trait CommercialWeighingDeviceLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     WeighingDeviceModel,
-> CommercialWeighingDeviceLotBuildable
+> CommercialWeighingDeviceLotSettable
 for InsertableCommercialWeighingDeviceLotBuilder<
     CommercialProductLot,
     WeighingDeviceModel,
 > {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute;
     ///Sets the value of the `public.commercial_weighing_device_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -270,18 +270,18 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v2 --->|"`ancestral same as`"| v3
-    ///v5 --->|"`extends`"| v7
-    ///v5 -.->|"`descendant of`"| v4
     ///v6 --->|"`extends`"| v5
     ///v6 -.->|"`descendant of`"| v4
     ///v6 -.->|"`descendant of`"| v7
+    ///v5 --->|"`extends`"| v7
+    ///v5 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::product_model(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::product_model(
                 self.commercial_weighing_device_lots_id_fkey,
                 product_model,
             )
@@ -290,7 +290,7 @@ for InsertableCommercialWeighingDeviceLotBuilder<
                     attribute.into(),
                 ))
             })?;
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_weighing_device_lots_id_fkey,
                 Some(product_model),
             )
@@ -304,21 +304,21 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     }
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     WeighingDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialWeighingDeviceLotBuilder<
     CommercialProductLot,
     WeighingDeviceModel,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -326,10 +326,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_weighing_device_lots_id_fkey,
                 name,
             )
@@ -348,10 +348,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_weighing_device_lots_id_fkey,
                 description,
             )
@@ -391,7 +391,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -402,7 +402,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_weighing_device_lots_id_fkey,
                 created_by,
             )
@@ -426,7 +426,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.commercial_weighing_device_lots_id_fkey,
                 created_at,
             )
@@ -444,7 +444,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_weighing_device_lots_id_fkey,
                 updated_by,
             )
@@ -468,7 +468,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.commercial_weighing_device_lots_id_fkey,
                 updated_at,
             )
@@ -482,21 +482,21 @@ where
     }
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     WeighingDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialWeighingDeviceLotBuilder<
     CommercialProductLot,
     WeighingDeviceModel,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -507,7 +507,7 @@ where
         L: TryInto<String>,
         validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
     {
-        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::lot(
+        self.commercial_weighing_device_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::lot(
                 self.commercial_weighing_device_lots_id_fkey,
                 lot,
             )
@@ -548,34 +548,31 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v5
     ///v4 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v5
+    ///v3 --->|"`extends`"| v5
     ///```
     fn product_model(
         self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialWeighingDeviceLotBuildable>::product_model(
-            self,
-            product_model,
-        )
+        <Self as CommercialWeighingDeviceLotSettable>::product_model(self, product_model)
     }
 }
 impl<
     CommercialProductLot,
     WeighingDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialWeighingDeviceLotBuilder<
     CommercialProductLot,
     WeighingDeviceModel,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -606,12 +603,12 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v7
     ///v5 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
@@ -623,7 +620,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialWeighingDeviceLotBuildable>::product_model(
+        <Self as CommercialWeighingDeviceLotSettable>::product_model(
             self,
             parent_model
                 .ok_or(
@@ -635,10 +632,10 @@ where
     }
 }
 impl<CommercialProductLot, WeighingDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelSettable
     for InsertableCommercialWeighingDeviceLotBuilder<CommercialProductLot, WeighingDeviceModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotAttribute;
 }
 impl<CommercialProductLot, WeighingDeviceModel> web_common_traits::database::MostConcreteTable
     for InsertableCommercialWeighingDeviceLotBuilder<CommercialProductLot, WeighingDeviceModel>
@@ -681,7 +678,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialWeighingDeviceLotAttributes,
+            InsertableCommercialWeighingDeviceLotAttribute,
         >,
     >,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -693,7 +690,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialWeighingDeviceLotAttributes;
+    type Attributes = InsertableCommercialWeighingDeviceLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_weighing_device_lots_id_fkey.is_complete()
             && self.commercial_weighing_device_lots_id_fkey1.is_complete()

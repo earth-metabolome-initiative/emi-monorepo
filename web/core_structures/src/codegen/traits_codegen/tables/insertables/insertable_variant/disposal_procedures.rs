@@ -22,8 +22,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
@@ -66,7 +66,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -110,7 +110,7 @@ where
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::foreign_procedure_template(
                     self,
                     disposal_procedure_templates.foreign_procedure_template,
                 )?;
@@ -121,7 +121,7 @@ where
                 foreign_procedure,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureBuildable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::foreign_procedure_template(
                     self,
                     procedures.procedure_template,
                 )?;
@@ -131,37 +131,37 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let foreign_procedure_template = self
             .foreign_procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes::ForeignProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ForeignProcedureTemplate,
                 ),
             )?;
         let foreign_procedure = self
             .foreign_procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ForeignProcedure,
                 ),
             )?;
         let disposed_asset = self
             .disposed_asset
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes::DisposedAsset,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::DisposedAsset,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureExtensionAttributes::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttributes::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
                     ),
                 ))
             })?;

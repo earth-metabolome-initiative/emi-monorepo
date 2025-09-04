@@ -34,7 +34,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRule;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -74,28 +74,28 @@ where
             .left_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::LeftAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::LeftAssetModel,
                 ),
             )?;
         let right_asset_model = self
             .right_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::RightAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::RightAssetModel,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

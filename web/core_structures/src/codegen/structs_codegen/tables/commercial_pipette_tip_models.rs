@@ -14,7 +14,7 @@
 )]
 pub struct CommercialPipetteTipModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub pipette_tip_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialPipetteTipModel {
     const TABLE_NAME: &'static str = "commercial_pipette_tip_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialPipetteTipModel {
     }
 }
 impl CommercialPipetteTipModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -92,7 +92,7 @@ impl CommercialPipetteTipModel {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
                 ),
-                self.parent_model,
+                self.pipette_tip_model,
             ),
             conn,
         )
@@ -163,22 +163,22 @@ impl CommercialPipetteTipModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_pipette_tip_model(
+        pipette_tip_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_pipette_tip_models::commercial_pipette_tip_models;
         Self::table()
-            .filter(commercial_pipette_tip_models::parent_model.eq(parent_model))
+            .filter(commercial_pipette_tip_models::pipette_tip_model.eq(pipette_tip_model))
             .order_by(commercial_pipette_tip_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_pipette_tip_model(
         id: &i32,
-        parent_model: &i32,
+        pipette_tip_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,7 +190,7 @@ impl CommercialPipetteTipModel {
             .filter(
                 commercial_pipette_tip_models::id
                     .eq(id)
-                    .and(commercial_pipette_tip_models::parent_model.eq(parent_model)),
+                    .and(commercial_pipette_tip_models::pipette_tip_model.eq(pipette_tip_model)),
             )
             .order_by(commercial_pipette_tip_models::id.asc())
             .load::<Self>(conn)
@@ -239,6 +239,30 @@ impl CommercialPipetteTipModel {
                     .on(commercial_pipette_tip_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_pipette_tip_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_pipette_tip_models::commercial_pipette_tip_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_pipette_tip_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_pipette_tip_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -12,6 +12,8 @@
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::procedures::procedures)]
 pub struct Procedure {
     pub procedure: ::rosetta_uuid::Uuid,
+    pub parent_procedure: Option<::rosetta_uuid::Uuid>,
+    pub parent_procedure_template: Option<i32>,
     pub procedure_template: i32,
     pub most_concrete_table: String,
     pub created_by: i32,
@@ -30,6 +32,30 @@ where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
+impl<C> web_common_traits::prelude::Ancestor<C> for Procedure
+where
+    Self: web_common_traits::prelude::TableName + Sized,
+    C: diesel::connection::LoadConnection,
+    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
+        + diesel::sql_types::HasSqlType<::rosetta_uuid::diesel_impls::Uuid>
+        + 'static,
+    web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
+            diesel::sql_types::Untyped,
+            <C as diesel::Connection>::Backend,
+        >,
+    for<'a> &'a Self: diesel::Identifiable,
+    for<'a> <&'a Self as diesel::Identifiable>::Id:
+        diesel::serialize::ToSql<::rosetta_uuid::diesel_impls::Uuid, C::Backend>,
+{
+    const PARENT_ID: &'static str = "parent_procedure";
+    const ID: &'static str = "procedure";
+    type SqlType = ::rosetta_uuid::diesel_impls::Uuid;
+}
+impl web_common_traits::prelude::Descendant<Procedure> for Procedure {
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id> {
+        self.parent_procedure.as_ref()
+    }
+}
 impl diesel::Identifiable for Procedure {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -37,6 +63,80 @@ impl diesel::Identifiable for Procedure {
     }
 }
 impl Procedure {
+    pub fn parent_procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure) = self.parent_procedure else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                parent_procedure,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure_template) = self.parent_procedure_template else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                    parent_procedure_template,
+                ),
+                conn,
+            )
+            .map(Some)
+    }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -132,6 +232,72 @@ impl Procedure {
             ),
             conn,
         )
+    }
+    pub fn procedures_parent_procedure_template_procedure_template_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(parent_procedure_template) = self.parent_procedure_template else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
+                    (parent_procedure_template, self.procedure_template),
+                ),
+                conn,
+            )
+            .map(Some)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure(
+        parent_procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(procedures::parent_procedure.eq(parent_procedure))
+            .order_by(procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure_template(
+        parent_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .order_by(procedures::procedure.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template(
@@ -230,6 +396,46 @@ impl Procedure {
             )
             .order_by(procedures::procedure.asc())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure_and_parent_procedure_template(
+        parent_procedure: &::rosetta_uuid::Uuid,
+        parent_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(
+                procedures::parent_procedure
+                    .eq(parent_procedure)
+                    .and(procedures::parent_procedure_template.eq(parent_procedure_template)),
+            )
+            .order_by(procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure_template_and_procedure_template(
+        parent_procedure_template: &i32,
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::procedures::procedures;
+        Self::table()
+            .filter(
+                procedures::parent_procedure_template
+                    .eq(parent_procedure_template)
+                    .and(procedures::procedure_template.eq(procedure_template)),
+            )
+            .order_by(procedures::procedure.asc())
+            .load::<Self>(conn)
     }
 }
 impl AsRef<Procedure> for Procedure {

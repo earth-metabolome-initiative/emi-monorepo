@@ -18,8 +18,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                procedure_template
-                    .ne(excluded(procedure_template))
+                parent_procedure
+                    .ne(excluded(parent_procedure))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(procedure_template.ne(excluded(procedure_template)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
@@ -50,8 +52,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                procedure_template
-                    .ne(excluded(procedure_template))
+                parent_procedure
+                    .ne(excluded(parent_procedure))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(procedure_template.ne(excluded(procedure_template)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))

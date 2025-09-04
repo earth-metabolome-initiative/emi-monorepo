@@ -14,7 +14,7 @@
 )]
 pub struct CommercialPackagingModel {
     pub id: i32,
-    pub parent_model: i32,
+    pub packaging_model: i32,
 }
 impl web_common_traits::prelude::TableName for CommercialPackagingModel {
     const TABLE_NAME: &'static str = "commercial_packaging_models";
@@ -64,7 +64,7 @@ impl diesel::Identifiable for CommercialPackagingModel {
     }
 }
 impl CommercialPackagingModel {
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
+    pub fn packaging_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -91,7 +91,7 @@ impl CommercialPackagingModel {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
-                self.parent_model,
+                self.packaging_model,
             ),
             conn,
         )
@@ -161,22 +161,22 @@ impl CommercialPackagingModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_packaging_model(
+        packaging_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models;
         Self::table()
-            .filter(commercial_packaging_models::parent_model.eq(parent_model))
+            .filter(commercial_packaging_models::packaging_model.eq(packaging_model))
             .order_by(commercial_packaging_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_id_and_parent_model(
+    pub fn from_id_and_packaging_model(
         id: &i32,
-        parent_model: &i32,
+        packaging_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -188,7 +188,7 @@ impl CommercialPackagingModel {
             .filter(
                 commercial_packaging_models::id
                     .eq(id)
-                    .and(commercial_packaging_models::parent_model.eq(parent_model)),
+                    .and(commercial_packaging_models::packaging_model.eq(packaging_model)),
             )
             .order_by(commercial_packaging_models::id.asc())
             .load::<Self>(conn)
@@ -237,6 +237,30 @@ impl CommercialPackagingModel {
                     .on(commercial_packaging_models::id.eq(commercial_products::id)),
             )
             .filter(commercial_products::brand_id.eq(brand_id))
+            .order_by(commercial_packaging_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_packaging_models::commercial_packaging_models,
+            physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(commercial_packaging_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
             .order_by(commercial_packaging_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

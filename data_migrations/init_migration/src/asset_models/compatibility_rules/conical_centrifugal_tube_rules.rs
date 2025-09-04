@@ -1,6 +1,6 @@
 //! Submodule defining the compatibility rules for conical centrifugal tubes.
 
-use core_structures::traits::CompatibleWith;
+use core_structures::traits::CanContain;
 
 use crate::asset_models::containers::{
     boxes::polystyrene_box, conical_centrifugal_tubes::conical_centrifugal_tube_50ml,
@@ -25,13 +25,13 @@ pub(super) fn init_conical_centrifugal_tube_rules(
     let cct_50ml_rack = conical_centrifugal_tube_50ml_rack(user, conn)?;
 
     // We can fit 24 conical centrifugal tubes of 50ml in a rack.
-    // cct_50ml_rack.compatible_with_quantity(&cct_50ml, 24, user, conn)?;
+    cct_50ml_rack.can_contain(&cct_50ml, 24, user, conn)?;
 
     let polystyrene_box = polystyrene_box(user, conn)?;
-    polystyrene_box.compatible_with(&cct_50ml, user, conn)?;
+    polystyrene_box.can_contain(&cct_50ml, 50, user, conn)?;
 
-    // let coffee_filter = coffee_filter_wrapper(user, conn)?;
-    // cct_50ml.compatible_with_quantity(&coffee_filter, 1, user, conn)?;
+    let coffee_filter = coffee_filter_wrapper(user, conn)?;
+    cct_50ml.can_contain(&coffee_filter, 1, user, conn)?;
 
     Ok(())
 }

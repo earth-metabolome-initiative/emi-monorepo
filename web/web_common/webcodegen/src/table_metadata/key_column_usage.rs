@@ -687,6 +687,8 @@ impl KeyColumnUsage {
     ///
     /// # Arguments
     ///
+    /// * `include_local_primary_key` - Whether to include the local primary key
+    ///   in the constraint
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -694,9 +696,10 @@ impl KeyColumnUsage {
     /// * If an error occurs while querying the database
     pub fn is_associated_same_as_constraint(
         &self,
+        include_local_primary_key: bool,
         conn: &mut PgConnection,
     ) -> Result<Option<PgIndex>, WebCodeGenError> {
-        if self.includes_local_primary_key(conn)? {
+        if !include_local_primary_key && self.includes_local_primary_key(conn)? {
             return Ok(None);
         }
         if !self

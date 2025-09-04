@@ -1,46 +1,48 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCentrifugeModelExtensionAttributes {
+pub enum InsertableCentrifugeModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCentrifugeModelExtensionAttributes {
+impl core::fmt::Display for InsertableCentrifugeModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
-> for InsertableCentrifugeModelExtensionAttributes {
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+    > for InsertableCentrifugeModelExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCentrifugeModelAttributes {
-    Extension(InsertableCentrifugeModelExtensionAttributes),
+pub enum InsertableCentrifugeModelAttribute {
+    Extension(InsertableCentrifugeModelExtensionAttribute),
     Id,
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
-> for InsertableCentrifugeModelAttributes {
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+    > for InsertableCentrifugeModelAttribute
+{
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(
-            InsertableCentrifugeModelExtensionAttributes::PhysicalAssetModel(
-                physical_asset_models,
-            ),
-        )
+        Self::Extension(InsertableCentrifugeModelExtensionAttribute::PhysicalAssetModel(
+            physical_asset_models,
+        ))
     }
 }
-impl core::str::FromStr for InsertableCentrifugeModelAttributes {
+impl core::str::FromStr for InsertableCentrifugeModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -48,7 +50,7 @@ impl core::str::FromStr for InsertableCentrifugeModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCentrifugeModelAttributes {
+impl core::fmt::Display for InsertableCentrifugeModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,28 +115,28 @@ pub struct InsertableCentrifugeModelBuilder<
 }
 /// Trait defining setters for attributes of an instance of `CentrifugeModel` or
 /// descendant tables.
-pub trait CentrifugeModelBuildable: Sized {
+pub trait CentrifugeModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
 }
-impl<PhysicalAssetModel> CentrifugeModelBuildable
+impl<PhysicalAssetModel> CentrifugeModelSettable
     for InsertableCentrifugeModelBuilder<PhysicalAssetModel>
 {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute;
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCentrifugeModelBuilder<PhysicalAssetModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -142,10 +144,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
                 name,
             )
@@ -164,10 +166,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
                 description,
             )
@@ -207,7 +209,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -218,7 +220,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -242,7 +244,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -260,7 +262,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -284,7 +286,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -298,19 +300,19 @@ where
     }
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes,
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCentrifugeModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.id,
                 parent_model,
             )
@@ -350,11 +352,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
-            Error = web_common_traits::database::InsertError<InsertableCentrifugeModelAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableCentrifugeModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCentrifugeModelAttributes;
+    type Attributes = InsertableCentrifugeModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

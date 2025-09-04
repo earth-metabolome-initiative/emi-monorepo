@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAssetCompatibilityRuleAttributes {
+pub enum InsertableAssetCompatibilityRuleAttribute {
     LeftAssetModel,
     RightAssetModel,
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableAssetCompatibilityRuleAttributes {
+impl core::str::FromStr for InsertableAssetCompatibilityRuleAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -22,7 +22,7 @@ impl core::str::FromStr for InsertableAssetCompatibilityRuleAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableAssetCompatibilityRuleAttributes {
+impl core::fmt::Display for InsertableAssetCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::LeftAssetModel => write!(f, "left_asset_model"),
@@ -164,7 +164,7 @@ impl Default for InsertableAssetCompatibilityRuleBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `AssetCompatibilityRule` or descendant tables.
-pub trait AssetCompatibilityRuleBuildable: Sized {
+pub trait AssetCompatibilityRuleSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -265,8 +265,8 @@ pub trait AssetCompatibilityRuleBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes;
+impl AssetCompatibilityRuleSettable for InsertableAssetCompatibilityRuleBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute;
     /// Sets the value of the
     /// `public.asset_compatibility_rules.left_asset_model` column.
     fn left_asset_model(
@@ -278,8 +278,8 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::LeftAssetModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::RightAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::LeftAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::RightAssetModel,
                         )
                 })?;
         }
@@ -297,8 +297,8 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::LeftAssetModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttributes::RightAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::LeftAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::RightAssetModel,
                         )
                 })?;
         }
@@ -327,7 +327,7 @@ impl AssetCompatibilityRuleBuildable for InsertableAssetCompatibilityRuleBuilder
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetCompatibilityRuleAttributes::CreatedAt)
+                .rename_field(InsertableAssetCompatibilityRuleAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -347,11 +347,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         Error = web_common_traits::database::InsertError<
-            InsertableAssetCompatibilityRuleAttributes,
+            InsertableAssetCompatibilityRuleAttribute,
         >,
     >,
 {
-    type Attributes = InsertableAssetCompatibilityRuleAttributes;
+    type Attributes = InsertableAssetCompatibilityRuleAttribute;
     fn is_complete(&self) -> bool {
         self.left_asset_model.is_some() && self.right_asset_model.is_some()
             && self.created_by.is_some() && self.created_at.is_some()

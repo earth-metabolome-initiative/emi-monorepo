@@ -1,45 +1,45 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelExtensionAttributes {
+pub enum InsertableVolumetricContainerModelExtensionAttribute {
     ContainerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelExtensionAttributes {
+impl core::fmt::Display for InsertableVolumetricContainerModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ContainerModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes>
-    for InsertableVolumetricContainerModelExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute>
+    for InsertableVolumetricContainerModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
     ) -> Self {
         Self::ContainerModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelAttributes {
-    Extension(InsertableVolumetricContainerModelExtensionAttributes),
+pub enum InsertableVolumetricContainerModelAttribute {
+    Extension(InsertableVolumetricContainerModelExtensionAttribute),
     Id,
     Liters,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes>
-    for InsertableVolumetricContainerModelAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute>
+    for InsertableVolumetricContainerModelAttribute
 {
     fn from(
-        container_models: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+        container_models: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableVolumetricContainerModelExtensionAttributes::ContainerModel(
+        Self::Extension(InsertableVolumetricContainerModelExtensionAttribute::ContainerModel(
             container_models,
         ))
     }
 }
-impl core::str::FromStr for InsertableVolumetricContainerModelAttributes {
+impl core::str::FromStr for InsertableVolumetricContainerModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -49,7 +49,7 @@ impl core::str::FromStr for InsertableVolumetricContainerModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelAttributes {
+impl core::fmt::Display for InsertableVolumetricContainerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -119,7 +119,7 @@ pub struct InsertableVolumetricContainerModelBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `VolumetricContainerModel` or descendant tables.
-pub trait VolumetricContainerModelBuildable: Sized {
+pub trait VolumetricContainerModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.volumetric_container_models.liters`
@@ -149,10 +149,10 @@ pub trait VolumetricContainerModelBuildable: Sized {
         L: TryInto<f32>,
         validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>;
 }
-impl<ContainerModel> VolumetricContainerModelBuildable
+impl<ContainerModel> VolumetricContainerModelSettable
     for InsertableVolumetricContainerModelBuilder<ContainerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
     /// Sets the value of the `public.volumetric_container_models.liters`
     /// column.
     fn liters<L>(
@@ -165,13 +165,13 @@ impl<ContainerModel> VolumetricContainerModelBuildable
     {
         let liters = liters.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableVolumetricContainerModelAttributes::Liters)
+                .rename_field(InsertableVolumetricContainerModelAttribute::Liters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes::Liters,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute::Liters,
                     )
             })?;
         self.liters = Some(liters);
@@ -179,17 +179,17 @@ impl<ContainerModel> VolumetricContainerModelBuildable
     }
 }
 impl<
-    ContainerModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+    ContainerModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableVolumetricContainerModelBuilder<ContainerModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -197,10 +197,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
                 name,
             )
@@ -219,10 +219,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
                 description,
             )
@@ -262,7 +262,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -273,7 +273,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -297,7 +297,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -315,7 +315,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -339,7 +339,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -352,25 +352,25 @@ where
         Ok(self)
     }
 }
-impl<ContainerModel> crate::codegen::structs_codegen::tables::insertables::ContainerModelBuildable
+impl<ContainerModel> crate::codegen::structs_codegen::tables::insertables::ContainerModelSettable
     for InsertableVolumetricContainerModelBuilder<ContainerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
 }
 impl<
-    ContainerModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+    ContainerModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableVolumetricContainerModelBuilder<ContainerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.id,
                 parent_model,
             )
@@ -411,12 +411,12 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         Error = web_common_traits::database::InsertError<
-            InsertableVolumetricContainerModelAttributes,
+            InsertableVolumetricContainerModelAttribute,
         >,
     >,
     ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableVolumetricContainerModelAttributes;
+    type Attributes = InsertableVolumetricContainerModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.liters.is_some()
     }

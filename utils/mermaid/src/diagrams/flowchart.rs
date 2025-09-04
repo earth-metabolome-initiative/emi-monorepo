@@ -42,17 +42,14 @@ impl Diagram for Flowchart {
         self.generic.edges()
     }
 
-    fn get_node_by_label<S>(&self, label: S) -> Option<std::rc::Rc<Self::Node>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_node_by_label(&self, label: &str) -> Option<std::rc::Rc<Self::Node>> {
         self.generic.get_node_by_label(label)
     }
 
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<std::rc::Rc<crate::shared::StyleClass>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_style_class_by_name(
+        &self,
+        name: &str,
+    ) -> Option<std::rc::Rc<crate::shared::StyleClass>> {
         self.generic.get_style_class_by_name(name)
     }
 

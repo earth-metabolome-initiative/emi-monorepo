@@ -176,29 +176,29 @@ impl CappingProcedureTemplate {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::caps_models::CapsModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::caps_models::CapsModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::cap_models::CapModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::caps_models::CapsModel,
+            crate::codegen::structs_codegen::tables::cap_models::CapModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::caps_models::CapsModel::table(),
+                crate::codegen::structs_codegen::tables::cap_models::CapModel::table(),
                 self.capped_with_model,
             ),
             conn,

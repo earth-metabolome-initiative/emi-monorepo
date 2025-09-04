@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableOrganizationAttributes {
+pub enum InsertableOrganizationAttribute {
     Name,
     Url,
     Country,
@@ -9,7 +9,7 @@ pub enum InsertableOrganizationAttributes {
     Domain,
     Id,
 }
-impl core::str::FromStr for InsertableOrganizationAttributes {
+impl core::str::FromStr for InsertableOrganizationAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -29,7 +29,7 @@ impl core::str::FromStr for InsertableOrganizationAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableOrganizationAttributes {
+impl core::fmt::Display for InsertableOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -71,7 +71,7 @@ pub struct InsertableOrganizationBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Organization` or
 /// descendant tables.
-pub trait OrganizationBuildable: Sized {
+pub trait OrganizationSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.organizations.name` column.
@@ -230,9 +230,9 @@ pub trait OrganizationBuildable: Sized {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl OrganizationBuildable for InsertableOrganizationBuilder {
+impl OrganizationSettable for InsertableOrganizationBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute;
     /// Sets the value of the `public.organizations.name` column.
     fn name<N>(
         mut self,
@@ -244,7 +244,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::Name)
+                .rename_field(InsertableOrganizationAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -260,7 +260,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let url = url.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::Url)
+                .rename_field(InsertableOrganizationAttribute::Url)
         })?;
         self.url = Some(url);
         Ok(self)
@@ -276,7 +276,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let country = country.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::Country)
+                .rename_field(InsertableOrganizationAttribute::Country)
         })?;
         self.country = Some(country);
         Ok(self)
@@ -293,7 +293,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let alpha_two_code = alpha_two_code.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::AlphaTwoCode)
+                .rename_field(InsertableOrganizationAttribute::AlphaTwoCode)
         })?;
         self.alpha_two_code = Some(alpha_two_code);
         Ok(self)
@@ -309,7 +309,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let state_province = state_province.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::StateProvince)
+                .rename_field(InsertableOrganizationAttribute::StateProvince)
         })?;
         self.state_province = state_province;
         Ok(self)
@@ -325,7 +325,7 @@ impl OrganizationBuildable for InsertableOrganizationBuilder {
     {
         let domain = domain.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganizationAttributes::Domain)
+                .rename_field(InsertableOrganizationAttribute::Domain)
         })?;
         self.domain = Some(domain);
         Ok(self)
@@ -343,10 +343,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organizations::Organization,
-            Error = web_common_traits::database::InsertError<InsertableOrganizationAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableOrganizationAttribute>,
         >,
 {
-    type Attributes = InsertableOrganizationAttributes;
+    type Attributes = InsertableOrganizationAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.url.is_some()

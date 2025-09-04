@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -60,7 +60,7 @@ where
         self.set_most_concrete_table("commercial_freeze_dryer_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.freeze_dryer_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -86,11 +86,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_model = self
-            .parent_model
+        let freeze_dryer_model = self
+            .freeze_dryer_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes::ParentModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute::FreezeDryerModel,
                 ),
             )?;
         let id = if self.commercial_freeze_dryer_models_id_fkey1.is_complete() {
@@ -98,9 +98,9 @@ where
                 .commercial_freeze_dryer_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -109,9 +109,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttributes::FreezeDryerModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttribute::FreezeDryerModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -121,9 +121,9 @@ where
                 .commercial_freeze_dryer_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttributes::FreezeDryerModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttribute::FreezeDryerModel(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -132,9 +132,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttributes::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttributes::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttributes::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -142,7 +142,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            parent_model,
+            freeze_dryer_model,
         })
     }
 }

@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFractioningProcedureTemplateExtensionAttributes {
+pub enum InsertableFractioningProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableFractioningProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableFractioningProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,36 +13,35 @@ impl core::fmt::Display for InsertableFractioningProcedureTemplateExtensionAttri
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableFractioningProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableFractioningProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFractioningProcedureTemplateAttributes {
-    Extension(InsertableFractioningProcedureTemplateExtensionAttributes),
+pub enum InsertableFractioningProcedureTemplateAttribute {
+    Extension(InsertableFractioningProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Kilograms,
     TolerancePercentage,
     WeighedWithModel,
     ProcedureTemplateWeighedWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
     FragmentContainerModel,
     ForeignProcedureTemplate,
     ProcedureTemplateFragmentContainerModel,
     FragmentPlacedIntoModel,
     ProcedureTemplateFragmentPlacedIntoModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
 }
-impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableFractioningProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +51,7 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             "ProcedureTemplateWeighedWithModel" => {
                 Ok(
                     Self::ProcedureTemplateWeighedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -65,7 +64,7 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             "ProcedureTemplateFragmentPlacedIntoModel" => {
                 Ok(
                     Self::ProcedureTemplateFragmentPlacedIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -75,7 +74,7 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             "procedure_template_weighed_with_model" => {
                 Ok(
                     Self::ProcedureTemplateWeighedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -88,7 +87,7 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
             "procedure_template_fragment_placed_into_model" => {
                 Ok(
                     Self::ProcedureTemplateFragmentPlacedIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -102,7 +101,7 @@ impl core::str::FromStr for InsertableFractioningProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableFractioningProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableFractioningProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -422,7 +421,7 @@ pub struct InsertableFractioningProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `FractioningProcedureTemplate` or descendant tables.
-pub trait FractioningProcedureTemplateBuildable: Sized {
+pub trait FractioningProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.fractioning_procedure_templates.kilograms`
@@ -651,10 +650,10 @@ pub trait FractioningProcedureTemplateBuildable: Sized {
         procedure_template_fragment_placed_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
+impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute;
     /// Sets the value of the `public.fractioning_procedure_templates.kilograms`
     /// column.
     fn kilograms<K>(
@@ -667,13 +666,13 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     {
         let kilograms = kilograms.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableFractioningProcedureTemplateAttributes::Kilograms)
+                .rename_field(InsertableFractioningProcedureTemplateAttribute::Kilograms)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes::Kilograms,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::Kilograms,
                     )
             })?;
         self.kilograms = Some(kilograms);
@@ -691,13 +690,13 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     {
         let tolerance_percentage = tolerance_percentage.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableFractioningProcedureTemplateAttributes::TolerancePercentage)
+                .rename_field(InsertableFractioningProcedureTemplateAttribute::TolerancePercentage)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(tolerance_percentage)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes::TolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::TolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -705,7 +704,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes::TolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::TolerancePercentage,
                             )
                     })
             })?;
@@ -727,26 +726,27 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "weighed_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn weighed_with_model(
         mut self,
         weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_weighed_with_model,
                 weighed_with_model,
             )
@@ -774,10 +774,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "weighed_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -785,8 +785,9 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_weighed_with_model(
@@ -806,7 +807,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_weighed_with_model.asset_model {
             self.weighed_with_model = Some(asset_model);
         } else if let Some(local) = self.weighed_with_model {
-            procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_weighed_with_model,
                     local,
                 )
@@ -898,6 +899,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
@@ -905,7 +907,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
         mut self,
         fragment_placed_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_fragment_placed_into_model,
                 fragment_placed_into_model,
             )
@@ -946,6 +948,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_fragment_placed_into_model(
@@ -967,7 +970,7 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
         {
             self.fragment_placed_into_model = Some(asset_model);
         } else if let Some(local) = self.fragment_placed_into_model {
-            procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_fragment_placed_into_model,
                     local,
                 )
@@ -985,12 +988,12 @@ impl<ProcedureTemplate> FractioningProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1001,7 +1004,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -1023,7 +1026,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -1045,7 +1048,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -1067,7 +1070,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -1085,7 +1088,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -1109,7 +1112,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -1127,7 +1130,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -1151,7 +1154,7 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -1192,7 +1195,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableFractioningProcedureTemplateAttributes,
+            InsertableFractioningProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -1203,7 +1206,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableFractioningProcedureTemplateAttributes;
+    type Attributes = InsertableFractioningProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kilograms.is_some()
             && self.tolerance_percentage.is_some() && self.weighed_with_model.is_some()

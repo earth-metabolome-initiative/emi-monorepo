@@ -106,10 +106,10 @@ impl Table {
             let camel_case_ident = closest_same_as_column.camel_case_ident()?;
             let table = closest_same_as_column.table(conn)?;
             let setter_trait = if self == &table {
-                let trait_ident = self.builder_trait_ident()?;
+                let trait_ident = self.setter_trait_ident()?;
                 quote! { #trait_ident }
             } else {
-                let trait_path = table.builder_trait_ty()?;
+                let trait_path = table.setter_trait_ty()?;
                 quote! { #trait_path }
             };
 
@@ -188,10 +188,10 @@ impl Table {
         check_constraints_extensions: &[&PgExtension],
     ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
         let trait_path = if self == ancestral_table {
-            let trait_ident = self.builder_trait_ident()?;
+            let trait_ident = self.setter_trait_ident()?;
             quote! { #trait_ident }
         } else {
-            let trait_path = ancestral_table.builder_trait_ty()?;
+            let trait_path = ancestral_table.setter_trait_ty()?;
             quote! { #trait_path }
         };
         let builder_ident = self.insertable_builder_ident()?;
@@ -288,7 +288,7 @@ impl Table {
                     .unwrap()
                     .iter()
                     .map(|required_table| {
-                        let trait_ident = required_table.builder_trait_ty()?;
+                        let trait_ident = required_table.setter_trait_ty()?;
                         Ok(quote! {
                             #trait_ident<Attributes = #generic_attributes>
                         })
@@ -325,7 +325,7 @@ impl Table {
             let where_clauses = self_trait_requirements
                 .iter()
                 .map(|required_table| {
-                    let trait_ident = required_table.builder_trait_ty()?;
+                    let trait_ident = required_table.setter_trait_ty()?;
                     Ok(quote! { Self: #trait_ident<Attributes = #attributes> })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;

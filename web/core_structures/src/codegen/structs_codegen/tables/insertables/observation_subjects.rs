@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableObservationSubjectAttributes {
+pub enum InsertableObservationSubjectAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableObservationSubjectAttributes {
+impl core::str::FromStr for InsertableObservationSubjectAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableObservationSubjectAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableObservationSubjectAttributes {
+impl core::fmt::Display for InsertableObservationSubjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -92,7 +92,7 @@ pub struct InsertableObservationSubjectBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ObservationSubject`
 /// or descendant tables.
-pub trait ObservationSubjectBuildable: Sized {
+pub trait ObservationSubjectSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.observation_subjects.name` column.
@@ -196,8 +196,9 @@ pub trait ObservationSubjectBuildable: Sized {
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl ObservationSubjectBuildable for InsertableObservationSubjectBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttributes;
+impl ObservationSubjectSettable for InsertableObservationSubjectBuilder {
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute;
     /// Sets the value of the `public.observation_subjects.name` column.
     fn name<N>(
         mut self,
@@ -209,7 +210,7 @@ impl ObservationSubjectBuildable for InsertableObservationSubjectBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttributes::Name)
+                .rename_field(InsertableObservationSubjectAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -225,7 +226,7 @@ impl ObservationSubjectBuildable for InsertableObservationSubjectBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttributes::Description)
+                .rename_field(InsertableObservationSubjectAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -241,7 +242,7 @@ impl ObservationSubjectBuildable for InsertableObservationSubjectBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttributes::Icon)
+                .rename_field(InsertableObservationSubjectAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -267,12 +268,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            Error = web_common_traits::database::InsertError<
-                InsertableObservationSubjectAttributes,
-            >,
+            Error = web_common_traits::database::InsertError<InsertableObservationSubjectAttribute>,
         >,
 {
-    type Attributes = InsertableObservationSubjectAttributes;
+    type Attributes = InsertableObservationSubjectAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

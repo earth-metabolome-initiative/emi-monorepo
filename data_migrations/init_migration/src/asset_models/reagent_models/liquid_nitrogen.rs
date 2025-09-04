@@ -1,6 +1,6 @@
 use core_structures::{
     ReagentModel, User,
-    tables::insertables::{AssetModelBuildable, ReagentModelBuildable},
+    tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -30,8 +30,8 @@ pub(crate) fn liquid_nitrogen(
     }
 
     Ok(ReagentModel::new()
-        .name(name.to_owned())?
-        .description("Liquid nitrogen, pure".to_owned())?
+        .name(name)?
+        .description("Liquid nitrogen, pure")?
         .purity(100.0)?
         .cas_code("7727-37-9")?
         .molecular_formula("N2")?

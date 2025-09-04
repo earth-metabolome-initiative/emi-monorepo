@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamAttributes {
+pub enum InsertableTeamAttribute {
     Id,
     Name,
     Description,
@@ -13,7 +13,7 @@ pub enum InsertableTeamAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableTeamAttributes {
+impl core::str::FromStr for InsertableTeamAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -43,7 +43,7 @@ impl core::str::FromStr for InsertableTeamAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamAttributes {
+impl core::fmt::Display for InsertableTeamAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -279,7 +279,7 @@ impl Default for InsertableTeamBuilder {
 }
 /// Trait defining setters for attributes of an instance of `Team` or descendant
 /// tables.
-pub trait TeamBuildable: Sized {
+pub trait TeamSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.teams.id` column.
@@ -542,25 +542,23 @@ pub trait TeamBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl TeamBuildable for InsertableTeamBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes;
+impl TeamSettable for InsertableTeamBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute;
     /// Sets the value of the `public.teams.id` column.
     fn id(
         mut self,
         id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::Id)
+            validation_errors::SingleFieldError::from(err).rename_field(InsertableTeamAttribute::Id)
         })?;
         if let Some(parent_team_id) = self.parent_team_id {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Id,
                         )
                 })?;
         }
@@ -578,15 +576,13 @@ impl TeamBuildable for InsertableTeamBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::Name)
+                .rename_field(InsertableTeamAttribute::Name)
         })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Name,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Name,
+            )
+        })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -601,7 +597,7 @@ impl TeamBuildable for InsertableTeamBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::Description)
+                .rename_field(InsertableTeamAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -617,15 +613,13 @@ impl TeamBuildable for InsertableTeamBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::Icon)
+                .rename_field(InsertableTeamAttribute::Icon)
         })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Icon,
-                    )
-            })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Icon,
+            )
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
@@ -655,8 +649,8 @@ impl TeamBuildable for InsertableTeamBuilder {
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::ParentTeamId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::Id,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Id,
                         )
                 })?;
         }
@@ -700,15 +694,15 @@ impl TeamBuildable for InsertableTeamBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::CreatedAt)
+                .rename_field(InsertableTeamAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -735,15 +729,15 @@ impl TeamBuildable for InsertableTeamBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttributes::UpdatedAt)
+                .rename_field(InsertableTeamAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -763,10 +757,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::teams::Team,
-            Error = web_common_traits::database::InsertError<InsertableTeamAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTeamAttribute>,
         >,
 {
-    type Attributes = InsertableTeamAttributes;
+    type Attributes = InsertableTeamAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some()
             && self.name.is_some()

@@ -8,8 +8,8 @@ use crate::codegen::diesel_codegen::tables::ball_mill_machines::ball_mill_machin
 diesel::allow_tables_to_appear_in_same_query!(ball_mill_procedures, ball_mill_machines);
 use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
 diesel::allow_tables_to_appear_in_same_query!(ball_mill_procedures, ball_mill_procedure_templates);
-use crate::codegen::diesel_codegen::tables::beads_models::beads_models;
-diesel::allow_tables_to_appear_in_same_query!(ball_mill_procedures, beads_models);
+use crate::codegen::diesel_codegen::tables::bead_models::bead_models;
+diesel::allow_tables_to_appear_in_same_query!(ball_mill_procedures, bead_models);
 use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
 diesel::allow_tables_to_appear_in_same_query!(ball_mill_procedures, procedure_assets);
 use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;

@@ -24,7 +24,7 @@ pub(super) fn init_freeze_dryer_rules(
     let freeze_dryer_instument = freeze_dryer(user, conn)?;
     let cct = conical_centrifugal_tube_50ml(user, conn)?;
 
-    freeze_dryer_instument.compatible_with_quantity(&cct, 80, user, conn)?;
+    freeze_dryer_instument.compatible_with(&cct, user, conn)?;
 
     Ok(())
 }

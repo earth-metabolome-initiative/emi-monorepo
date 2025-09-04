@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableOrganismTaxonAttributes {
+pub enum InsertableOrganismTaxonAttribute {
     CreatedBy,
     CreatedAt,
     OrganismId,
     TaxonId,
 }
-impl core::str::FromStr for InsertableOrganismTaxonAttributes {
+impl core::str::FromStr for InsertableOrganismTaxonAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -22,7 +22,7 @@ impl core::str::FromStr for InsertableOrganismTaxonAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableOrganismTaxonAttributes {
+impl core::fmt::Display for InsertableOrganismTaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CreatedBy => write!(f, "created_by"),
@@ -164,7 +164,7 @@ impl Default for InsertableOrganismTaxonBuilder {
 }
 /// Trait defining setters for attributes of an instance of `OrganismTaxon` or
 /// descendant tables.
-pub trait OrganismTaxonBuildable: Sized {
+pub trait OrganismTaxonSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.organism_taxa.created_by` column.
@@ -262,9 +262,9 @@ pub trait OrganismTaxonBuildable: Sized {
         taxon_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl OrganismTaxonBuildable for InsertableOrganismTaxonBuilder {
+impl OrganismTaxonSettable for InsertableOrganismTaxonBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonAttribute;
     /// Sets the value of the `public.organism_taxa.created_by` column.
     fn created_by(
         mut self,
@@ -285,7 +285,7 @@ impl OrganismTaxonBuildable for InsertableOrganismTaxonBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableOrganismTaxonAttributes::CreatedAt)
+                .rename_field(InsertableOrganismTaxonAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -319,10 +319,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
-            Error = web_common_traits::database::InsertError<InsertableOrganismTaxonAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableOrganismTaxonAttribute>,
         >,
 {
-    type Attributes = InsertableOrganismTaxonAttributes;
+    type Attributes = InsertableOrganismTaxonAttribute;
     fn is_complete(&self) -> bool {
         self.created_by.is_some()
             && self.created_at.is_some()

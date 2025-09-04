@@ -1,32 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerExtensionAttributes {
-    Container(crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes),
+pub enum InsertableVolumetricContainerExtensionAttribute {
+    Container(crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute),
 }
-impl core::fmt::Display for InsertableVolumetricContainerExtensionAttributes {
+impl core::fmt::Display for InsertableVolumetricContainerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Container(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes>
-    for InsertableVolumetricContainerExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute>
+    for InsertableVolumetricContainerExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
     ) -> Self {
         Self::Container(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerAttributes {
-    Extension(InsertableVolumetricContainerExtensionAttributes),
+pub enum InsertableVolumetricContainerAttribute {
+    Extension(InsertableVolumetricContainerExtensionAttribute),
     Id,
     VolumetricContainerModel,
 }
-impl core::str::FromStr for InsertableVolumetricContainerAttributes {
+impl core::str::FromStr for InsertableVolumetricContainerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -36,7 +36,7 @@ impl core::str::FromStr for InsertableVolumetricContainerAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumetricContainerAttributes {
+impl core::fmt::Display for InsertableVolumetricContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -137,7 +137,7 @@ pub struct InsertableVolumetricContainerBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `VolumetricContainer` or descendant tables.
-pub trait VolumetricContainerBuildable: Sized {
+pub trait VolumetricContainerSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -165,14 +165,14 @@ pub trait VolumetricContainerBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Container: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+    Container: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::ContainerBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
         >,
-> VolumetricContainerBuildable for InsertableVolumetricContainerBuilder<Container> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes;
+> VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
     ///Sets the value of the `public.volumetric_containers.volumetric_container_model` column.
     ///
     ///# Implementation notes
@@ -202,11 +202,11 @@ impl<
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
     ///class v2 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v2 --->|"`ancestral same as`"| v3
     ///v2 -.->|"`inferred ancestral same as`"| v0
     ///v2 -.->|"`inferred ancestral same as`"| v1
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
@@ -219,7 +219,7 @@ impl<
         mut self,
         volumetric_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::ContainerBuildable>::container_model(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::ContainerSettable>::container_model(
                 self.id,
                 volumetric_container_model,
             )
@@ -228,7 +228,7 @@ impl<
                     attribute.into(),
                 ))
             })?;
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 volumetric_container_model,
             )
@@ -242,24 +242,24 @@ impl<
     }
 }
 impl<
-    Container: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttributes,
+    Container: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
             )
@@ -281,7 +281,7 @@ where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
                 name,
             )
@@ -303,7 +303,7 @@ where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
                 description,
             )
@@ -343,7 +343,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable>::model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
             self,
             model,
         )
@@ -354,7 +354,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -378,7 +378,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -396,7 +396,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -420,7 +420,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+        self.id = <Container as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -433,14 +433,14 @@ where
         Ok(self)
     }
 }
-impl<Container> crate::codegen::structs_codegen::tables::insertables::ContainerBuildable
+impl<Container> crate::codegen::structs_codegen::tables::insertables::ContainerSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.containers.container_model` column.
     ///
@@ -467,18 +467,18 @@ where
     ///    v1@{shape: rounded, label: "volumetric_container_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v3 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v3
     ///v5 -.->|"`descendant of`"| v4
-    ///v3 --->|"`extends`"| v4
     ///```
     fn container_model(
         self,
         container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as VolumetricContainerBuildable>::volumetric_container_model(
+        <Self as VolumetricContainerSettable>::volumetric_container_model(
             self,
             container_model,
         )
@@ -486,14 +486,14 @@ where
 }
 impl<
     Container,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -524,24 +524,24 @@ where
     ///    v1@{shape: rounded, label: "volumetric_container_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v1 -.->|"`inferred ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v5 --->|"`extends`"| v6
+    ///v5 -.->|"`descendant of`"| v4
     ///v6 --->|"`extends`"| v4
     ///v7 --->|"`extends`"| v5
     ///v7 -.->|"`descendant of`"| v4
     ///v7 -.->|"`descendant of`"| v6
-    ///v5 --->|"`extends`"| v6
-    ///v5 -.->|"`descendant of`"| v4
     ///```
     fn model(
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as VolumetricContainerBuildable>::volumetric_container_model(self, model)
+        <Self as VolumetricContainerSettable>::volumetric_container_model(self, model)
     }
 }
 impl<Container> web_common_traits::database::MostConcreteTable
@@ -572,7 +572,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         Error = web_common_traits::database::InsertError<
-            InsertableVolumetricContainerAttributes,
+            InsertableVolumetricContainerAttribute,
         >,
     >,
     Container: web_common_traits::database::TryInsertGeneric<
@@ -580,7 +580,7 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
-    type Attributes = InsertableVolumetricContainerAttributes;
+    type Attributes = InsertableVolumetricContainerAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.volumetric_container_model.is_some()
     }

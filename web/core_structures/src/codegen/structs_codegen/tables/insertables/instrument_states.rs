@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableInstrumentStateAttributes {
+pub enum InsertableInstrumentStateAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableInstrumentStateAttributes {
+impl core::str::FromStr for InsertableInstrumentStateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableInstrumentStateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableInstrumentStateAttributes {
+impl core::fmt::Display for InsertableInstrumentStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -92,7 +92,7 @@ pub struct InsertableInstrumentStateBuilder {
 }
 /// Trait defining setters for attributes of an instance of `InstrumentState` or
 /// descendant tables.
-pub trait InstrumentStateBuildable: Sized {
+pub trait InstrumentStateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.instrument_states.name` column.
@@ -196,9 +196,9 @@ pub trait InstrumentStateBuildable: Sized {
         color_id: i16,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl InstrumentStateBuildable for InsertableInstrumentStateBuilder {
+impl InstrumentStateSettable for InsertableInstrumentStateBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute;
     /// Sets the value of the `public.instrument_states.name` column.
     fn name<N>(
         mut self,
@@ -210,7 +210,7 @@ impl InstrumentStateBuildable for InsertableInstrumentStateBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableInstrumentStateAttributes::Name)
+                .rename_field(InsertableInstrumentStateAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -226,7 +226,7 @@ impl InstrumentStateBuildable for InsertableInstrumentStateBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableInstrumentStateAttributes::Description)
+                .rename_field(InsertableInstrumentStateAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -242,7 +242,7 @@ impl InstrumentStateBuildable for InsertableInstrumentStateBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableInstrumentStateAttributes::Icon)
+                .rename_field(InsertableInstrumentStateAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -268,10 +268,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
-            Error = web_common_traits::database::InsertError<InsertableInstrumentStateAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableInstrumentStateAttribute>,
         >,
 {
-    type Attributes = InsertableInstrumentStateAttributes;
+    type Attributes = InsertableInstrumentStateAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

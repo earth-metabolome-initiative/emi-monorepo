@@ -180,29 +180,29 @@ impl BallMillProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::beads_models::BeadsModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::beads_models::BeadsModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::bead_models::BeadModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::beads_models::BeadsModel,
+            crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::beads_models::BeadsModel::table(),
+                crate::codegen::structs_codegen::tables::bead_models::BeadModel::table(),
                 self.bead_model,
             ),
             conn,
@@ -686,6 +686,50 @@ impl BallMillProcedure {
             .order_by(ball_mill_procedures::procedure.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure(
+        parent_procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedures::ball_mill_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::parent_procedure.eq(parent_procedure))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_procedure_template(
+        parent_procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedures::ball_mill_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(

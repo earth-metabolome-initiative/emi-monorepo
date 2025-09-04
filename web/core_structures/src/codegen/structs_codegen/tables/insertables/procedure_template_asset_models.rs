@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcedureTemplateAssetModelAttributes {
+pub enum InsertableProcedureTemplateAssetModelAttribute {
     Id,
     Name,
     ProcedureTemplate,
@@ -10,7 +10,7 @@ pub enum InsertableProcedureTemplateAssetModelAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableProcedureTemplateAssetModelAttributes {
+impl core::str::FromStr for InsertableProcedureTemplateAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -32,7 +32,7 @@ impl core::str::FromStr for InsertableProcedureTemplateAssetModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableProcedureTemplateAssetModelAttributes {
+impl core::fmt::Display for InsertableProcedureTemplateAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -219,7 +219,7 @@ impl Default for InsertableProcedureTemplateAssetModelBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ProcedureTemplateAssetModel` or descendant tables.
-pub trait ProcedureTemplateAssetModelBuildable: Sized {
+pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedure_template_asset_models.name`
@@ -398,8 +398,8 @@ pub trait ProcedureTemplateAssetModelBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetModelBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes;
+impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetModelBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute;
     /// Sets the value of the `public.procedure_template_asset_models.name`
     /// column.
     fn name<N>(
@@ -412,13 +412,13 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::Name)
+                .rename_field(InsertableProcedureTemplateAssetModelAttribute::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Name,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Name,
                     )
             })?;
         self.name = Some(name);
@@ -481,15 +481,15 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::CreatedAt)
+                .rename_field(InsertableProcedureTemplateAssetModelAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -518,15 +518,15 @@ impl ProcedureTemplateAssetModelBuildable for InsertableProcedureTemplateAssetMo
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAssetModelAttributes::UpdatedAt)
+                .rename_field(InsertableProcedureTemplateAssetModelAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -548,11 +548,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         Error = web_common_traits::database::InsertError<
-            InsertableProcedureTemplateAssetModelAttributes,
+            InsertableProcedureTemplateAssetModelAttribute,
         >,
     >,
 {
-    type Attributes = InsertableProcedureTemplateAssetModelAttributes;
+    type Attributes = InsertableProcedureTemplateAssetModelAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.procedure_template.is_some()
             && self.asset_model.is_some() && self.created_by.is_some()

@@ -71,7 +71,7 @@ impl Table {
                 ))[0];
 
             let required_ancestor_table = required_ancestor_column.table(conn)?;
-            let buildable_trait = required_ancestor_table.builder_trait_ty()?;
+            let buildable_trait = required_ancestor_table.setter_trait_ty()?;
             let foreign_table = foreign_key.foreign_table(conn)?;
             let generic_ident = foreign_table.struct_ident()?;
             let foreign_key_ident = foreign_key.constraint_ident(conn)?;
@@ -105,7 +105,7 @@ impl Table {
         if let Some(foreign_key) = current_column.requires_partial_builder(conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
 
-            for foreign_key in self.associated_same_as_foreign_keys(conn)? {
+            for foreign_key in self.associated_same_as_foreign_keys(false, conn)? {
                 let local_columns = foreign_key.columns(conn)?;
                 if !local_columns.contains(current_column) {
                     continue;
@@ -128,7 +128,7 @@ impl Table {
                 let local_column_ident = local_column.snake_case_ident()?;
                 let local_column_camel_case_ident = local_column.camel_case_ident()?;
                 let foreign_builder = foreign_table.insertable_builder_ty()?;
-                let foreign_table_trait = foreign_table.builder_trait_ty()?;
+                let foreign_table_trait = foreign_table.setter_trait_ty()?;
                 let foreign_column_ident = foreign_column.snake_case_ident()?;
                 let foreign_column_setter_ident = foreign_column.getter_ident()?;
 
@@ -160,10 +160,8 @@ impl Table {
                 });
             }
         } else {
-            for (associated_same_as_constraint, foreign_column) in current_column
-                .associated_same_as_constraints(conn)?
-                .into_iter()
-                .zip(current_column.associated_same_as_columns(conn)?.into_iter())
+            for (foreign_column, associated_same_as_constraint) in
+                current_column.associated_same_as_columns(false, conn)?
             {
                 let local_columns = associated_same_as_constraint.columns(conn)?;
                 assert_eq!(local_columns.len(), 2,);
@@ -174,7 +172,7 @@ impl Table {
 
                 let foreign_table = associated_same_as_constraint.foreign_table(conn)?;
                 let foreign_builder = foreign_table.insertable_builder_ty()?;
-                let foreign_table_trait = foreign_table.builder_trait_ty()?;
+                let foreign_table_trait = foreign_table.setter_trait_ty()?;
 
                 let local_column_ident = local_column.snake_case_ident()?;
                 let local_column_camel_case_ident = local_column.camel_case_ident()?;

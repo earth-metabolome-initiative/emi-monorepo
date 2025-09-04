@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::team_states::TeamState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttributes::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezeDryerLotExtensionAttributes {
+pub enum InsertableCommercialFreezeDryerLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ),
     FreezeDryerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialFreezeDryerLotExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialFreezeDryerLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -17,32 +17,31 @@ impl core::fmt::Display for InsertableCommercialFreezeDryerLotExtensionAttribute
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
-> for InsertableCommercialFreezeDryerLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+> for InsertableCommercialFreezeDryerLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttributes>
-    for InsertableCommercialFreezeDryerLotExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttribute>
+    for InsertableCommercialFreezeDryerLotExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerModelAttribute,
     ) -> Self {
         Self::FreezeDryerModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezeDryerLotAttributes {
-    Extension(InsertableCommercialFreezeDryerLotExtensionAttributes),
+pub enum InsertableCommercialFreezeDryerLotAttribute {
+    Extension(InsertableCommercialFreezeDryerLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialFreezeDryerLotAttributes {
+impl core::str::FromStr for InsertableCommercialFreezeDryerLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +51,7 @@ impl core::str::FromStr for InsertableCommercialFreezeDryerLotAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialFreezeDryerLotAttributes {
+impl core::fmt::Display for InsertableCommercialFreezeDryerLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -191,7 +190,7 @@ pub struct InsertableCommercialFreezeDryerLotBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialFreezeDryerLot` or descendant tables.
-pub trait CommercialFreezeDryerLotBuildable: Sized {
+pub trait CommercialFreezeDryerLotSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -219,16 +218,16 @@ pub trait CommercialFreezeDryerLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     FreezeDryerModel,
-> CommercialFreezeDryerLotBuildable
+> CommercialFreezeDryerLotSettable
 for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute;
     ///Sets the value of the `public.commercial_freeze_dryer_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -258,16 +257,16 @@ for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerM
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
+    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
     ///```
@@ -275,7 +274,7 @@ for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerM
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::product_model(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::product_model(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 product_model,
             )
@@ -284,7 +283,7 @@ for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerM
                     attribute.into(),
                 ))
             })?;
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 Some(product_model),
             )
@@ -298,18 +297,18 @@ for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerM
     }
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     FreezeDryerModel,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -317,10 +316,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 name,
             )
@@ -339,10 +338,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 description,
             )
@@ -382,7 +381,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -393,7 +392,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 created_by,
             )
@@ -417,7 +416,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 created_at,
             )
@@ -435,7 +434,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 updated_by,
             )
@@ -459,7 +458,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 updated_at,
             )
@@ -473,18 +472,18 @@ where
     }
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
     FreezeDryerModel,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -495,7 +494,7 @@ where
         L: TryInto<String>,
         validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
     {
-        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::lot(
+        self.commercial_freeze_dryer_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::lot(
                 self.commercial_freeze_dryer_lots_id_fkey,
                 lot,
             )
@@ -536,34 +535,34 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v3 --->|"`extends`"| v4
     ///v3 -.->|"`descendant of`"| v5
+    ///v4 --->|"`extends`"| v5
     ///```
     fn product_model(
         self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialFreezeDryerLotBuildable>::product_model(self, product_model)
+        <Self as CommercialFreezeDryerLotSettable>::product_model(self, product_model)
     }
 }
 impl<CommercialProductLot, FreezeDryerModel>
-    crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelSettable
     for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute;
 }
 impl<
     CommercialProductLot,
     FreezeDryerModel,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -596,22 +595,22 @@ where
     ///end
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v6
-    ///v5 -.->|"`descendant of`"| v4
-    ///v5 -.->|"`descendant of`"| v7
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v6
+    ///v5 -.->|"`descendant of`"| v4
+    ///v5 -.->|"`descendant of`"| v7
     ///```
     fn parent_model(
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialFreezeDryerLotBuildable>::product_model(
+        <Self as CommercialFreezeDryerLotSettable>::product_model(
             self,
             parent_model
                 .ok_or(
@@ -660,7 +659,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialFreezeDryerLotAttributes,
+            InsertableCommercialFreezeDryerLotAttribute,
         >,
     >,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -669,7 +668,7 @@ where
     >,
     FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCommercialFreezeDryerLotAttributes;
+    type Attributes = InsertableCommercialFreezeDryerLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_freeze_dryer_lots_id_fkey.is_complete()
             && self.commercial_freeze_dryer_lots_id_fkey1.is_complete()

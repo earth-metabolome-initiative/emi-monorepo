@@ -42,11 +42,18 @@ CREATE TABLE IF NOT EXISTS commercial_packaging_lots (
 	product_model INTEGER NOT NULL REFERENCES commercial_packaging_models(id),
 	FOREIGN KEY (id, product_model) REFERENCES asset_models(id, parent_model)
 );
-CREATE TABLE IF NOT EXISTS commercial_beads_lots (
+CREATE TABLE IF NOT EXISTS commercial_bead_lots (
 	id INTEGER PRIMARY KEY,
 	FOREIGN KEY (id) REFERENCES commercial_product_lots(id) ON DELETE CASCADE,
-	FOREIGN KEY (id) REFERENCES beads_models(id) ON DELETE CASCADE,
-	product_model INTEGER NOT NULL REFERENCES commercial_beads_models(id),
+	FOREIGN KEY (id) REFERENCES bead_models(id) ON DELETE CASCADE,
+	product_model INTEGER NOT NULL REFERENCES commercial_bead_models(id),
+	FOREIGN KEY (id, product_model) REFERENCES asset_models(id, parent_model)
+);
+CREATE TABLE IF NOT EXISTS commercial_cap_lots (
+	id INTEGER PRIMARY KEY,
+	FOREIGN KEY (id) REFERENCES commercial_product_lots(id) ON DELETE CASCADE,
+	FOREIGN KEY (id) REFERENCES cap_models(id) ON DELETE CASCADE,
+	product_model INTEGER NOT NULL REFERENCES commercial_cap_models(id),
 	FOREIGN KEY (id, product_model) REFERENCES asset_models(id, parent_model)
 );
 CREATE TABLE IF NOT EXISTS commercial_ball_mill_machine_lots (

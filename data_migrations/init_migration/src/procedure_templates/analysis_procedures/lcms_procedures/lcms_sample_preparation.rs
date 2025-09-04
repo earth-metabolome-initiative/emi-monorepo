@@ -1,6 +1,6 @@
 //! Submodule for negative ionization LC-MS procedures.
 
-use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateBuildable};
+use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 

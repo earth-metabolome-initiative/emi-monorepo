@@ -52,9 +52,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::BallMillProcedure)
                     .collect::<Vec<_>>()
             }
-            super::Rows::BeadsModel(rows) => {
+            super::Rows::BeadModel(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::BeadsModel)
+                    .map(crate::codegen::tables::row::Row::BeadModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::Brand(rows) => {
@@ -68,6 +68,9 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Camera(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Camera).collect::<Vec<_>>()
             }
+            super::Rows::CapModel(rows) => {
+                rows.into_iter().map(crate::codegen::tables::row::Row::CapModel).collect::<Vec<_>>()
+            }
             super::Rows::CappingProcedureTemplate(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CappingProcedureTemplate)
@@ -76,11 +79,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::CappingProcedure(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CappingProcedure)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::CapsModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CapsModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::CentrifugeModel(rows) => {
@@ -119,14 +117,14 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::CommercialBallMillMachineModel)
                     .collect::<Vec<_>>()
             }
-            super::Rows::CommercialBeadsLot(rows) => {
+            super::Rows::CommercialBeadLot(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CommercialBeadsLot)
+                    .map(crate::codegen::tables::row::Row::CommercialBeadLot)
                     .collect::<Vec<_>>()
             }
-            super::Rows::CommercialBeadsModel(rows) => {
+            super::Rows::CommercialBeadModel(rows) => {
                 rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::CommercialBeadsModel)
+                    .map(crate::codegen::tables::row::Row::CommercialBeadModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::CommercialCameraLot(rows) => {
@@ -137,6 +135,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::CommercialCameraModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::CommercialCameraModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CommercialCapLot(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CommercialCapLot)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CommercialCapModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CommercialCapModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::CommercialCentrifugeLot(rows) => {
@@ -517,11 +525,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::SampleState(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SampleState)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::SharedProcedureTemplateAssetModel(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::SharedProcedureTemplateAssetModel)
                     .collect::<Vec<_>>()
             }
             super::Rows::SpatialRefSy(rows) => {

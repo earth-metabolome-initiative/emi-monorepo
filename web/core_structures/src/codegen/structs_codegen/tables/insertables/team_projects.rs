@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamProjectAttributes {
+pub enum InsertableTeamProjectAttribute {
     TeamId,
     ProjectId,
 }
-impl core::str::FromStr for InsertableTeamProjectAttributes {
+impl core::str::FromStr for InsertableTeamProjectAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableTeamProjectAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamProjectAttributes {
+impl core::fmt::Display for InsertableTeamProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::TeamId => write!(f, "team_id"),
@@ -110,7 +110,7 @@ pub struct InsertableTeamProjectBuilder {
 }
 /// Trait defining setters for attributes of an instance of `TeamProject` or
 /// descendant tables.
-pub trait TeamProjectBuildable: Sized {
+pub trait TeamProjectSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.team_projects.team_id` column.
@@ -158,9 +158,9 @@ pub trait TeamProjectBuildable: Sized {
         project_id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl TeamProjectBuildable for InsertableTeamProjectBuilder {
+impl TeamProjectSettable for InsertableTeamProjectBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttribute;
     /// Sets the value of the `public.team_projects.team_id` column.
     fn team(
         mut self,
@@ -190,10 +190,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject,
-            Error = web_common_traits::database::InsertError<InsertableTeamProjectAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableTeamProjectAttribute>,
         >,
 {
-    type Attributes = InsertableTeamProjectAttributes;
+    type Attributes = InsertableTeamProjectAttribute;
     fn is_complete(&self) -> bool {
         self.team_id.is_some() && self.project_id.is_some()
     }

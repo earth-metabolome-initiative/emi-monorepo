@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableRegisteringProcedureTemplateExtensionAttributes {
+pub enum InsertableRegisteringProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableRegisteringProcedureTemplateExtensionAttributes {
+impl core::fmt::Display for InsertableRegisteringProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
@@ -13,27 +13,26 @@ impl core::fmt::Display for InsertableRegisteringProcedureTemplateExtensionAttri
     }
 }
 impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
-    > for InsertableRegisteringProcedureTemplateExtensionAttributes
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
+    for InsertableRegisteringProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableRegisteringProcedureTemplateAttributes {
-    Extension(InsertableRegisteringProcedureTemplateExtensionAttributes),
+pub enum InsertableRegisteringProcedureTemplateAttribute {
+    Extension(InsertableRegisteringProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     RegisteredAssetModel,
     ProcedureTemplateRegisteredAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
     ),
 }
-impl core::str::FromStr for InsertableRegisteringProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableRegisteringProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -41,7 +40,7 @@ impl core::str::FromStr for InsertableRegisteringProcedureTemplateAttributes {
             "ProcedureTemplateRegisteredAssetModel" => {
                 Ok(
                     Self::ProcedureTemplateRegisteredAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -49,7 +48,7 @@ impl core::str::FromStr for InsertableRegisteringProcedureTemplateAttributes {
             "procedure_template_registered_asset_model" => {
                 Ok(
                     Self::ProcedureTemplateRegisteredAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes::Id,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -63,7 +62,7 @@ impl core::str::FromStr for InsertableRegisteringProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableRegisteringProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableRegisteringProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -198,7 +197,7 @@ pub struct InsertableRegisteringProcedureTemplateBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `RegisteringProcedureTemplate` or descendant tables.
-pub trait RegisteringProcedureTemplateBuildable: Sized {
+pub trait RegisteringProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -251,10 +250,10 @@ pub trait RegisteringProcedureTemplateBuildable: Sized {
         procedure_template_registered_asset_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<ProcedureTemplate> RegisteringProcedureTemplateBuildable
+impl<ProcedureTemplate> RegisteringProcedureTemplateSettable
     for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.registering_procedure_templates.registered_asset_model` column.
     ///
@@ -276,20 +275,21 @@ impl<ProcedureTemplate> RegisteringProcedureTemplateBuildable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`registering_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_registered_asset_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "registered_asset_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_registered_asset_model"}
+    /// class v1 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn registered_asset_model(
         mut self,
         registered_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_registered_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+        self.procedure_template_registered_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self.procedure_template_registered_asset_model,
                 registered_asset_model,
             )
@@ -323,13 +323,14 @@ impl<ProcedureTemplate> RegisteringProcedureTemplateBuildable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`registering_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "registered_asset_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_registered_asset_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "registered_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_registered_asset_model(
@@ -349,7 +350,7 @@ impl<ProcedureTemplate> RegisteringProcedureTemplateBuildable
         } else if let Some(asset_model) = procedure_template_registered_asset_model.asset_model {
             self.registered_asset_model = Some(asset_model);
         } else if let Some(local) = self.registered_asset_model {
-            procedure_template_registered_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelBuildable>::asset_model(
+            procedure_template_registered_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_registered_asset_model,
                     local,
                 )
@@ -366,12 +367,12 @@ impl<ProcedureTemplate> RegisteringProcedureTemplateBuildable
     }
 }
 impl<
-    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes,
+    ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable
+> crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableRegisteringProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -382,7 +383,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::name(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
                 name,
             )
@@ -404,7 +405,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::description(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
                 description,
             )
@@ -426,7 +427,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::deprecated(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
             )
@@ -448,7 +449,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::icon(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
                 self.procedure_template,
                 icon,
             )
@@ -466,7 +467,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
             )
@@ -490,7 +491,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::created_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                 self.procedure_template,
                 created_at,
             )
@@ -508,7 +509,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_by(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,
             )
@@ -532,7 +533,7 @@ for InsertableRegisteringProcedureTemplateBuilder<ProcedureTemplate> {
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateBuildable>::updated_at(
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
             )
@@ -573,7 +574,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableRegisteringProcedureTemplateAttributes,
+            InsertableRegisteringProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -584,7 +585,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableRegisteringProcedureTemplateAttributes;
+    type Attributes = InsertableRegisteringProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.registered_asset_model.is_some()
             && self.procedure_template_registered_asset_model.is_complete()

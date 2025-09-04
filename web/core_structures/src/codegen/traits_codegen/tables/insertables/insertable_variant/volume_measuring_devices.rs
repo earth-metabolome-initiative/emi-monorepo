@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDevice;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceExtensionAttributes::PhysicalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceExtensionAttribute::PhysicalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute::Id,
                     ),
                 ))
             })?;

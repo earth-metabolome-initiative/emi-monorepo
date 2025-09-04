@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePhoneModelExtensionAttributes {
+pub enum InsertablePhoneModelExtensionAttribute {
     CameraModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
     ),
     PositioningDeviceModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertablePhoneModelExtensionAttributes {
+impl core::fmt::Display for InsertablePhoneModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CameraModel(e) => write!(f, "{e}"),
@@ -16,31 +16,31 @@ impl core::fmt::Display for InsertablePhoneModelExtensionAttributes {
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes>
-    for InsertablePhoneModelExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute>
+    for InsertablePhoneModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
     ) -> Self {
         Self::CameraModel(attribute)
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
-> for InsertablePhoneModelExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
+> for InsertablePhoneModelExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
     ) -> Self {
         Self::PositioningDeviceModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePhoneModelAttributes {
-    Extension(InsertablePhoneModelExtensionAttributes),
+pub enum InsertablePhoneModelAttribute {
+    Extension(InsertablePhoneModelExtensionAttribute),
     Id,
 }
-impl core::str::FromStr for InsertablePhoneModelAttributes {
+impl core::str::FromStr for InsertablePhoneModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -48,7 +48,7 @@ impl core::str::FromStr for InsertablePhoneModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertablePhoneModelAttributes {
+impl core::fmt::Display for InsertablePhoneModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -152,29 +152,29 @@ pub struct InsertablePhoneModelBuilder<
 }
 /// Trait defining setters for attributes of an instance of `PhoneModel` or
 /// descendant tables.
-pub trait PhoneModelBuildable: Sized {
+pub trait PhoneModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
 }
-impl<CameraModel, PositioningDeviceModel> PhoneModelBuildable
+impl<CameraModel, PositioningDeviceModel> PhoneModelSettable
     for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
 {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute;
 }
 impl<
-    CameraModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
         >,
     PositioningDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -182,10 +182,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.phone_models_camera,
                 name,
             )
@@ -204,10 +204,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.phone_models_camera,
                 description,
             )
@@ -247,7 +247,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -258,7 +258,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.phone_models_camera,
                 created_by,
             )
@@ -282,7 +282,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.phone_models_camera,
                 created_at,
             )
@@ -300,7 +300,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.phone_models_camera,
                 updated_by,
             )
@@ -324,7 +324,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.phone_models_camera,
                 updated_at,
             )
@@ -338,27 +338,27 @@ where
     }
 }
 impl<CameraModel, PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::CameraModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::CameraModelSettable
     for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
 {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute;
 }
 impl<
-    CameraModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttributes,
+    CameraModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
         >,
     PositioningDeviceModel,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.phone_models_camera,
                 parent_model,
             )
@@ -372,11 +372,11 @@ for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel> {
     }
 }
 impl<CameraModel, PositioningDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelSettable
     for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
 {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute;
 }
 impl<CameraModel, PositioningDeviceModel> web_common_traits::database::MostConcreteTable
     for InsertablePhoneModelBuilder<CameraModel, PositioningDeviceModel>
@@ -409,12 +409,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
-            Error = web_common_traits::database::InsertError<InsertablePhoneModelAttributes>,
+            Error = web_common_traits::database::InsertError<InsertablePhoneModelAttribute>,
         >,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertablePhoneModelAttributes;
+    type Attributes = InsertablePhoneModelAttribute;
     fn is_complete(&self) -> bool {
         self.phone_models_camera.is_complete() && self.phone_models_positioning.is_complete()
     }

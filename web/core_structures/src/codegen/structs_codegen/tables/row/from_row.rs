@@ -30,22 +30,22 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::BallMillProcedure(ball_mill_procedures) => {
                 crate::codegen::tables::rows::Rows::from(ball_mill_procedures)
             }
-            super::Row::BeadsModel(beads_models) => {
-                crate::codegen::tables::rows::Rows::from(beads_models)
+            super::Row::BeadModel(bead_models) => {
+                crate::codegen::tables::rows::Rows::from(bead_models)
             }
             super::Row::Brand(brands) => crate::codegen::tables::rows::Rows::from(brands),
             super::Row::CameraModel(camera_models) => {
                 crate::codegen::tables::rows::Rows::from(camera_models)
             }
             super::Row::Camera(cameras) => crate::codegen::tables::rows::Rows::from(cameras),
+            super::Row::CapModel(cap_models) => {
+                crate::codegen::tables::rows::Rows::from(cap_models)
+            }
             super::Row::CappingProcedureTemplate(capping_procedure_templates) => {
                 crate::codegen::tables::rows::Rows::from(capping_procedure_templates)
             }
             super::Row::CappingProcedure(capping_procedures) => {
                 crate::codegen::tables::rows::Rows::from(capping_procedures)
-            }
-            super::Row::CapsModel(caps_models) => {
-                crate::codegen::tables::rows::Rows::from(caps_models)
             }
             super::Row::CentrifugeModel(centrifuge_models) => {
                 crate::codegen::tables::rows::Rows::from(centrifuge_models)
@@ -67,17 +67,23 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
                 crate::codegen::tables::rows::Rows::from(commercial_ball_mill_machine_models)
             }
-            super::Row::CommercialBeadsLot(commercial_beads_lots) => {
-                crate::codegen::tables::rows::Rows::from(commercial_beads_lots)
+            super::Row::CommercialBeadLot(commercial_bead_lots) => {
+                crate::codegen::tables::rows::Rows::from(commercial_bead_lots)
             }
-            super::Row::CommercialBeadsModel(commercial_beads_models) => {
-                crate::codegen::tables::rows::Rows::from(commercial_beads_models)
+            super::Row::CommercialBeadModel(commercial_bead_models) => {
+                crate::codegen::tables::rows::Rows::from(commercial_bead_models)
             }
             super::Row::CommercialCameraLot(commercial_camera_lots) => {
                 crate::codegen::tables::rows::Rows::from(commercial_camera_lots)
             }
             super::Row::CommercialCameraModel(commercial_camera_models) => {
                 crate::codegen::tables::rows::Rows::from(commercial_camera_models)
+            }
+            super::Row::CommercialCapLot(commercial_cap_lots) => {
+                crate::codegen::tables::rows::Rows::from(commercial_cap_lots)
+            }
+            super::Row::CommercialCapModel(commercial_cap_models) => {
+                crate::codegen::tables::rows::Rows::from(commercial_cap_models)
             }
             super::Row::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
                 crate::codegen::tables::rows::Rows::from(commercial_centrifuge_lots)
@@ -301,9 +307,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::SampleState(sample_states) => {
                 crate::codegen::tables::rows::Rows::from(sample_states)
             }
-            super::Row::SharedProcedureTemplateAssetModel(
-                shared_procedure_template_asset_models,
-            ) => crate::codegen::tables::rows::Rows::from(shared_procedure_template_asset_models),
             super::Row::SpatialRefSy(spatial_ref_sys) => {
                 crate::codegen::tables::rows::Rows::from(spatial_ref_sys)
             }

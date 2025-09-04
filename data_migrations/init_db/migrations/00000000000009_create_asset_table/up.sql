@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS asset_models (
     id SERIAL PRIMARY KEY,
     most_concrete_table TEXT NOT NULL,
-    name VARCHAR(255) UNIQUE CHECK (must_be_paragraph(description)),
-    description TEXT CHECK (must_be_paragraph(description)),
+    name VARCHAR(255) NOT NULL UNIQUE CHECK (must_be_paragraph(name)),
+    description TEXT NOT NULL CHECK (must_be_paragraph(description)),
     parent_model INTEGER REFERENCES asset_models(id) ON DELETE CASCADE,
     created_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS asset_models (
 CREATE TABLE IF NOT EXISTS assets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     most_concrete_table TEXT NOT NULL,
-    name VARCHAR(255) UNIQUE CHECK (must_be_paragraph(description)),
+    name VARCHAR(255) CHECK (must_be_paragraph(name)),
     description TEXT CHECK (must_be_paragraph(description)),
     model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
     created_by INTEGER NOT NULL REFERENCES users(id),
@@ -25,7 +25,9 @@ CREATE TABLE IF NOT EXISTS assets (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHECK (must_be_distinct(name, description)),
     CHECK (must_be_smaller_than_utc(created_at, updated_at)),
-    UNIQUE (id, model)
+    UNIQUE (id, model),
+    -- Assets of different models can have the same name, but not assets of the same model.
+    UNIQUE (name, model)
 );
 CREATE TABLE IF NOT EXISTS physical_asset_models (
     id INTEGER PRIMARY KEY REFERENCES asset_models(id) ON DELETE CASCADE,

@@ -9,8 +9,8 @@ use web_common_traits::{
 
 use crate::{
     NextProcedureTemplate, ProcedureTemplate,
-    codegen::structs_codegen::tables::insertables::NextProcedureTemplateBuildable,
-    tables::insertables::InsertableNextProcedureTemplateAttributes,
+    codegen::structs_codegen::tables::insertables::NextProcedureTemplateSettable,
+    tables::insertables::InsertableNextProcedureTemplateAttribute,
 };
 
 /// Trait defining the methods for managing parent-child relationships in
@@ -38,7 +38,7 @@ where
         successor_procedure: &C2,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::NextProcedureTemplate, InsertError<InsertableNextProcedureTemplateAttributes>>
+    ) -> Result<crate::NextProcedureTemplate, InsertError<InsertableNextProcedureTemplateAttribute>>
     where
         C1: ExtensionTable<ProcedureTemplate>,
         C2: ExtensionTable<ProcedureTemplate>,
@@ -77,7 +77,7 @@ where
         conn: &mut diesel::PgConnection,
     ) -> Result<
         Vec<crate::NextProcedureTemplate>,
-        InsertError<InsertableNextProcedureTemplateAttributes>,
+        InsertError<InsertableNextProcedureTemplateAttribute>,
     >
     where
         C: ExtensionTable<ProcedureTemplate>,

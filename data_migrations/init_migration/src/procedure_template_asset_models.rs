@@ -2,6 +2,7 @@
 //! trackable builders.
 
 pub mod ball_mill;
+pub mod bead;
 pub mod centrifuge;
 pub mod coffee_wrapper;
 pub mod conical_tubes;

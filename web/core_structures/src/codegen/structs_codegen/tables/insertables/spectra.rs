@@ -1,34 +1,34 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpectrumExtensionAttributes {
+pub enum InsertableSpectrumExtensionAttribute {
     DigitalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
     ),
 }
-impl core::fmt::Display for InsertableSpectrumExtensionAttributes {
+impl core::fmt::Display for InsertableSpectrumExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::DigitalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes>
-    for InsertableSpectrumExtensionAttributes
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute>
+    for InsertableSpectrumExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
     ) -> Self {
         Self::DigitalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpectrumAttributes {
-    Extension(InsertableSpectrumExtensionAttributes),
+pub enum InsertableSpectrumAttribute {
+    Extension(InsertableSpectrumExtensionAttribute),
     Id,
     SpectraCollectionId,
 }
-impl core::str::FromStr for InsertableSpectrumAttributes {
+impl core::str::FromStr for InsertableSpectrumAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableSpectrumAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableSpectrumAttributes {
+impl core::fmt::Display for InsertableSpectrumAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -136,7 +136,7 @@ pub struct InsertableSpectrumBuilder<
 }
 /// Trait defining setters for attributes of an instance of `Spectrum` or
 /// descendant tables.
-pub trait SpectrumBuildable: Sized {
+pub trait SpectrumSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.spectra.spectra_collection_id` column.
@@ -163,9 +163,9 @@ pub trait SpectrumBuildable: Sized {
         spectra_collection_id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<DigitalAsset> SpectrumBuildable for InsertableSpectrumBuilder<DigitalAsset> {
+impl<DigitalAsset> SpectrumSettable for InsertableSpectrumBuilder<DigitalAsset> {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttribute;
     /// Sets the value of the `public.spectra.spectra_collection_id` column.
     fn spectra_collection(
         mut self,
@@ -176,24 +176,24 @@ impl<DigitalAsset> SpectrumBuildable for InsertableSpectrumBuilder<DigitalAsset>
     }
 }
 impl<
-    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::AssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
+    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::AssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableSpectrumBuilder<DigitalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::id(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
             )
@@ -215,7 +215,7 @@ where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::name(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
                 name,
             )
@@ -237,7 +237,7 @@ where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::description(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
                 description,
             )
@@ -277,7 +277,7 @@ where
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable>::model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
             self,
             model,
         )
@@ -288,7 +288,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_by(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -312,7 +312,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::created_at(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -330,7 +330,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_by(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -354,7 +354,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetBuildable>::updated_at(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -368,19 +368,19 @@ where
     }
 }
 impl<
-    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttributes,
+    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable
+> crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable
 for InsertableSpectrumBuilder<DigitalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumAttribute;
     #[inline]
     ///Sets the value of the `public.digital_assets.model` column.
     fn model(
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::DigitalAssetBuildable>::model(
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
                 self.id,
                 model,
             )
@@ -420,12 +420,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spectra::Spectrum,
-            Error = web_common_traits::database::InsertError<InsertableSpectrumAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableSpectrumAttribute>,
         >,
     DigitalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableSpectrumAttributes;
+    type Attributes = InsertableSpectrumAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.spectra_collection_id.is_some()
     }

@@ -1,6 +1,6 @@
 use core_structures::{
     ReagentModel, User,
-    tables::insertables::{AssetModelBuildable, ReagentModelBuildable},
+    tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -31,8 +31,8 @@ pub(crate) fn distilled_water(
     }
 
     Ok(ReagentModel::new()
-        .name(name.to_owned())?
-        .description("Distilled water, pure".to_owned())?
+        .name(name)?
+        .description("Distilled water, pure")?
         .purity(100.0)?
         .cas_code("7732-18-5")?
         .molecular_formula("H2O")?

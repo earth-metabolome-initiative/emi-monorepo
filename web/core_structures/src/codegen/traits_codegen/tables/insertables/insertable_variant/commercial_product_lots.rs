@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,23 +78,23 @@ where
             .lot
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Lot,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Lot,
                 ),
             )?;
         let product_model = self
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::ProductModel,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotExtensionAttributes::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

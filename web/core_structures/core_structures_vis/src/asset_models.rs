@@ -20,9 +20,7 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
 
     // First, we inser all of the asset_models as nodes.
     for asset_model in &asset_models {
-        builder.node(ERNodeBuilder::default().label(
-            asset_model.name.clone().unwrap_or_else(|| format!("asset model {}", asset_model.id)),
-        )?)?;
+        builder.node(ERNodeBuilder::default().label(&asset_model.name)?)?;
     }
 
     // Next, we insert the asset_models' parent-child relationships as edges.
@@ -31,19 +29,10 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
             continue;
         };
 
-        let child_node = builder
-            .get_node_by_label(
-                asset_model
-                    .name
-                    .clone()
-                    .unwrap_or_else(|| format!("asset_model {}", asset_model.id)),
-            )
-            .expect("Trackable node not found");
-        let parent_node = builder
-            .get_node_by_label(
-                parent.name.clone().unwrap_or_else(|| format!("asset_model {}", parent.id)),
-            )
-            .expect("Parent asset_model node not found");
+        let child_node =
+            builder.get_node_by_label(&asset_model.name).expect("Trackable node not found");
+        let parent_node =
+            builder.get_node_by_label(&parent.name).expect("Parent asset_model node not found");
 
         builder.edge(EREdgeBuilder::one_to_one(child_node, parent_node).label("child of")?)?;
     }
@@ -53,20 +42,10 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
         let left_asset_model = rule.left_asset_model(conn)?;
         let right_asset_model = rule.right_asset_model(conn)?;
         let left_node = builder
-            .get_node_by_label(
-                left_asset_model
-                    .name
-                    .clone()
-                    .unwrap_or_else(|| format!("asset_model {}", left_asset_model.id)),
-            )
+            .get_node_by_label(&left_asset_model.name)
             .expect("Left asset_model node not found");
         let right_node = builder
-            .get_node_by_label(
-                right_asset_model
-                    .name
-                    .clone()
-                    .unwrap_or_else(|| format!("asset_model {}", right_asset_model.id)),
-            )
+            .get_node_by_label(&right_asset_model.name)
             .expect("Right asset_model node not found");
         builder.edge(EREdgeBuilder::one_to_one(left_node, right_node).label("compatible with")?)?;
     }

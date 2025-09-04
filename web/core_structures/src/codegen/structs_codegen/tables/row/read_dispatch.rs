@@ -33,7 +33,7 @@ where
     crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::beads_models::BeadsModel: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::bead_models::BeadModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::brands::Brand: web_common_traits::database::Read<
@@ -45,13 +45,13 @@ where
     crate::codegen::structs_codegen::tables::cameras::Camera: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::cap_models::CapModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::caps_models::CapsModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Read<
@@ -78,16 +78,22 @@ where
     crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot: web_common_traits::database::Read<
@@ -330,9 +336,6 @@ where
     crate::codegen::structs_codegen::tables::sample_states::SampleState: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy: web_common_traits::database::Read<
         C,
     >,
@@ -516,10 +519,10 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadsModel(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::beads_models::BeadsModel::read(
+                    crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(
                             primary_key,
                             conn,
                         )?
@@ -552,6 +555,15 @@ where
                         )?
                         .map(super::Row::from)
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::cap_models::CapModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
                     primary_key,
                 ) => {
@@ -565,15 +577,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapsModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::caps_models::CapsModel::read(
                             primary_key,
                             conn,
                         )?
@@ -651,19 +654,19 @@ where
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadsLot(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadLot(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::commercial_beads_lots::CommercialBeadsLot::read(
+                    crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot::read(
                             primary_key,
                             conn,
                         )?
                         .map(super::Row::from)
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadsModel(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadModel(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::commercial_beads_models::CommercialBeadsModel::read(
+                    crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel::read(
                             primary_key,
                             conn,
                         )?
@@ -682,6 +685,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCapLot(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .map(super::Row::from)
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCapModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel::read(
                             primary_key,
                             conn,
                         )?
@@ -1402,15 +1423,6 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::sample_states::SampleState::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .map(super::Row::from)
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SharedProcedureTemplateAssetModel(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::shared_procedure_template_asset_models::SharedProcedureTemplateAssetModel::read(
                             primary_key,
                             conn,
                         )?

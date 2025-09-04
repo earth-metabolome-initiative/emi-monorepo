@@ -24,7 +24,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttributes,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -62,7 +62,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -108,7 +108,7 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
@@ -117,25 +117,43 @@ where
             .packaged_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttributes::PackagedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::PackagedWithModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateExtensionAttributes::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
+            })?;
+        self.procedure_template_packaged_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_packaged_with_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::ProcedureTemplatePackagedWithModel,
+                )
             })?;
         let procedure_template_packaged_with_model = self
             .procedure_template_packaged_with_model
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttributes::ProcedureTemplatePackagedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::ProcedureTemplatePackagedWithModel,
+                )
+            })?;
+        self.procedure_template_sample_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                self.procedure_template_sample_model,
+                procedure_template,
+            )
+            .map_err(|err| {
+                err.into_field_name(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::ProcedureTemplateSampleModel,
                 )
             })?;
         let procedure_template_sample_model = self
@@ -143,7 +161,7 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttributes::ProcedureTemplateSampleModel,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateAttribute::ProcedureTemplateSampleModel,
                 )
             })?;
         Ok(Self::InsertableVariant {

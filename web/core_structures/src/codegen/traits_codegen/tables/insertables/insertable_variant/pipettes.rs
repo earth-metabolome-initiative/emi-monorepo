@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::pipettes::Pipette;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePipette;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,16 +78,16 @@ where
             .model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttributes::Model,
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute::Model,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteExtensionAttributes::PhysicalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteExtensionAttribute::PhysicalAsset(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute::Id,
                     ),
                 ))
             })?;

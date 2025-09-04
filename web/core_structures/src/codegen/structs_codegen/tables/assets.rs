@@ -149,6 +149,16 @@ impl Asset {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table().filter(assets::name.eq(name)).order_by(assets::id.asc()).load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,
@@ -224,16 +234,6 @@ impl Asset {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table().filter(assets::name.eq(name)).order_by(assets::id.asc()).first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_model_and_id(
         model: &i32,
         id: &::rosetta_uuid::Uuid,
@@ -246,6 +246,22 @@ impl Asset {
         use crate::codegen::diesel_codegen::tables::assets::assets;
         Self::table()
             .filter(assets::model.eq(model).and(assets::id.eq(id)))
+            .order_by(assets::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name_and_model(
+        name: &str,
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::name.eq(name).and(assets::model.eq(model)))
             .order_by(assets::id.asc())
             .first::<Self>(conn)
     }

@@ -4,8 +4,8 @@ use core_structures::{
     PackagingProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
     StorageProcedureTemplate, User,
     tables::insertables::{
-        PackagingProcedureTemplateBuildable, ProcedureTemplateBuildable,
-        StorageProcedureTemplateBuildable,
+        PackagingProcedureTemplateSettable, ProcedureTemplateSettable,
+        StorageProcedureTemplateSettable,
     },
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
@@ -121,7 +121,7 @@ pub(crate) fn init_part_of_organism_collection(
         &place_in_tube.procedure_template(conn)?,
         &place_in_storage_box.procedure_template(conn)?,
     ] {
-        collection.child(procedure, ChildOptions::default().inherit_asset_models(), user, conn)?;
+        collection.child(procedure, ChildOptions::default(), user, conn)?;
     }
 
     collection.extend(

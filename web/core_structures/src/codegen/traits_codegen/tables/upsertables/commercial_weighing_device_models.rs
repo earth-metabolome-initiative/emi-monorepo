@@ -15,7 +15,7 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(weighing_device_model.ne(excluded(weighing_device_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }
@@ -37,7 +37,7 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(parent_model.ne(excluded(parent_model)))
+            .filter(weighing_device_model.ne(excluded(weighing_device_model)))
             .get_results(conn)
             .map(|mut result| { result.pop() })
     }

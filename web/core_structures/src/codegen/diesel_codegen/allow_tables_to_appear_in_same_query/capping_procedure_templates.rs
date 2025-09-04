@@ -6,8 +6,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     capping_procedure_templates,
     asset_compatibility_rules
 );
-use crate::codegen::diesel_codegen::tables::caps_models::caps_models;
-diesel::allow_tables_to_appear_in_same_query!(capping_procedure_templates, caps_models);
+use crate::codegen::diesel_codegen::tables::cap_models::cap_models;
+diesel::allow_tables_to_appear_in_same_query!(capping_procedure_templates, cap_models);
 use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(
     capping_procedure_templates,

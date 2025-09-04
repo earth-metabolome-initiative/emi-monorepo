@@ -3,7 +3,7 @@
 use core_structures::{
     CommercialProduct, User, VolumetricContainerModel,
     tables::insertables::{
-        AssetModelBuildable, CommercialProductBuildable, VolumetricContainerModelBuildable,
+        AssetModelSettable, CommercialProductSettable, VolumetricContainerModelSettable,
     },
 };
 use diesel::{OptionalExtension, PgConnection};
@@ -37,8 +37,8 @@ pub(crate) fn vial_1_5ml(
     }
 
     Ok(VolumetricContainerModel::new()
-        .name(name.to_owned())?
-        .description("Vial of 1.5 ml used for extracts storage".to_owned())?
+        .name(name)?
+        .description("Vial of 1.5 ml used for extracts storage")?
         .created_by(user.id)?
         .liters(0.0015)?
         .insert(user.id, conn)?)
@@ -57,10 +57,9 @@ pub(crate) fn init_macherey_nagel_vial(
     let vial_1_5ml = vial_1_5ml(user, conn)?;
     let macherey_nagel = macherey_nagel(user, conn)?;
     Ok(CommercialProduct::new()
-        .name(vial.to_owned())?
+        .name(vial)?
         .description(
-            "Macherey Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis."
-                .to_owned(),
+            "Macherey Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis.",
         )?
         .created_by(user.id)?
         .brand(macherey_nagel.id)?

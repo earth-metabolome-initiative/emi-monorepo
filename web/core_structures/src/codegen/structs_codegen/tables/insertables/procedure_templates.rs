@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcedureTemplateAttributes {
+pub enum InsertableProcedureTemplateAttribute {
     ProcedureTemplate,
     MostConcreteTable,
     Name,
@@ -12,7 +12,7 @@ pub enum InsertableProcedureTemplateAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +38,7 @@ impl core::str::FromStr for InsertableProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate => write!(f, "procedure_template"),
@@ -169,7 +169,7 @@ impl Default for InsertableProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of `ProcedureTemplate`
 /// or descendant tables.
-pub trait ProcedureTemplateBuildable: Sized {
+pub trait ProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the `public.procedure_templates.name` column.
@@ -374,9 +374,9 @@ pub trait ProcedureTemplateBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
+impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes;
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute;
     /// Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
         mut self,
@@ -388,15 +388,15 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::Name)
+                .rename_field(InsertableProcedureTemplateAttribute::Name)
         })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Description,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Description,
                         )
                 })?;
         }
@@ -404,7 +404,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Name,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Name,
                     )
             })?;
         self.name = Some(name);
@@ -421,15 +421,15 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::Description)
+                .rename_field(InsertableProcedureTemplateAttribute::Description)
         })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Description,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Description,
                         )
                 })?;
         }
@@ -437,7 +437,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Description,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Description,
                     )
             })?;
         self.description = Some(description);
@@ -454,7 +454,7 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let deprecated = deprecated.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::Deprecated)
+                .rename_field(InsertableProcedureTemplateAttribute::Deprecated)
         })?;
         self.deprecated = Some(deprecated);
         Ok(self)
@@ -470,13 +470,13 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::Icon)
+                .rename_field(InsertableProcedureTemplateAttribute::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::Icon,
+                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::Icon,
                     )
             })?;
         self.icon = Some(icon);
@@ -519,15 +519,15 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::CreatedAt)
+                .rename_field(InsertableProcedureTemplateAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -554,15 +554,15 @@ impl ProcedureTemplateBuildable for InsertableProcedureTemplateBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureTemplateAttributes::UpdatedAt)
+                .rename_field(InsertableProcedureTemplateAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttributes::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -589,10 +589,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-            Error = web_common_traits::database::InsertError<InsertableProcedureTemplateAttributes>,
+            Error = web_common_traits::database::InsertError<InsertableProcedureTemplateAttribute>,
         >,
 {
-    type Attributes = InsertableProcedureTemplateAttributes;
+    type Attributes = InsertableProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.most_concrete_table.is_some()
             && self.name.is_some()

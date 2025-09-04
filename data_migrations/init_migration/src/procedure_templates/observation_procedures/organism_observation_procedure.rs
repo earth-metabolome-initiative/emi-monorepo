@@ -2,8 +2,8 @@ use core_structures::{
     GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate,
     RegisteringProcedureTemplate, User,
     tables::insertables::{
-        GeolocationProcedureTemplateBuildable, PhotographProcedureTemplateBuildable,
-        ProcedureTemplateBuildable, RegisteringProcedureTemplateBuildable,
+        GeolocationProcedureTemplateSettable, PhotographProcedureTemplateSettable,
+        ProcedureTemplateSettable, RegisteringProcedureTemplateSettable,
     },
     traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
 };
@@ -108,12 +108,7 @@ pub(crate) fn init_organism_observation_procedure(
         &organism_details_picture.procedure_template(conn)?,
         &organism_geolocation.procedure_template(conn)?,
     ] {
-        observation_procedure.child(
-            procedure,
-            ChildOptions::default().inherit_asset_models(),
-            user,
-            conn,
-        )?;
+        observation_procedure.child(procedure, ChildOptions::default(), user, conn)?;
     }
 
     observation_procedure.extend(

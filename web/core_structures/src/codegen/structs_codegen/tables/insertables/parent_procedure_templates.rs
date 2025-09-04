@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableParentProcedureTemplateAttributes {
+pub enum InsertableParentProcedureTemplateAttribute {
     ParentProcedureTemplate,
     ChildProcedureTemplate,
     Snoozable,
@@ -10,7 +10,7 @@ pub enum InsertableParentProcedureTemplateAttributes {
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableParentProcedureTemplateAttributes {
+impl core::str::FromStr for InsertableParentProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -34,7 +34,7 @@ impl core::str::FromStr for InsertableParentProcedureTemplateAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableParentProcedureTemplateAttributes {
+impl core::fmt::Display for InsertableParentProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ParentProcedureTemplate => write!(f, "parent_procedure_template"),
@@ -192,7 +192,7 @@ impl Default for InsertableParentProcedureTemplateBuilder {
 }
 /// Trait defining setters for attributes of an instance of
 /// `ParentProcedureTemplate` or descendant tables.
-pub trait ParentProcedureTemplateBuildable: Sized {
+pub trait ParentProcedureTemplateSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -397,8 +397,8 @@ pub trait ParentProcedureTemplateBuildable: Sized {
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes;
+impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilder {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.parent_procedure_templates.parent_procedure_template` column.
     fn parent_procedure_template(
@@ -413,8 +413,8 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes::ParentProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes::ChildProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ParentProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ChildProcedureTemplate,
                         )
                 })?;
         }
@@ -435,8 +435,8 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes::ParentProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttributes::ChildProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ParentProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ChildProcedureTemplate,
                         )
                 })?;
         }
@@ -455,7 +455,7 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     {
         let snoozable = snoozable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::Snoozable)
+                .rename_field(InsertableParentProcedureTemplateAttribute::Snoozable)
         })?;
         self.snoozable = Some(snoozable);
         Ok(self)
@@ -472,7 +472,7 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     {
         let copiable = copiable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::Copiable)
+                .rename_field(InsertableParentProcedureTemplateAttribute::Copiable)
         })?;
         self.copiable = Some(copiable);
         Ok(self)
@@ -489,7 +489,7 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     {
         let repeatable = repeatable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::Repeatable)
+                .rename_field(InsertableParentProcedureTemplateAttribute::Repeatable)
         })?;
         self.repeatable = Some(repeatable);
         Ok(self)
@@ -506,7 +506,7 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     {
         let skippable = skippable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::Skippable)
+                .rename_field(InsertableParentProcedureTemplateAttribute::Skippable)
         })?;
         self.skippable = Some(skippable);
         Ok(self)
@@ -533,7 +533,7 @@ impl ParentProcedureTemplateBuildable for InsertableParentProcedureTemplateBuild
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttributes::CreatedAt)
+                .rename_field(InsertableParentProcedureTemplateAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -553,11 +553,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableParentProcedureTemplateAttributes,
+            InsertableParentProcedureTemplateAttribute,
         >,
     >,
 {
-    type Attributes = InsertableParentProcedureTemplateAttributes;
+    type Attributes = InsertableParentProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.parent_procedure_template.is_some()
             && self.child_procedure_template.is_some() && self.snoozable.is_some()

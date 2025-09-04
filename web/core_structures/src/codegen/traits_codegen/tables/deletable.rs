@@ -58,7 +58,6 @@ mod reagent_models;
 mod registering_procedure_templates;
 mod registering_procedures;
 mod rooms;
-mod shared_procedure_template_asset_models;
 mod spectra;
 mod spectra_collections;
 mod storage_procedure_templates;

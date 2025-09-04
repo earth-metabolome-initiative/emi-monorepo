@@ -1,727 +1,724 @@
 mod addresses;
 pub use addresses::{
-    AddressBuildable, InsertableAddress, InsertableAddressAttributes, InsertableAddressBuilder,
+    AddressSettable, InsertableAddress, InsertableAddressAttribute, InsertableAddressBuilder,
 };
 mod aliquoting_procedure_templates;
 pub use aliquoting_procedure_templates::{
-    AliquotingProcedureTemplateBuildable, InsertableAliquotingProcedureTemplate,
-    InsertableAliquotingProcedureTemplateAttributes, InsertableAliquotingProcedureTemplateBuilder,
-    InsertableAliquotingProcedureTemplateExtensionAttributes,
+    AliquotingProcedureTemplateSettable, InsertableAliquotingProcedureTemplate,
+    InsertableAliquotingProcedureTemplateAttribute, InsertableAliquotingProcedureTemplateBuilder,
+    InsertableAliquotingProcedureTemplateExtensionAttribute,
 };
 mod aliquoting_procedures;
 pub use aliquoting_procedures::{
-    AliquotingProcedureBuildable, InsertableAliquotingProcedure,
-    InsertableAliquotingProcedureAttributes, InsertableAliquotingProcedureBuilder,
-    InsertableAliquotingProcedureExtensionAttributes,
+    AliquotingProcedureSettable, InsertableAliquotingProcedure,
+    InsertableAliquotingProcedureAttribute, InsertableAliquotingProcedureBuilder,
+    InsertableAliquotingProcedureExtensionAttribute,
 };
 mod asset_compatibility_rules;
 pub use asset_compatibility_rules::{
-    AssetCompatibilityRuleBuildable, InsertableAssetCompatibilityRule,
-    InsertableAssetCompatibilityRuleAttributes, InsertableAssetCompatibilityRuleBuilder,
+    AssetCompatibilityRuleSettable, InsertableAssetCompatibilityRule,
+    InsertableAssetCompatibilityRuleAttribute, InsertableAssetCompatibilityRuleBuilder,
 };
 mod asset_model_ancestors;
 pub use asset_model_ancestors::{
-    AssetModelAncestorBuildable, InsertableAssetModelAncestor,
-    InsertableAssetModelAncestorAttributes, InsertableAssetModelAncestorBuilder,
+    AssetModelAncestorSettable, InsertableAssetModelAncestor,
+    InsertableAssetModelAncestorAttribute, InsertableAssetModelAncestorBuilder,
 };
 mod asset_models;
 pub use asset_models::{
-    AssetModelBuildable, InsertableAssetModel, InsertableAssetModelAttributes,
+    AssetModelSettable, InsertableAssetModel, InsertableAssetModelAttribute,
     InsertableAssetModelBuilder,
 };
 mod assets;
 pub use assets::{
-    AssetBuildable, InsertableAsset, InsertableAssetAttributes, InsertableAssetBuilder,
+    AssetSettable, InsertableAsset, InsertableAssetAttribute, InsertableAssetBuilder,
 };
 mod ball_mill_machine_models;
 pub use ball_mill_machine_models::{
-    BallMillMachineModelBuildable, InsertableBallMillMachineModel,
-    InsertableBallMillMachineModelAttributes, InsertableBallMillMachineModelBuilder,
-    InsertableBallMillMachineModelExtensionAttributes,
+    BallMillMachineModelSettable, InsertableBallMillMachineModel,
+    InsertableBallMillMachineModelAttribute, InsertableBallMillMachineModelBuilder,
+    InsertableBallMillMachineModelExtensionAttribute,
 };
 mod ball_mill_machines;
 pub use ball_mill_machines::{
-    BallMillMachineBuildable, InsertableBallMillMachine, InsertableBallMillMachineAttributes,
-    InsertableBallMillMachineBuilder, InsertableBallMillMachineExtensionAttributes,
+    BallMillMachineSettable, InsertableBallMillMachine, InsertableBallMillMachineAttribute,
+    InsertableBallMillMachineBuilder, InsertableBallMillMachineExtensionAttribute,
 };
 mod ball_mill_procedure_templates;
 pub use ball_mill_procedure_templates::{
-    BallMillProcedureTemplateBuildable, InsertableBallMillProcedureTemplate,
-    InsertableBallMillProcedureTemplateAttributes, InsertableBallMillProcedureTemplateBuilder,
-    InsertableBallMillProcedureTemplateExtensionAttributes,
+    BallMillProcedureTemplateSettable, InsertableBallMillProcedureTemplate,
+    InsertableBallMillProcedureTemplateAttribute, InsertableBallMillProcedureTemplateBuilder,
+    InsertableBallMillProcedureTemplateExtensionAttribute,
 };
 mod ball_mill_procedures;
 pub use ball_mill_procedures::{
-    BallMillProcedureBuildable, InsertableBallMillProcedure, InsertableBallMillProcedureAttributes,
-    InsertableBallMillProcedureBuilder, InsertableBallMillProcedureExtensionAttributes,
+    BallMillProcedureSettable, InsertableBallMillProcedure, InsertableBallMillProcedureAttribute,
+    InsertableBallMillProcedureBuilder, InsertableBallMillProcedureExtensionAttribute,
 };
-mod beads_models;
-pub use beads_models::{
-    BeadsModelBuildable, InsertableBeadsModel, InsertableBeadsModelAttributes,
-    InsertableBeadsModelBuilder, InsertableBeadsModelExtensionAttributes,
+mod bead_models;
+pub use bead_models::{
+    BeadModelSettable, InsertableBeadModel, InsertableBeadModelAttribute,
+    InsertableBeadModelBuilder, InsertableBeadModelExtensionAttribute,
 };
 mod brands;
 pub use brands::{
-    BrandBuildable, InsertableBrand, InsertableBrandAttributes, InsertableBrandBuilder,
+    BrandSettable, InsertableBrand, InsertableBrandAttribute, InsertableBrandBuilder,
 };
 mod camera_models;
 pub use camera_models::{
-    CameraModelBuildable, InsertableCameraModel, InsertableCameraModelAttributes,
-    InsertableCameraModelBuilder, InsertableCameraModelExtensionAttributes,
+    CameraModelSettable, InsertableCameraModel, InsertableCameraModelAttribute,
+    InsertableCameraModelBuilder, InsertableCameraModelExtensionAttribute,
 };
 mod cameras;
 pub use cameras::{
-    CameraBuildable, InsertableCamera, InsertableCameraAttributes, InsertableCameraBuilder,
-    InsertableCameraExtensionAttributes,
+    CameraSettable, InsertableCamera, InsertableCameraAttribute, InsertableCameraBuilder,
+    InsertableCameraExtensionAttribute,
+};
+mod cap_models;
+pub use cap_models::{
+    CapModelSettable, InsertableCapModel, InsertableCapModelAttribute, InsertableCapModelBuilder,
+    InsertableCapModelExtensionAttribute,
 };
 mod capping_procedure_templates;
 pub use capping_procedure_templates::{
-    CappingProcedureTemplateBuildable, InsertableCappingProcedureTemplate,
-    InsertableCappingProcedureTemplateAttributes, InsertableCappingProcedureTemplateBuilder,
-    InsertableCappingProcedureTemplateExtensionAttributes,
+    CappingProcedureTemplateSettable, InsertableCappingProcedureTemplate,
+    InsertableCappingProcedureTemplateAttribute, InsertableCappingProcedureTemplateBuilder,
+    InsertableCappingProcedureTemplateExtensionAttribute,
 };
 mod capping_procedures;
 pub use capping_procedures::{
-    CappingProcedureBuildable, InsertableCappingProcedure, InsertableCappingProcedureAttributes,
-    InsertableCappingProcedureBuilder, InsertableCappingProcedureExtensionAttributes,
-};
-mod caps_models;
-pub use caps_models::{
-    CapsModelBuildable, InsertableCapsModel, InsertableCapsModelAttributes,
-    InsertableCapsModelBuilder, InsertableCapsModelExtensionAttributes,
+    CappingProcedureSettable, InsertableCappingProcedure, InsertableCappingProcedureAttribute,
+    InsertableCappingProcedureBuilder, InsertableCappingProcedureExtensionAttribute,
 };
 mod centrifuge_models;
 pub use centrifuge_models::{
-    CentrifugeModelBuildable, InsertableCentrifugeModel, InsertableCentrifugeModelAttributes,
-    InsertableCentrifugeModelBuilder, InsertableCentrifugeModelExtensionAttributes,
+    CentrifugeModelSettable, InsertableCentrifugeModel, InsertableCentrifugeModelAttribute,
+    InsertableCentrifugeModelBuilder, InsertableCentrifugeModelExtensionAttribute,
 };
 mod centrifuge_procedure_templates;
 pub use centrifuge_procedure_templates::{
-    CentrifugeProcedureTemplateBuildable, InsertableCentrifugeProcedureTemplate,
-    InsertableCentrifugeProcedureTemplateAttributes, InsertableCentrifugeProcedureTemplateBuilder,
-    InsertableCentrifugeProcedureTemplateExtensionAttributes,
+    CentrifugeProcedureTemplateSettable, InsertableCentrifugeProcedureTemplate,
+    InsertableCentrifugeProcedureTemplateAttribute, InsertableCentrifugeProcedureTemplateBuilder,
+    InsertableCentrifugeProcedureTemplateExtensionAttribute,
 };
 mod centrifuge_procedures;
 pub use centrifuge_procedures::{
-    CentrifugeProcedureBuildable, InsertableCentrifugeProcedure,
-    InsertableCentrifugeProcedureAttributes, InsertableCentrifugeProcedureBuilder,
-    InsertableCentrifugeProcedureExtensionAttributes,
+    CentrifugeProcedureSettable, InsertableCentrifugeProcedure,
+    InsertableCentrifugeProcedureAttribute, InsertableCentrifugeProcedureBuilder,
+    InsertableCentrifugeProcedureExtensionAttribute,
 };
 mod centrifuges;
 pub use centrifuges::{
-    CentrifugeBuildable, InsertableCentrifuge, InsertableCentrifugeAttributes,
-    InsertableCentrifugeBuilder, InsertableCentrifugeExtensionAttributes,
+    CentrifugeSettable, InsertableCentrifuge, InsertableCentrifugeAttribute,
+    InsertableCentrifugeBuilder, InsertableCentrifugeExtensionAttribute,
 };
 mod cities;
-pub use cities::{CityBuildable, InsertableCity, InsertableCityAttributes, InsertableCityBuilder};
+pub use cities::{CitySettable, InsertableCity, InsertableCityAttribute, InsertableCityBuilder};
 mod colors;
 pub use colors::{
-    ColorBuildable, InsertableColor, InsertableColorAttributes, InsertableColorBuilder,
+    ColorSettable, InsertableColor, InsertableColorAttribute, InsertableColorBuilder,
 };
 mod commercial_ball_mill_machine_lots;
 pub use commercial_ball_mill_machine_lots::{
-    CommercialBallMillMachineLotBuildable, InsertableCommercialBallMillMachineLot,
-    InsertableCommercialBallMillMachineLotAttributes,
-    InsertableCommercialBallMillMachineLotBuilder,
-    InsertableCommercialBallMillMachineLotExtensionAttributes,
+    CommercialBallMillMachineLotSettable, InsertableCommercialBallMillMachineLot,
+    InsertableCommercialBallMillMachineLotAttribute, InsertableCommercialBallMillMachineLotBuilder,
+    InsertableCommercialBallMillMachineLotExtensionAttribute,
 };
 mod commercial_ball_mill_machine_models;
 pub use commercial_ball_mill_machine_models::{
-    CommercialBallMillMachineModelBuildable, InsertableCommercialBallMillMachineModel,
-    InsertableCommercialBallMillMachineModelAttributes,
+    CommercialBallMillMachineModelSettable, InsertableCommercialBallMillMachineModel,
+    InsertableCommercialBallMillMachineModelAttribute,
     InsertableCommercialBallMillMachineModelBuilder,
-    InsertableCommercialBallMillMachineModelExtensionAttributes,
+    InsertableCommercialBallMillMachineModelExtensionAttribute,
 };
-mod commercial_beads_lots;
-pub use commercial_beads_lots::{
-    CommercialBeadsLotBuildable, InsertableCommercialBeadsLot,
-    InsertableCommercialBeadsLotAttributes, InsertableCommercialBeadsLotBuilder,
-    InsertableCommercialBeadsLotExtensionAttributes,
+mod commercial_bead_lots;
+pub use commercial_bead_lots::{
+    CommercialBeadLotSettable, InsertableCommercialBeadLot, InsertableCommercialBeadLotAttribute,
+    InsertableCommercialBeadLotBuilder, InsertableCommercialBeadLotExtensionAttribute,
 };
-mod commercial_beads_models;
-pub use commercial_beads_models::{
-    CommercialBeadsModelBuildable, InsertableCommercialBeadsModel,
-    InsertableCommercialBeadsModelAttributes, InsertableCommercialBeadsModelBuilder,
-    InsertableCommercialBeadsModelExtensionAttributes,
+mod commercial_bead_models;
+pub use commercial_bead_models::{
+    CommercialBeadModelSettable, InsertableCommercialBeadModel,
+    InsertableCommercialBeadModelAttribute, InsertableCommercialBeadModelBuilder,
+    InsertableCommercialBeadModelExtensionAttribute,
 };
 mod commercial_camera_lots;
 pub use commercial_camera_lots::{
-    CommercialCameraLotBuildable, InsertableCommercialCameraLot,
-    InsertableCommercialCameraLotAttributes, InsertableCommercialCameraLotBuilder,
-    InsertableCommercialCameraLotExtensionAttributes,
+    CommercialCameraLotSettable, InsertableCommercialCameraLot,
+    InsertableCommercialCameraLotAttribute, InsertableCommercialCameraLotBuilder,
+    InsertableCommercialCameraLotExtensionAttribute,
 };
 mod commercial_camera_models;
 pub use commercial_camera_models::{
-    CommercialCameraModelBuildable, InsertableCommercialCameraModel,
-    InsertableCommercialCameraModelAttributes, InsertableCommercialCameraModelBuilder,
-    InsertableCommercialCameraModelExtensionAttributes,
+    CommercialCameraModelSettable, InsertableCommercialCameraModel,
+    InsertableCommercialCameraModelAttribute, InsertableCommercialCameraModelBuilder,
+    InsertableCommercialCameraModelExtensionAttribute,
+};
+mod commercial_cap_lots;
+pub use commercial_cap_lots::{
+    CommercialCapLotSettable, InsertableCommercialCapLot, InsertableCommercialCapLotAttribute,
+    InsertableCommercialCapLotBuilder, InsertableCommercialCapLotExtensionAttribute,
+};
+mod commercial_cap_models;
+pub use commercial_cap_models::{
+    CommercialCapModelSettable, InsertableCommercialCapModel,
+    InsertableCommercialCapModelAttribute, InsertableCommercialCapModelBuilder,
+    InsertableCommercialCapModelExtensionAttribute,
 };
 mod commercial_centrifuge_lots;
 pub use commercial_centrifuge_lots::{
-    CommercialCentrifugeLotBuildable, InsertableCommercialCentrifugeLot,
-    InsertableCommercialCentrifugeLotAttributes, InsertableCommercialCentrifugeLotBuilder,
-    InsertableCommercialCentrifugeLotExtensionAttributes,
+    CommercialCentrifugeLotSettable, InsertableCommercialCentrifugeLot,
+    InsertableCommercialCentrifugeLotAttribute, InsertableCommercialCentrifugeLotBuilder,
+    InsertableCommercialCentrifugeLotExtensionAttribute,
 };
 mod commercial_centrifuge_models;
 pub use commercial_centrifuge_models::{
-    CommercialCentrifugeModelBuildable, InsertableCommercialCentrifugeModel,
-    InsertableCommercialCentrifugeModelAttributes, InsertableCommercialCentrifugeModelBuilder,
-    InsertableCommercialCentrifugeModelExtensionAttributes,
+    CommercialCentrifugeModelSettable, InsertableCommercialCentrifugeModel,
+    InsertableCommercialCentrifugeModelAttribute, InsertableCommercialCentrifugeModelBuilder,
+    InsertableCommercialCentrifugeModelExtensionAttribute,
 };
 mod commercial_freeze_dryer_lots;
 pub use commercial_freeze_dryer_lots::{
-    CommercialFreezeDryerLotBuildable, InsertableCommercialFreezeDryerLot,
-    InsertableCommercialFreezeDryerLotAttributes, InsertableCommercialFreezeDryerLotBuilder,
-    InsertableCommercialFreezeDryerLotExtensionAttributes,
+    CommercialFreezeDryerLotSettable, InsertableCommercialFreezeDryerLot,
+    InsertableCommercialFreezeDryerLotAttribute, InsertableCommercialFreezeDryerLotBuilder,
+    InsertableCommercialFreezeDryerLotExtensionAttribute,
 };
 mod commercial_freeze_dryer_models;
 pub use commercial_freeze_dryer_models::{
-    CommercialFreezeDryerModelBuildable, InsertableCommercialFreezeDryerModel,
-    InsertableCommercialFreezeDryerModelAttributes, InsertableCommercialFreezeDryerModelBuilder,
-    InsertableCommercialFreezeDryerModelExtensionAttributes,
+    CommercialFreezeDryerModelSettable, InsertableCommercialFreezeDryerModel,
+    InsertableCommercialFreezeDryerModelAttribute, InsertableCommercialFreezeDryerModelBuilder,
+    InsertableCommercialFreezeDryerModelExtensionAttribute,
 };
 mod commercial_freezer_lots;
 pub use commercial_freezer_lots::{
-    CommercialFreezerLotBuildable, InsertableCommercialFreezerLot,
-    InsertableCommercialFreezerLotAttributes, InsertableCommercialFreezerLotBuilder,
-    InsertableCommercialFreezerLotExtensionAttributes,
+    CommercialFreezerLotSettable, InsertableCommercialFreezerLot,
+    InsertableCommercialFreezerLotAttribute, InsertableCommercialFreezerLotBuilder,
+    InsertableCommercialFreezerLotExtensionAttribute,
 };
 mod commercial_freezer_models;
 pub use commercial_freezer_models::{
-    CommercialFreezerModelBuildable, InsertableCommercialFreezerModel,
-    InsertableCommercialFreezerModelAttributes, InsertableCommercialFreezerModelBuilder,
-    InsertableCommercialFreezerModelExtensionAttributes,
+    CommercialFreezerModelSettable, InsertableCommercialFreezerModel,
+    InsertableCommercialFreezerModelAttribute, InsertableCommercialFreezerModelBuilder,
+    InsertableCommercialFreezerModelExtensionAttribute,
 };
 mod commercial_packaging_lots;
 pub use commercial_packaging_lots::{
-    CommercialPackagingLotBuildable, InsertableCommercialPackagingLot,
-    InsertableCommercialPackagingLotAttributes, InsertableCommercialPackagingLotBuilder,
-    InsertableCommercialPackagingLotExtensionAttributes,
+    CommercialPackagingLotSettable, InsertableCommercialPackagingLot,
+    InsertableCommercialPackagingLotAttribute, InsertableCommercialPackagingLotBuilder,
+    InsertableCommercialPackagingLotExtensionAttribute,
 };
 mod commercial_packaging_models;
 pub use commercial_packaging_models::{
-    CommercialPackagingModelBuildable, InsertableCommercialPackagingModel,
-    InsertableCommercialPackagingModelAttributes, InsertableCommercialPackagingModelBuilder,
-    InsertableCommercialPackagingModelExtensionAttributes,
+    CommercialPackagingModelSettable, InsertableCommercialPackagingModel,
+    InsertableCommercialPackagingModelAttribute, InsertableCommercialPackagingModelBuilder,
+    InsertableCommercialPackagingModelExtensionAttribute,
 };
 mod commercial_pipette_lots;
 pub use commercial_pipette_lots::{
-    CommercialPipetteLotBuildable, InsertableCommercialPipetteLot,
-    InsertableCommercialPipetteLotAttributes, InsertableCommercialPipetteLotBuilder,
-    InsertableCommercialPipetteLotExtensionAttributes,
+    CommercialPipetteLotSettable, InsertableCommercialPipetteLot,
+    InsertableCommercialPipetteLotAttribute, InsertableCommercialPipetteLotBuilder,
+    InsertableCommercialPipetteLotExtensionAttribute,
 };
 mod commercial_pipette_models;
 pub use commercial_pipette_models::{
-    CommercialPipetteModelBuildable, InsertableCommercialPipetteModel,
-    InsertableCommercialPipetteModelAttributes, InsertableCommercialPipetteModelBuilder,
-    InsertableCommercialPipetteModelExtensionAttributes,
+    CommercialPipetteModelSettable, InsertableCommercialPipetteModel,
+    InsertableCommercialPipetteModelAttribute, InsertableCommercialPipetteModelBuilder,
+    InsertableCommercialPipetteModelExtensionAttribute,
 };
 mod commercial_pipette_tip_lots;
 pub use commercial_pipette_tip_lots::{
-    CommercialPipetteTipLotBuildable, InsertableCommercialPipetteTipLot,
-    InsertableCommercialPipetteTipLotAttributes, InsertableCommercialPipetteTipLotBuilder,
-    InsertableCommercialPipetteTipLotExtensionAttributes,
+    CommercialPipetteTipLotSettable, InsertableCommercialPipetteTipLot,
+    InsertableCommercialPipetteTipLotAttribute, InsertableCommercialPipetteTipLotBuilder,
+    InsertableCommercialPipetteTipLotExtensionAttribute,
 };
 mod commercial_pipette_tip_models;
 pub use commercial_pipette_tip_models::{
-    CommercialPipetteTipModelBuildable, InsertableCommercialPipetteTipModel,
-    InsertableCommercialPipetteTipModelAttributes, InsertableCommercialPipetteTipModelBuilder,
-    InsertableCommercialPipetteTipModelExtensionAttributes,
+    CommercialPipetteTipModelSettable, InsertableCommercialPipetteTipModel,
+    InsertableCommercialPipetteTipModelAttribute, InsertableCommercialPipetteTipModelBuilder,
+    InsertableCommercialPipetteTipModelExtensionAttribute,
 };
 mod commercial_positioning_device_lots;
 pub use commercial_positioning_device_lots::{
-    CommercialPositioningDeviceLotBuildable, InsertableCommercialPositioningDeviceLot,
-    InsertableCommercialPositioningDeviceLotAttributes,
+    CommercialPositioningDeviceLotSettable, InsertableCommercialPositioningDeviceLot,
+    InsertableCommercialPositioningDeviceLotAttribute,
     InsertableCommercialPositioningDeviceLotBuilder,
-    InsertableCommercialPositioningDeviceLotExtensionAttributes,
+    InsertableCommercialPositioningDeviceLotExtensionAttribute,
 };
 mod commercial_positioning_device_models;
 pub use commercial_positioning_device_models::{
-    CommercialPositioningDeviceModelBuildable, InsertableCommercialPositioningDeviceModel,
-    InsertableCommercialPositioningDeviceModelAttributes,
+    CommercialPositioningDeviceModelSettable, InsertableCommercialPositioningDeviceModel,
+    InsertableCommercialPositioningDeviceModelAttribute,
     InsertableCommercialPositioningDeviceModelBuilder,
-    InsertableCommercialPositioningDeviceModelExtensionAttributes,
+    InsertableCommercialPositioningDeviceModelExtensionAttribute,
 };
 mod commercial_product_lots;
 pub use commercial_product_lots::{
-    CommercialProductLotBuildable, InsertableCommercialProductLot,
-    InsertableCommercialProductLotAttributes, InsertableCommercialProductLotBuilder,
-    InsertableCommercialProductLotExtensionAttributes,
+    CommercialProductLotSettable, InsertableCommercialProductLot,
+    InsertableCommercialProductLotAttribute, InsertableCommercialProductLotBuilder,
+    InsertableCommercialProductLotExtensionAttribute,
 };
 mod commercial_products;
 pub use commercial_products::{
-    CommercialProductBuildable, InsertableCommercialProduct, InsertableCommercialProductAttributes,
-    InsertableCommercialProductBuilder, InsertableCommercialProductExtensionAttributes,
+    CommercialProductSettable, InsertableCommercialProduct, InsertableCommercialProductAttribute,
+    InsertableCommercialProductBuilder, InsertableCommercialProductExtensionAttribute,
 };
 mod commercial_volume_measuring_device_lots;
 pub use commercial_volume_measuring_device_lots::{
-    CommercialVolumeMeasuringDeviceLotBuildable, InsertableCommercialVolumeMeasuringDeviceLot,
-    InsertableCommercialVolumeMeasuringDeviceLotAttributes,
+    CommercialVolumeMeasuringDeviceLotSettable, InsertableCommercialVolumeMeasuringDeviceLot,
+    InsertableCommercialVolumeMeasuringDeviceLotAttribute,
     InsertableCommercialVolumeMeasuringDeviceLotBuilder,
-    InsertableCommercialVolumeMeasuringDeviceLotExtensionAttributes,
+    InsertableCommercialVolumeMeasuringDeviceLotExtensionAttribute,
 };
 mod commercial_volume_measuring_device_models;
 pub use commercial_volume_measuring_device_models::{
-    CommercialVolumeMeasuringDeviceModelBuildable, InsertableCommercialVolumeMeasuringDeviceModel,
-    InsertableCommercialVolumeMeasuringDeviceModelAttributes,
+    CommercialVolumeMeasuringDeviceModelSettable, InsertableCommercialVolumeMeasuringDeviceModel,
+    InsertableCommercialVolumeMeasuringDeviceModelAttribute,
     InsertableCommercialVolumeMeasuringDeviceModelBuilder,
-    InsertableCommercialVolumeMeasuringDeviceModelExtensionAttributes,
+    InsertableCommercialVolumeMeasuringDeviceModelExtensionAttribute,
 };
 mod commercial_weighing_device_lots;
 pub use commercial_weighing_device_lots::{
-    CommercialWeighingDeviceLotBuildable, InsertableCommercialWeighingDeviceLot,
-    InsertableCommercialWeighingDeviceLotAttributes, InsertableCommercialWeighingDeviceLotBuilder,
-    InsertableCommercialWeighingDeviceLotExtensionAttributes,
+    CommercialWeighingDeviceLotSettable, InsertableCommercialWeighingDeviceLot,
+    InsertableCommercialWeighingDeviceLotAttribute, InsertableCommercialWeighingDeviceLotBuilder,
+    InsertableCommercialWeighingDeviceLotExtensionAttribute,
 };
 mod commercial_weighing_device_models;
 pub use commercial_weighing_device_models::{
-    CommercialWeighingDeviceModelBuildable, InsertableCommercialWeighingDeviceModel,
-    InsertableCommercialWeighingDeviceModelAttributes,
+    CommercialWeighingDeviceModelSettable, InsertableCommercialWeighingDeviceModel,
+    InsertableCommercialWeighingDeviceModelAttribute,
     InsertableCommercialWeighingDeviceModelBuilder,
-    InsertableCommercialWeighingDeviceModelExtensionAttributes,
+    InsertableCommercialWeighingDeviceModelExtensionAttribute,
 };
 mod container_compatibility_rules;
 pub use container_compatibility_rules::{
-    ContainerCompatibilityRuleBuildable, InsertableContainerCompatibilityRule,
-    InsertableContainerCompatibilityRuleAttributes, InsertableContainerCompatibilityRuleBuilder,
+    ContainerCompatibilityRuleSettable, InsertableContainerCompatibilityRule,
+    InsertableContainerCompatibilityRuleAttribute, InsertableContainerCompatibilityRuleBuilder,
 };
 mod container_models;
 pub use container_models::{
-    ContainerModelBuildable, InsertableContainerModel, InsertableContainerModelAttributes,
-    InsertableContainerModelBuilder, InsertableContainerModelExtensionAttributes,
+    ContainerModelSettable, InsertableContainerModel, InsertableContainerModelAttribute,
+    InsertableContainerModelBuilder, InsertableContainerModelExtensionAttribute,
 };
 mod containers;
 pub use containers::{
-    ContainerBuildable, InsertableContainer, InsertableContainerAttributes,
-    InsertableContainerBuilder, InsertableContainerExtensionAttributes,
+    ContainerSettable, InsertableContainer, InsertableContainerAttribute,
+    InsertableContainerBuilder, InsertableContainerExtensionAttribute,
 };
 mod countries;
 pub use countries::{
-    CountryBuildable, InsertableCountry, InsertableCountryAttributes, InsertableCountryBuilder,
+    CountrySettable, InsertableCountry, InsertableCountryAttribute, InsertableCountryBuilder,
 };
 mod digital_asset_models;
 pub use digital_asset_models::{
-    DigitalAssetModelBuildable, InsertableDigitalAssetModel, InsertableDigitalAssetModelAttributes,
-    InsertableDigitalAssetModelBuilder, InsertableDigitalAssetModelExtensionAttributes,
+    DigitalAssetModelSettable, InsertableDigitalAssetModel, InsertableDigitalAssetModelAttribute,
+    InsertableDigitalAssetModelBuilder, InsertableDigitalAssetModelExtensionAttribute,
 };
 mod digital_assets;
 pub use digital_assets::{
-    DigitalAssetBuildable, InsertableDigitalAsset, InsertableDigitalAssetAttributes,
-    InsertableDigitalAssetBuilder, InsertableDigitalAssetExtensionAttributes,
+    DigitalAssetSettable, InsertableDigitalAsset, InsertableDigitalAssetAttribute,
+    InsertableDigitalAssetBuilder, InsertableDigitalAssetExtensionAttribute,
 };
 mod disposal_procedure_templates;
 pub use disposal_procedure_templates::{
-    DisposalProcedureTemplateBuildable, InsertableDisposalProcedureTemplate,
-    InsertableDisposalProcedureTemplateAttributes, InsertableDisposalProcedureTemplateBuilder,
-    InsertableDisposalProcedureTemplateExtensionAttributes,
+    DisposalProcedureTemplateSettable, InsertableDisposalProcedureTemplate,
+    InsertableDisposalProcedureTemplateAttribute, InsertableDisposalProcedureTemplateBuilder,
+    InsertableDisposalProcedureTemplateExtensionAttribute,
 };
 mod disposal_procedures;
 pub use disposal_procedures::{
-    DisposalProcedureBuildable, InsertableDisposalProcedure, InsertableDisposalProcedureAttributes,
-    InsertableDisposalProcedureBuilder, InsertableDisposalProcedureExtensionAttributes,
+    DisposalProcedureSettable, InsertableDisposalProcedure, InsertableDisposalProcedureAttribute,
+    InsertableDisposalProcedureBuilder, InsertableDisposalProcedureExtensionAttribute,
 };
 mod documents;
 pub use documents::{
-    DocumentBuildable, InsertableDocument, InsertableDocumentAttributes, InsertableDocumentBuilder,
+    DocumentSettable, InsertableDocument, InsertableDocumentAttribute, InsertableDocumentBuilder,
 };
 mod email_providers;
 pub use email_providers::{
-    EmailProviderBuildable, InsertableEmailProvider, InsertableEmailProviderAttributes,
+    EmailProviderSettable, InsertableEmailProvider, InsertableEmailProviderAttribute,
     InsertableEmailProviderBuilder,
 };
 mod fractioning_procedure_templates;
 pub use fractioning_procedure_templates::{
-    FractioningProcedureTemplateBuildable, InsertableFractioningProcedureTemplate,
-    InsertableFractioningProcedureTemplateAttributes,
-    InsertableFractioningProcedureTemplateBuilder,
-    InsertableFractioningProcedureTemplateExtensionAttributes,
+    FractioningProcedureTemplateSettable, InsertableFractioningProcedureTemplate,
+    InsertableFractioningProcedureTemplateAttribute, InsertableFractioningProcedureTemplateBuilder,
+    InsertableFractioningProcedureTemplateExtensionAttribute,
 };
 mod fractioning_procedures;
 pub use fractioning_procedures::{
-    FractioningProcedureBuildable, InsertableFractioningProcedure,
-    InsertableFractioningProcedureAttributes, InsertableFractioningProcedureBuilder,
-    InsertableFractioningProcedureExtensionAttributes,
+    FractioningProcedureSettable, InsertableFractioningProcedure,
+    InsertableFractioningProcedureAttribute, InsertableFractioningProcedureBuilder,
+    InsertableFractioningProcedureExtensionAttribute,
 };
 mod freeze_dryer_models;
 pub use freeze_dryer_models::{
-    FreezeDryerModelBuildable, InsertableFreezeDryerModel, InsertableFreezeDryerModelAttributes,
-    InsertableFreezeDryerModelBuilder, InsertableFreezeDryerModelExtensionAttributes,
+    FreezeDryerModelSettable, InsertableFreezeDryerModel, InsertableFreezeDryerModelAttribute,
+    InsertableFreezeDryerModelBuilder, InsertableFreezeDryerModelExtensionAttribute,
 };
 mod freeze_dryers;
 pub use freeze_dryers::{
-    FreezeDryerBuildable, InsertableFreezeDryer, InsertableFreezeDryerAttributes,
-    InsertableFreezeDryerBuilder, InsertableFreezeDryerExtensionAttributes,
+    FreezeDryerSettable, InsertableFreezeDryer, InsertableFreezeDryerAttribute,
+    InsertableFreezeDryerBuilder, InsertableFreezeDryerExtensionAttribute,
 };
 mod freeze_drying_procedure_templates;
 pub use freeze_drying_procedure_templates::{
-    FreezeDryingProcedureTemplateBuildable, InsertableFreezeDryingProcedureTemplate,
-    InsertableFreezeDryingProcedureTemplateAttributes,
+    FreezeDryingProcedureTemplateSettable, InsertableFreezeDryingProcedureTemplate,
+    InsertableFreezeDryingProcedureTemplateAttribute,
     InsertableFreezeDryingProcedureTemplateBuilder,
-    InsertableFreezeDryingProcedureTemplateExtensionAttributes,
+    InsertableFreezeDryingProcedureTemplateExtensionAttribute,
 };
 mod freeze_drying_procedures;
 pub use freeze_drying_procedures::{
-    FreezeDryingProcedureBuildable, InsertableFreezeDryingProcedure,
-    InsertableFreezeDryingProcedureAttributes, InsertableFreezeDryingProcedureBuilder,
-    InsertableFreezeDryingProcedureExtensionAttributes,
+    FreezeDryingProcedureSettable, InsertableFreezeDryingProcedure,
+    InsertableFreezeDryingProcedureAttribute, InsertableFreezeDryingProcedureBuilder,
+    InsertableFreezeDryingProcedureExtensionAttribute,
 };
 mod freezer_models;
 pub use freezer_models::{
-    FreezerModelBuildable, InsertableFreezerModel, InsertableFreezerModelAttributes,
-    InsertableFreezerModelBuilder, InsertableFreezerModelExtensionAttributes,
+    FreezerModelSettable, InsertableFreezerModel, InsertableFreezerModelAttribute,
+    InsertableFreezerModelBuilder, InsertableFreezerModelExtensionAttribute,
 };
 mod freezers;
 pub use freezers::{
-    FreezerBuildable, InsertableFreezer, InsertableFreezerAttributes, InsertableFreezerBuilder,
-    InsertableFreezerExtensionAttributes,
+    FreezerSettable, InsertableFreezer, InsertableFreezerAttribute, InsertableFreezerBuilder,
+    InsertableFreezerExtensionAttribute,
 };
 mod freezing_procedure_templates;
 pub use freezing_procedure_templates::{
-    FreezingProcedureTemplateBuildable, InsertableFreezingProcedureTemplate,
-    InsertableFreezingProcedureTemplateAttributes, InsertableFreezingProcedureTemplateBuilder,
-    InsertableFreezingProcedureTemplateExtensionAttributes,
+    FreezingProcedureTemplateSettable, InsertableFreezingProcedureTemplate,
+    InsertableFreezingProcedureTemplateAttribute, InsertableFreezingProcedureTemplateBuilder,
+    InsertableFreezingProcedureTemplateExtensionAttribute,
 };
 mod freezing_procedures;
 pub use freezing_procedures::{
-    FreezingProcedureBuildable, InsertableFreezingProcedure, InsertableFreezingProcedureAttributes,
-    InsertableFreezingProcedureBuilder, InsertableFreezingProcedureExtensionAttributes,
+    FreezingProcedureSettable, InsertableFreezingProcedure, InsertableFreezingProcedureAttribute,
+    InsertableFreezingProcedureBuilder, InsertableFreezingProcedureExtensionAttribute,
 };
 mod geolocation_procedure_templates;
 pub use geolocation_procedure_templates::{
-    GeolocationProcedureTemplateBuildable, InsertableGeolocationProcedureTemplate,
-    InsertableGeolocationProcedureTemplateAttributes,
-    InsertableGeolocationProcedureTemplateBuilder,
-    InsertableGeolocationProcedureTemplateExtensionAttributes,
+    GeolocationProcedureTemplateSettable, InsertableGeolocationProcedureTemplate,
+    InsertableGeolocationProcedureTemplateAttribute, InsertableGeolocationProcedureTemplateBuilder,
+    InsertableGeolocationProcedureTemplateExtensionAttribute,
 };
 mod geolocation_procedures;
 pub use geolocation_procedures::{
-    GeolocationProcedureBuildable, InsertableGeolocationProcedure,
-    InsertableGeolocationProcedureAttributes, InsertableGeolocationProcedureBuilder,
-    InsertableGeolocationProcedureExtensionAttributes,
+    GeolocationProcedureSettable, InsertableGeolocationProcedure,
+    InsertableGeolocationProcedureAttribute, InsertableGeolocationProcedureBuilder,
+    InsertableGeolocationProcedureExtensionAttribute,
 };
 mod instrument_states;
 pub use instrument_states::{
-    InsertableInstrumentState, InsertableInstrumentStateAttributes,
-    InsertableInstrumentStateBuilder, InstrumentStateBuildable,
+    InsertableInstrumentState, InsertableInstrumentStateAttribute,
+    InsertableInstrumentStateBuilder, InstrumentStateSettable,
 };
 mod login_providers;
 pub use login_providers::{
-    InsertableLoginProvider, InsertableLoginProviderAttributes, InsertableLoginProviderBuilder,
-    LoginProviderBuildable,
+    InsertableLoginProvider, InsertableLoginProviderAttribute, InsertableLoginProviderBuilder,
+    LoginProviderSettable,
 };
 mod materials;
 pub use materials::{
-    InsertableMaterial, InsertableMaterialAttributes, InsertableMaterialBuilder, MaterialBuildable,
+    InsertableMaterial, InsertableMaterialAttribute, InsertableMaterialBuilder, MaterialSettable,
 };
 mod next_procedure_templates;
 pub use next_procedure_templates::{
-    InsertableNextProcedureTemplate, InsertableNextProcedureTemplateAttributes,
-    InsertableNextProcedureTemplateBuilder, NextProcedureTemplateBuildable,
+    InsertableNextProcedureTemplate, InsertableNextProcedureTemplateAttribute,
+    InsertableNextProcedureTemplateBuilder, NextProcedureTemplateSettable,
 };
 mod observation_subjects;
 pub use observation_subjects::{
-    InsertableObservationSubject, InsertableObservationSubjectAttributes,
-    InsertableObservationSubjectBuilder, ObservationSubjectBuildable,
+    InsertableObservationSubject, InsertableObservationSubjectAttribute,
+    InsertableObservationSubjectBuilder, ObservationSubjectSettable,
 };
 mod organism_taxa;
 pub use organism_taxa::{
-    InsertableOrganismTaxon, InsertableOrganismTaxonAttributes, InsertableOrganismTaxonBuilder,
-    OrganismTaxonBuildable,
+    InsertableOrganismTaxon, InsertableOrganismTaxonAttribute, InsertableOrganismTaxonBuilder,
+    OrganismTaxonSettable,
 };
 mod organisms;
 pub use organisms::{
-    InsertableOrganism, InsertableOrganismAttributes, InsertableOrganismBuilder,
-    InsertableOrganismExtensionAttributes, OrganismBuildable,
+    InsertableOrganism, InsertableOrganismAttribute, InsertableOrganismBuilder,
+    InsertableOrganismExtensionAttribute, OrganismSettable,
 };
 mod organizations;
 pub use organizations::{
-    InsertableOrganization, InsertableOrganizationAttributes, InsertableOrganizationBuilder,
-    OrganizationBuildable,
+    InsertableOrganization, InsertableOrganizationAttribute, InsertableOrganizationBuilder,
+    OrganizationSettable,
 };
 mod packaging_models;
 pub use packaging_models::{
-    InsertablePackagingModel, InsertablePackagingModelAttributes, InsertablePackagingModelBuilder,
-    InsertablePackagingModelExtensionAttributes, PackagingModelBuildable,
+    InsertablePackagingModel, InsertablePackagingModelAttribute, InsertablePackagingModelBuilder,
+    InsertablePackagingModelExtensionAttribute, PackagingModelSettable,
 };
 mod packaging_procedure_templates;
 pub use packaging_procedure_templates::{
-    InsertablePackagingProcedureTemplate, InsertablePackagingProcedureTemplateAttributes,
+    InsertablePackagingProcedureTemplate, InsertablePackagingProcedureTemplateAttribute,
     InsertablePackagingProcedureTemplateBuilder,
-    InsertablePackagingProcedureTemplateExtensionAttributes, PackagingProcedureTemplateBuildable,
+    InsertablePackagingProcedureTemplateExtensionAttribute, PackagingProcedureTemplateSettable,
 };
 mod packaging_procedures;
 pub use packaging_procedures::{
-    InsertablePackagingProcedure, InsertablePackagingProcedureAttributes,
-    InsertablePackagingProcedureBuilder, InsertablePackagingProcedureExtensionAttributes,
-    PackagingProcedureBuildable,
+    InsertablePackagingProcedure, InsertablePackagingProcedureAttribute,
+    InsertablePackagingProcedureBuilder, InsertablePackagingProcedureExtensionAttribute,
+    PackagingProcedureSettable,
 };
 mod parent_procedure_templates;
 pub use parent_procedure_templates::{
-    InsertableParentProcedureTemplate, InsertableParentProcedureTemplateAttributes,
-    InsertableParentProcedureTemplateBuilder, ParentProcedureTemplateBuildable,
+    InsertableParentProcedureTemplate, InsertableParentProcedureTemplateAttribute,
+    InsertableParentProcedureTemplateBuilder, ParentProcedureTemplateSettable,
 };
 mod permanence_categories;
 pub use permanence_categories::{
-    InsertablePermanenceCategory, InsertablePermanenceCategoryAttributes,
-    InsertablePermanenceCategoryBuilder, PermanenceCategoryBuildable,
+    InsertablePermanenceCategory, InsertablePermanenceCategoryAttribute,
+    InsertablePermanenceCategoryBuilder, PermanenceCategorySettable,
 };
 mod phone_models;
 pub use phone_models::{
-    InsertablePhoneModel, InsertablePhoneModelAttributes, InsertablePhoneModelBuilder,
-    InsertablePhoneModelExtensionAttributes, PhoneModelBuildable,
+    InsertablePhoneModel, InsertablePhoneModelAttribute, InsertablePhoneModelBuilder,
+    InsertablePhoneModelExtensionAttribute, PhoneModelSettable,
 };
 mod photograph_procedure_templates;
 pub use photograph_procedure_templates::{
-    InsertablePhotographProcedureTemplate, InsertablePhotographProcedureTemplateAttributes,
+    InsertablePhotographProcedureTemplate, InsertablePhotographProcedureTemplateAttribute,
     InsertablePhotographProcedureTemplateBuilder,
-    InsertablePhotographProcedureTemplateExtensionAttributes, PhotographProcedureTemplateBuildable,
+    InsertablePhotographProcedureTemplateExtensionAttribute, PhotographProcedureTemplateSettable,
 };
 mod photograph_procedures;
 pub use photograph_procedures::{
-    InsertablePhotographProcedure, InsertablePhotographProcedureAttributes,
-    InsertablePhotographProcedureBuilder, InsertablePhotographProcedureExtensionAttributes,
-    PhotographProcedureBuildable,
+    InsertablePhotographProcedure, InsertablePhotographProcedureAttribute,
+    InsertablePhotographProcedureBuilder, InsertablePhotographProcedureExtensionAttribute,
+    PhotographProcedureSettable,
 };
 mod physical_asset_models;
 pub use physical_asset_models::{
-    InsertablePhysicalAssetModel, InsertablePhysicalAssetModelAttributes,
-    InsertablePhysicalAssetModelBuilder, InsertablePhysicalAssetModelExtensionAttributes,
-    PhysicalAssetModelBuildable,
+    InsertablePhysicalAssetModel, InsertablePhysicalAssetModelAttribute,
+    InsertablePhysicalAssetModelBuilder, InsertablePhysicalAssetModelExtensionAttribute,
+    PhysicalAssetModelSettable,
 };
 mod physical_assets;
 pub use physical_assets::{
-    InsertablePhysicalAsset, InsertablePhysicalAssetAttributes, InsertablePhysicalAssetBuilder,
-    InsertablePhysicalAssetExtensionAttributes, PhysicalAssetBuildable,
+    InsertablePhysicalAsset, InsertablePhysicalAssetAttribute, InsertablePhysicalAssetBuilder,
+    InsertablePhysicalAssetExtensionAttribute, PhysicalAssetSettable,
 };
 mod pipette_models;
 pub use pipette_models::{
-    InsertablePipetteModel, InsertablePipetteModelAttributes, InsertablePipetteModelBuilder,
-    InsertablePipetteModelExtensionAttributes, PipetteModelBuildable,
+    InsertablePipetteModel, InsertablePipetteModelAttribute, InsertablePipetteModelBuilder,
+    InsertablePipetteModelExtensionAttribute, PipetteModelSettable,
 };
 mod pipette_tip_models;
 pub use pipette_tip_models::{
-    InsertablePipetteTipModel, InsertablePipetteTipModelAttributes,
-    InsertablePipetteTipModelBuilder, InsertablePipetteTipModelExtensionAttributes,
-    PipetteTipModelBuildable,
+    InsertablePipetteTipModel, InsertablePipetteTipModelAttribute,
+    InsertablePipetteTipModelBuilder, InsertablePipetteTipModelExtensionAttribute,
+    PipetteTipModelSettable,
 };
 mod pipettes;
 pub use pipettes::{
-    InsertablePipette, InsertablePipetteAttributes, InsertablePipetteBuilder,
-    InsertablePipetteExtensionAttributes, PipetteBuildable,
+    InsertablePipette, InsertablePipetteAttribute, InsertablePipetteBuilder,
+    InsertablePipetteExtensionAttribute, PipetteSettable,
 };
 mod positioning_device_models;
 pub use positioning_device_models::{
-    InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttributes,
-    InsertablePositioningDeviceModelBuilder, InsertablePositioningDeviceModelExtensionAttributes,
-    PositioningDeviceModelBuildable,
+    InsertablePositioningDeviceModel, InsertablePositioningDeviceModelAttribute,
+    InsertablePositioningDeviceModelBuilder, InsertablePositioningDeviceModelExtensionAttribute,
+    PositioningDeviceModelSettable,
 };
 mod positioning_devices;
 pub use positioning_devices::{
-    InsertablePositioningDevice, InsertablePositioningDeviceAttributes,
-    InsertablePositioningDeviceBuilder, InsertablePositioningDeviceExtensionAttributes,
-    PositioningDeviceBuildable,
+    InsertablePositioningDevice, InsertablePositioningDeviceAttribute,
+    InsertablePositioningDeviceBuilder, InsertablePositioningDeviceExtensionAttribute,
+    PositioningDeviceSettable,
 };
 mod pouring_procedure_templates;
 pub use pouring_procedure_templates::{
-    InsertablePouringProcedureTemplate, InsertablePouringProcedureTemplateAttributes,
+    InsertablePouringProcedureTemplate, InsertablePouringProcedureTemplateAttribute,
     InsertablePouringProcedureTemplateBuilder,
-    InsertablePouringProcedureTemplateExtensionAttributes, PouringProcedureTemplateBuildable,
+    InsertablePouringProcedureTemplateExtensionAttribute, PouringProcedureTemplateSettable,
 };
 mod pouring_procedures;
 pub use pouring_procedures::{
-    InsertablePouringProcedure, InsertablePouringProcedureAttributes,
-    InsertablePouringProcedureBuilder, InsertablePouringProcedureExtensionAttributes,
-    PouringProcedureBuildable,
+    InsertablePouringProcedure, InsertablePouringProcedureAttribute,
+    InsertablePouringProcedureBuilder, InsertablePouringProcedureExtensionAttribute,
+    PouringProcedureSettable,
 };
 mod procedure_assets;
 pub use procedure_assets::{
-    InsertableProcedureAsset, InsertableProcedureAssetAttributes, InsertableProcedureAssetBuilder,
-    ProcedureAssetBuildable,
+    InsertableProcedureAsset, InsertableProcedureAssetAttribute, InsertableProcedureAssetBuilder,
+    ProcedureAssetSettable,
 };
 mod procedure_template_asset_models;
 pub use procedure_template_asset_models::{
-    InsertableProcedureTemplateAssetModel, InsertableProcedureTemplateAssetModelAttributes,
-    InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelBuildable,
+    InsertableProcedureTemplateAssetModel, InsertableProcedureTemplateAssetModelAttribute,
+    InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelSettable,
 };
 mod procedure_templates;
 pub use procedure_templates::{
-    InsertableProcedureTemplate, InsertableProcedureTemplateAttributes,
-    InsertableProcedureTemplateBuilder, ProcedureTemplateBuildable,
+    InsertableProcedureTemplate, InsertableProcedureTemplateAttribute,
+    InsertableProcedureTemplateBuilder, ProcedureTemplateSettable,
 };
 mod procedures;
 pub use procedures::{
-    InsertableProcedure, InsertableProcedureAttributes, InsertableProcedureBuilder,
-    ProcedureBuildable,
+    InsertableProcedure, InsertableProcedureAttribute, InsertableProcedureBuilder,
+    ProcedureSettable,
 };
 mod project_states;
 pub use project_states::{
-    InsertableProjectState, InsertableProjectStateAttributes, InsertableProjectStateBuilder,
-    ProjectStateBuildable,
+    InsertableProjectState, InsertableProjectStateAttribute, InsertableProjectStateBuilder,
+    ProjectStateSettable,
 };
 mod projects;
 pub use projects::{
-    InsertableProject, InsertableProjectAttributes, InsertableProjectBuilder, ProjectBuildable,
+    InsertableProject, InsertableProjectAttribute, InsertableProjectBuilder, ProjectSettable,
 };
 mod ranks;
-pub use ranks::{InsertableRank, InsertableRankAttributes, InsertableRankBuilder, RankBuildable};
+pub use ranks::{InsertableRank, InsertableRankAttribute, InsertableRankBuilder, RankSettable};
 mod reagent_models;
 pub use reagent_models::{
-    InsertableReagentModel, InsertableReagentModelAttributes, InsertableReagentModelBuilder,
-    InsertableReagentModelExtensionAttributes, ReagentModelBuildable,
+    InsertableReagentModel, InsertableReagentModelAttribute, InsertableReagentModelBuilder,
+    InsertableReagentModelExtensionAttribute, ReagentModelSettable,
 };
 mod registering_procedure_templates;
 pub use registering_procedure_templates::{
-    InsertableRegisteringProcedureTemplate, InsertableRegisteringProcedureTemplateAttributes,
+    InsertableRegisteringProcedureTemplate, InsertableRegisteringProcedureTemplateAttribute,
     InsertableRegisteringProcedureTemplateBuilder,
-    InsertableRegisteringProcedureTemplateExtensionAttributes,
-    RegisteringProcedureTemplateBuildable,
+    InsertableRegisteringProcedureTemplateExtensionAttribute, RegisteringProcedureTemplateSettable,
 };
 mod registering_procedures;
 pub use registering_procedures::{
-    InsertableRegisteringProcedure, InsertableRegisteringProcedureAttributes,
-    InsertableRegisteringProcedureBuilder, InsertableRegisteringProcedureExtensionAttributes,
-    RegisteringProcedureBuildable,
+    InsertableRegisteringProcedure, InsertableRegisteringProcedureAttribute,
+    InsertableRegisteringProcedureBuilder, InsertableRegisteringProcedureExtensionAttribute,
+    RegisteringProcedureSettable,
 };
 mod roles;
-pub use roles::{InsertableRole, InsertableRoleAttributes, InsertableRoleBuilder, RoleBuildable};
+pub use roles::{InsertableRole, InsertableRoleAttribute, InsertableRoleBuilder, RoleSettable};
 mod rooms;
-pub use rooms::{InsertableRoom, InsertableRoomAttributes, InsertableRoomBuilder, RoomBuildable};
+pub use rooms::{InsertableRoom, InsertableRoomAttribute, InsertableRoomBuilder, RoomSettable};
 mod sample_states;
 pub use sample_states::{
-    InsertableSampleState, InsertableSampleStateAttributes, InsertableSampleStateBuilder,
-    SampleStateBuildable,
-};
-mod shared_procedure_template_asset_models;
-pub use shared_procedure_template_asset_models::{
-    InsertableSharedProcedureTemplateAssetModel,
-    InsertableSharedProcedureTemplateAssetModelAttributes,
-    InsertableSharedProcedureTemplateAssetModelBuilder, SharedProcedureTemplateAssetModelBuildable,
+    InsertableSampleState, InsertableSampleStateAttribute, InsertableSampleStateBuilder,
+    SampleStateSettable,
 };
 mod spatial_ref_sys;
 pub use spatial_ref_sys::{
-    InsertableSpatialRefSy, InsertableSpatialRefSyAttributes, InsertableSpatialRefSyBuilder,
-    SpatialRefSyBuildable,
+    InsertableSpatialRefSy, InsertableSpatialRefSyAttribute, InsertableSpatialRefSyBuilder,
+    SpatialRefSySettable,
 };
 mod spectra;
 pub use spectra::{
-    InsertableSpectrum, InsertableSpectrumAttributes, InsertableSpectrumBuilder,
-    InsertableSpectrumExtensionAttributes, SpectrumBuildable,
+    InsertableSpectrum, InsertableSpectrumAttribute, InsertableSpectrumBuilder,
+    InsertableSpectrumExtensionAttribute, SpectrumSettable,
 };
 mod spectra_collections;
 pub use spectra_collections::{
-    InsertableSpectraCollection, InsertableSpectraCollectionAttributes,
-    InsertableSpectraCollectionBuilder, InsertableSpectraCollectionExtensionAttributes,
-    SpectraCollectionBuildable,
+    InsertableSpectraCollection, InsertableSpectraCollectionAttribute,
+    InsertableSpectraCollectionBuilder, InsertableSpectraCollectionExtensionAttribute,
+    SpectraCollectionSettable,
 };
 mod storage_procedure_templates;
 pub use storage_procedure_templates::{
-    InsertableStorageProcedureTemplate, InsertableStorageProcedureTemplateAttributes,
+    InsertableStorageProcedureTemplate, InsertableStorageProcedureTemplateAttribute,
     InsertableStorageProcedureTemplateBuilder,
-    InsertableStorageProcedureTemplateExtensionAttributes, StorageProcedureTemplateBuildable,
+    InsertableStorageProcedureTemplateExtensionAttribute, StorageProcedureTemplateSettable,
 };
 mod storage_procedures;
 pub use storage_procedures::{
-    InsertableStorageProcedure, InsertableStorageProcedureAttributes,
-    InsertableStorageProcedureBuilder, InsertableStorageProcedureExtensionAttributes,
-    StorageProcedureBuildable,
+    InsertableStorageProcedure, InsertableStorageProcedureAttribute,
+    InsertableStorageProcedureBuilder, InsertableStorageProcedureExtensionAttribute,
+    StorageProcedureSettable,
 };
 mod supernatant_procedure_templates;
 pub use supernatant_procedure_templates::{
-    InsertableSupernatantProcedureTemplate, InsertableSupernatantProcedureTemplateAttributes,
+    InsertableSupernatantProcedureTemplate, InsertableSupernatantProcedureTemplateAttribute,
     InsertableSupernatantProcedureTemplateBuilder,
-    InsertableSupernatantProcedureTemplateExtensionAttributes,
-    SupernatantProcedureTemplateBuildable,
+    InsertableSupernatantProcedureTemplateExtensionAttribute, SupernatantProcedureTemplateSettable,
 };
 mod supernatant_procedures;
 pub use supernatant_procedures::{
-    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttributes,
-    InsertableSupernatantProcedureBuilder, InsertableSupernatantProcedureExtensionAttributes,
-    SupernatantProcedureBuildable,
+    InsertableSupernatantProcedure, InsertableSupernatantProcedureAttribute,
+    InsertableSupernatantProcedureBuilder, InsertableSupernatantProcedureExtensionAttribute,
+    SupernatantProcedureSettable,
 };
 mod taxa;
-pub use taxa::{
-    InsertableTaxon, InsertableTaxonAttributes, InsertableTaxonBuilder, TaxonBuildable,
-};
+pub use taxa::{InsertableTaxon, InsertableTaxonAttribute, InsertableTaxonBuilder, TaxonSettable};
 mod team_members;
 pub use team_members::{
-    InsertableTeamMember, InsertableTeamMemberAttributes, InsertableTeamMemberBuilder,
-    TeamMemberBuildable,
+    InsertableTeamMember, InsertableTeamMemberAttribute, InsertableTeamMemberBuilder,
+    TeamMemberSettable,
 };
 mod team_projects;
 pub use team_projects::{
-    InsertableTeamProject, InsertableTeamProjectAttributes, InsertableTeamProjectBuilder,
-    TeamProjectBuildable,
+    InsertableTeamProject, InsertableTeamProjectAttribute, InsertableTeamProjectBuilder,
+    TeamProjectSettable,
 };
 mod team_states;
 pub use team_states::{
-    InsertableTeamState, InsertableTeamStateAttributes, InsertableTeamStateBuilder,
-    TeamStateBuildable,
+    InsertableTeamState, InsertableTeamStateAttribute, InsertableTeamStateBuilder,
+    TeamStateSettable,
 };
 mod teams;
-pub use teams::{InsertableTeam, InsertableTeamAttributes, InsertableTeamBuilder, TeamBuildable};
+pub use teams::{InsertableTeam, InsertableTeamAttribute, InsertableTeamBuilder, TeamSettable};
 mod temporary_user;
 pub use temporary_user::{
-    InsertableTemporaryUser, InsertableTemporaryUserAttributes, InsertableTemporaryUserBuilder,
-    TemporaryUserBuildable,
+    InsertableTemporaryUser, InsertableTemporaryUserAttribute, InsertableTemporaryUserBuilder,
+    TemporaryUserSettable,
 };
 mod units;
-pub use units::{InsertableUnit, InsertableUnitAttributes, InsertableUnitBuilder, UnitBuildable};
+pub use units::{InsertableUnit, InsertableUnitAttribute, InsertableUnitBuilder, UnitSettable};
 mod user_emails;
 pub use user_emails::{
-    InsertableUserEmail, InsertableUserEmailAttributes, InsertableUserEmailBuilder,
-    UserEmailBuildable,
+    InsertableUserEmail, InsertableUserEmailAttribute, InsertableUserEmailBuilder,
+    UserEmailSettable,
 };
 mod user_organizations;
 pub use user_organizations::{
-    InsertableUserOrganization, InsertableUserOrganizationAttributes,
-    InsertableUserOrganizationBuilder, UserOrganizationBuildable,
+    InsertableUserOrganization, InsertableUserOrganizationAttribute,
+    InsertableUserOrganizationBuilder, UserOrganizationSettable,
 };
 mod users;
-pub use users::{InsertableUser, InsertableUserAttributes, InsertableUserBuilder, UserBuildable};
+pub use users::{InsertableUser, InsertableUserAttribute, InsertableUserBuilder, UserSettable};
 mod volume_measuring_device_models;
 pub use volume_measuring_device_models::{
-    InsertableVolumeMeasuringDeviceModel, InsertableVolumeMeasuringDeviceModelAttributes,
+    InsertableVolumeMeasuringDeviceModel, InsertableVolumeMeasuringDeviceModelAttribute,
     InsertableVolumeMeasuringDeviceModelBuilder,
-    InsertableVolumeMeasuringDeviceModelExtensionAttributes, VolumeMeasuringDeviceModelBuildable,
+    InsertableVolumeMeasuringDeviceModelExtensionAttribute, VolumeMeasuringDeviceModelSettable,
 };
 mod volume_measuring_devices;
 pub use volume_measuring_devices::{
-    InsertableVolumeMeasuringDevice, InsertableVolumeMeasuringDeviceAttributes,
-    InsertableVolumeMeasuringDeviceBuilder, InsertableVolumeMeasuringDeviceExtensionAttributes,
-    VolumeMeasuringDeviceBuildable,
+    InsertableVolumeMeasuringDevice, InsertableVolumeMeasuringDeviceAttribute,
+    InsertableVolumeMeasuringDeviceBuilder, InsertableVolumeMeasuringDeviceExtensionAttribute,
+    VolumeMeasuringDeviceSettable,
 };
 mod volumetric_container_models;
 pub use volumetric_container_models::{
-    InsertableVolumetricContainerModel, InsertableVolumetricContainerModelAttributes,
+    InsertableVolumetricContainerModel, InsertableVolumetricContainerModelAttribute,
     InsertableVolumetricContainerModelBuilder,
-    InsertableVolumetricContainerModelExtensionAttributes, VolumetricContainerModelBuildable,
+    InsertableVolumetricContainerModelExtensionAttribute, VolumetricContainerModelSettable,
 };
 mod volumetric_containers;
 pub use volumetric_containers::{
-    InsertableVolumetricContainer, InsertableVolumetricContainerAttributes,
-    InsertableVolumetricContainerBuilder, InsertableVolumetricContainerExtensionAttributes,
-    VolumetricContainerBuildable,
+    InsertableVolumetricContainer, InsertableVolumetricContainerAttribute,
+    InsertableVolumetricContainerBuilder, InsertableVolumetricContainerExtensionAttribute,
+    VolumetricContainerSettable,
 };
 mod weighing_device_models;
 pub use weighing_device_models::{
-    InsertableWeighingDeviceModel, InsertableWeighingDeviceModelAttributes,
-    InsertableWeighingDeviceModelBuilder, InsertableWeighingDeviceModelExtensionAttributes,
-    WeighingDeviceModelBuildable,
+    InsertableWeighingDeviceModel, InsertableWeighingDeviceModelAttribute,
+    InsertableWeighingDeviceModelBuilder, InsertableWeighingDeviceModelExtensionAttribute,
+    WeighingDeviceModelSettable,
 };
 mod weighing_devices;
 pub use weighing_devices::{
-    InsertableWeighingDevice, InsertableWeighingDeviceAttributes, InsertableWeighingDeviceBuilder,
-    InsertableWeighingDeviceExtensionAttributes, WeighingDeviceBuildable,
+    InsertableWeighingDevice, InsertableWeighingDeviceAttribute, InsertableWeighingDeviceBuilder,
+    InsertableWeighingDeviceExtensionAttribute, WeighingDeviceSettable,
 };
 mod weighing_procedure_templates;
 pub use weighing_procedure_templates::{
-    InsertableWeighingProcedureTemplate, InsertableWeighingProcedureTemplateAttributes,
+    InsertableWeighingProcedureTemplate, InsertableWeighingProcedureTemplateAttribute,
     InsertableWeighingProcedureTemplateBuilder,
-    InsertableWeighingProcedureTemplateExtensionAttributes, WeighingProcedureTemplateBuildable,
+    InsertableWeighingProcedureTemplateExtensionAttribute, WeighingProcedureTemplateSettable,
 };
 mod weighing_procedures;
 pub use weighing_procedures::{
-    InsertableWeighingProcedure, InsertableWeighingProcedureAttributes,
-    InsertableWeighingProcedureBuilder, InsertableWeighingProcedureExtensionAttributes,
-    WeighingProcedureBuildable,
+    InsertableWeighingProcedure, InsertableWeighingProcedureAttribute,
+    InsertableWeighingProcedureBuilder, InsertableWeighingProcedureExtensionAttribute,
+    WeighingProcedureSettable,
 };

@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelExtensionAttributes::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttributes::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

@@ -29,19 +29,19 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::BallMillProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::BallMillProcedure
             }
-            super::Row::BeadsModel(_) => crate::codegen::tables::table_names::TableName::BeadsModel,
+            super::Row::BeadModel(_) => crate::codegen::tables::table_names::TableName::BeadModel,
             super::Row::Brand(_) => crate::codegen::tables::table_names::TableName::Brand,
             super::Row::CameraModel(_) => {
                 crate::codegen::tables::table_names::TableName::CameraModel
             }
             super::Row::Camera(_) => crate::codegen::tables::table_names::TableName::Camera,
+            super::Row::CapModel(_) => crate::codegen::tables::table_names::TableName::CapModel,
             super::Row::CappingProcedureTemplate(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedureTemplate
             }
             super::Row::CappingProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::CappingProcedure
             }
-            super::Row::CapsModel(_) => crate::codegen::tables::table_names::TableName::CapsModel,
             super::Row::CentrifugeModel(_) => {
                 crate::codegen::tables::table_names::TableName::CentrifugeModel
             }
@@ -60,17 +60,23 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::CommercialBallMillMachineModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialBallMillMachineModel
             }
-            super::Row::CommercialBeadsLot(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialBeadsLot
+            super::Row::CommercialBeadLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialBeadLot
             }
-            super::Row::CommercialBeadsModel(_) => {
-                crate::codegen::tables::table_names::TableName::CommercialBeadsModel
+            super::Row::CommercialBeadModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialBeadModel
             }
             super::Row::CommercialCameraLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCameraLot
             }
             super::Row::CommercialCameraModel(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCameraModel
+            }
+            super::Row::CommercialCapLot(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialCapLot
+            }
+            super::Row::CommercialCapModel(_) => {
+                crate::codegen::tables::table_names::TableName::CommercialCapModel
             }
             super::Row::CommercialCentrifugeLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialCentrifugeLot
@@ -285,9 +291,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::Room(_) => crate::codegen::tables::table_names::TableName::Room,
             super::Row::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
-            }
-            super::Row::SharedProcedureTemplateAssetModel(_) => {
-                crate::codegen::tables::table_names::TableName::SharedProcedureTemplateAssetModel
             }
             super::Row::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy

@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialBallMillMachineLotExtensionAttributes {
+pub enum InsertableCommercialBallMillMachineLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ),
     BallMillMachineModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialBallMillMachineLotExtensionAttributes {
+impl core::fmt::Display for InsertableCommercialBallMillMachineLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -17,31 +17,31 @@ impl core::fmt::Display for InsertableCommercialBallMillMachineLotExtensionAttri
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
-> for InsertableCommercialBallMillMachineLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+> for InsertableCommercialBallMillMachineLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes,
-> for InsertableCommercialBallMillMachineLotExtensionAttributes {
+    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute,
+> for InsertableCommercialBallMillMachineLotExtensionAttribute {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes,
+        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute,
     ) -> Self {
         Self::BallMillMachineModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialBallMillMachineLotAttributes {
-    Extension(InsertableCommercialBallMillMachineLotExtensionAttributes),
+pub enum InsertableCommercialBallMillMachineLotAttribute {
+    Extension(InsertableCommercialBallMillMachineLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialBallMillMachineLotAttributes {
+impl core::str::FromStr for InsertableCommercialBallMillMachineLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableCommercialBallMillMachineLotAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialBallMillMachineLotAttributes {
+impl core::fmt::Display for InsertableCommercialBallMillMachineLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -194,7 +194,7 @@ pub struct InsertableCommercialBallMillMachineLotBuilder<
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialBallMillMachineLot` or descendant tables.
-pub trait CommercialBallMillMachineLotBuildable: Sized {
+pub trait CommercialBallMillMachineLotSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
     /// Sets the value of the
@@ -222,18 +222,18 @@ pub trait CommercialBallMillMachineLotBuildable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    BallMillMachineModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes,
+    BallMillMachineModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute,
         >,
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
-> CommercialBallMillMachineLotBuildable
+> CommercialBallMillMachineLotSettable
 for InsertableCommercialBallMillMachineLotBuilder<
     BallMillMachineModel,
     CommercialProductLot,
 > {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute;
     ///Sets the value of the `public.commercial_ball_mill_machine_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -263,24 +263,24 @@ for InsertableCommercialBallMillMachineLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
+    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v7 --->|"`extends`"| v4
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///```
     fn product_model(
         mut self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_ball_mill_machine_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::product_model(
+        self.commercial_ball_mill_machine_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::product_model(
                 self.commercial_ball_mill_machine_lots_id_fkey,
                 product_model,
             )
@@ -289,7 +289,7 @@ for InsertableCommercialBallMillMachineLotBuilder<
                     attribute.into(),
                 ))
             })?;
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 Some(product_model),
             )
@@ -303,21 +303,21 @@ for InsertableCommercialBallMillMachineLotBuilder<
     }
 }
 impl<
-    BallMillMachineModel: crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttributes,
+    BallMillMachineModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelAttribute,
         >,
     CommercialProductLot,
-> crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialBallMillMachineLotBuilder<
     BallMillMachineModel,
     CommercialProductLot,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -325,10 +325,10 @@ where
         name: N,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::name(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 name,
             )
@@ -347,10 +347,10 @@ where
         description: D,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::description(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 description,
             )
@@ -390,7 +390,7 @@ where
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable>::parent_model(
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
         )
@@ -401,7 +401,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_by(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 created_by,
             )
@@ -425,7 +425,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::created_at(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 created_at,
             )
@@ -443,7 +443,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_by(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 updated_by,
             )
@@ -467,7 +467,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelBuildable>::updated_at(
+        self.commercial_ball_mill_machine_lots_id_fkey1 = <BallMillMachineModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.commercial_ball_mill_machine_lots_id_fkey1,
                 updated_at,
             )
@@ -481,27 +481,27 @@ where
     }
 }
 impl<BallMillMachineModel, CommercialProductLot>
-    crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelBuildable
+    crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelSettable
     for InsertableCommercialBallMillMachineLotBuilder<BallMillMachineModel, CommercialProductLot>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute;
 }
 impl<
     BallMillMachineModel,
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttributes,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
         >,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialBallMillMachineLotBuilder<
     BallMillMachineModel,
     CommercialProductLot,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialBallMillMachineLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialBallMillMachineLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -512,7 +512,7 @@ where
         L: TryInto<String>,
         validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
     {
-        self.commercial_ball_mill_machine_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotBuildable>::lot(
+        self.commercial_ball_mill_machine_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::lot(
                 self.commercial_ball_mill_machine_lots_id_fkey,
                 lot,
             )
@@ -550,9 +550,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v3 -.->|"`descendant of`"| v5
     ///v4 --->|"`extends`"| v5
@@ -561,7 +561,7 @@ where
         self,
         product_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialBallMillMachineLotBuildable>::product_model(
+        <Self as CommercialBallMillMachineLotSettable>::product_model(
             self,
             product_model,
         )
@@ -570,17 +570,17 @@ where
 impl<
     BallMillMachineModel,
     CommercialProductLot,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelBuildable
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialBallMillMachineLotBuilder<
     BallMillMachineModel,
     CommercialProductLot,
 >
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialBallMillMachineLotBuildable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialBallMillMachineLotSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -611,24 +611,24 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as CommercialBallMillMachineLotBuildable>::product_model(
+        <Self as CommercialBallMillMachineLotSettable>::product_model(
             self,
             parent_model
                 .ok_or(
@@ -680,7 +680,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialBallMillMachineLotAttributes,
+            InsertableCommercialBallMillMachineLotAttribute,
         >,
     >,
     BallMillMachineModel: web_common_traits::database::TryInsertGeneric<
@@ -692,7 +692,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialBallMillMachineLotAttributes;
+    type Attributes = InsertableCommercialBallMillMachineLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_ball_mill_machine_lots_id_fkey1.is_complete()
             && self.commercial_ball_mill_machine_lots_id_fkey.is_complete()
