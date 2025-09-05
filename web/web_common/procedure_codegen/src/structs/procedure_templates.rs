@@ -2,9 +2,9 @@
 //! tables defined in the database.
 
 use diesel::PgConnection;
-use webcodegen::{Column, PgIndex, Table};
+use webcodegen::{Column, KeyColumnUsage, PgIndex, Table};
 
-use crate::Procedure;
+use crate::{Procedure, is_asset_model_foreign_key, is_procedure_template_asset_model_foreign_key};
 
 /// The name of the procedure templates table.
 pub const PROCEDURE_TEMPLATES_TABLE_NAME: &str = "procedure_templates";
@@ -16,6 +16,18 @@ pub(crate) struct ProcedureTemplate {
     pub(super) table: Table,
 }
 
+impl From<ProcedureTemplate> for Table {
+    fn from(procedure_template: ProcedureTemplate) -> Self {
+        procedure_template.table
+    }
+}
+
+impl From<ProcedureTemplate> for Box<Table> {
+    fn from(procedure_template: ProcedureTemplate) -> Self {
+        Box::new(procedure_template.table)
+    }
+}
+
 impl AsRef<Table> for ProcedureTemplate {
     fn as_ref(&self) -> &Table {
         &self.table
@@ -23,6 +35,80 @@ impl AsRef<Table> for ProcedureTemplate {
 }
 
 impl ProcedureTemplate {
+    /// Returns whether the current procedure template is the abstract template.
+    pub(crate) fn is_abstract(&self) -> bool {
+        self.table.table_name == PROCEDURE_TEMPLATES_TABLE_NAME
+    }
+
+    /// Returns the columns which are foreign keys to asset models in the
+    /// procedure template table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn asset_models(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
+        let mut asset_model_fk_columns = Vec::new();
+        for column in self.table.columns(conn)? {
+            if let Some(fk) = is_asset_model_foreign_key(&column, conn)? {
+                asset_model_fk_columns.push((column, fk));
+            }
+        }
+        Ok(asset_model_fk_columns)
+    }
+
+    /// Returns the columns which are foreign keys to procedure template asset
+    /// models in the procedure template table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn procedure_template_asset_models(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
+        let mut asset_model_fk_columns = Vec::new();
+        for column in self.table.columns(conn)? {
+            if let Some(fk) = is_procedure_template_asset_model_foreign_key(&column, conn)? {
+                asset_model_fk_columns.push((column, fk));
+            }
+        }
+        Ok(asset_model_fk_columns)
+    }
+
+    /// Returns the foreign keys to rule tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn rules(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, crate::errors::Error> {
+        let mut rule_table_fks = Vec::new();
+        for foreign_key in self.table.foreign_keys(conn)? {
+            let foreign_table = foreign_key.foreign_table(conn)?;
+            if foreign_table.table_name.ends_with("_compatibility_rules") {
+                rule_table_fks.push(foreign_key);
+            }
+        }
+        Ok(rule_table_fks)
+    }
+
     /// Returns whether the given table is a procedure template table.
     ///
     /// # Arguments

@@ -19,9 +19,7 @@ impl CustomColumnConstraint for LowercaseColumnConstraint {
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name.chars().any(char::is_uppercase) {
-            return Err(
-                ConstraintError::UnexpectedUppercaseColumn(column.column_name.clone()).into()
-            );
+            return Err(ConstraintError::UnexpectedUppercaseColumn(Box::new(column.clone())).into());
         }
         Ok(())
     }

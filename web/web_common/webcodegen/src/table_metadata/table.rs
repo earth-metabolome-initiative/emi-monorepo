@@ -36,8 +36,23 @@ fn load_all_tables(
 #[cached(
     result = true,
     key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
+    convert = r#"{ format!("{}-{}-{}", table_name, table_schema, table_catalog) }"#
 )]
+fn load_table(
+    conn: &mut PgConnection,
+    table_name: &str,
+    table_schema: &str,
+    table_catalog: &str,
+) -> Result<Table, diesel::result::Error> {
+    use crate::schema::tables;
+    tables::table
+        .filter(tables::table_name.eq(table_name))
+        .filter(tables::table_schema.eq(table_schema))
+        .filter(tables::table_catalog.eq(table_catalog))
+        .first::<Table>(conn)
+}
+
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn columns(table: &Table, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::columns;
     columns::table
@@ -48,11 +63,7 @@ fn columns(table: &Table, conn: &mut PgConnection) -> Result<Vec<Column>, diesel
         .load::<Column>(conn)
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn unique_columns(
     table: &Table,
     conn: &mut PgConnection,
@@ -119,11 +130,7 @@ fn unique_columns(
         })
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn primary_key_columns(
     table: &Table,
     conn: &mut PgConnection,
@@ -180,11 +187,7 @@ fn primary_key_columns(
         .load::<Column>(conn)
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
@@ -211,11 +214,7 @@ fn foreign_keys(
         .load::<KeyColumnUsage>(conn)
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -235,11 +234,7 @@ fn unique_indices(
         .load::<PgIndex>(conn)
 }
 
-#[cached(
-    result = true,
-    key = "String",
-    convert = r#"{ format!("{}-{}-{}", table.table_catalog, table.table_schema, table.table_name) }"#
-)]
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
 fn same_as_indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -247,6 +242,33 @@ fn same_as_indices(
     Ok(unique_indices(table, conn)?
         .into_iter()
         .filter(|pg_index| pg_index.is_same_as(conn).map(|fk| fk.is_some()).unwrap_or(false))
+        .collect())
+}
+
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+fn ancestral_extension_tables(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<Table>, diesel::result::Error> {
+    let mut tables = Vec::new();
+    for extended_table in table.extension_tables(conn)? {
+        tables.extend(extended_table.ancestral_extension_tables(conn)?);
+        tables.push(extended_table);
+    }
+    tables.sort_unstable();
+    tables.dedup();
+    Ok(tables)
+}
+
+#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+fn extension_tables(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<Vec<Table>, diesel::result::Error> {
+    Ok(table
+        .extension_foreign_keys(conn)?
+        .into_iter()
+        .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok())
         .collect())
 }
 
@@ -923,12 +945,7 @@ impl Table {
         table_schema: &str,
         table_catalog: &str,
     ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::tables;
-        tables::table
-            .filter(tables::table_name.eq(table_name))
-            .filter(tables::table_schema.eq(table_schema))
-            .filter(tables::table_catalog.eq(table_catalog))
-            .first::<Table>(conn)
+        load_table(conn, table_name, table_schema, table_catalog)
     }
 
     /// Returns the columns of the table.
@@ -1076,11 +1093,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Table>, diesel::result::Error> {
-        Ok(self
-            .extension_foreign_keys(conn)?
-            .into_iter()
-            .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok())
-            .collect())
+        extension_tables(self, conn)
     }
 
     /// Returns whether the current table extends any other table.
@@ -1204,14 +1217,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Table>, diesel::result::Error> {
-        let mut tables = Vec::new();
-        for extended_table in self.extension_tables(conn)? {
-            tables.extend(extended_table.ancestral_extension_tables(conn)?);
-            tables.push(extended_table);
-        }
-        tables.sort_unstable();
-        tables.dedup();
-        Ok(tables)
+        ancestral_extension_tables(self, conn)
     }
 
     /// Returns whether the table is extending the provided table.

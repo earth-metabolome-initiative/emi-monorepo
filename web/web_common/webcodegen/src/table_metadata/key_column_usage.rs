@@ -160,6 +160,16 @@ fn foreign_table(
         .first::<Table>(conn)
 }
 
+#[cached(result = true, key = "KeyColumnUsage", convert = r#"{ key_column_usage.clone() }"#)]
+pub fn is_extension(
+    key_column_usage: &KeyColumnUsage,
+    conn: &mut PgConnection,
+) -> Result<bool, WebCodeGenError> {
+    Ok(key_column_usage.is_foreign_primary_key(conn)?
+        && key_column_usage.is_local_primary_key(conn)?
+        && !key_column_usage.is_self_referential(conn)?)
+}
+
 /// Represents a row in the `key_column_usage` table, which contains information
 /// about columns that are constrained by a unique or primary key constraint.
 ///
@@ -485,9 +495,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while querying the database
     pub(crate) fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.is_foreign_primary_key(conn)?
-            && self.is_local_primary_key(conn)?
-            && !self.is_self_referential(conn)?)
+        is_extension(self, conn)
     }
 
     /// Returns the identifier for this key column usage getter.

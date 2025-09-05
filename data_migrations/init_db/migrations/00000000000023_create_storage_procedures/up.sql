@@ -12,24 +12,7 @@ CREATE TABLE IF NOT EXISTS storage_procedure_templates (
 	procedure_template_stored_into_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	-- The asset that is being stored.
 	stored_asset_model INTEGER NOT NULL REFERENCES physical_asset_models(id),
-	-- The procedure template which originated the container being stored (e.g., a sampling or fractioning procedure template).
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
-		must_be_distinct_i32(
-			procedure_template,
-			foreign_procedure_template
-		)
-	),
 	procedure_template_stored_asset_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
-	-- We check that the `procedure_template_stored_into_model` is indeed an asset model that is compatible with the procedure template.
-	FOREIGN KEY (
-		procedure_template_stored_into_model,
-		procedure_template
-	) REFERENCES procedure_template_asset_models(id, procedure_template),
-	-- We check that the `procedure_template_stored_asset_model` is indeed an asset model that is compatible with the procedure template.
-	FOREIGN KEY (
-		procedure_template_stored_asset_model,
-		foreign_procedure_template
-	) REFERENCES procedure_template_asset_models(id, procedure_template),
 	-- We check that the `stored_into_model` is indeed a container that is compatible with the procedure template.
 	FOREIGN KEY (
 		procedure_template_stored_into_model,
@@ -41,40 +24,81 @@ CREATE TABLE IF NOT EXISTS storage_procedure_templates (
 		stored_asset_model
 	) REFERENCES procedure_template_asset_models(id, asset_model),
 	-- We check that the `stored_into_model` is indeed a container that can hold the `stored_asset_model`.
-	CONSTRAINT storage_pm_compatibility_rules FOREIGN KEY (stored_into_model, stored_asset_model) REFERENCES container_compatibility_rules(container_model, contained_asset_model),
-	-- We create a same-as index to allow for foreign key references to check whether a `storage_procedure_template`
-	-- is associated with a given `storage_foreign_procedure_template`.
-	UNIQUE (procedure_template, foreign_procedure_template)
+	FOREIGN KEY (stored_into_model, stored_asset_model) REFERENCES container_compatibility_rules(container_model, contained_asset_model),
+	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_stored_into_model`
+	-- for the current `procedure_template`.
+	UNIQUE (
+		procedure_template,
+		procedure_template_stored_into_model
+	),
+	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_stored_asset_model`
+	-- for the current `procedure_template`.
+	UNIQUE (
+		procedure_template,
+		procedure_template_stored_asset_model
+	)
 );
-
 CREATE TABLE IF NOT EXISTS storage_procedures (
 	-- Identifier of the storage procedure, which is also a foreign key to the general procedure.
 	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
 	-- The template of this procedure should be a storage procedure template.
 	procedure_template INTEGER NOT NULL REFERENCES storage_procedure_templates(procedure_template),
-	-- The procedure template associated with the foreign procedure template.
-	foreign_procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) CHECK (
-		must_be_distinct_i32(
-			procedure_template,
-			foreign_procedure_template
-		)
-	),
-	-- The foreign procedure that has first defined the asset being stored (e.g., a sampling or fractioning procedure).
-	foreign_procedure UUID NOT NULL REFERENCES procedures(procedure) CHECK (
-		must_be_distinct_uuid(procedure, foreign_procedure)
-	),
 	-- The asset being stored, which must be a physical asset.
 	stored_asset UUID NOT NULL REFERENCES physical_assets(id),
-	-- The positioning device used for storage. This field is optional, as the positioning device might not necessarily be tracked.
-	stored_with UUID NOT NULL REFERENCES containers(id),
-	-- We enforce that the current `storage` has indeed the same `photograph_template`.
+	-- The model of the asset being stored, which must be a physical asset model.
+	stored_asset_model INTEGER NOT NULL REFERENCES physical_asset_models(id),
+	-- The procedure template asset model describing the `stored_asset`.
+	procedure_template_stored_asset_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
+	-- The procedure asset describing the `stored_asset`.
+	procedure_stored_asset UUID NOT NULL REFERENCES procedure_assets(id),
+	-- The container into which the asset is being stored.
+	stored_into UUID NOT NULL REFERENCES containers(id),
+	-- The model of the container into which the asset is being stored.
+	stored_into_model INTEGER NOT NULL REFERENCES container_models(id),
+	-- The procedure template asset model describing the `stored_into`.
+	procedure_template_stored_into_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
+	-- The procedure asset describing the `stored_into`.
+	procedure_stored_into UUID NOT NULL REFERENCES procedure_assets(id),
+	-- The current procedure must be a storage procedure.
 	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
-	-- We enforce that the `foreign_procedure` has as `procedure_template` the specified `foreign_procedure_template`.
-	FOREIGN KEY (foreign_procedure, foreign_procedure_template) REFERENCES procedures(procedure, procedure_template),
-	-- Additionally, we enforce that the `stored_asset` is indeed a procedure asset of the correct model.
-	FOREIGN KEY (foreign_procedure, stored_asset) REFERENCES procedure_assets(procedure, asset),
-	-- And that the `stored_with` is indeed a procedure asset of the correct model.
-	FOREIGN KEY (procedure, stored_with) REFERENCES procedure_assets(procedure, asset),
-	-- We enforce that the associated procedure template requires the provided foreign procedure template.
-	FOREIGN KEY (procedure_template, foreign_procedure_template) REFERENCES storage_procedure_templates(procedure_template, foreign_procedure_template)
+	-- The procedure template asset model describing the `stored_asset` must be the same one
+	-- as the one in the procedure template.
+	FOREIGN KEY (
+		procedure_template,
+		procedure_template_stored_asset_model
+	) REFERENCES storage_procedure_templates(
+		procedure_template,
+		procedure_template_stored_asset_model
+	),
+	-- The procedure template asset model describing the `stored_into` must be the same one
+	-- as the one in the procedure template.
+	FOREIGN KEY (
+		procedure_template,
+		procedure_template_stored_into_model
+	) REFERENCES storage_procedure_templates(
+		procedure_template,
+		procedure_template_stored_into_model
+	),
+	-- The procedure template asset model and the procedure asset describing the `stored_asset`
+	-- must be compatible.
+	FOREIGN KEY (
+		procedure_stored_asset,
+		procedure_template_stored_asset_model
+	) REFERENCES procedure_assets(id, procedure_template_asset_model),
+	-- The procedure template asset model and the procedure asset describing the `stored_into`
+	-- must be compatible.
+	FOREIGN KEY (
+		procedure_stored_into,
+		procedure_template_stored_into_model
+	) REFERENCES procedure_assets(id, procedure_template_asset_model),
+	-- Check the compatibility between the `stored_asset` and the `stored_into_model`.
+	FOREIGN KEY (stored_into_model, stored_asset_model) REFERENCES container_compatibility_rules(container_model, contained_asset_model),
+	-- We check that the `procedure_stored_asset` is associated to the `stored_asset_model`.
+	FOREIGN KEY (procedure_stored_asset, stored_asset_model) REFERENCES procedure_assets(id, asset_model),
+	-- We check that the `procedure_stored_into` is associated to the `stored_into_model`.
+	FOREIGN KEY (procedure_stored_into, stored_into_model) REFERENCES procedure_assets(id, asset_model),
+	-- We check that the `procedure_stored_asset` is associated to the `stored_asset`.
+	FOREIGN KEY (procedure_stored_asset, stored_asset) REFERENCES procedure_assets(id, asset),
+	-- We check that the `procedure_stored_into` is associated to the `stored_into`.
+	FOREIGN KEY (procedure_stored_into, stored_into) REFERENCES procedure_assets(id, asset)
 );

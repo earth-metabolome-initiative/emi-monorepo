@@ -2,10 +2,9 @@
 
 use diesel::PgConnection;
 use procedure_codegen::constraints::{
-    AssetForeignKeysConstraint, AssetModelsForeignKeysConstraint, ProcedurePrimaryKeyConstraint,
-    ProcedureTemplateAssetModelsForeignKeysConstraint, ProcedureTemplatePrimaryKeyConstraint,
-    ProcedureToProcedureTemplateForeignKeyConstraint, UncharacterizedAssetModelsConstraint,
-    UncharacterizedAssetsConstraint, UnusedForeignProcedureTemplateConstraint,
+    ProcedureAlignmentConstraint, ProcedurePrimaryKeyConstraint,
+    ProcedureTemplatePrimaryKeyConstraint, ProcedureToProcedureTemplateForeignKeyConstraint,
+    UnusedForeignProcedureTemplateConstraint,
 };
 use time_requirements::{prelude::TimeTracker, task::Task};
 use webcodegen::{
@@ -20,6 +19,11 @@ pub(crate) fn execute_consistency_constraint_checks(
 ) -> Result<TimeTracker, crate::errors::Error> {
     let mut time_tracker = TimeTracker::new("Consistency Constraint Checks");
     let schema = "public";
+
+    let task = Task::new("Procedure and procedure template alignment");
+    ProcedureAlignmentConstraint.check_all(database_name, schema, conn)?;
+    time_tracker.add_completed_task(task);
+
     let mut sub_time_tracker = TimeTracker::new(&format!("Check constraints in schema '{schema}'"));
     let task = Task::new("Compatible foreign type constraints");
     CompatibleForeignTypeConstraint.check_all(database_name, schema, conn)?;
@@ -87,14 +91,6 @@ pub(crate) fn execute_consistency_constraint_checks(
     ProcedureTemplatePrimaryKeyConstraint.check_all(database_name, schema, conn)?;
     ProcedureToProcedureTemplateForeignKeyConstraint.check_all(database_name, schema, conn)?;
     UnusedForeignProcedureTemplateConstraint.check_all(database_name, schema, conn)?;
-    time_tracker.add_completed_task(task);
-
-    let task = Task::new("Procedure and procedure template asset constraints");
-    UncharacterizedAssetsConstraint.check_all(database_name, schema, conn)?;
-    UncharacterizedAssetModelsConstraint.check_all(database_name, schema, conn)?;
-    AssetForeignKeysConstraint.check_all(database_name, schema, conn)?;
-    AssetModelsForeignKeysConstraint.check_all(database_name, schema, conn)?;
-    ProcedureTemplateAssetModelsForeignKeysConstraint.check_all(database_name, schema, conn)?;
     time_tracker.add_completed_task(task);
 
     // TODO!: All textual fields in all tables that are not CSVs should have a check

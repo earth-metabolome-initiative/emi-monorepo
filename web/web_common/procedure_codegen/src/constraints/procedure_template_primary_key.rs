@@ -37,7 +37,7 @@ impl CustomTableConstraint for ProcedureTemplatePrimaryKeyConstraint {
             if let Some(foreign_key) = first_primary_key.is_part_of_extension_primary_key(conn)? {
                 if !foreign_key.has_on_delete_cascade(conn)? {
                     return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
-                        column: Box::new(first_primary_key),
+                        columns: vec![first_primary_key],
                         expected_behavior: CascadeOption::Cascade,
                         found_behavior: CascadeOption::Restrict,
                     }

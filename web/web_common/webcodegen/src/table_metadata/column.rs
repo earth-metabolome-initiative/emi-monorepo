@@ -1473,14 +1473,14 @@ impl Column {
         &self,
         table: &Table,
         conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
+    ) -> Result<Option<KeyColumnUsage>, diesel::result::Error> {
         for foreign_primary_key in self.foreign_primary_keys(conn)? {
             let foreign_table = foreign_primary_key.foreign_table(conn)?;
             if foreign_table == *table || foreign_table.is_extending(table, conn)? {
-                return Ok(true);
+                return Ok(Some(foreign_primary_key));
             }
         }
-        Ok(false)
+        Ok(None)
     }
 
     /// Returns whether the column is a foreign primary key.
@@ -1573,7 +1573,7 @@ impl Column {
         let mut foreign_definer_constraints = Vec::new();
         for foreign_key in self.foreign_keys(conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
-            if !self.is_foreign_primary_key_of_table(&foreign_table, conn)? {
+            if !self.is_foreign_primary_key_of_table(&foreign_table, conn)?.is_some() {
                 continue;
             }
             if foreign_key.includes_local_primary_key(conn)? {

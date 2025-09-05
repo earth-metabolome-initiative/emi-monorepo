@@ -19,7 +19,7 @@ impl CustomTableConstraint for LowercaseTableConstraint {
         table: &Table,
     ) -> Result<(), WebCodeGenError> {
         if table.table_name.chars().any(char::is_uppercase) {
-            return Err(ConstraintError::UnexpectedUppercaseTable(table.table_name.clone()).into());
+            return Err(ConstraintError::UnexpectedUppercaseTable(Box::new(table.clone())).into());
         }
         Ok(())
     }

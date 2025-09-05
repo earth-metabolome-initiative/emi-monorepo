@@ -8,7 +8,7 @@ pub use procedure_error::ProcedureError;
 pub use procedure_template_error::ProcedureTemplateError;
 use webcodegen::{Column, Table};
 
-use crate::utils::{ASSET_MODELS_TABLE_NAME, ASSETS_TABLE_NAME};
+use crate::utils::ASSETS_TABLE_NAME;
 
 #[derive(Debug)]
 /// Errors which may occur during procedure code generation.
@@ -27,12 +27,6 @@ pub enum Error {
     ProcedureTemplate(ProcedureTemplateError),
     /// An asset column was not characterized in a procedure table.
     UncharacterizedAssetColumn(Box<Column>),
-    /// An asset model column was not characterized in a procedure or procedure
-    /// model table.
-    UncharacterizedAssetModelColumn(Box<Column>),
-    /// An asset model foreign key in a procedure or procedure template table
-    /// was cascading.
-    CascadingAssetModelForeignKey(Box<Column>),
     /// An asset foreign key in a procedure or procedure template table was
     /// cascading.
     CascadingAssetForeignKey(Box<Column>),
@@ -59,20 +53,6 @@ impl std::fmt::Display for Error {
                 write!(
                     f,
                     "Uncharacterized foreign key to {ASSETS_TABLE_NAME} table: `{}.{}.{}`",
-                    column.table_schema, column.table_name, column.column_name
-                )
-            }
-            Error::UncharacterizedAssetModelColumn(column) => {
-                write!(
-                    f,
-                    "Uncharacterized foreign key to {ASSET_MODELS_TABLE_NAME} table: `{}.{}.{}`",
-                    column.table_schema, column.table_name, column.column_name
-                )
-            }
-            Error::CascadingAssetModelForeignKey(column) => {
-                write!(
-                    f,
-                    "Foreign key to `{ASSET_MODELS_TABLE_NAME}` in a procedure or procedure template table should not be cascading: `{}.{}.{}`",
                     column.table_schema, column.table_name, column.column_name
                 )
             }
@@ -106,8 +86,6 @@ impl core::error::Error for Error {
             Error::Procedure(err) => Some(err),
             Error::ProcedureTemplate(err) => Some(err),
             Error::UncharacterizedAssetColumn(_) => None,
-            Error::UncharacterizedAssetModelColumn(_) => None,
-            Error::CascadingAssetModelForeignKey(_) => None,
             Error::CascadingAssetForeignKey(_) => None,
             Error::UnusedForeignProcedureTemplateConstraint { .. } => None,
         }

@@ -6,14 +6,7 @@ use sqlparser::ast::CascadeOption;
 use crate::{CheckConstraint, Column, KeyColumnUsage, Table};
 
 fn format_column_list(columns: &Vec<Column>) -> String {
-    format!(
-        "({})",
-        columns
-            .iter()
-            .map(|c| format!("`{}.{}`", c.table_name, c.column_name))
-            .collect::<Vec<String>>()
-            .join(", ")
-    )
+    format!("({})", columns.iter().map(|c| c.to_string()).collect::<Vec<String>>().join(", "))
 }
 
 #[derive(Debug)]
@@ -21,10 +14,44 @@ fn format_column_list(columns: &Vec<Column>) -> String {
 pub enum ConstraintError {
     /// The column is unexpectedly nullable.
     UnexpectedNullableColumn(Box<Column>),
+    /// The column is unexpectedly non-nullable.
+    UnexpectedNonNullableColumn(Box<Column>),
     /// The column name is unexpectedly uppercase.
-    UnexpectedUppercaseColumn(String),
+    UnexpectedUppercaseColumn(Box<Column>),
+    /// Missing column in a table.
+    MissingColumn {
+        /// The table missing the column.
+        table: Box<Table>,
+        /// The name of the missing column.
+        column_name: String,
+    },
+    /// A column was found and it was not expected.
+    UnexpectedColumn(Box<Column>),
+    /// A foreign key was found and it was not expected.
+    UnexpectedForeignKey {
+        /// The columns that compose the foreign key.
+        columns: Vec<Column>,
+        /// The referenced columns.
+        referenced_columns: Vec<Column>,
+    },
+    /// Missing unique index on a table.
+    MissingUniqueIndex {
+        /// The table missing the unique index.
+        table: Box<Table>,
+        /// The columns that should compose the unique index.
+        columns: Vec<Column>,
+    },
+    /// Missing foreign key constraint on a table.
+    MissingForeignKey {
+        /// The columns that should compose the foreign key.
+        columns: Vec<Column>,
+        /// The referenced columns.
+        referenced_columns: Vec<Column>,
+        /// The foreign key cascade option (e.g., cascade on delete).
+        cascade_option: CascadeOption,
+    },
     /// The table name is unexpectedly uppercase.
-    UnexpectedUppercaseTable(String),
+    UnexpectedUppercaseTable(Box<Table>),
     /// A deprecated word is used in a column name.
     ColumnWordDeprecationError {
         /// The column name where the deprecated word was used.
@@ -122,8 +149,8 @@ pub enum ConstraintError {
     },
     /// A foreign key has unexpected cascading behavior.
     ForeignKeyWithUnexpectedCascadingBehavior {
-        /// The column with the foreign key.
-        column: Box<Column>,
+        /// The columns with the foreign key.
+        columns: Vec<Column>,
         /// The expected cascading behavior.
         expected_behavior: CascadeOption,
         /// The found cascading behavior.
@@ -135,13 +162,66 @@ impl Display for ConstraintError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
             ConstraintError::UnexpectedNullableColumn(column) => {
-                write!(f, "Unexpected nullable column: `{column}`")
+                write!(f, "Unexpected nullable column: {column}")
+            }
+            ConstraintError::UnexpectedNonNullableColumn(column) => {
+                write!(f, "Unexpected non-nullable column: {column}")
             }
             ConstraintError::ColumnWordDeprecationError { column, deprecated_word } => {
+                write!(f, "The column {column} uses the deprecated word '{deprecated_word}'",)
+            }
+            ConstraintError::MissingColumn { table, column_name } => {
+                write!(f, "The table {table} is missing the expected column `{column_name}`.",)
+            }
+            ConstraintError::UnexpectedColumn(column) => {
+                write!(f, "Unexpected column found: {column}, you may want to remove it.")
+            }
+            ConstraintError::UnexpectedForeignKey { columns, referenced_columns } => {
                 write!(
                     f,
-                    "The column `{}.{}` uses the deprecated word '{}'",
-                    column.table_name, column.column_name, deprecated_word
+                    "Unexpected foreign key found in table {}: FOREIGN KEY ({}) REFERENCES {}({})",
+                    columns[0].table_name,
+                    columns
+                        .iter()
+                        .map(|c| c.column_name.clone())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                    referenced_columns[0].table_name,
+                    referenced_columns
+                        .iter()
+                        .map(|c| c.column_name.clone())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                )
+            }
+            ConstraintError::MissingUniqueIndex { table, columns } => {
+                write!(
+                    f,
+                    "The table {table} is missing a unique index on columns: {}",
+                    format_column_list(columns)
+                )
+            }
+            ConstraintError::MissingForeignKey { columns, referenced_columns, cascade_option } => {
+                write!(
+                    f,
+                    "In table {}, you are missing: FOREIGN KEY ({}) REFERENCES {}({}){}",
+                    columns[0].table_name,
+                    columns
+                        .iter()
+                        .map(|c| c.column_name.clone())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                    referenced_columns[0].table_name,
+                    referenced_columns
+                        .iter()
+                        .map(|c| c.column_name.clone())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                    if *cascade_option != CascadeOption::Restrict {
+                        format!(" ON DELETE {}", cascade_option)
+                    } else {
+                        "".to_string()
+                    }
                 )
             }
             ConstraintError::TableWordDeprecationError { table, deprecated_word } => {
@@ -160,13 +240,7 @@ impl Display for ConstraintError {
             ConstraintError::IncompatibleForeignType { column, foreign_column } => {
                 write!(
                     f,
-                    "Column `{}.{}.{}` is of type {column_type}, foreign column `{}.{}.{}` is of type {foreign_column_type}",
-                    column.table_schema,
-                    column.table_name,
-                    column.column_name,
-                    foreign_column.table_schema,
-                    foreign_column.table_name,
-                    foreign_column.column_name,
+                    "Column {column} is of type {column_type}, foreign column {foreign_column} is of type {foreign_column_type}",
                     column_type = column.raw_data_type(),
                     foreign_column_type = foreign_column.raw_data_type(),
                 )
@@ -177,44 +251,24 @@ impl Display for ConstraintError {
             ConstraintError::NotOfCorrectType { column, expected_column_type } => {
                 write!(
                     f,
-                    "Column `{}.{}.{}` is of type {}, expected {expected_column_type}",
-                    column.table_schema,
-                    column.table_name,
-                    column.column_name,
+                    "Column {column} is of type {}, expected {expected_column_type}",
                     column.raw_data_type(),
                 )
             }
             ConstraintError::DoesNotHaveExpectedName { column, expected_name } => {
-                write!(
-                    f,
-                    "Column `{}.{}.{}` does not have the expected name \"{expected_name}\"",
-                    column.table_schema, column.table_name, column.column_name
-                )
+                write!(f, "Column {column} does not have the expected name \"{expected_name}\"",)
             }
             ConstraintError::DoesNotHaveExpectedSuffix { column, expected_suffix } => {
-                write!(
-                    f,
-                    "Column `{}.{}.{}` does not have the expected suffix \"{expected_suffix}\"",
-                    column.table_schema, column.table_name, column.column_name
-                )
+                write!(f, "Column {column} does not have the expected suffix \"{expected_suffix}\"",)
             }
             ConstraintError::DoesNotHaveExpectedPrefix { column, expected_prefix } => {
-                write!(
-                    f,
-                    "Column `{}.{}.{}` does not have the expected prefix \"{expected_prefix}\"",
-                    column.table_schema, column.table_name, column.column_name
-                )
+                write!(f, "Column {column} does not have the expected prefix \"{expected_prefix}\"",)
             }
             ConstraintError::DoesNotHaveSiblingColumn { column, sibling_column_name } => {
                 write!(
                     f,
-                    "Column `{}.{}.{}` does not have the expected sibling column `{}.{}.{}`",
-                    column.table_schema,
-                    column.table_name,
-                    column.column_name,
-                    column.table_schema,
-                    column.table_name,
-                    sibling_column_name
+                    "Column {column} does not have the expected sibling column `{}.{}.{sibling_column_name}`",
+                    column.table_schema, column.table_name,
                 )
             }
             ConstraintError::SameAsConstraintMustNotCascade(same_as_constraint) => {
@@ -249,27 +303,24 @@ impl Display for ConstraintError {
             }
             ConstraintError::RedundantUniqueIndices { table, columns } => {
                 let cols = format_column_list(columns);
-                write!(
-                    f,
-                    "Redundant unique indices detected on table `{}` for columns {}",
-                    table.table_name, cols
-                )
+                write!(f, "Redundant unique indices detected on table {table} for columns {cols}")
             }
             ConstraintError::DuplicatedCheckConstraint { table, check_constraint } => {
                 write!(
                     f,
-                    "Duplicated check constraint detected on table `{}.{}`: clause `{}`",
-                    table.table_schema, table.table_name, check_constraint.check_clause
+                    "Duplicated check constraint detected on table {table}: clause `{}`",
+                    check_constraint.check_clause
                 )
             }
             ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
-                column,
+                columns,
                 expected_behavior,
                 found_behavior,
             } => {
                 write!(
                     f,
-                    "Foreign key on {column} has unexpected cascading behavior. Expected: `{expected_behavior}`, found: `{found_behavior}`",
+                    "Foreign key on {} has unexpected cascading behavior. Expected: `{expected_behavior}`, found: `{found_behavior}`",
+                    format_column_list(columns),
                 )
             }
         }
