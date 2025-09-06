@@ -1,48 +1,44 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePositioningDeviceModelExtensionAttribute {
+pub enum PositioningDeviceModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertablePositioningDeviceModelExtensionAttribute {
+impl core::fmt::Display for PositioningDeviceModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePositioningDeviceModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PositioningDeviceModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePositioningDeviceModelAttribute {
-    Extension(InsertablePositioningDeviceModelExtensionAttribute),
+pub enum PositioningDeviceModelAttribute {
+    Extension(PositioningDeviceModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePositioningDeviceModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PositioningDeviceModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertablePositioningDeviceModelExtensionAttribute::PhysicalAssetModel(
+        Self::Extension(PositioningDeviceModelExtensionAttribute::PhysicalAssetModel(
             physical_asset_models,
         ))
     }
 }
-impl core::str::FromStr for InsertablePositioningDeviceModelAttribute {
+impl core::str::FromStr for PositioningDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +46,7 @@ impl core::str::FromStr for InsertablePositioningDeviceModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePositioningDeviceModelAttribute {
+impl core::fmt::Display for PositioningDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +109,13 @@ pub struct InsertablePositioningDeviceModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertablePositioningDeviceModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertablePositioningDeviceModelBuilder>
+{
+    fn from(builder: InsertablePositioningDeviceModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of
 /// `PositioningDeviceModel` or descendant tables.
 pub trait PositioningDeviceModelSettable: Sized {
@@ -122,20 +125,21 @@ pub trait PositioningDeviceModelSettable: Sized {
 impl<PhysicalAssetModel> PositioningDeviceModelSettable
     for InsertablePositioningDeviceModelBuilder<PhysicalAssetModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertablePositioningDeviceModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -300,11 +304,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertablePositioningDeviceModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -351,16 +355,14 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
-        Error = web_common_traits::database::InsertError<
-            InsertablePositioningDeviceModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<PositioningDeviceModelAttribute>,
     >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertablePositioningDeviceModelAttribute;
+    type Attributes = PositioningDeviceModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

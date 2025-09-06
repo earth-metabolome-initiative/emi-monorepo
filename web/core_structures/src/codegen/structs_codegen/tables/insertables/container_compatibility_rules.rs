@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerCompatibilityRuleAttribute {
+pub enum ContainerCompatibilityRuleAttribute {
     ContainerModel,
     ContainedAssetModel,
     Quantity,
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableContainerCompatibilityRuleAttribute {
+impl core::str::FromStr for ContainerCompatibilityRuleAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -25,7 +25,7 @@ impl core::str::FromStr for InsertableContainerCompatibilityRuleAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableContainerCompatibilityRuleAttribute {
+impl core::fmt::Display for ContainerCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ContainerModel => write!(f, "container_model"),
@@ -299,7 +299,8 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRuleBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute;
     /// Sets the value of the
     /// `public.container_compatibility_rules.container_model` column.
     fn container_model(
@@ -311,8 +312,8 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainerModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainedAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::ContainerModel,
+                            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::ContainedAssetModel,
                         )
                 })?;
         }
@@ -330,8 +331,8 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainerModel,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::ContainedAssetModel,
+                            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::ContainerModel,
+                            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::ContainedAssetModel,
                         )
                 })?;
         }
@@ -350,14 +351,14 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
     {
         let quantity = quantity.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttribute::Quantity)
+                .rename_field(ContainerCompatibilityRuleAttribute::Quantity)
         })?;
         if let Some(quantity) = quantity {
             pgrx_validation::must_be_strictly_positive_i16(quantity)
                 .map_err(|e| {
                     e
                         .rename_field(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleAttribute::Quantity,
+                            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::Quantity,
                         )
                 })?;
         }
@@ -386,7 +387,7 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableContainerCompatibilityRuleAttribute::CreatedAt)
+                .rename_field(ContainerCompatibilityRuleAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -406,11 +407,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
         Error = web_common_traits::database::InsertError<
-            InsertableContainerCompatibilityRuleAttribute,
+            ContainerCompatibilityRuleAttribute,
         >,
     >,
 {
-    type Attributes = InsertableContainerCompatibilityRuleAttribute;
+    type Attributes = ContainerCompatibilityRuleAttribute;
     fn is_complete(&self) -> bool {
         self.container_model.is_some() && self.contained_asset_model.is_some()
             && self.created_by.is_some() && self.created_at.is_some()

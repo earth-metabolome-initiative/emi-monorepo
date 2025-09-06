@@ -1,43 +1,43 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureTemplateExtensionAttribute {
+pub enum StorageProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableStorageProcedureTemplateExtensionAttribute {
+impl core::fmt::Display for StorageProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
-    for InsertableStorageProcedureTemplateExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute>
+    for StorageProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableStorageProcedureTemplateAttribute {
-    Extension(InsertableStorageProcedureTemplateExtensionAttribute),
+pub enum StorageProcedureTemplateAttribute {
+    Extension(StorageProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Kelvin,
     KelvinTolerancePercentage,
     StoredIntoModel,
     ProcedureTemplateStoredIntoModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     ),
     StoredAssetModel,
-    ForeignProcedureTemplate,
-    ProcedureTemplateStoredAssetModel,
+    ProcedureTemplateStoredAssetModel(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+    ),
 }
-impl core::str::FromStr for InsertableStorageProcedureTemplateAttribute {
+impl core::str::FromStr for StorageProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -47,14 +47,17 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttribute {
             "ProcedureTemplateStoredIntoModel" => {
                 Ok(
                     Self::ProcedureTemplateStoredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "StoredAssetModel" => Ok(Self::StoredAssetModel),
-            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateStoredAssetModel" => {
-                Ok(Self::ProcedureTemplateStoredAssetModel)
+                Ok(
+                    Self::ProcedureTemplateStoredAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
@@ -62,14 +65,17 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttribute {
             "procedure_template_stored_into_model" => {
                 Ok(
                     Self::ProcedureTemplateStoredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "stored_asset_model" => Ok(Self::StoredAssetModel),
-            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_stored_asset_model" => {
-                Ok(Self::ProcedureTemplateStoredAssetModel)
+                Ok(
+                    Self::ProcedureTemplateStoredAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             _ => {
                 Err(
@@ -81,7 +87,7 @@ impl core::str::FromStr for InsertableStorageProcedureTemplateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableStorageProcedureTemplateAttribute {
+impl core::fmt::Display for StorageProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -91,10 +97,7 @@ impl core::fmt::Display for InsertableStorageProcedureTemplateAttribute {
             Self::StoredIntoModel => write!(f, "stored_into_model"),
             Self::ProcedureTemplateStoredIntoModel(e) => write!(f, "{e}"),
             Self::StoredAssetModel => write!(f, "stored_asset_model"),
-            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplateStoredAssetModel => {
-                write!(f, "procedure_template_stored_asset_model")
-            }
+            Self::ProcedureTemplateStoredAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -113,7 +116,6 @@ pub struct InsertableStorageProcedureTemplate {
     pub(crate) stored_into_model: i32,
     pub(crate) procedure_template_stored_into_model: i32,
     pub(crate) stored_asset_model: i32,
-    pub(crate) foreign_procedure_template: i32,
     pub(crate) procedure_template_stored_asset_model: i32,
 }
 impl InsertableStorageProcedureTemplate {
@@ -149,37 +151,85 @@ impl InsertableStorageProcedureTemplate {
             conn,
         )
     }
-    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedure_templates_procedure_template_stored_ass_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_stored_asset_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.stored_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    pub fn procedure_template_stored_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.stored_into_model,
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_stored_asset_model,
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedure_templates_procedure_template_stored_int_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_stored_into_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.stored_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_stored_into_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -245,71 +295,41 @@ impl InsertableStorageProcedureTemplate {
             conn,
         )
     }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
+                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
+                self.stored_into_model,
             ),
             conn,
         )
     }
-    pub fn procedure_template_stored_asset_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
-                self.procedure_template_stored_asset_model,
-            ),
-            conn,
-        )
-    }
-    pub fn storage_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
+    pub fn storage_procedure_templates_stored_into_model_stored_asset_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -351,11 +371,23 @@ pub struct InsertableStorageProcedureTemplateBuilder<
     pub(crate) kelvin: Option<f32>,
     pub(crate) kelvin_tolerance_percentage: Option<f32>,
     pub(crate) stored_into_model: Option<i32>,
-    pub(crate) procedure_template_stored_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_stored_into_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) stored_asset_model: Option<i32>,
-    pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_stored_asset_model: Option<i32>,
+    pub(crate) procedure_template_stored_asset_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) procedure_template: ProcedureTemplate,
+}
+impl From<InsertableStorageProcedureTemplateBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableStorageProcedureTemplateBuilder>
+{
+    fn from(builder: InsertableStorageProcedureTemplateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl<ProcedureTemplate> Default for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -369,7 +401,6 @@ where
             stored_into_model: Default::default(),
             procedure_template_stored_into_model: Default::default(),
             stored_asset_model: Default::default(),
-            foreign_procedure_template: Default::default(),
             procedure_template_stored_asset_model: Default::default(),
         }
     }
@@ -476,10 +507,17 @@ pub trait StorageProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_stored_into_model(
+    fn procedure_template_stored_into_model<PTSIM>(
         self,
-        procedure_template_stored_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_stored_into_model: PTSIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTSIM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the
     /// `public.storage_procedure_templates.stored_asset_model` column.
     ///
@@ -504,30 +542,6 @@ pub trait StorageProcedureTemplateSettable: Sized {
         stored_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `public.storage_procedure_templates.foreign_procedure_template` column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure_template`: The value to set for the
-    ///   `public.storage_procedure_templates.foreign_procedure_template`
-    ///   column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure_template(
-        self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
     /// `public.storage_procedure_templates.
     /// procedure_template_stored_asset_model` column.
     ///
@@ -548,15 +562,23 @@ pub trait StorageProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_stored_asset_model(
+    fn procedure_template_stored_asset_model<PTSAM>(
         self,
-        procedure_template_stored_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_stored_asset_model: PTSAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTSAM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
 }
 impl<ProcedureTemplate> StorageProcedureTemplateSettable
     for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute;
     /// Sets the value of the `public.storage_procedure_templates.kelvin`
     /// column.
     fn kelvin<K>(
@@ -569,13 +591,13 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     {
         let kelvin = kelvin.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableStorageProcedureTemplateAttribute::Kelvin)
+                .rename_field(StorageProcedureTemplateAttribute::Kelvin)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::Kelvin,
+                        crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::Kelvin,
                     )
             })?;
         self.kelvin = Some(kelvin);
@@ -593,15 +615,14 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     {
         let kelvin_tolerance_percentage =
             kelvin_tolerance_percentage.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
-                )
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(StorageProcedureTemplateAttribute::KelvinTolerancePercentage)
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -612,7 +633,7 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute::KelvinTolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::KelvinTolerancePercentage,
                             )
                     })
             })?;
@@ -633,36 +654,48 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
+    /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
     /// end
-    /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
+    /// subgraph v6 ["`storage_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "stored_into_model"}
+    /// class v3 column-of-interest
     /// end
     /// v2 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v5 ---o|"`associated with`"| v4
+    /// v2 -.->|"`foreign defines`"| v3
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v0
+    /// v3 -.->|"`foreign defines`"| v2
+    /// v6 ---o|"`associated with`"| v5
     /// ```
     fn stored_into_model(
         mut self,
         stored_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                self.procedure_template_stored_into_model,
-                stored_into_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
-                })
-            })?;
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_stored_into_model,
+        ) = self.procedure_template_stored_into_model
+        {
+            self.procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_stored_into_model,
+                    stored_into_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.stored_into_model = Some(stored_into_model);
         Ok(self)
     }
@@ -682,10 +715,10 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
     ///    v2@{shape: rounded, label: "stored_into_model"}
@@ -696,54 +729,117 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn procedure_template_stored_into_model(
+    fn procedure_template_stored_into_model<PTSIM>(
         mut self,
-        mut procedure_template_stored_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) =
-            (self.stored_into_model, procedure_template_stored_into_model.asset_model)
+        procedure_template_stored_into_model: PTSIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTSIM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_stored_into_model = procedure_template_stored_into_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_stored_into_model
         {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::StoredIntoModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) = procedure_template_stored_into_model.asset_model {
-            self.stored_into_model = Some(asset_model);
-        } else if let Some(local) = self.stored_into_model {
-            procedure_template_stored_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_stored_into_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
-                    })
-                })?;
+            procedure_template_stored_into_model = if let (
+                Some(stored_into_model),
+                Some(asset_model),
+            ) =
+                (self.stored_into_model, builder.asset_model)
+            {
+                if stored_into_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StoredIntoModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.stored_into_model = Some(asset_model);
+                builder.into()
+            } else if let Some(stored_into_model) = self.stored_into_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        stored_into_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
         }
         self.procedure_template_stored_into_model = procedure_template_stored_into_model;
         Ok(self)
     }
     /// Sets the value of the
     /// `public.storage_procedure_templates.stored_asset_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v6 ["`storage_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 column-of-interest
+    ///    v3@{shape: rounded, label: "stored_into_model"}
+    /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v0
+    /// v3 -.->|"`foreign defines`"| v2
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v6 ---o|"`associated with`"| v5
+    /// ```
     fn stored_asset_model(
         mut self,
         stored_asset_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_stored_asset_model,
+        ) = self.procedure_template_stored_asset_model
+        {
+            self.procedure_template_stored_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_stored_asset_model,
+                    stored_asset_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateStoredAssetModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.stored_asset_model = Some(stored_asset_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.foreign_procedure_template` column.
-    fn foreign_procedure_template(
-        mut self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
     /// Sets the value of the
@@ -760,30 +856,87 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "foreign_procedure_template"}
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v1 column-of-interest
-    /// v2@{shape: rounded, label: "stored_asset_model"}
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
     /// class v2 directly-involved-column
-    /// v1 -.->|"`foreign defines`"| v0
+    ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn procedure_template_stored_asset_model(
+    fn procedure_template_stored_asset_model<PTSAM>(
         mut self,
-        procedure_template_stored_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_stored_asset_model = Some(procedure_template_stored_asset_model);
+        procedure_template_stored_asset_model: PTSAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTSAM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_stored_asset_model =
+            procedure_template_stored_asset_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_stored_asset_model
+        {
+            procedure_template_stored_asset_model = if let (
+                Some(stored_asset_model),
+                Some(asset_model),
+            ) =
+                (self.stored_asset_model, builder.asset_model)
+            {
+                if stored_asset_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StoredAssetModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.stored_asset_model = Some(asset_model);
+                builder.into()
+            } else if let Some(stored_asset_model) = self.stored_asset_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        stored_asset_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateStoredAssetModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_template_stored_asset_model = procedure_template_stored_asset_model;
         Ok(self)
     }
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -985,7 +1138,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableStorageProcedureTemplateAttribute,
+            StorageProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -996,15 +1149,14 @@ where
         C,
     >,
 {
-    type Attributes = InsertableStorageProcedureTemplateAttribute;
+    type Attributes = StorageProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kelvin.is_some()
             && self.kelvin_tolerance_percentage.is_some()
             && self.stored_into_model.is_some()
             && self.procedure_template_stored_into_model.is_complete()
             && self.stored_asset_model.is_some()
-            && self.foreign_procedure_template.is_some()
-            && self.procedure_template_stored_asset_model.is_some()
+            && self.procedure_template_stored_asset_model.is_complete()
     }
     fn mint_primary_key(
         self,

@@ -1,14 +1,14 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPositioningDeviceLotExtensionAttribute {
+pub enum CommercialPositioningDeviceLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ),
     PositioningDeviceModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialPositioningDeviceLotExtensionAttribute {
+impl core::fmt::Display for CommercialPositioningDeviceLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -16,32 +16,32 @@ impl core::fmt::Display for InsertableCommercialPositioningDeviceLotExtensionAtt
         }
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
-> for InsertableCommercialPositioningDeviceLotExtensionAttribute {
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute>
+    for CommercialPositioningDeviceLotExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
-> for InsertableCommercialPositioningDeviceLotExtensionAttribute {
+impl From<crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute>
+    for CommercialPositioningDeviceLotExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
     ) -> Self {
         Self::PositioningDeviceModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPositioningDeviceLotAttribute {
-    Extension(InsertableCommercialPositioningDeviceLotExtensionAttribute),
+pub enum CommercialPositioningDeviceLotAttribute {
+    Extension(CommercialPositioningDeviceLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialPositioningDeviceLotAttribute {
+impl core::str::FromStr for CommercialPositioningDeviceLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableCommercialPositioningDeviceLotAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialPositioningDeviceLotAttribute {
+impl core::fmt::Display for CommercialPositioningDeviceLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -173,6 +173,30 @@ impl InsertableCommercialPositioningDeviceLot {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_positioning_device_lots_id_product_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.product_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -191,6 +215,16 @@ pub struct InsertableCommercialPositioningDeviceLotBuilder<
     pub(crate) product_model: Option<i32>,
     pub(crate) commercial_positioning_device_lots_id_fkey: CommercialProductLot,
     pub(crate) commercial_positioning_device_lots_id_fkey1: PositioningDeviceModel,
+}
+impl From<InsertableCommercialPositioningDeviceLotBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        InsertableCommercialPositioningDeviceLotBuilder,
+    >
+{
+    fn from(builder: InsertableCommercialPositioningDeviceLotBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialPositioningDeviceLot` or descendant tables.
@@ -223,10 +257,10 @@ pub trait CommercialPositioningDeviceLotSettable: Sized {
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
         + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PositioningDeviceModel,
 > CommercialPositioningDeviceLotSettable
@@ -234,7 +268,7 @@ for InsertableCommercialPositioningDeviceLotBuilder<
     CommercialProductLot,
     PositioningDeviceModel,
 > {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute;
     ///Sets the value of the `public.commercial_positioning_device_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -270,11 +304,11 @@ for InsertableCommercialPositioningDeviceLotBuilder<
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
@@ -305,7 +339,7 @@ for InsertableCommercialPositioningDeviceLotBuilder<
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PositioningDeviceModel,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
@@ -315,10 +349,10 @@ for InsertableCommercialPositioningDeviceLotBuilder<
 >
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -483,7 +517,7 @@ where
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PositioningDeviceModel,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
@@ -493,10 +527,10 @@ for InsertableCommercialPositioningDeviceLotBuilder<
 >
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -572,10 +606,10 @@ for InsertableCommercialPositioningDeviceLotBuilder<
 >
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -608,16 +642,16 @@ where
     ///end
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v7 --->|"`extends`"| v4
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///```
     fn parent_model(
         self,
@@ -641,7 +675,7 @@ impl<CommercialProductLot, PositioningDeviceModel>
         PositioningDeviceModel,
     >
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute;
 }
 impl<CommercialProductLot, PositioningDeviceModel> web_common_traits::database::MostConcreteTable
     for InsertableCommercialPositioningDeviceLotBuilder<
@@ -690,7 +724,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialPositioningDeviceLotAttribute,
+            CommercialPositioningDeviceLotAttribute,
         >,
     >,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -702,7 +736,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialPositioningDeviceLotAttribute;
+    type Attributes = CommercialPositioningDeviceLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_positioning_device_lots_id_fkey.is_complete()
             && self.commercial_positioning_device_lots_id_fkey1.is_complete()

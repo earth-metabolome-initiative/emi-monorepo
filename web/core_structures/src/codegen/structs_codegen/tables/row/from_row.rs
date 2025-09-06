@@ -296,12 +296,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ReagentModel(reagent_models) => {
                 crate::codegen::tables::rows::Rows::from(reagent_models)
             }
-            super::Row::RegisteringProcedureTemplate(registering_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(registering_procedure_templates)
-            }
-            super::Row::RegisteringProcedure(registering_procedures) => {
-                crate::codegen::tables::rows::Rows::from(registering_procedures)
-            }
             super::Row::Role(roles) => crate::codegen::tables::rows::Rows::from(roles),
             super::Row::Room(rooms) => crate::codegen::tables::rows::Rows::from(rooms),
             super::Row::SampleState(sample_states) => {

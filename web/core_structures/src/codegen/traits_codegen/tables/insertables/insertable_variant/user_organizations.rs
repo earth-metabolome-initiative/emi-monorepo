@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganization;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttribute,
+        crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,14 +46,14 @@ where
             .user_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttribute::UserId,
+                    crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute::UserId,
                 ),
             )?;
         let organization_id = self
             .organization_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttribute::OrganizationId,
+                    crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute::OrganizationId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

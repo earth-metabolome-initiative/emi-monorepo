@@ -1,32 +1,38 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PouringProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    pub measured_with: Option<
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
     >,
     pub poured_from: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
-    >,
-    pub foreign_procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub foreign_procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub measured_with_model: Option<
-        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
-    >,
-    pub measured_with: Option<
-        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
-    >,
     pub poured_into: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
-    pub pouring_procedures_procedure_measured_with_model_fkey: Option<
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_measured_with: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_poured_from: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_poured_into: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+    >,
+    pub procedure_template_measured_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template_poured_from_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template_poured_into_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -38,34 +44,6 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
-                self.poured_from,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.foreign_procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
-                self.foreign_procedure,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDeviceModel(
-                self.measured_with_model,
-            ),
-        ));
         if let Some(measured_with) = self.measured_with {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDevice(
@@ -75,26 +53,74 @@ impl web_common_traits::prelude::HasForeignKeys
         }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
+                self.poured_from,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.poured_into,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset((
-                self.procedure,
-                self.measured_with_model,
-            )),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_measured_with,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_poured_from,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_poured_into,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureTemplate(
+                self.procedure_template,
+            ),
+        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_measured_with_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_poured_from_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_poured_into_model,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure.is_some()
+        (foreign_keys.measured_with.is_some() || self.measured_with.is_some())
             && foreign_keys.poured_from.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
-            && foreign_keys.foreign_procedure.is_some()
-            && foreign_keys.measured_with_model.is_some()
-            && (foreign_keys.measured_with.is_some() || self.measured_with.is_some())
             && foreign_keys.poured_into.is_some()
-            && foreign_keys.pouring_procedures_procedure_measured_with_model_fkey.is_some()
+            && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_measured_with.is_some()
+            && foreign_keys.procedure_poured_from.is_some()
+            && foreign_keys.procedure_poured_into.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.procedure_template_measured_with_model.is_some()
+            && foreign_keys.procedure_template_poured_from_model.is_some()
+            && foreign_keys.procedure_template_poured_into_model.is_some()
     }
     fn update(
         &self,
@@ -134,11 +160,16 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.measured_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.pouring_procedures_procedure_measured_with_model_fkey =
-                        Some(procedure_assets);
+                if self.procedure_measured_with == procedure_assets.id {
+                    foreign_keys.procedure_measured_with = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_poured_from == procedure_assets.id {
+                    foreign_keys.procedure_poured_from = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_poured_into == procedure_assets.id {
+                    foreign_keys.procedure_poured_into = Some(procedure_assets);
                     updated = true;
                 }
             }
@@ -146,30 +177,61 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.measured_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.pouring_procedures_procedure_measured_with_model_fkey = None;
+                if self.procedure_measured_with == procedure_assets.id {
+                    foreign_keys.procedure_measured_with = None;
+                    updated = true;
+                }
+                if self.procedure_poured_from == procedure_assets.id {
+                    foreign_keys.procedure_poured_from = None;
+                    updated = true;
+                }
+                if self.procedure_poured_into == procedure_assets.id {
+                    foreign_keys.procedure_poured_into = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                crate::codegen::tables::row::Row::ProcedureTemplateAssetModel(
+                    procedure_template_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = Some(procedure_templates);
+                if self.procedure_template_measured_with_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_measured_with_model =
+                        Some(procedure_template_asset_models.clone());
+                    updated = true;
+                }
+                if self.procedure_template_poured_from_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_poured_from_model =
+                        Some(procedure_template_asset_models.clone());
+                    updated = true;
+                }
+                if self.procedure_template_poured_into_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_poured_into_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                crate::codegen::tables::row::Row::ProcedureTemplateAssetModel(
+                    procedure_template_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = None;
+                if self.procedure_template_measured_with_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_measured_with_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_poured_from_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_poured_from_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_poured_into_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_poured_into_model = None;
                     updated = true;
                 }
             }
@@ -180,11 +242,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure == procedures.procedure {
-                    foreign_keys.procedure = Some(procedures.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = Some(procedures.clone());
+                    foreign_keys.procedure = Some(procedures);
                     updated = true;
                 }
             }
@@ -194,34 +252,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = None;
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::VolumeMeasuringDeviceModel(
-                    volume_measuring_device_models,
-                ),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.measured_with_model == volume_measuring_device_models.id {
-                    foreign_keys.measured_with_model = Some(volume_measuring_device_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::VolumeMeasuringDeviceModel(
-                    volume_measuring_device_models,
-                ),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.measured_with_model == volume_measuring_device_models.id {
-                    foreign_keys.measured_with_model = None;
                     updated = true;
                 }
             }

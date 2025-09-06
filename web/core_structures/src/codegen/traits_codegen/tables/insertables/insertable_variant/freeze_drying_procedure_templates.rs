@@ -23,11 +23,11 @@ where
         PrimaryKey = i32,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -44,6 +44,9 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
@@ -68,7 +71,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -83,16 +86,16 @@ where
         self.set_most_concrete_table("freeze_drying_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_freeze_dried_with_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct
-            .procedure_template_freeze_dried_with_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -111,17 +114,28 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template_freeze_dried_container_model) = self
-            .procedure_template_freeze_dried_container_model
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_freeze_dried_with_model),
+        ) = self.procedure_template_freeze_dried_with_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_freeze_dried_with_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateSettable>::freeze_dried_with_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_freeze_dried_container_model),
+        ) = self.procedure_template_freeze_dried_container_model
         {
             if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_freeze_dried_container_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateSettable>::foreign_procedure_template(
-                    self,
-                    procedure_template_asset_models.procedure_template,
-                )?;
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateSettable>::freeze_dried_container_model(
                     self,
                     procedure_template_asset_models.asset_model,
@@ -132,85 +146,122 @@ where
             .kelvin
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::Kelvin,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::Kelvin,
                 ),
             )?;
         let kelvin_tolerance_percentage = self
             .kelvin_tolerance_percentage
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::KelvinTolerancePercentage,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::KelvinTolerancePercentage,
                 ),
             )?;
         let pascal = self
             .pascal
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::Pascal,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::Pascal,
                 ),
             )?;
         let seconds = self
             .seconds
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::Seconds,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::Seconds,
                 ),
             )?;
         let freeze_dried_with_model = self
             .freeze_dried_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::FreezeDriedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::FreezeDriedWithModel,
                 ),
             )?;
         let freeze_dried_container_model = self
             .freeze_dried_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::FreezeDriedContainerModel,
-                ),
-            )?;
-        let foreign_procedure_template = self
-            .foreign_procedure_template
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::ForeignProcedureTemplate,
-                ),
-            )?;
-        let procedure_template_freeze_dried_container_model = self
-            .procedure_template_freeze_dried_container_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::FreezeDriedContainerModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateExtensionAttribute::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
             })?;
-        self.procedure_template_freeze_dried_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_freeze_dried_with_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedWithModel,
-                )
-            })?;
-        let procedure_template_freeze_dried_with_model = self
+        let procedure_template_freeze_dried_with_model = match self
             .procedure_template_freeze_dried_with_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedWithModel,
-                )
-            })?;
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedWithModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_freeze_dried_with_model,
+            ) => {
+                procedure_template_freeze_dried_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_freeze_dried_with_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedWithModel,
+                        )
+                    })?;
+                procedure_template_freeze_dried_with_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedWithModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_freeze_dried_container_model = match self
+            .procedure_template_freeze_dried_container_model
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedContainerModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_freeze_dried_container_model,
+            ) => {
+                procedure_template_freeze_dried_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_freeze_dried_container_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedContainerModel,
+                        )
+                    })?;
+                procedure_template_freeze_dried_container_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute::ProcedureTemplateFreezeDriedContainerModel,
+                        )
+                    })?
+            }
+        };
         Ok(Self::InsertableVariant {
             procedure_template,
             kelvin,
@@ -220,7 +271,6 @@ where
             freeze_dried_with_model,
             procedure_template_freeze_dried_with_model,
             freeze_dried_container_model,
-            foreign_procedure_template,
             procedure_template_freeze_dried_container_model,
         })
     }

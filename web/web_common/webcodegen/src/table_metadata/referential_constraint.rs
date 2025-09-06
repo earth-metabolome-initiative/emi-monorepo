@@ -4,7 +4,17 @@ use diesel::{
 
 use crate::errors::WebCodeGenError;
 
-#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
+#[derive(
+    Queryable,
+    QueryableByName,
+    Selectable,
+    PartialEq,
+    Eq,
+    Debug,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 #[diesel(table_name = crate::schema::referential_constraints)]
 /// A struct representing a referential constraint
 pub struct ReferentialConstraint {

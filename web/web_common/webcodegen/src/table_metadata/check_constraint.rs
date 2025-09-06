@@ -1,5 +1,9 @@
-use std::fmt::Debug;
+use std::{
+    fmt::{Debug, Display},
+    sync::Arc,
+};
 
+use cached::{DiskCache, proc_macro::io_cached};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
     QueryableByName, Selectable, SelectableHelper,
@@ -19,8 +23,67 @@ use crate::{
     errors::{CheckConstraintError, UnsupportedCheckConstraintErrorSyntax, WebCodeGenError},
 };
 
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("check_constraints.columns")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "CheckConstraint",
+    convert = r#"{check_constraint.clone()}"#
+)]
+fn columns(
+    check_constraint: &CheckConstraint,
+    conn: &mut PgConnection,
+) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
+    use diesel::RunQueryDsl;
+
+    use crate::schema::{columns, constraint_column_usage};
+    Ok(Arc::new(
+        columns::table
+            .inner_join(
+                constraint_column_usage::table.on(constraint_column_usage::constraint_name
+                    .eq(&check_constraint.constraint_name)
+                    .and(
+                        constraint_column_usage::constraint_catalog
+                            .eq(&check_constraint.constraint_catalog)
+                            .and(
+                                constraint_column_usage::constraint_schema
+                                    .eq(&check_constraint.constraint_schema),
+                            ),
+                    )),
+            )
+            .filter(
+                constraint_column_usage::column_name.eq(&columns::column_name).and(
+                    constraint_column_usage::table_catalog.eq(&columns::table_catalog).and(
+                        constraint_column_usage::table_schema
+                            .eq(&columns::table_schema)
+                            .and(constraint_column_usage::table_name.eq(&columns::table_name)),
+                    ),
+                ),
+            )
+            .select(Column::as_select())
+            .load(conn)?,
+    ))
+}
+
 #[derive(
-    Queryable, QueryableByName, Debug, Clone, Selectable, Ord, PartialEq, Eq, Hash, PartialOrd,
+    Queryable,
+    QueryableByName,
+    Debug,
+    Clone,
+    Selectable,
+    Ord,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    serde::Serialize,
+    serde::Deserialize,
 )]
 #[diesel(table_name = crate::schema::check_constraints)]
 /// A struct representing a check constraint
@@ -35,6 +98,12 @@ pub struct CheckConstraint {
     pub check_clause: String,
 }
 
+impl Display for CheckConstraint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.constraint_catalog, self.constraint_schema, self.constraint_name)
+    }
+}
+
 const POSTGIS_CONSTRAINTS: [&str; 1] = ["spatial_ref_sys_srid_check"];
 
 struct TranslateExpression<'a, C1: Debug, C2: Debug> {
@@ -47,22 +116,44 @@ struct TranslateExpression<'a, C1: Debug, C2: Debug> {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum ReturningType {
-    Result,
+/// The type returned by an expression
+pub enum ReturningType {
+    /// Empty tuple, i.e., `()`
+    Unit,
+    /// When the expression returns a `Result`
+    Result(Box<ReturningType>),
+    /// When the expression returns a `Boolean`
     Boolean,
+    /// When the expression returns a `Textual`
     Textual,
+    /// When the expression returns a `U16`
     U16,
+    /// When the expression returns a `U32`
     U32,
+    /// When the expression returns a `U64`
     U64,
+    /// When the expression returns a `I16`
     I16,
+    /// When the expression returns a `I32`
     I32,
+    /// When the expression returns a `I64`
     I64,
+    /// When the expression returns a `F32`
     F32,
+    /// When the expression returns a `F64`
     F64,
+    /// When the expression returns a `Custom` type
     Custom(Box<PgType>),
 }
 
 impl ReturningType {
+    fn is_unit_result(&self) -> bool {
+        match self {
+            ReturningType::Result(inner) => matches!(**inner, ReturningType::Unit),
+            _ => false,
+        }
+    }
+
     fn is_numeric(&self) -> bool {
         matches!(
             self,
@@ -443,7 +534,7 @@ where
                 #function_path(#(#args),*)#map_err
             },
             if function.returns_result(conn)? {
-                ReturningType::Result
+                ReturningType::Result(ReturningType::Unit.into())
             } else {
                 ReturningType::try_from_pg_type(function.return_type(conn)?, conn)?
             },
@@ -578,15 +669,15 @@ where
                                 Vec::new(),
                                 ReturningType::Boolean,
                             ))
-                        } else if matches!(left_returning_type, ReturningType::Result)
-                            || matches!(right_returning_type, ReturningType::Result)
+                        } else if left_returning_type.is_unit_result()
+                            || right_returning_type.is_unit_result()
                         {
                             Ok((
                                 quote::quote! {
                                     #left.and_then(|_| #right)
                                 },
                                 Vec::new(),
-                                ReturningType::Result,
+                                ReturningType::Result(ReturningType::Unit.into()),
                             ))
                         } else {
                             unimplemented!("Unsupported binary operation");
@@ -610,15 +701,15 @@ where
                                 Vec::new(),
                                 ReturningType::Boolean,
                             ))
-                        } else if matches!(left_returning_type, ReturningType::Result)
-                            || matches!(right_returning_type, ReturningType::Result)
+                        } else if left_returning_type.is_unit_result()
+                            || right_returning_type.is_unit_result()
                         {
                             Ok((
                                 quote::quote! {
                                     #left.or_else(|_| #right)
                                 },
                                 Vec::new(),
-                                ReturningType::Result,
+                                ReturningType::Result(ReturningType::Unit.into()),
                             ))
                         } else {
                             unimplemented!("Unsupported binary operation");
@@ -792,6 +883,10 @@ impl CheckConstraint {
             }
         }
 
+        if functions.is_empty() {
+            return Err(CheckConstraintError::NoFunctionCalls(Box::new(self.clone())).into());
+        }
+
         // If any of the operators are not plain Rust operators, then it is not
         // possible to generate the check clause.
         if !operators.is_empty() {
@@ -825,7 +920,7 @@ impl CheckConstraint {
             .into());
         }
 
-        if !matches!(returning_type, ReturningType::Result) {
+        if !returning_type.is_unit_result() {
             return Err(
                 CheckConstraintError::TopLevelExpressionNotResult(Box::new(self.clone())).into()
             );
@@ -936,12 +1031,12 @@ impl CheckConstraint {
     pub fn table_constraint(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<TableConstraint, diesel::result::Error> {
+    ) -> Result<TableConstraint, WebCodeGenError> {
         use diesel::RunQueryDsl;
 
         use crate::schema::table_constraints;
 
-        table_constraints::table
+        Ok(table_constraints::table
             .filter(
                 table_constraints::constraint_name
                     .eq(&self.constraint_name)
@@ -949,7 +1044,7 @@ impl CheckConstraint {
                     .and(table_constraints::constraint_schema.eq(&self.constraint_schema)),
             )
             .select(TableConstraint::as_select())
-            .first(conn)
+            .first(conn)?)
     }
 
     /// Returns the table that this check constraint belongs to
@@ -961,7 +1056,7 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Arc<Table>, WebCodeGenError> {
         self.table_constraint(conn)?.table(conn)
     }
 
@@ -974,28 +1069,40 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
-        use diesel::RunQueryDsl;
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
+        columns(self, conn)
+    }
 
-        use crate::schema::{columns, constraint_column_usage};
-        Ok(columns::table
-            .inner_join(constraint_column_usage::table.on(
-                constraint_column_usage::constraint_name.eq(&self.constraint_name).and(
-                    constraint_column_usage::constraint_catalog.eq(&self.constraint_catalog).and(
-                        constraint_column_usage::constraint_schema.eq(&self.constraint_schema),
-                    ),
-                ),
-            ))
-            .filter(
-                constraint_column_usage::column_name.eq(&columns::column_name).and(
-                    constraint_column_usage::table_catalog.eq(&columns::table_catalog).and(
-                        constraint_column_usage::table_schema
-                            .eq(&columns::table_schema)
-                            .and(constraint_column_usage::table_name.eq(&columns::table_name)),
-                    ),
-                ),
-            )
-            .select(Column::as_select())
-            .load(conn)?)
+    /// Returns whether the current check constraint is a `distinct` constraint,
+    /// i.e. it checks whether two columns are distinct.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    /// * If their is an error while querying the database.
+    pub fn is_distinct_constraint(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Arc<Vec<Column>>>, WebCodeGenError> {
+        let columns = self.columns(conn)?;
+        if columns.len() != 2 {
+            return Ok(None);
+        }
+        let parsed_check_clause = Parser::new(&PostgreSqlDialect {})
+            .try_with_sql(&self.check_clause)
+            .expect("Failed to parse check clause")
+            .parse_expr()
+            .expect("Failed to parse check clause");
+        match parsed_check_clause {
+            Expr::Function(function) => {
+                if !function.name.to_string().starts_with("must_be_distinct") {
+                    return Ok(None);
+                }
+                Ok(Some(columns))
+            }
+            _ => Ok(None),
+        }
     }
 }

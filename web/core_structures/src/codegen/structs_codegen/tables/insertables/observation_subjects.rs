@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableObservationSubjectAttribute {
+pub enum ObservationSubjectAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableObservationSubjectAttribute {
+impl core::str::FromStr for ObservationSubjectAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableObservationSubjectAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableObservationSubjectAttribute {
+impl core::fmt::Display for ObservationSubjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -89,6 +89,13 @@ pub struct InsertableObservationSubjectBuilder {
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
+}
+impl From<InsertableObservationSubjectBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableObservationSubjectBuilder>
+{
+    fn from(builder: InsertableObservationSubjectBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `ObservationSubject`
 /// or descendant tables.
@@ -198,7 +205,7 @@ pub trait ObservationSubjectSettable: Sized {
 }
 impl ObservationSubjectSettable for InsertableObservationSubjectBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectAttribute;
+        crate::codegen::structs_codegen::tables::insertables::ObservationSubjectAttribute;
     /// Sets the value of the `public.observation_subjects.name` column.
     fn name<N>(
         mut self,
@@ -210,7 +217,7 @@ impl ObservationSubjectSettable for InsertableObservationSubjectBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttribute::Name)
+                .rename_field(ObservationSubjectAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -226,7 +233,7 @@ impl ObservationSubjectSettable for InsertableObservationSubjectBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttribute::Description)
+                .rename_field(ObservationSubjectAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -242,7 +249,7 @@ impl ObservationSubjectSettable for InsertableObservationSubjectBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableObservationSubjectAttribute::Icon)
+                .rename_field(ObservationSubjectAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -268,10 +275,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            Error = web_common_traits::database::InsertError<InsertableObservationSubjectAttribute>,
+            Error = web_common_traits::database::InsertError<ObservationSubjectAttribute>,
         >,
 {
-    type Attributes = InsertableObservationSubjectAttribute;
+    type Attributes = ObservationSubjectAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

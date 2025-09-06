@@ -32,7 +32,7 @@ impl Table {
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
 
         let mut columns = Vec::new();
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             let original_column_name = &column.column_name;
             let column_attribute: Ident = column.snake_case_ident()?;
             let column_type = column.diesel_type(conn)?;
@@ -49,7 +49,7 @@ impl Table {
         }
         let primary_key_names = self
             .primary_key_columns(conn)?
-            .into_iter()
+            .iter()
             .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()))
             .collect::<Vec<Ident>>();
 

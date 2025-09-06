@@ -23,11 +23,11 @@ impl CustomTableConstraint for ProcedureTemplatePrimaryKeyConstraint {
         table: &webcodegen::Table,
     ) -> Result<(), Self::Error> {
         if ProcedureTemplate::must_be_procedure_template_table(table, conn).is_ok() {
-            let mut primary_keys = table.primary_key_columns(conn)?;
-            let first_primary_key = primary_keys.remove(0);
+            let primary_keys = table.primary_key_columns(conn)?;
+            let first_primary_key = &primary_keys[0];
             if first_primary_key.column_name != "procedure_template" {
                 return Err(webcodegen::ConstraintError::DoesNotHaveExpectedName {
-                    column: Box::new(first_primary_key),
+                    column: Box::new(first_primary_key.clone()),
                     expected_name: "procedure_template".to_owned(),
                 }
                 .into());
@@ -37,7 +37,7 @@ impl CustomTableConstraint for ProcedureTemplatePrimaryKeyConstraint {
             if let Some(foreign_key) = first_primary_key.is_part_of_extension_primary_key(conn)? {
                 if !foreign_key.has_on_delete_cascade(conn)? {
                     return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
-                        columns: vec![first_primary_key],
+                        columns: vec![first_primary_key.clone()],
                         expected_behavior: CascadeOption::Cascade,
                         found_behavior: CascadeOption::Restrict,
                     }

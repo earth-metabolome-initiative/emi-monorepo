@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::organizations::Organization;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganization;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute,
+        crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,35 +46,35 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute::Name,
                 ),
             )?;
         let url = self
             .url
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute::Url,
+                    crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute::Url,
                 ),
             )?;
         let country = self
             .country
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute::Country,
+                    crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute::Country,
                 ),
             )?;
         let alpha_two_code = self
             .alpha_two_code
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute::AlphaTwoCode,
+                    crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute::AlphaTwoCode,
                 ),
             )?;
         let domain = self
             .domain
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationAttribute::Domain,
+                    crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute::Domain,
                 ),
             )?;
         Ok(Self::InsertableVariant {

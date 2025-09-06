@@ -25,10 +25,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
                     )
                     .or(poured_from_model.ne(excluded(poured_from_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_poured_from_model
                             .ne(excluded(procedure_template_poured_from_model)),
                     )
@@ -69,10 +65,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
                             .ne(excluded(procedure_template_measured_with_model)),
                     )
                     .or(poured_from_model.ne(excluded(poured_from_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_poured_from_model
                             .ne(excluded(procedure_template_poured_from_model)),

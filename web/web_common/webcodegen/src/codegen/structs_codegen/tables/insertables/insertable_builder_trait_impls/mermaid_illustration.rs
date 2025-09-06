@@ -257,8 +257,8 @@ pub(super) fn columns_to_mermaid_illustration(
         for (table, table_node) in &table_nodes {
             let extension_tables = table.extension_tables(conn)?;
 
-            for extended_table in &extension_tables {
-                if let Some(extended_table_node) = table_nodes.get(&extended_table) {
+            for extended_table in extension_tables.iter() {
+                if let Some(extended_table_node) = table_nodes.get(extended_table.as_ref()) {
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
@@ -274,13 +274,13 @@ pub(super) fn columns_to_mermaid_illustration(
                         .unwrap();
                 }
             }
-            for ancestor_table in table.ancestral_extension_tables(conn)? {
-                if extension_tables.contains(&ancestor_table) {
+            for ancestor_table in table.ancestral_extension_tables(conn)?.iter() {
+                if extension_tables.iter().any(|t| t.as_ref() == ancestor_table) {
                     // We have already added this edge.
                     continue;
                 }
 
-                if let Some(ancestor_table_node) = table_nodes.get(&ancestor_table) {
+                if let Some(ancestor_table_node) = table_nodes.get(ancestor_table) {
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
@@ -299,7 +299,7 @@ pub(super) fn columns_to_mermaid_illustration(
             }
 
             for associated_table in table.associated_tables(true, conn)? {
-                if let Some(associated_table_node) = table_nodes.get(&associated_table) {
+                if let Some(associated_table_node) = table_nodes.get(associated_table.as_ref()) {
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()

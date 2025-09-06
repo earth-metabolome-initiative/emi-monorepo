@@ -20,10 +20,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(capped_container.ne(excluded(capped_container)))
-                    .or(capped_with_model.ne(excluded(capped_with_model))),
+                    .or(capped_container_model.ne(excluded(capped_container_model)))
+                    .or(procedure_template_capped_container_model
+                        .ne(excluded(procedure_template_capped_container_model)))
+                    .or(procedure_capped_container.ne(excluded(procedure_capped_container)))
+                    .or(capped_with_model.ne(excluded(capped_with_model)))
+                    .or(procedure_template_capped_with_model
+                        .ne(excluded(procedure_template_capped_with_model)))
+                    .or(procedure_capped_with.ne(excluded(procedure_capped_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -51,10 +56,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(capped_container.ne(excluded(capped_container)))
-                    .or(capped_with_model.ne(excluded(capped_with_model))),
+                    .or(capped_container_model.ne(excluded(capped_container_model)))
+                    .or(procedure_template_capped_container_model
+                        .ne(excluded(procedure_template_capped_container_model)))
+                    .or(procedure_capped_container.ne(excluded(procedure_capped_container)))
+                    .or(capped_with_model.ne(excluded(capped_with_model)))
+                    .or(procedure_template_capped_with_model
+                        .ne(excluded(procedure_template_capped_with_model)))
+                    .or(procedure_capped_with.ne(excluded(procedure_capped_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

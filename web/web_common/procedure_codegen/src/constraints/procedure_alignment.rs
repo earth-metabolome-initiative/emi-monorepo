@@ -58,7 +58,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
                 procedure_template_primary_key.clone(),
                 procedure_template_asset_model_column.clone(),
             ];
-            if !unique_indices_columns.contains(&expected_columns) {
+            if !unique_indices_columns.iter().any(|cols| cols.as_ref() == &expected_columns) {
                 return Err(ConstraintError::MissingUniqueIndex {
                     table: procedure_template.into(),
                     columns: expected_columns,
@@ -71,7 +71,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
         let procedure_template_foreign_key =
             procedure.procedure_template_foreign_key(conn)?.unwrap();
         let procedure_template_column_in_procedure =
-            procedure_template_foreign_key.columns(conn)?.pop().unwrap();
+            procedure_template_foreign_key.columns(conn)?.as_ref()[0].clone();
 
         // For each procedure template asset model foreign key in the procedure
         // template, there must be a corresponding foreign key in the procedure.
@@ -122,15 +122,17 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             ];
 
             let mut found_unique_index_foreign_key = false;
-            for foreign_key in procedure_template_asset_model_in_procedure.foreign_keys(conn)? {
+            for foreign_key in
+                procedure_template_asset_model_in_procedure.foreign_keys(conn)?.iter()
+            {
                 let foreign_table = foreign_key.foreign_table(conn)?;
-                if &foreign_table != procedure_template.as_ref() {
+                if foreign_table.as_ref() != procedure_template.as_ref() {
                     continue;
                 }
                 let foreign_key_columns = foreign_key.columns(conn)?;
                 let foreign_key_foreign_columns = foreign_key.foreign_columns(conn)?;
-                if foreign_key_columns == expected_local_columns
-                    && foreign_key_foreign_columns == expected_foreign_columns
+                if foreign_key_columns.as_ref() == &expected_local_columns
+                    && foreign_key_foreign_columns.as_ref() == &expected_foreign_columns
                 {
                     if foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
@@ -164,7 +166,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
         let procedure_assets_table =
             Table::load(conn, PROCEDURE_ASSETS_TABLE_NAME, "public", &table.table_catalog)?;
         let procedure_template_asset_models_primary_key =
-            procedure_template_asset_models_table.primary_key_columns(conn)?.pop().unwrap();
+            procedure_template_asset_models_table.primary_key_columns(conn)?.as_ref()[0].clone();
 
         if procedure_template_asset_models_primary_key.is_nullable() {
             return Err(ConstraintError::UnexpectedNullableColumn(Box::new(
@@ -174,7 +176,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
         }
 
         let procedure_assets_primary_key =
-            procedure_assets_table.primary_key_columns(conn)?.pop().unwrap();
+            procedure_assets_table.primary_key_columns(conn)?.as_ref()[0].clone();
 
         if procedure_assets_primary_key.is_nullable() {
             return Err(ConstraintError::UnexpectedNullableColumn(Box::new(
@@ -282,15 +284,15 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             ];
             let mut found_foreign_key = false;
 
-            for foreign_key in procedure_asset.foreign_keys(conn)? {
+            for foreign_key in procedure_asset.foreign_keys(conn)?.iter() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if foreign_table != procedure_assets_table {
                     continue;
                 }
                 let local_columns = foreign_key.columns(conn)?;
                 let foreign_columns = foreign_key.foreign_columns(conn)?;
-                if local_columns == expected_local_columns
-                    && foreign_columns == expected_foreign_columns
+                if local_columns.as_ref() == &expected_local_columns
+                    && foreign_columns.as_ref() == &expected_foreign_columns
                 {
                     if foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
@@ -350,15 +352,15 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
                 procedure_template_asset_models_primary_key.clone(),
                 asset_model_in_procedure_template_asset_models.clone(),
             ];
-            for foreign_key in asset_model_in_procedure_template.foreign_keys(conn)? {
+            for foreign_key in asset_model_in_procedure_template.foreign_keys(conn)?.as_ref() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if foreign_table != procedure_template_asset_models_table {
                     continue;
                 }
                 let local_columns = foreign_key.columns(conn)?;
                 let foreign_columns = foreign_key.foreign_columns(conn)?;
-                if local_columns == expected_local_columns
-                    && foreign_columns == expected_foreign_columns
+                if local_columns.as_ref() == &expected_local_columns
+                    && foreign_columns.as_ref() == &expected_foreign_columns
                 {
                     if foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
@@ -395,7 +397,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
 
             // We search the corresponding procedure asset models in the procedure
             // by name, and if we do not find them, we return an error.
-            for procedure_template_asset_model in &procedure_template_asset_models {
+            for procedure_template_asset_model in procedure_template_asset_models.iter() {
                 let Some((procedure_asset_model, _)) =
                     asset_models_in_procedure.iter().find(|(procedure_asset_model, _)| {
                         procedure_asset_model.column_name
@@ -418,7 +420,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             let mut found_procedure_rule = false;
             for procedure_rule in &procedure_rules {
                 let procedure_rule_asset_models = procedure_rule.columns(conn)?;
-                if procedure_rule_asset_models != expected_procedure_asset_models {
+                if procedure_rule_asset_models.as_ref() != &expected_procedure_asset_models {
                     continue;
                 }
                 found_procedure_rule = true;
@@ -427,7 +429,10 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             if !found_procedure_rule {
                 return Err(ConstraintError::MissingForeignKey {
                     columns: expected_procedure_asset_models,
-                    referenced_columns: procedure_template_rule.foreign_columns(conn)?,
+                    referenced_columns: procedure_template_rule
+                        .foreign_columns(conn)?
+                        .as_ref()
+                        .clone(),
                     cascade_option: CascadeOption::Restrict,
                 }
                 .into());
@@ -442,7 +447,7 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
 
             // We search the corresponding procedure asset models in the procedure template
             // by name, and if we do not find them, we return an error.
-            for procedure_asset_model in &procedure_asset_models {
+            for procedure_asset_model in procedure_asset_models.iter() {
                 let Some((procedure_template_asset_model, _)) = asset_models_in_procedure_template
                     .iter()
                     .find(|(procedure_template_asset_model, _)| {
@@ -466,7 +471,8 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             let mut found_procedure_template_rule = false;
             for procedure_template_rule in &procedure_template_rules {
                 let procedure_template_rule_asset_models = procedure_template_rule.columns(conn)?;
-                if procedure_template_rule_asset_models != expected_procedure_template_asset_models
+                if procedure_template_rule_asset_models.as_ref()
+                    != &expected_procedure_template_asset_models
                 {
                     continue;
                 }
@@ -475,8 +481,8 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             }
             if !found_procedure_template_rule {
                 return Err(ConstraintError::UnexpectedForeignKey {
-                    columns: procedure_asset_models,
-                    referenced_columns: procedure_rule.foreign_columns(conn)?,
+                    columns: procedure_asset_models.as_ref().clone(),
+                    referenced_columns: procedure_rule.foreign_columns(conn)?.as_ref().clone(),
                 }
                 .into());
             }
@@ -540,15 +546,15 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
                 vec![procedure_asset.clone(), asset_model_in_procedure.clone()];
             let expected_foreign_columns =
                 vec![procedure_assets_primary_key.clone(), asset_model_in_procedure_assets.clone()];
-            for foreign_key in asset_model_in_procedure.foreign_keys(conn)? {
+            for foreign_key in asset_model_in_procedure.foreign_keys(conn)?.as_ref() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if foreign_table != procedure_assets_table {
                     continue;
                 }
                 let local_columns = foreign_key.columns(conn)?;
                 let foreign_columns = foreign_key.foreign_columns(conn)?;
-                if local_columns == expected_local_columns
-                    && foreign_columns == expected_foreign_columns
+                if local_columns.as_ref() == &expected_local_columns
+                    && foreign_columns.as_ref() == &expected_foreign_columns
                 {
                     if foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {
@@ -594,15 +600,15 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             let expected_local_columns = vec![procedure_asset.clone(), asset_in_procedure.clone()];
             let expected_foreign_columns =
                 vec![procedure_assets_primary_key.clone(), asset_in_procedure_assets.clone()];
-            for foreign_key in asset_in_procedure.foreign_keys(conn)? {
+            for foreign_key in asset_in_procedure.foreign_keys(conn)?.iter() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if foreign_table != procedure_assets_table {
                     continue;
                 }
                 let local_columns = foreign_key.columns(conn)?;
                 let foreign_columns = foreign_key.foreign_columns(conn)?;
-                if local_columns == expected_local_columns
-                    && foreign_columns == expected_foreign_columns
+                if local_columns.as_ref() == &expected_local_columns
+                    && foreign_columns.as_ref() == &expected_foreign_columns
                 {
                     if foreign_key.has_on_delete_cascade(conn)? {
                         return Err(ConstraintError::ForeignKeyWithUnexpectedCascadingBehavior {

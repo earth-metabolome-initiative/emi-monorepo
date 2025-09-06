@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAssetModelAttribute {
+pub enum AssetModelAttribute {
     Id,
     MostConcreteTable,
     Name,
@@ -11,7 +11,7 @@ pub enum InsertableAssetModelAttribute {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableAssetModelAttribute {
+impl core::str::FromStr for AssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -35,7 +35,7 @@ impl core::str::FromStr for InsertableAssetModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableAssetModelAttribute {
+impl core::fmt::Display for AssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -181,6 +181,13 @@ pub struct InsertableAssetModelBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl From<InsertableAssetModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableAssetModelBuilder>
+{
+    fn from(builder: InsertableAssetModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableAssetModelBuilder {
     fn default() -> Self {
@@ -374,8 +381,7 @@ pub trait AssetModelSettable: Sized {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl AssetModelSettable for InsertableAssetModelBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute;
     /// Sets the value of the `public.asset_models.name` column.
     fn name<N>(
         mut self,
@@ -386,26 +392,23 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetModelAttribute::Name)
         })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Name,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Name,
+            )
+        })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -420,25 +423,25 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttribute::Description)
+                .rename_field(AssetModelAttribute::Description)
         })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
+                    )
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Description,
-                    )
-            })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -487,15 +490,15 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttribute::CreatedAt)
+                .rename_field(AssetModelAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -522,15 +525,15 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
     {
         let updated_at = updated_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetModelAttribute::UpdatedAt)
+                .rename_field(AssetModelAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -557,10 +560,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            Error = web_common_traits::database::InsertError<InsertableAssetModelAttribute>,
+            Error = web_common_traits::database::InsertError<AssetModelAttribute>,
         >,
 {
-    type Attributes = InsertableAssetModelAttribute;
+    type Attributes = AssetModelAttribute;
     fn is_complete(&self) -> bool {
         self.most_concrete_table.is_some()
             && self.name.is_some()

@@ -1,31 +1,30 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCentrifugeProcedureTemplateExtensionAttribute {
+pub enum CentrifugeProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCentrifugeProcedureTemplateExtensionAttribute {
+impl core::fmt::Display for CentrifugeProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
-    for InsertableCentrifugeProcedureTemplateExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute>
+    for CentrifugeProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCentrifugeProcedureTemplateAttribute {
-    Extension(InsertableCentrifugeProcedureTemplateExtensionAttribute),
+pub enum CentrifugeProcedureTemplateAttribute {
+    Extension(CentrifugeProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     Kelvin,
     KelvinTolerancePercentage,
@@ -33,13 +32,14 @@ pub enum InsertableCentrifugeProcedureTemplateAttribute {
     RotationPerMinute,
     CentrifugedWithModel,
     ProcedureTemplateCentrifugedWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     ),
     CentrifugedContainerModel,
-    ForeignProcedureTemplate,
-    ProcedureTemplateCentrifugedContainerModel,
+    ProcedureTemplateCentrifugedContainerModel(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+    ),
 }
-impl core::str::FromStr for InsertableCentrifugeProcedureTemplateAttribute {
+impl core::str::FromStr for CentrifugeProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,14 +51,17 @@ impl core::str::FromStr for InsertableCentrifugeProcedureTemplateAttribute {
             "ProcedureTemplateCentrifugedWithModel" => {
                 Ok(
                     Self::ProcedureTemplateCentrifugedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "CentrifugedContainerModel" => Ok(Self::CentrifugedContainerModel),
-            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateCentrifugedContainerModel" => {
-                Ok(Self::ProcedureTemplateCentrifugedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateCentrifugedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
@@ -68,14 +71,17 @@ impl core::str::FromStr for InsertableCentrifugeProcedureTemplateAttribute {
             "procedure_template_centrifuged_with_model" => {
                 Ok(
                     Self::ProcedureTemplateCentrifugedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "centrifuged_container_model" => Ok(Self::CentrifugedContainerModel),
-            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_centrifuged_container_model" => {
-                Ok(Self::ProcedureTemplateCentrifugedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateCentrifugedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             _ => {
                 Err(
@@ -87,7 +93,7 @@ impl core::str::FromStr for InsertableCentrifugeProcedureTemplateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCentrifugeProcedureTemplateAttribute {
+impl core::fmt::Display for CentrifugeProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -99,10 +105,7 @@ impl core::fmt::Display for InsertableCentrifugeProcedureTemplateAttribute {
             Self::CentrifugedWithModel => write!(f, "centrifuged_with_model"),
             Self::ProcedureTemplateCentrifugedWithModel(e) => write!(f, "{e}"),
             Self::CentrifugedContainerModel => write!(f, "centrifuged_container_model"),
-            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplateCentrifugedContainerModel => {
-                write!(f, "procedure_template_centrifuged_container_model")
-            }
+            Self::ProcedureTemplateCentrifugedContainerModel(e) => write!(f, "{e}"),
         }
     }
 }
@@ -123,7 +126,6 @@ pub struct InsertableCentrifugeProcedureTemplate {
     pub(crate) centrifuged_with_model: i32,
     pub(crate) procedure_template_centrifuged_with_model: i32,
     pub(crate) centrifuged_container_model: i32,
-    pub(crate) foreign_procedure_template: i32,
     pub(crate) procedure_template_centrifuged_container_model: i32,
 }
 impl InsertableCentrifugeProcedureTemplate {
@@ -258,38 +260,6 @@ impl InsertableCentrifugeProcedureTemplate {
             conn,
         )
     }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
-            ),
-            conn,
-        )
-    }
     pub fn procedure_template_centrifuged_container_model<
         C: diesel::connection::LoadConnection,
     >(
@@ -323,6 +293,54 @@ impl InsertableCentrifugeProcedureTemplate {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuge_procedure_templat_procedure_template_centrifug_fkey2(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_centrifuged_with_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.centrifuged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuge_procedure_templat_procedure_template_centrifug_fkey3(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_centrifuged_container_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.centrifuged_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn centrifuge_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
@@ -368,11 +386,23 @@ pub struct InsertableCentrifugeProcedureTemplateBuilder<
     pub(crate) seconds: Option<f32>,
     pub(crate) rotation_per_minute: Option<f32>,
     pub(crate) centrifuged_with_model: Option<i32>,
-    pub(crate) procedure_template_centrifuged_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_centrifuged_with_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) centrifuged_container_model: Option<i32>,
-    pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_centrifuged_container_model: Option<i32>,
+    pub(crate) procedure_template_centrifuged_container_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) procedure_template: ProcedureTemplate,
+}
+impl From<InsertableCentrifugeProcedureTemplateBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCentrifugeProcedureTemplateBuilder>
+{
+    fn from(builder: InsertableCentrifugeProcedureTemplateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl<ProcedureTemplate> Default for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate>
 where
@@ -388,7 +418,6 @@ where
             centrifuged_with_model: Default::default(),
             procedure_template_centrifuged_with_model: Default::default(),
             centrifuged_container_model: Default::default(),
-            foreign_procedure_template: Default::default(),
             procedure_template_centrifuged_container_model: Default::default(),
         }
     }
@@ -548,10 +577,17 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_centrifuged_with_model(
+    fn procedure_template_centrifuged_with_model<PTCWM>(
         self,
-        procedure_template_centrifuged_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_centrifuged_with_model: PTCWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the
     /// `public.centrifuge_procedure_templates.centrifuged_container_model`
     /// column.
@@ -578,31 +614,6 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
         centrifuged_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `public.centrifuge_procedure_templates.foreign_procedure_template`
-    /// column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure_template`: The value to set for the
-    ///   `public.centrifuge_procedure_templates.foreign_procedure_template`
-    ///   column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure_template(
-        self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
     /// `public.centrifuge_procedure_templates.
     /// procedure_template_centrifuged_container_model` column.
     ///
@@ -623,15 +634,23 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_centrifuged_container_model(
+    fn procedure_template_centrifuged_container_model<PTCCM>(
         self,
-        procedure_template_centrifuged_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_centrifuged_container_model: PTCCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCCM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
 }
 impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute;
     /// Sets the value of the `public.centrifuge_procedure_templates.kelvin`
     /// column.
     fn kelvin<K>(
@@ -644,13 +663,13 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     {
         let kelvin = kelvin.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCentrifugeProcedureTemplateAttribute::Kelvin)
+                .rename_field(CentrifugeProcedureTemplateAttribute::Kelvin)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::Kelvin,
+                        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::Kelvin,
                     )
             })?;
         self.kelvin = Some(kelvin);
@@ -669,15 +688,14 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     {
         let kelvin_tolerance_percentage =
             kelvin_tolerance_percentage.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err).rename_field(
-                    InsertableCentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
-                )
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(CentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage)
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
+                        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
                     )
             })
             .and_then(|_| {
@@ -688,7 +706,7 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
+                                crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
                             )
                     })
             })?;
@@ -707,13 +725,13 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     {
         let seconds = seconds.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCentrifugeProcedureTemplateAttribute::Seconds)
+                .rename_field(CentrifugeProcedureTemplateAttribute::Seconds)
         })?;
         pgrx_validation::must_be_greater_than_f32(seconds, 30f32)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::Seconds,
+                        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::Seconds,
                     )
             })
             .and_then(|_| {
@@ -721,7 +739,7 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::Seconds,
+                                crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::Seconds,
                             )
                     })
             })?;
@@ -740,13 +758,13 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     {
         let rotation_per_minute = rotation_per_minute.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCentrifugeProcedureTemplateAttribute::RotationPerMinute)
+                .rename_field(CentrifugeProcedureTemplateAttribute::RotationPerMinute)
         })?;
         pgrx_validation::must_be_greater_than_f32(rotation_per_minute, 5000f32)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::RotationPerMinute,
+                        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::RotationPerMinute,
                     )
             })
             .and_then(|_| {
@@ -754,7 +772,7 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute::RotationPerMinute,
+                                crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::RotationPerMinute,
                             )
                     })
             })?;
@@ -775,36 +793,50 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`centrifuge_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "centrifuged_with_model"}
-    /// class v0 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
+    /// subgraph v5 ["`centrifuge_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
     /// class v2 directly-involved-column
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     /// end
+    /// subgraph v6 ["`procedure_template_asset_models`"]
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
     /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v1
+    /// v5 ---o|"`associated with`"| v6
     /// ```
     fn centrifuged_with_model(
         mut self,
         centrifuged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_centrifuged_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                self.procedure_template_centrifuged_with_model,
-                centrifuged_with_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplateCentrifugedWithModel(attribute)
-                })
-            })?;
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_centrifuged_with_model,
+        ) = self.procedure_template_centrifuged_with_model
+        {
+            self.procedure_template_centrifuged_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_centrifuged_with_model,
+                    centrifuged_with_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateCentrifugedWithModel(
+                            attribute,
+                        )
+                    })
+                })?
+                .into();
+        }
         self.centrifuged_with_model = Some(centrifuged_with_model);
         Ok(self)
     }
@@ -830,44 +862,67 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_centrifuged_with_model(
+    fn procedure_template_centrifuged_with_model<PTCWM>(
         mut self,
-        mut procedure_template_centrifuged_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) =
-            (self.centrifuged_with_model, procedure_template_centrifuged_with_model.asset_model)
+        procedure_template_centrifuged_with_model: PTCWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_centrifuged_with_model =
+            procedure_template_centrifuged_with_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_centrifuged_with_model
         {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::CentrifugedWithModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) = procedure_template_centrifuged_with_model.asset_model {
-            self.centrifuged_with_model = Some(asset_model);
-        } else if let Some(local) = self.centrifuged_with_model {
-            procedure_template_centrifuged_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_centrifuged_with_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateCentrifugedWithModel(
-                            attribute,
-                        )
-                    })
-                })?;
+            procedure_template_centrifuged_with_model = if let (
+                Some(centrifuged_with_model),
+                Some(asset_model),
+            ) =
+                (self.centrifuged_with_model, builder.asset_model)
+            {
+                if centrifuged_with_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::CentrifugedWithModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.centrifuged_with_model = Some(asset_model);
+                builder.into()
+            } else if let Some(centrifuged_with_model) = self.centrifuged_with_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        centrifuged_with_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateCentrifugedWithModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
         }
         self.procedure_template_centrifuged_with_model = procedure_template_centrifuged_with_model;
         Ok(self)
@@ -875,21 +930,63 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// Sets the value of the
     /// `public.centrifuge_procedure_templates.centrifuged_container_model`
     /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v5 ["`centrifuge_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v6 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v5 ---o|"`associated with`"| v6
+    /// ```
     fn centrifuged_container_model(
         mut self,
         centrifuged_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_centrifuged_container_model,
+        ) = self.procedure_template_centrifuged_container_model
+        {
+            self.procedure_template_centrifuged_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_centrifuged_container_model,
+                    centrifuged_container_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateCentrifugedContainerModel(
+                            attribute,
+                        )
+                    })
+                })?
+                .into();
+        }
         self.centrifuged_container_model = Some(centrifuged_container_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.centrifuge_procedure_templates.foreign_procedure_template`
-    /// column.
-    fn foreign_procedure_template(
-        mut self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
     /// Sets the value of the
@@ -906,31 +1003,88 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "centrifuged_container_model"}
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`centrifuge_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
     /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "foreign_procedure_template"}
-    /// class v1 directly-involved-column
-    /// v2@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v2 column-of-interest
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v2 -.->|"`foreign defines`"| v0
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_centrifuged_container_model(
+    fn procedure_template_centrifuged_container_model<PTCCM>(
         mut self,
-        procedure_template_centrifuged_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_centrifuged_container_model: PTCCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCCM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_centrifuged_container_model =
+            procedure_template_centrifuged_container_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_centrifuged_container_model
+        {
+            procedure_template_centrifuged_container_model = if let (
+                Some(centrifuged_container_model),
+                Some(asset_model),
+            ) =
+                (self.centrifuged_container_model, builder.asset_model)
+            {
+                if centrifuged_container_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::CentrifugedContainerModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.centrifuged_container_model = Some(asset_model);
+                builder.into()
+            } else if let Some(centrifuged_container_model) = self.centrifuged_container_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        centrifuged_container_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateCentrifugedContainerModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         self.procedure_template_centrifuged_container_model =
-            Some(procedure_template_centrifuged_container_model);
+            procedure_template_centrifuged_container_model;
         Ok(self)
     }
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1132,7 +1286,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableCentrifugeProcedureTemplateAttribute,
+            CentrifugeProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -1143,7 +1297,7 @@ where
         C,
     >,
 {
-    type Attributes = InsertableCentrifugeProcedureTemplateAttribute;
+    type Attributes = CentrifugeProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.kelvin.is_some()
             && self.kelvin_tolerance_percentage.is_some() && self.seconds.is_some()
@@ -1151,8 +1305,7 @@ where
             && self.centrifuged_with_model.is_some()
             && self.procedure_template_centrifuged_with_model.is_complete()
             && self.centrifuged_container_model.is_some()
-            && self.foreign_procedure_template.is_some()
-            && self.procedure_template_centrifuged_container_model.is_some()
+            && self.procedure_template_centrifuged_container_model.is_complete()
     }
     fn mint_primary_key(
         self,

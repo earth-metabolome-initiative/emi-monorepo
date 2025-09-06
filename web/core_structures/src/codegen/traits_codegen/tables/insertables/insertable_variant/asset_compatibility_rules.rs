@@ -34,7 +34,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRule;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute,
+        crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -74,28 +74,28 @@ where
             .left_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::LeftAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute::LeftAssetModel,
                 ),
             )?;
         let right_asset_model = self
             .right_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::RightAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute::RightAssetModel,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

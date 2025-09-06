@@ -1,34 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerExtensionAttribute {
-    PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
-    ),
+pub enum ContainerExtensionAttribute {
+    PhysicalAsset(crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute),
 }
-impl core::fmt::Display for InsertableContainerExtensionAttribute {
+impl core::fmt::Display for ContainerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
-    for InsertableContainerExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute>
+    for ContainerExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableContainerAttribute {
-    Extension(InsertableContainerExtensionAttribute),
+pub enum ContainerAttribute {
+    Extension(ContainerExtensionAttribute),
     Id,
     ContainerModel,
 }
-impl core::str::FromStr for InsertableContainerAttribute {
+impl core::str::FromStr for ContainerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +36,7 @@ impl core::str::FromStr for InsertableContainerAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableContainerAttribute {
+impl core::fmt::Display for ContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -122,6 +120,23 @@ impl InsertableContainer {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn containers_id_container_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.container_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -133,6 +148,13 @@ pub struct InsertableContainerBuilder<
 > {
     pub(crate) container_model: Option<i32>,
     pub(crate) id: PhysicalAsset,
+}
+impl From<InsertableContainerBuilder>
+    for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableContainerBuilder>
+{
+    fn from(builder: InsertableContainerBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `Container` or
 /// descendant tables.
@@ -164,10 +186,10 @@ pub trait ContainerSettable: Sized {
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > ContainerSettable for InsertableContainerBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute;
     ///Sets the value of the `public.containers.container_model` column.
     ///
     ///# Implementation notes
@@ -219,16 +241,16 @@ impl<
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableContainerBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -409,49 +431,47 @@ where
         Ok(self)
     }
 }
-impl<
-    PhysicalAsset,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
-for InsertableContainerBuilder<PhysicalAsset>
+impl<PhysicalAsset> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
+    for InsertableContainerBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
-    >,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+        >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute;
     #[inline]
-    ///Sets the value of the `public.physical_assets.model` column.
+    /// Sets the value of the `public.physical_assets.model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`assets`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`assets`"]
     ///    v2@{shape: rounded, label: "model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`containers`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`containers`"]
     ///    v1@{shape: rounded, label: "container_model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///subgraph v5 ["`physical_assets`"]
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v5 ["`physical_assets`"]
     ///    v0@{shape: rounded, label: "model"}
-    ///class v0 column-of-interest
-    ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v3
-    ///v4 --->|"`extends`"| v5
-    ///v4 -.->|"`descendant of`"| v3
-    ///```
+    /// class v0 column-of-interest
+    /// end
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v1 -.->|"`inferred ancestral same as`"| v0
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v4 --->|"`extends`"| v5
+    /// v4 -.->|"`descendant of`"| v3
+    /// v5 --->|"`extends`"| v3
+    /// ```
     fn model(
         self,
         model: i32,
@@ -486,12 +506,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::containers::Container,
-            Error = web_common_traits::database::InsertError<InsertableContainerAttribute>,
+            Error = web_common_traits::database::InsertError<ContainerAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableContainerAttribute;
+    type Attributes = ContainerAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.container_model.is_some()
     }

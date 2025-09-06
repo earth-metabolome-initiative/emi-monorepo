@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAssetAttribute {
+pub enum AssetAttribute {
     Id,
     MostConcreteTable,
     Name,
@@ -11,7 +11,7 @@ pub enum InsertableAssetAttribute {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableAssetAttribute {
+impl core::str::FromStr for AssetAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -37,7 +37,7 @@ impl core::str::FromStr for InsertableAssetAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableAssetAttribute {
+impl core::fmt::Display for AssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -179,6 +179,13 @@ pub struct InsertableAssetBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl From<InsertableAssetBuilder>
+    for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableAssetBuilder>
+{
+    fn from(builder: InsertableAssetBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableAssetBuilder {
     fn default() -> Self {
@@ -394,16 +401,14 @@ pub trait AssetSettable: Sized {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl AssetSettable for InsertableAssetBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::AssetAttribute;
     /// Sets the value of the `public.assets.id` column.
     fn id(
         mut self,
         id: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetAttribute::Id)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::Id)
         })?;
         self.id = Some(id);
         Ok(self)
@@ -418,27 +423,24 @@ impl AssetSettable for InsertableAssetBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::Name)
         })?;
         if let (Some(name), Some(description)) = (name.as_ref(), self.description.as_ref()) {
             pgrx_validation::must_be_distinct(name, description)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Description,
                         )
                 })?;
         }
         if let Some(name) = name.as_ref() {
-            pgrx_validation::must_be_paragraph(name)
-                .map_err(|e| {
-                    e
-                        .rename_field(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Name,
-                        )
-                })?;
+            pgrx_validation::must_be_paragraph(name).map_err(|e| {
+                e.rename_field(
+                    crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Name,
+                )
+            })?;
         }
         self.name = name;
         Ok(self)
@@ -453,16 +455,15 @@ impl AssetSettable for InsertableAssetBuilder {
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetAttribute::Description)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::Description)
         })?;
         if let (Some(name), Some(description)) = (self.name.as_ref(), description.as_ref()) {
             pgrx_validation::must_be_distinct(name, description)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Description,
                         )
                 })?;
         }
@@ -471,7 +472,7 @@ impl AssetSettable for InsertableAssetBuilder {
                 .map_err(|e| {
                     e
                         .rename_field(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Description,
                         )
                 })?;
         }
@@ -522,18 +523,15 @@ impl AssetSettable for InsertableAssetBuilder {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetAttribute::CreatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::AssetAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::AssetAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.created_at = Some(created_at);
         Ok(self)
@@ -557,18 +555,15 @@ impl AssetSettable for InsertableAssetBuilder {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAssetAttribute::UpdatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::AssetAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::AssetAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)
@@ -594,10 +589,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::assets::Asset,
-            Error = web_common_traits::database::InsertError<InsertableAssetAttribute>,
+            Error = web_common_traits::database::InsertError<AssetAttribute>,
         >,
 {
-    type Attributes = InsertableAssetAttribute;
+    type Attributes = AssetAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some()
             && self.most_concrete_table.is_some()

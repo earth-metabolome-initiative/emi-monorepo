@@ -19,7 +19,7 @@ pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
 pub use insertable::{
-    InsertError, Insertable, InsertableVariant, MostConcreteTable, SetPrimaryKey,
+    IdOrBuilder, InsertError, Insertable, InsertableVariant, MostConcreteTable, SetPrimaryKey,
 };
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;

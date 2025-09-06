@@ -20,11 +20,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(centrifuged_container.ne(excluded(centrifuged_container)))
+                    .or(centrifuged_container_model.ne(excluded(centrifuged_container_model)))
+                    .or(procedure_template_centrifuged_container_model
+                        .ne(excluded(procedure_template_centrifuged_container_model)))
+                    .or(procedure_centrifuged_container
+                        .ne(excluded(procedure_centrifuged_container)))
                     .or(centrifuged_with_model.ne(excluded(centrifuged_with_model)))
-                    .or(centrifuged_with.ne(excluded(centrifuged_with))),
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(procedure_template_centrifuged_with_model
+                        .ne(excluded(procedure_template_centrifuged_with_model)))
+                    .or(procedure_centrifuged_with.ne(excluded(procedure_centrifuged_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -52,11 +58,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(centrifuged_container.ne(excluded(centrifuged_container)))
+                    .or(centrifuged_container_model.ne(excluded(centrifuged_container_model)))
+                    .or(procedure_template_centrifuged_container_model
+                        .ne(excluded(procedure_template_centrifuged_container_model)))
+                    .or(procedure_centrifuged_container
+                        .ne(excluded(procedure_centrifuged_container)))
                     .or(centrifuged_with_model.ne(excluded(centrifuged_with_model)))
-                    .or(centrifuged_with.ne(excluded(centrifuged_with))),
+                    .or(centrifuged_with.ne(excluded(centrifuged_with)))
+                    .or(procedure_template_centrifuged_with_model
+                        .ne(excluded(procedure_template_centrifuged_with_model)))
+                    .or(procedure_centrifuged_with.ne(excluded(procedure_centrifuged_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

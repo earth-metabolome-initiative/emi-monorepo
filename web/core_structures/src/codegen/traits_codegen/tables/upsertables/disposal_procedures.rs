@@ -20,9 +20,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(disposed_asset.ne(excluded(disposed_asset))),
+                    .or(disposed_asset.ne(excluded(disposed_asset)))
+                    .or(procedure_template_disposed_asset_model
+                        .ne(excluded(procedure_template_disposed_asset_model)))
+                    .or(procedure_disposed_asset.ne(excluded(procedure_disposed_asset))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -50,9 +51,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(disposed_asset.ne(excluded(disposed_asset))),
+                    .or(disposed_asset.ne(excluded(disposed_asset)))
+                    .or(procedure_template_disposed_asset_model
+                        .ne(excluded(procedure_template_disposed_asset_model)))
+                    .or(procedure_disposed_asset.ne(excluded(procedure_disposed_asset))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

@@ -23,11 +23,11 @@ where
         PrimaryKey = i32,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -44,6 +44,12 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
@@ -68,7 +74,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -120,17 +126,42 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template_milled_container_model) = self
-            .procedure_template_milled_container_model
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_bead_model),
+        ) = self.procedure_template_bead_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_bead_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::bead_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_milled_with_model),
+        ) = self.procedure_template_milled_with_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_milled_with_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::milled_with_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_milled_container_model),
+        ) = self.procedure_template_milled_container_model
         {
             if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_milled_container_model,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::foreign_procedure_template(
-                    self,
-                    procedure_template_asset_models.procedure_template,
-                )?;
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::milled_container_model(
                     self,
                     procedure_template_asset_models.asset_model,
@@ -141,116 +172,168 @@ where
             .kelvin
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Kelvin,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::Kelvin,
                 ),
             )?;
         let kelvin_tolerance_percentage = self
             .kelvin_tolerance_percentage
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::KelvinTolerancePercentage,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::KelvinTolerancePercentage,
                 ),
             )?;
         let seconds = self
             .seconds
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Seconds,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::Seconds,
                 ),
             )?;
         let hertz = self
             .hertz
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Hertz,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::Hertz,
                 ),
             )?;
         let bead_model = self
             .bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::BeadModel,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::BeadModel,
                 ),
             )?;
         let number_of_beads = self
             .number_of_beads
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::NumberOfBeads,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::NumberOfBeads,
                 ),
             )?;
         let milled_with_model = self
             .milled_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::MilledWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::MilledWithModel,
                 ),
             )?;
         let milled_container_model = self
             .milled_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::MilledContainerModel,
-                ),
-            )?;
-        let foreign_procedure_template = self
-            .foreign_procedure_template
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ForeignProcedureTemplate,
-                ),
-            )?;
-        let procedure_template_milled_container_model = self
-            .procedure_template_milled_container_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ProcedureTemplateMilledContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::MilledContainerModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateExtensionAttribute::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
             })?;
-        self.procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_bead_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ProcedureTemplateBeadModel,
-                )
-            })?;
-        let procedure_template_bead_model = self
-            .procedure_template_bead_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ProcedureTemplateBeadModel,
-                )
-            })?;
-        self.procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_milled_with_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ProcedureTemplateMilledWithModel,
-                )
-            })?;
-        let procedure_template_milled_with_model = self
+        let procedure_template_bead_model = match self.procedure_template_bead_model {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateBeadModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_bead_model,
+            ) => {
+                procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_bead_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateBeadModel,
+                        )
+                    })?;
+                procedure_template_bead_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateBeadModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_milled_with_model = match self
             .procedure_template_milled_with_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateAttribute::ProcedureTemplateMilledWithModel,
-                )
-            })?;
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledWithModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_milled_with_model,
+            ) => {
+                procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_milled_with_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledWithModel,
+                        )
+                    })?;
+                procedure_template_milled_with_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledWithModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_milled_container_model = match self
+            .procedure_template_milled_container_model
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledContainerModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_milled_container_model,
+            ) => {
+                procedure_template_milled_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_milled_container_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledContainerModel,
+                        )
+                    })?;
+                procedure_template_milled_container_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::ProcedureTemplateMilledContainerModel,
+                        )
+                    })?
+            }
+        };
         Ok(Self::InsertableVariant {
             procedure_template,
             kelvin,
@@ -263,7 +346,6 @@ where
             milled_with_model,
             procedure_template_milled_with_model,
             milled_container_model,
-            foreign_procedure_template,
             procedure_template_milled_container_model,
         })
     }

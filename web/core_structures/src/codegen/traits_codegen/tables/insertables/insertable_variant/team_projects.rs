@@ -49,7 +49,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttribute,
+        crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -62,13 +62,13 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.team(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.project(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.project(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.team(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,14 +89,14 @@ where
             .team_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttribute::TeamId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute::TeamId,
                 ),
             )?;
         let project_id = self
             .project_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttribute::ProjectId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute::ProjectId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

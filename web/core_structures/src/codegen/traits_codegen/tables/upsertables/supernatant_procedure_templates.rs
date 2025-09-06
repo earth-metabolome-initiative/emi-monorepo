@@ -21,10 +21,6 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_templates::Su
                     .ne(excluded(liters))
                     .or(stratified_source_model.ne(excluded(stratified_source_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_stratified_source_model
                             .ne(excluded(procedure_template_stratified_source_model)),
                     )
@@ -75,10 +71,6 @@ for crate::codegen::structs_codegen::tables::supernatant_procedure_templates::Su
                 liters
                     .ne(excluded(liters))
                     .or(stratified_source_model.ne(excluded(stratified_source_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_stratified_source_model
                             .ne(excluded(procedure_template_stratified_source_model)),

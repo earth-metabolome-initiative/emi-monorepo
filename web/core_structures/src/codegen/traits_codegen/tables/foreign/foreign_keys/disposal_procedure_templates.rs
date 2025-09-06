@@ -7,9 +7,6 @@ pub struct DisposalProcedureTemplateForeignKeys {
     pub disposed_asset_model: Option<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
-    pub foreign_procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
     pub procedure_template_disposed_asset_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
@@ -41,14 +38,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.foreign_procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                         self.procedure_template_disposed_asset_model,
                     ),
@@ -58,7 +47,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_template.is_some()
             && foreign_keys.disposed_asset_model.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
             && foreign_keys.procedure_template_disposed_asset_model.is_some()
     }
     fn update(
@@ -130,15 +118,7 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
+                    foreign_keys.procedure_template = Some(procedure_templates);
                     updated = true;
                 }
             }
@@ -148,12 +128,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
                     foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = None;
                     updated = true;
                 }
             }

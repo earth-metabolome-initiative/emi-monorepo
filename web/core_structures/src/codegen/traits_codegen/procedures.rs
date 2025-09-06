@@ -11,7 +11,6 @@ mod packaging_procedures;
 mod photograph_procedures;
 mod pouring_procedures;
 mod procedures;
-mod registering_procedures;
 mod storage_procedures;
 mod supernatant_procedures;
 mod weighing_procedures;

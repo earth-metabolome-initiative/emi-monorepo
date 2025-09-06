@@ -21,7 +21,7 @@ async fn test_init_migration() {
         .expect("Failed to connect to the database");
 
     // We initialize the database into the docker container
-    if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
+    if let Err(err) = init_database(DATABASE_NAME, true, &mut conn).await {
         docker.stop().await.expect("Failed to stop the docker container");
         panic!("Failed to initialize the database: {err}");
     }

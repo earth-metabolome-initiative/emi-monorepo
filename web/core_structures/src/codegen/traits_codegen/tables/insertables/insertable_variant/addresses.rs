@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::addresses::Address;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAddress;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute,
+        crate::codegen::structs_codegen::tables::insertables::AddressAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,35 +46,35 @@ where
             .city_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute::CityId,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::CityId,
                 ),
             )?;
         let street_name = self
             .street_name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute::StreetName,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::StreetName,
                 ),
             )?;
         let street_number = self
             .street_number
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute::StreetNumber,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::StreetNumber,
                 ),
             )?;
         let postal_code = self
             .postal_code
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute::PostalCode,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::PostalCode,
                 ),
             )?;
         let geolocation = self
             .geolocation
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute::Geolocation,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::Geolocation,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -47,13 +47,7 @@ where
         if user_id == self.created_by {
             return Ok(true);
         }
-        if !self.parent(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
         if !self.current(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
-        if !self.successor(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         if !self
@@ -62,10 +56,16 @@ where
         {
             return Ok(false);
         }
+        if !self.parent(conn)?.can_update(user_id, conn)? {
+            return Ok(false);
+        }
         if !self
             .next_procedure_templates_parent_successor_id_fkey(conn)?
             .can_update(user_id, conn)?
         {
+            return Ok(false);
+        }
+        if !self.successor(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

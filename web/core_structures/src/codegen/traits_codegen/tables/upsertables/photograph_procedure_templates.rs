@@ -25,10 +25,6 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                     )
                     .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_photographed_asset_model
                             .ne(excluded(procedure_template_photographed_asset_model)),
                     ),
@@ -63,10 +59,6 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                             .ne(excluded(procedure_template_photographed_with_model)),
                     )
                     .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_photographed_asset_model
                             .ne(excluded(procedure_template_photographed_asset_model)),

@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::freezer_models::FreezerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::FreezerModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

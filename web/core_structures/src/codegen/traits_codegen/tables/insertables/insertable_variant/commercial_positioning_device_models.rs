@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -94,7 +94,7 @@ where
             .positioning_device_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute::PositioningDeviceModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute::PositioningDeviceModel,
                 ),
             )?;
         let id = if self.commercial_positioning_device_models_id_fkey1.is_complete() {
@@ -102,9 +102,9 @@ where
                 .commercial_positioning_device_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -113,9 +113,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -125,9 +125,9 @@ where
                 .commercial_positioning_device_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -136,9 +136,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;

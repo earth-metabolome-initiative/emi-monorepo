@@ -321,12 +321,6 @@ where
     crate::codegen::structs_codegen::tables::reagent_models::ReagentModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::roles::Role: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -1271,22 +1265,6 @@ where
             }
             crate::codegen::tables::table_names::TableName::ReagentModel => {
                 crate::codegen::structs_codegen::tables::reagent_models::ReagentModel::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::RegisteringProcedureTemplate => {
-                crate::codegen::structs_codegen::tables::registering_procedure_templates::RegisteringProcedureTemplate::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::RegisteringProcedure => {
-                crate::codegen::structs_codegen::tables::registering_procedures::RegisteringProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

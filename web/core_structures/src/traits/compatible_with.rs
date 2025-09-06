@@ -10,9 +10,7 @@ use crate::{
     codegen::structs_codegen::tables::insertables::{
         AssetCompatibilityRuleSettable, ContainerCompatibilityRuleSettable,
     },
-    tables::insertables::{
-        InsertableAssetCompatibilityRuleAttribute, InsertableContainerCompatibilityRuleAttribute,
-    },
+    tables::insertables::{AssetCompatibilityRuleAttribute, ContainerCompatibilityRuleAttribute},
 };
 
 /// A trait for asset models that can be compatible with other asset models.
@@ -40,7 +38,7 @@ where
         other: &AM,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<AssetCompatibilityRule, InsertError<InsertableAssetCompatibilityRuleAttribute>>
+    ) -> Result<AssetCompatibilityRule, InsertError<AssetCompatibilityRuleAttribute>>
     where
         AM: ExtensionTable<AssetModel>,
         for<'a> &'a AM: diesel::Identifiable<Id = &'a i32>,
@@ -90,10 +88,7 @@ where
         quantity: i16,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        ContainerCompatibilityRule,
-        InsertError<InsertableContainerCompatibilityRuleAttribute>,
-    >
+    ) -> Result<ContainerCompatibilityRule, InsertError<ContainerCompatibilityRuleAttribute>>
     where
         AM: ExtensionTable<AssetModel>,
         for<'a> &'a AM: diesel::Identifiable<Id = &'a i32>,

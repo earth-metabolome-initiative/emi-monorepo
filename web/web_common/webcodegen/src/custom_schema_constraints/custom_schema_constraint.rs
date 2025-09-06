@@ -1,11 +1,14 @@
 use diesel::PgConnection;
 
-use crate::{Column, Table};
+use crate::{Column, Table, errors::WebCodeGenError};
 
 /// A trait for custom table constraints
 pub trait CustomTableConstraint {
     /// The error type for the constraint
-    type Error: From<diesel::result::Error> + From<std::io::Error> + std::fmt::Display;
+    type Error: From<diesel::result::Error>
+        + From<std::io::Error>
+        + std::fmt::Display
+        + From<WebCodeGenError>;
 
     /// Check the table constraint
     ///
@@ -75,7 +78,7 @@ pub trait CustomTableConstraint {
             }
         }
 
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
+        for table in Table::load_all(conn, table_catalog, table_schema)?.as_ref() {
             if let Err(err) = self.check_constraint(conn, &table) {
                 // We store this error into a file.
                 let file_name = format!("{file_name_prefix}{}.err", table.table_name);
@@ -91,7 +94,10 @@ pub trait CustomTableConstraint {
 /// A trait for custom column constraints
 pub trait CustomColumnConstraint {
     /// The error type for the constraint
-    type Error: From<diesel::result::Error>;
+    type Error: From<diesel::result::Error>
+        + From<std::io::Error>
+        + std::fmt::Display
+        + From<WebCodeGenError>;
 
     /// Check the column constraint
     ///
@@ -126,8 +132,8 @@ pub trait CustomColumnConstraint {
         table_schema: &str,
         conn: &mut PgConnection,
     ) -> Result<(), Self::Error> {
-        for table in Table::load_all(conn, table_catalog, table_schema)? {
-            for column in table.columns(conn)? {
+        for table in Table::load_all(conn, table_catalog, table_schema)?.as_ref() {
+            for column in table.columns(conn)?.as_ref() {
                 self.check_constraint(conn, &column)?;
             }
         }

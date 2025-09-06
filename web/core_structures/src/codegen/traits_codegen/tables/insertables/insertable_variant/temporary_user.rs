@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUser;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttribute,
+        crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,14 +46,14 @@ where
             .email
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttribute::Email,
+                    crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute::Email,
                 ),
             )?;
         let login_provider_id = self
             .login_provider_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserAttribute::LoginProviderId,
+                    crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute::LoginProviderId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

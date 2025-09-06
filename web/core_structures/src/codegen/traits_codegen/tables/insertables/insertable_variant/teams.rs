@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::teams::Team;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeam;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute,
+        crate::codegen::structs_codegen::tables::insertables::TeamAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,70 +46,70 @@ where
             .id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Id,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Id,
                 ),
             )?;
         let name = self
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::ColorId,
                 ),
             )?;
         let state_id = self
             .state_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::StateId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::StateId,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -15,13 +15,16 @@
 pub struct FractioningProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
-    pub foreign_procedure_template: i32,
-    pub foreign_procedure: ::rosetta_uuid::Uuid,
     pub fragment_container: ::rosetta_uuid::Uuid,
+    pub procedure_template_fragment_container_model: i32,
+    pub procedure_fragment_container: ::rosetta_uuid::Uuid,
     pub fragment_placed_into: ::rosetta_uuid::Uuid,
+    pub procedure_template_fragment_placed_into_model: i32,
+    pub procedure_fragment_placed_into: ::rosetta_uuid::Uuid,
     pub kilograms: f32,
     pub weighed_with: Option<::rosetta_uuid::Uuid>,
-    pub weighed_with_model: i32,
+    pub procedure_template_weighed_with_model: i32,
+    pub procedure_weighed_with: ::rosetta_uuid::Uuid,
 }
 impl web_common_traits::prelude::TableName for FractioningProcedure {
     const TABLE_NAME: &'static str = "fractioning_procedures";
@@ -49,134 +52,6 @@ impl diesel::Identifiable for FractioningProcedure {
     }
 }
 impl FractioningProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.procedure,
-            ),
-            conn,
-        )
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table(),
-                self.procedure_template,
-            ),
-            conn,
-        )
-    }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
-            ),
-            conn,
-        )
-    }
-    pub fn foreign_procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.foreign_procedure,
-            ),
-            conn,
-        )
-    }
     pub fn fragment_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -241,6 +116,508 @@ impl FractioningProcedure {
             conn,
         )
     }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                self.procedure,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_fragment_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_fragment_container,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_fragment_container_fragme_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_fragment_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.fragment_container),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_fragment_container_proced_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_fragment_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_fragment_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure_fragment_placed_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_fragment_placed_into,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_fragment_placed_into_frag_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_fragment_placed_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.fragment_placed_into),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_fragment_placed_into_proc_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_fragment_placed_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_fragment_placed_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table(),
+                self.procedure_template,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template_fragment_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_fragment_container_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template_fragment_placed_into_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_fragment_placed_into_model,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_template_procedure_templ_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_container_model
+                            .eq(&self.procedure_template_fragment_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_template_procedure_templ_fkey2(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_placed_into_model
+                            .eq(&self.procedure_template_fragment_placed_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_template_procedure_templa_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_weighed_with_model
+                            .eq(&self.procedure_template_weighed_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+            >(conn)
+    }
+    pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_weighed_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_weighed_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_weighed_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_weighed_with_procedure_te_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_weighed_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_weighed_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn fractioning_procedures_procedure_weighed_with_weighed_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(weighed_with) = self.weighed_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_weighed_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(weighed_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .map(Some)
+    }
     pub fn weighed_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -279,148 +656,6 @@ impl FractioningProcedure {
         )
         .map(Some)
     }
-    pub fn weighed_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::table(),
-                self.weighed_with_model,
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn fractioning_procedures_foreign_procedure_fragment_containe_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.foreign_procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.fragment_container),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn fractioning_procedures_procedure_fragment_placed_into_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.fragment_placed_into),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    pub fn fractioning_procedures_procedure_weighed_with_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                (self.procedure, self.weighed_with_model),
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn fractioning_procedures_procedure_weighed_with_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        let Some(weighed_with) = self.weighed_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(weighed_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-            .map(Some)
-    }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template(
         procedure_template: &i32,
@@ -431,34 +666,6 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(fractioning_procedures::procedure_template.eq(procedure_template))
-            .order_by(fractioning_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_template(
-        foreign_procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
-        Self::table()
-            .filter(
-                fractioning_procedures::foreign_procedure_template.eq(foreign_procedure_template),
-            )
-            .order_by(fractioning_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure(
-        foreign_procedure: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
-        Self::table()
-            .filter(fractioning_procedures::foreign_procedure.eq(foreign_procedure))
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -476,6 +683,38 @@ impl FractioningProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_fragment_container_model(
+        procedure_template_fragment_container_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_template_fragment_container_model
+                    .eq(procedure_template_fragment_container_model),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_container(
+        procedure_fragment_container: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_container
+                    .eq(procedure_fragment_container),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_fragment_placed_into(
         fragment_placed_into: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
@@ -485,6 +724,38 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(fractioning_procedures::fragment_placed_into.eq(fragment_placed_into))
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_fragment_placed_into_model(
+        procedure_template_fragment_placed_into_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_template_fragment_placed_into_model
+                    .eq(procedure_template_fragment_placed_into_model),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_placed_into(
+        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_placed_into
+                    .eq(procedure_fragment_placed_into),
+            )
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -502,15 +773,117 @@ impl FractioningProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_weighed_with_model(
-        weighed_with_model: &i32,
+    pub fn from_procedure_template_weighed_with_model(
+        procedure_template_weighed_with_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
-            .filter(fractioning_procedures::weighed_with_model.eq(weighed_with_model))
+            .filter(
+                fractioning_procedures::procedure_template_weighed_with_model
+                    .eq(procedure_template_weighed_with_model),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_with(
+        procedure_weighed_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(fractioning_procedures::procedure_weighed_with.eq(procedure_weighed_with))
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_container_and_fragment_container(
+        procedure_fragment_container: &::rosetta_uuid::Uuid,
+        fragment_container: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_container
+                    .eq(procedure_fragment_container)
+                    .and(fractioning_procedures::fragment_container.eq(fragment_container)),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_container_and_procedure_template_fragment_container_model(
+        procedure_fragment_container: &::rosetta_uuid::Uuid,
+        procedure_template_fragment_container_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_container
+                    .eq(procedure_fragment_container)
+                    .and(
+                        fractioning_procedures::procedure_template_fragment_container_model
+                            .eq(procedure_template_fragment_container_model),
+                    ),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_placed_into_and_fragment_placed_into(
+        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
+        fragment_placed_into: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_placed_into
+                    .eq(procedure_fragment_placed_into)
+                    .and(fractioning_procedures::fragment_placed_into.eq(fragment_placed_into)),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_fragment_placed_into_and_procedure_template_fragment_placed_into_model(
+        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
+        procedure_template_fragment_placed_into_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_fragment_placed_into
+                    .eq(procedure_fragment_placed_into)
+                    .and(
+                        fractioning_procedures::procedure_template_fragment_placed_into_model
+                            .eq(procedure_template_fragment_placed_into_model),
+                    ),
+            )
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -535,27 +908,9 @@ impl FractioningProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_and_foreign_procedure_template(
-        foreign_procedure: &::rosetta_uuid::Uuid,
-        foreign_procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
-        Self::table()
-            .filter(fractioning_procedures::foreign_procedure.eq(foreign_procedure).and(
-                fractioning_procedures::foreign_procedure_template.eq(foreign_procedure_template),
-            ))
-            .order_by(fractioning_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_and_fragment_container(
-        foreign_procedure: &::rosetta_uuid::Uuid,
-        fragment_container: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_template_and_procedure_template_fragment_container_model(
+        procedure_template: &i32,
+        procedure_template_fragment_container_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -565,17 +920,18 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::foreign_procedure
-                    .eq(foreign_procedure)
-                    .and(fractioning_procedures::fragment_container.eq(fragment_container)),
+                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                    fractioning_procedures::procedure_template_fragment_container_model
+                        .eq(procedure_template_fragment_container_model),
+                ),
             )
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_fragment_placed_into(
-        procedure: &::rosetta_uuid::Uuid,
-        fragment_placed_into: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_template_and_procedure_template_fragment_placed_into_model(
+        procedure_template: &i32,
+        procedure_template_fragment_placed_into_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -585,17 +941,18 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure
-                    .eq(procedure)
-                    .and(fractioning_procedures::fragment_placed_into.eq(fragment_placed_into)),
+                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                    fractioning_procedures::procedure_template_fragment_placed_into_model
+                        .eq(procedure_template_fragment_placed_into_model),
+                ),
             )
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_weighed_with_model(
-        procedure: &::rosetta_uuid::Uuid,
-        weighed_with_model: &i32,
+    pub fn from_procedure_template_and_procedure_template_weighed_with_model(
+        procedure_template: &i32,
+        procedure_template_weighed_with_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -605,16 +962,38 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure
-                    .eq(procedure)
-                    .and(fractioning_procedures::weighed_with_model.eq(weighed_with_model)),
+                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                    fractioning_procedures::procedure_template_weighed_with_model
+                        .eq(procedure_template_weighed_with_model),
+                ),
             )
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_weighed_with(
-        procedure: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_weighed_with_and_procedure_template_weighed_with_model(
+        procedure_weighed_with: &::rosetta_uuid::Uuid,
+        procedure_template_weighed_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
+        Self::table()
+            .filter(
+                fractioning_procedures::procedure_weighed_with.eq(procedure_weighed_with).and(
+                    fractioning_procedures::procedure_template_weighed_with_model
+                        .eq(procedure_template_weighed_with_model),
+                ),
+            )
+            .order_by(fractioning_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_with_and_weighed_with(
+        procedure_weighed_with: &::rosetta_uuid::Uuid,
         weighed_with: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -625,48 +1004,10 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure
-                    .eq(procedure)
+                fractioning_procedures::procedure_weighed_with
+                    .eq(procedure_weighed_with)
                     .and(fractioning_procedures::weighed_with.eq(weighed_with)),
             )
-            .order_by(fractioning_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_weighed_with_and_weighed_with_model(
-        weighed_with: &::rosetta_uuid::Uuid,
-        weighed_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
-        Self::table()
-            .filter(
-                fractioning_procedures::weighed_with
-                    .eq(weighed_with)
-                    .and(fractioning_procedures::weighed_with_model.eq(weighed_with_model)),
-            )
-            .order_by(fractioning_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_foreign_procedure_template(
-        procedure_template: &i32,
-        foreign_procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
-        Self::table()
-            .filter(fractioning_procedures::procedure_template.eq(procedure_template).and(
-                fractioning_procedures::foreign_procedure_template.eq(foreign_procedure_template),
-            ))
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }

@@ -20,11 +20,23 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
+                    .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
+                    .or(procedure_template_aliquoted_with_model
+                        .ne(excluded(procedure_template_aliquoted_with_model)))
+                    .or(procedure_aliquoted_with.ne(excluded(procedure_aliquoted_with)))
                     .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
-                    .or(aliquoted_from.ne(excluded(aliquoted_from))),
+                    .or(procedure_template_pipette_tip_model
+                        .ne(excluded(procedure_template_pipette_tip_model)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip)))
+                    .or(aliquoted_from.ne(excluded(aliquoted_from)))
+                    .or(procedure_template_aliquoted_from_model
+                        .ne(excluded(procedure_template_aliquoted_from_model)))
+                    .or(procedure_aliquoted_from.ne(excluded(procedure_aliquoted_from)))
+                    .or(aliquoted_into.ne(excluded(aliquoted_into)))
+                    .or(procedure_template_aliquoted_into_model
+                        .ne(excluded(procedure_template_aliquoted_into_model)))
+                    .or(procedure_aliquoted_into.ne(excluded(procedure_aliquoted_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -52,11 +64,23 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
+                    .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
+                    .or(procedure_template_aliquoted_with_model
+                        .ne(excluded(procedure_template_aliquoted_with_model)))
+                    .or(procedure_aliquoted_with.ne(excluded(procedure_aliquoted_with)))
                     .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
-                    .or(aliquoted_from.ne(excluded(aliquoted_from))),
+                    .or(procedure_template_pipette_tip_model
+                        .ne(excluded(procedure_template_pipette_tip_model)))
+                    .or(procedure_pipette_tip.ne(excluded(procedure_pipette_tip)))
+                    .or(aliquoted_from.ne(excluded(aliquoted_from)))
+                    .or(procedure_template_aliquoted_from_model
+                        .ne(excluded(procedure_template_aliquoted_from_model)))
+                    .or(procedure_aliquoted_from.ne(excluded(procedure_aliquoted_from)))
+                    .or(aliquoted_into.ne(excluded(aliquoted_into)))
+                    .or(procedure_template_aliquoted_into_model
+                        .ne(excluded(procedure_template_aliquoted_into_model)))
+                    .or(procedure_aliquoted_into.ne(excluded(procedure_aliquoted_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

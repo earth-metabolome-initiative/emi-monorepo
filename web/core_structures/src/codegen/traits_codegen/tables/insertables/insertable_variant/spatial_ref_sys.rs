@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSy;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyAttribute,
+        crate::codegen::structs_codegen::tables::insertables::SpatialRefSyAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,7 +46,7 @@ where
             .srid
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyAttribute::Srid,
+                    crate::codegen::structs_codegen::tables::insertables::SpatialRefSyAttribute::Srid,
                 ),
             )?;
         Ok(Self::InsertableVariant {

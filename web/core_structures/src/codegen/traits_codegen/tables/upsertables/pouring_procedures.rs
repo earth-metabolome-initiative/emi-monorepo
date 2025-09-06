@@ -18,14 +18,20 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                poured_from
-                    .ne(excluded(poured_from))
-                    .or(procedure_template.ne(excluded(procedure_template)))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(measured_with_model.ne(excluded(measured_with_model)))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(poured_from.ne(excluded(poured_from)))
+                    .or(procedure_template_poured_from_model
+                        .ne(excluded(procedure_template_poured_from_model)))
+                    .or(procedure_poured_from.ne(excluded(procedure_poured_from)))
                     .or(measured_with.ne(excluded(measured_with)))
-                    .or(poured_into.ne(excluded(poured_into))),
+                    .or(procedure_template_measured_with_model
+                        .ne(excluded(procedure_template_measured_with_model)))
+                    .or(procedure_measured_with.ne(excluded(procedure_measured_with)))
+                    .or(poured_into.ne(excluded(poured_into)))
+                    .or(procedure_template_poured_into_model
+                        .ne(excluded(procedure_template_poured_into_model)))
+                    .or(procedure_poured_into.ne(excluded(procedure_poured_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -51,14 +57,20 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                poured_from
-                    .ne(excluded(poured_from))
-                    .or(procedure_template.ne(excluded(procedure_template)))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(measured_with_model.ne(excluded(measured_with_model)))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(poured_from.ne(excluded(poured_from)))
+                    .or(procedure_template_poured_from_model
+                        .ne(excluded(procedure_template_poured_from_model)))
+                    .or(procedure_poured_from.ne(excluded(procedure_poured_from)))
                     .or(measured_with.ne(excluded(measured_with)))
-                    .or(poured_into.ne(excluded(poured_into))),
+                    .or(procedure_template_measured_with_model
+                        .ne(excluded(procedure_template_measured_with_model)))
+                    .or(procedure_measured_with.ne(excluded(procedure_measured_with)))
+                    .or(poured_into.ne(excluded(poured_into)))
+                    .or(procedure_template_poured_into_model
+                        .ne(excluded(procedure_template_poured_into_model)))
+                    .or(procedure_poured_into.ne(excluded(procedure_poured_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

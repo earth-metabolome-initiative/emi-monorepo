@@ -15,7 +15,7 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    Column, PgExtension, PgType, Table, TableExtensionNetwork,
+    PgExtension, PgType, Table, TableExtensionNetwork,
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
@@ -456,7 +456,10 @@ impl<'a> Codegen<'a> {
         for table in tables {
             let mut custom_types = Vec::new();
 
-            for column in table.columns(conn)?.into_iter().filter(Column::has_custom_type) {
+            for column in table.columns(conn)?.iter() {
+                if !column.has_custom_type() {
+                    continue;
+                }
                 let column_type = PgType::from_name(column.data_type_str(conn)?, conn)?;
                 if column_type.is_enum() || column_type.is_composite() {
                     custom_types.push(column_type);
@@ -506,9 +509,10 @@ impl<'a> Codegen<'a> {
         let task = Task::new("Retrieving tables");
 
         let mut tables = Table::load_all(conn, table_catalog, "public")?
-            .into_iter()
+            .iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .filter(|table| !self.tables_deny_list.contains(&table))
+            .cloned()
             .collect::<Vec<Table>>();
 
         tables.sort_unstable();

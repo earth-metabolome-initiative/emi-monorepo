@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCapModelExtensionAttribute {
-    CapModel(crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute),
+pub enum CommercialCapModelExtensionAttribute {
+    CapModel(crate::codegen::structs_codegen::tables::insertables::CapModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialCapModelExtensionAttribute {
+impl core::fmt::Display for CommercialCapModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CapModel(e) => write!(f, "{e}"),
@@ -14,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialCapModelExtensionAttribute {
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute>
-    for InsertableCommercialCapModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CapModelAttribute>
+    for CommercialCapModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
     ) -> Self {
         Self::CapModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialCapModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialCapModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCapModelAttribute {
-    Extension(InsertableCommercialCapModelExtensionAttribute),
+pub enum CommercialCapModelAttribute {
+    Extension(CommercialCapModelExtensionAttribute),
     Id,
     CapModel,
 }
-impl core::str::FromStr for InsertableCommercialCapModelAttribute {
+impl core::str::FromStr for CommercialCapModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialCapModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialCapModelAttribute {
+impl core::fmt::Display for CommercialCapModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -168,6 +167,30 @@ impl InsertableCommercialCapModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_cap_models_id_cap_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.cap_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -186,6 +209,13 @@ pub struct InsertableCommercialCapModelBuilder<
     pub(crate) cap_model: Option<i32>,
     pub(crate) commercial_cap_models_id_fkey: CapModel,
     pub(crate) commercial_cap_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialCapModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCapModelBuilder>
+{
+    fn from(builder: InsertableCommercialCapModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `CommercialCapModel`
 /// or descendant tables.
@@ -217,44 +247,45 @@ pub trait CommercialCapModelSettable: Sized {
 }
 impl<
     CapModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
         >,
     CommercialProduct,
-> CommercialCapModelSettable
-for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute;
-    ///Sets the value of the `public.commercial_cap_models.cap_model` column.
+> CommercialCapModelSettable for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute;
+    /// Sets the value of the `public.commercial_cap_models.cap_model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`asset_models`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`asset_models`"]
     ///    v2@{shape: rounded, label: "parent_model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`commercial_cap_models`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`commercial_cap_models`"]
     ///    v0@{shape: rounded, label: "cap_model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`physical_asset_models`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v5 --->|"`extends`"| v3
-    ///v4 -.->|"`descendant of`"| v3
-    ///v4 -.->|"`descendant of`"| v5
-    ///```
+    /// class v1 directly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v4 -.->|"`descendant of`"| v3
+    /// v4 -.->|"`descendant of`"| v5
+    /// v5 --->|"`extends`"| v3
+    /// ```
     fn cap_model(
         mut self,
         cap_model: i32,
@@ -274,17 +305,17 @@ for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct> {
 }
 impl<
     CapModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -452,16 +483,16 @@ impl<CapModel, CommercialProduct>
     for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct>
 {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute;
+        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute;
 }
 impl<
     CapModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -512,10 +543,10 @@ impl<
 for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCapModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -597,9 +628,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
-        Error = web_common_traits::database::InsertError<
-            InsertableCommercialCapModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<CommercialCapModelAttribute>,
     >,
     CapModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -607,7 +636,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialCapModelAttribute;
+    type Attributes = CommercialCapModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_cap_models_id_fkey.is_complete()
             && self.commercial_cap_models_id_fkey1.is_complete()

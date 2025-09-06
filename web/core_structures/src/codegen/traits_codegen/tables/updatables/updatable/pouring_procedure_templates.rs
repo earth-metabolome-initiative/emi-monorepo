@@ -51,9 +51,6 @@ where
         {
             return Ok(false);
         }
-        if !self.foreign_procedure_template(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
         if !self.procedure_template_poured_into_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }

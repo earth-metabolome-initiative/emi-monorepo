@@ -20,13 +20,19 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(fragment_container.ne(excluded(fragment_container)))
+                    .or(procedure_template_fragment_container_model
+                        .ne(excluded(procedure_template_fragment_container_model)))
+                    .or(procedure_fragment_container.ne(excluded(procedure_fragment_container)))
                     .or(fragment_placed_into.ne(excluded(fragment_placed_into)))
+                    .or(procedure_template_fragment_placed_into_model
+                        .ne(excluded(procedure_template_fragment_placed_into_model)))
+                    .or(procedure_fragment_placed_into.ne(excluded(procedure_fragment_placed_into)))
                     .or(kilograms.ne(excluded(kilograms)))
                     .or(weighed_with.ne(excluded(weighed_with)))
-                    .or(weighed_with_model.ne(excluded(weighed_with_model))),
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -54,13 +60,19 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(fragment_container.ne(excluded(fragment_container)))
+                    .or(procedure_template_fragment_container_model
+                        .ne(excluded(procedure_template_fragment_container_model)))
+                    .or(procedure_fragment_container.ne(excluded(procedure_fragment_container)))
                     .or(fragment_placed_into.ne(excluded(fragment_placed_into)))
+                    .or(procedure_template_fragment_placed_into_model
+                        .ne(excluded(procedure_template_fragment_placed_into_model)))
+                    .or(procedure_fragment_placed_into.ne(excluded(procedure_fragment_placed_into)))
                     .or(kilograms.ne(excluded(kilograms)))
                     .or(weighed_with.ne(excluded(weighed_with)))
-                    .or(weighed_with_model.ne(excluded(weighed_with_model))),
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

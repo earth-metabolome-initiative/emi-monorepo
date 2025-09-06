@@ -1,49 +1,43 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBeadModelExtensionAttribute {
+pub enum BeadModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableBeadModelExtensionAttribute {
+impl core::fmt::Display for BeadModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableBeadModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for BeadModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBeadModelAttribute {
-    Extension(InsertableBeadModelExtensionAttribute),
+pub enum BeadModelAttribute {
+    Extension(BeadModelExtensionAttribute),
     Id,
     DiameterMillimeters,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableBeadModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for BeadModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableBeadModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
+        Self::Extension(BeadModelExtensionAttribute::PhysicalAssetModel(physical_asset_models))
     }
 }
-impl core::str::FromStr for InsertableBeadModelAttribute {
+impl core::str::FromStr for BeadModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -53,7 +47,7 @@ impl core::str::FromStr for InsertableBeadModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableBeadModelAttribute {
+impl core::fmt::Display for BeadModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -117,6 +111,13 @@ pub struct InsertableBeadModelBuilder<
     pub(crate) diameter_millimeters: Option<f32>,
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertableBeadModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableBeadModelBuilder>
+{
+    fn from(builder: InsertableBeadModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `BeadModel` or
 /// descendant tables.
 pub trait BeadModelSettable: Sized {
@@ -149,8 +150,7 @@ pub trait BeadModelSettable: Sized {
         validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>;
 }
 impl<PhysicalAssetModel> BeadModelSettable for InsertableBeadModelBuilder<PhysicalAssetModel> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute;
     /// Sets the value of the `public.bead_models.diameter_millimeters` column.
     fn diameter_millimeters<DM>(
         mut self,
@@ -162,13 +162,13 @@ impl<PhysicalAssetModel> BeadModelSettable for InsertableBeadModelBuilder<Physic
     {
         let diameter_millimeters = diameter_millimeters.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableBeadModelAttribute::DiameterMillimeters)
+                .rename_field(BeadModelAttribute::DiameterMillimeters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(diameter_millimeters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute::DiameterMillimeters,
+                        crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute::DiameterMillimeters,
                     )
             })?;
         self.diameter_millimeters = Some(diameter_millimeters);
@@ -177,16 +177,16 @@ impl<PhysicalAssetModel> BeadModelSettable for InsertableBeadModelBuilder<Physic
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableBeadModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -351,11 +351,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableBeadModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -402,11 +402,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::bead_models::BeadModel,
-            Error = web_common_traits::database::InsertError<InsertableBeadModelAttribute>,
+            Error = web_common_traits::database::InsertError<BeadModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableBeadModelAttribute;
+    type Attributes = BeadModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.diameter_millimeters.is_some()
     }

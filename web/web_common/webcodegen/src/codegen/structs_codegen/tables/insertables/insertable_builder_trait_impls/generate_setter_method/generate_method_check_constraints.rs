@@ -26,18 +26,14 @@ impl Table {
             .map(Column::to_nullable)
             .collect();
 
-        let mut check_constraints = columns
+        let check_constraints = columns
             .iter()
-            .map(|column| column.as_ref().check_constraints(conn))
+            .map(|column| Ok(column.as_ref().check_constraints(conn)?.as_ref().clone()))
             .collect::<Result<Vec<_>, WebCodeGenError>>()?
             .into_iter()
             .flatten()
             .filter(|constraint| !constraint.is_postgis_constraint())
             .collect::<Vec<_>>();
-
-        check_constraints
-            .sort_unstable_by_key(|check_constraint| check_constraint.check_clause.clone());
-        check_constraints.dedup_by_key(|check_constraint| check_constraint.check_clause.clone());
 
         check_constraints
             .into_iter()
@@ -48,6 +44,14 @@ impl Table {
                     check_constraints_extensions,
                     conn,
                 );
+                if let Err(WebCodeGenError::CodeGenerationError(
+                    CodeGenerationError::CheckConstraintError(
+                        CheckConstraintError::NoFunctionCalls(_check_constraint),
+                    ),
+                )) = &outcome
+                {
+                    return None;
+                }
                 if let Err(WebCodeGenError::CodeGenerationError(
                     CodeGenerationError::CheckConstraintError(
                         CheckConstraintError::NoInvolvedColumns(unknown_column, _),

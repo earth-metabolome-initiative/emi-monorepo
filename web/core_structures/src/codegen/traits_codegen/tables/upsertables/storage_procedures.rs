@@ -20,10 +20,16 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(stored_asset.ne(excluded(stored_asset)))
-                    .or(stored_with.ne(excluded(stored_with))),
+                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(procedure_template_stored_asset_model
+                        .ne(excluded(procedure_template_stored_asset_model)))
+                    .or(procedure_stored_asset.ne(excluded(procedure_stored_asset)))
+                    .or(stored_into.ne(excluded(stored_into)))
+                    .or(stored_into_model.ne(excluded(stored_into_model)))
+                    .or(procedure_template_stored_into_model
+                        .ne(excluded(procedure_template_stored_into_model)))
+                    .or(procedure_stored_into.ne(excluded(procedure_stored_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -51,10 +57,16 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(stored_asset.ne(excluded(stored_asset)))
-                    .or(stored_with.ne(excluded(stored_with))),
+                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(procedure_template_stored_asset_model
+                        .ne(excluded(procedure_template_stored_asset_model)))
+                    .or(procedure_stored_asset.ne(excluded(procedure_stored_asset)))
+                    .or(stored_into.ne(excluded(stored_into)))
+                    .or(stored_into_model.ne(excluded(stored_into_model)))
+                    .or(procedure_template_stored_into_model
+                        .ne(excluded(procedure_template_stored_into_model)))
+                    .or(procedure_stored_into.ne(excluded(procedure_stored_into))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

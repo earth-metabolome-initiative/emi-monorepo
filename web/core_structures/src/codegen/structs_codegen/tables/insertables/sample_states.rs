@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSampleStateAttribute {
+pub enum SampleStateAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableSampleStateAttribute {
+impl core::str::FromStr for SampleStateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableSampleStateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableSampleStateAttribute {
+impl core::fmt::Display for SampleStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -89,6 +89,13 @@ pub struct InsertableSampleStateBuilder {
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
+}
+impl From<InsertableSampleStateBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableSampleStateBuilder>
+{
+    fn from(builder: InsertableSampleStateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `SampleState` or
 /// descendant tables.
@@ -195,8 +202,7 @@ pub trait SampleStateSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl SampleStateSettable for InsertableSampleStateBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute;
     /// Sets the value of the `public.sample_states.name` column.
     fn name<N>(
         mut self,
@@ -207,8 +213,7 @@ impl SampleStateSettable for InsertableSampleStateBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSampleStateAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(SampleStateAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -224,7 +229,7 @@ impl SampleStateSettable for InsertableSampleStateBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSampleStateAttribute::Description)
+                .rename_field(SampleStateAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -239,8 +244,7 @@ impl SampleStateSettable for InsertableSampleStateBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableSampleStateAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(SampleStateAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -266,10 +270,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::sample_states::SampleState,
-            Error = web_common_traits::database::InsertError<InsertableSampleStateAttribute>,
+            Error = web_common_traits::database::InsertError<SampleStateAttribute>,
         >,
 {
-    type Attributes = InsertableSampleStateAttribute;
+    type Attributes = SampleStateAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

@@ -18,8 +18,8 @@ impl Codegen<'_> {
     }
 
     #[allow(clippy::needless_pass_by_value)]
-    fn build_dispatch(
-        foreign_keys: &[&KeyColumnUsage],
+    fn build_dispatch<FK: AsRef<KeyColumnUsage>>(
+        foreign_keys: &[FK],
         foreign_table: &Table,
         assignment_right_term: TokenStream,
         conn: &mut PgConnection,
@@ -27,9 +27,9 @@ impl Codegen<'_> {
         let foreign_table_snake_case_ident = foreign_table.snake_case_ident()?;
         foreign_keys.iter()
             .map(|foreign_key_constraint| {
-                let columns = foreign_key_constraint.columns(conn)?;
-                let foreign_columns = foreign_key_constraint.foreign_columns(conn)?;
-                let constraint_ident = foreign_key_constraint.constraint_ident(conn)?;
+                let columns = foreign_key_constraint.as_ref().columns(conn)?;
+                let foreign_columns = foreign_key_constraint.as_ref().foreign_columns(conn)?;
+                let constraint_ident = foreign_key_constraint.as_ref().constraint_ident(conn)?;
 
                 let if_statement = columns.iter().zip(foreign_columns.iter()).map(|(column, foreign_column)|{
                     let column_ident = column.snake_case_ident()?;
@@ -84,13 +84,16 @@ impl Codegen<'_> {
             let table_path = table.import_struct_path()?;
             let foreign_keys_trait_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let snake_case_ident = table.snake_case_ident()?;
-            let mut foreign_keys = table.foreign_keys(conn)?;
 
             // We only keep foreign key constraints that are associated with foreign primary
             // keys.
-            foreign_keys.retain(|fk| fk.is_foreign_primary_key(conn).unwrap_or(false));
+            let foreign_keys = table.foreign_keys(conn)?;
+            let foreign_primary_keys = foreign_keys
+                .iter()
+                .filter(|fk| fk.is_foreign_primary_key(conn).unwrap_or(false))
+                .collect::<Vec<_>>();
 
-            if foreign_keys.is_empty() {
+            if foreign_primary_keys.is_empty() {
                 continue;
             }
 
@@ -100,13 +103,13 @@ impl Codegen<'_> {
 
             let mut foreign_tables = Vec::new();
 
-            for foreign_key in &foreign_keys {
+            for foreign_key in &foreign_primary_keys {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 foreign_tables.push(foreign_table);
             }
 
             let foreign_keys_struct_ident = Self::foreign_keys_struct_ident(table)?;
-            let attributes = foreign_keys
+            let attributes = foreign_primary_keys
                 .iter()
                 .zip(foreign_tables.iter())
                 .map(|(foreign_key, foreign_table)| {
@@ -119,7 +122,7 @@ impl Codegen<'_> {
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
-            let fully_loaded_method_impl = foreign_keys
+            let fully_loaded_method_impl = foreign_primary_keys
                 .iter()
                 .map(|foreign_key| {
                     let columns = foreign_key.columns(conn)?;
@@ -168,7 +171,7 @@ impl Codegen<'_> {
                     |acc, foreign_key: Result<(TokenStream, bool), WebCodeGenError>| {
                         let (foreign_key, or_joined) = foreign_key?;
                         Ok::<TokenStream, WebCodeGenError>(if acc.is_empty() {
-                            if or_joined && foreign_keys.len() > 1 {
+                            if or_joined && foreign_primary_keys.len() > 1 {
                                 quote::quote! {
                                     (#foreign_key)
                                 }
@@ -189,7 +192,7 @@ impl Codegen<'_> {
                     },
                 )?;
 
-            let load_foreign_keys_impl = foreign_keys
+            let load_foreign_keys_impl = foreign_primary_keys
                 .iter()
                 .zip(foreign_tables.iter())
                 .map(|(foreign_key, foreign_table)| {
@@ -263,10 +266,10 @@ impl Codegen<'_> {
             for unique_foreign_table in unique_table_types {
                 let mut unique_foreign_keys = Vec::new();
 
-                for foreign_key in &foreign_keys {
-                    let foreign_table = foreign_key.foreign_table(conn)?;
+                for foreign_primary_key in &foreign_primary_keys {
+                    let foreign_table = foreign_primary_key.foreign_table(conn)?;
                     if foreign_table == unique_foreign_table {
-                        unique_foreign_keys.push(foreign_key);
+                        unique_foreign_keys.push(foreign_primary_key);
                     }
                 }
 

@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamAttribute {
+pub enum TeamAttribute {
     Id,
     Name,
     Description,
@@ -13,7 +13,7 @@ pub enum InsertableTeamAttribute {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableTeamAttribute {
+impl core::str::FromStr for TeamAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -43,7 +43,7 @@ impl core::str::FromStr for InsertableTeamAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamAttribute {
+impl core::fmt::Display for TeamAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -80,70 +80,6 @@ pub struct InsertableTeam {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableTeam {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
-    }
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -176,34 +112,34 @@ impl InsertableTeam {
             conn,
         )
     }
-    pub fn state<C: diesel::connection::LoadConnection>(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        crate::codegen::structs_codegen::tables::users::User,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::team_states::TeamState: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::team_states::TeamState,
+            crate::codegen::structs_codegen::tables::users::User,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::team_states::TeamState::table(),
-                self.state_id,
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
             ),
             conn,
         )
@@ -244,6 +180,70 @@ impl InsertableTeam {
         )
         .map(Some)
     }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::team_states::TeamState: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::team_states::TeamState,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::team_states::TeamState::table(),
+                self.state_id,
+            ),
+            conn,
+        )
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
+    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -259,6 +259,13 @@ pub struct InsertableTeamBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl From<InsertableTeamBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableTeamBuilder>
+{
+    fn from(builder: InsertableTeamBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableTeamBuilder {
     fn default() -> Self {
@@ -543,22 +550,22 @@ pub trait TeamSettable: Sized {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl TeamSettable for InsertableTeamBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::TeamAttribute;
     /// Sets the value of the `public.teams.id` column.
     fn id(
         mut self,
         id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(InsertableTeamAttribute::Id)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Id)
         })?;
         if let Some(parent_team_id) = self.parent_team_id {
             pgrx_validation::must_be_distinct_i32(parent_team_id, id)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::ParentTeamId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Id,
+                            crate::codegen::structs_codegen::tables::insertables::TeamAttribute::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Id,
                         )
                 })?;
         }
@@ -575,12 +582,11 @@ impl TeamSettable for InsertableTeamBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
             e.rename_field(
-                crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Name,
+                crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Name,
             )
         })?;
         self.name = Some(name);
@@ -596,8 +602,7 @@ impl TeamSettable for InsertableTeamBuilder {
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttribute::Description)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -612,12 +617,11 @@ impl TeamSettable for InsertableTeamBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
             e.rename_field(
-                crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Icon,
+                crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Icon,
             )
         })?;
         self.icon = Some(icon);
@@ -649,8 +653,8 @@ impl TeamSettable for InsertableTeamBuilder {
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::ParentTeamId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::Id,
+                            crate::codegen::structs_codegen::tables::insertables::TeamAttribute::ParentTeamId,
+                            crate::codegen::structs_codegen::tables::insertables::TeamAttribute::Id,
                         )
                 })?;
         }
@@ -693,18 +697,15 @@ impl TeamSettable for InsertableTeamBuilder {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttribute::CreatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.created_at = Some(created_at);
         Ok(self)
@@ -728,18 +729,15 @@ impl TeamSettable for InsertableTeamBuilder {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableTeamAttribute::UpdatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableTeamAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::TeamAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)
@@ -757,10 +755,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::teams::Team,
-            Error = web_common_traits::database::InsertError<InsertableTeamAttribute>,
+            Error = web_common_traits::database::InsertError<TeamAttribute>,
         >,
 {
-    type Attributes = InsertableTeamAttribute;
+    type Attributes = TeamAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some()
             && self.name.is_some()

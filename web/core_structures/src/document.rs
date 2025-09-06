@@ -4,7 +4,7 @@ use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
 
 use crate::{
     Document, codegen::structs_codegen::tables::insertables::DocumentSettable,
-    tables::insertables::InsertableDocumentAttribute,
+    tables::insertables::DocumentAttribute,
 };
 
 /// Returns the newly created photograph.
@@ -12,7 +12,7 @@ pub fn create_photograph<C: LoadConnection>(
     photograph: &[u8],
     user: &crate::User,
     conn: &mut C,
-) -> Result<Document, InsertError<InsertableDocumentAttribute>>
+) -> Result<Document, InsertError<DocumentAttribute>>
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
@@ -28,8 +28,8 @@ where
 
     // We begin a transaction where we insert the document and write it to the
     // database
-    let document: Document = conn
-        .transaction::<Document, InsertError<InsertableDocumentAttribute>, _>(|conn| {
+    let document: Document =
+        conn.transaction::<Document, InsertError<DocumentAttribute>, _>(|conn| {
             let document: Document = crate::Document::new()
                 .mime_type(info.mime_type())?
                 .created_by(user.id)?

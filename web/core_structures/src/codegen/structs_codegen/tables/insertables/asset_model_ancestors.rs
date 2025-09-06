@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAssetModelAncestorAttribute {
+pub enum AssetModelAncestorAttribute {
     DescendantModel,
     AncestorModel,
 }
-impl core::str::FromStr for InsertableAssetModelAncestorAttribute {
+impl core::str::FromStr for AssetModelAncestorAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableAssetModelAncestorAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableAssetModelAncestorAttribute {
+impl core::fmt::Display for AssetModelAncestorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::DescendantModel => write!(f, "descendant_model"),
@@ -162,7 +162,7 @@ pub trait AssetModelAncestorSettable: Sized {
 }
 impl AssetModelAncestorSettable for InsertableAssetModelAncestorBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttribute;
+        crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`
     /// column.
     fn descendant_model(
@@ -195,12 +195,10 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        Error = web_common_traits::database::InsertError<
-            InsertableAssetModelAncestorAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
     >,
 {
-    type Attributes = InsertableAssetModelAncestorAttribute;
+    type Attributes = AssetModelAncestorAttribute;
     fn is_complete(&self) -> bool {
         self.descendant_model.is_some() && self.ancestor_model.is_some()
     }

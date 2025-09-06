@@ -1,6 +1,7 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
 use std::fmt::Display;
 
+use cached::DiskCacheError;
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
@@ -71,6 +72,8 @@ pub enum WebCodeGenError {
     UnsupportedTypeCasting(String, Box<PgType>),
     /// The column does not have a default value.
     ColumnDoesNotHaveDefaultValue(Box<Column>),
+    /// Something failed with the Disk Cache.
+    DiskCache(DiskCacheError),
 }
 
 impl Display for WebCodeGenError {
@@ -172,6 +175,7 @@ impl Display for WebCodeGenError {
                     column.table_name, column.column_name
                 )
             }
+            WebCodeGenError::DiskCache(err) => write!(f, "Disk cache error: {}", err),
         }
     }
 }
@@ -251,6 +255,9 @@ impl core::error::Error for CodeGenerationError {
 pub enum CheckConstraintError {
     /// When one of the functions is not from the provided extensions.
     FunctionNotFromProvidedExtensions(Box<PgProc>, Box<CheckConstraint>),
+    /// When the check constraint does not contain any function calls, and
+    /// therefore it is not clear how to convert it into a rust function.
+    NoFunctionCalls(Box<CheckConstraint>),
     /// When some of the syntax of the [`CheckConstraint`] is not supported.
     UnsupportedSyntax(Box<CheckConstraint>, UnsupportedCheckConstraintErrorSyntax),
     /// When one of the operators is not a plain Rust operator.
@@ -265,24 +272,31 @@ pub enum CheckConstraintError {
 impl Display for CheckConstraintError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CheckConstraintError::FunctionNotFromProvidedExtensions(proc, constraint) => {
+            Self::FunctionNotFromProvidedExtensions(proc, constraint) => {
                 write!(
                     f,
                     "Function `{}` in check constraint `{}.{}` is not from the provided extensions",
                     proc.proname, constraint.constraint_schema, constraint.constraint_name
                 )
             }
-            CheckConstraintError::UnsupportedSyntax(constraint, syntax_error) => {
+            Self::NoFunctionCalls(constraint) => {
+                write!(
+                    f,
+                    "Check constraint `{}.{}` does not contain any function calls",
+                    constraint.constraint_schema, constraint.constraint_name
+                )
+            }
+            Self::UnsupportedSyntax(constraint, syntax_error) => {
                 write!(
                     f,
                     "Unsupported syntax in check constraint `{}.{}`: {}",
                     constraint.constraint_schema, constraint.constraint_name, syntax_error
                 )
             }
-            CheckConstraintError::OperatorsNotSupported => {
+            Self::OperatorsNotSupported => {
                 write!(f, "Some operators are not supported")
             }
-            CheckConstraintError::NoInvolvedColumns(column, constraint) => {
+            Self::NoInvolvedColumns(column, constraint) => {
                 write!(
                     f,
                     "Column `{}.{}` is not involved in the check constraint `{}.{}`",
@@ -292,7 +306,7 @@ impl Display for CheckConstraintError {
                     constraint.constraint_name
                 )
             }
-            CheckConstraintError::TopLevelExpressionNotResult(constraint) => {
+            Self::TopLevelExpressionNotResult(constraint) => {
                 write!(
                     f,
                     "Top-level expression in check constraint `{}.{}` cannot be reduced to a Result-returning expression",
@@ -409,5 +423,11 @@ impl From<core::num::ParseFloatError> for WebCodeGenError {
 impl From<core::str::ParseBoolError> for WebCodeGenError {
     fn from(value: core::str::ParseBoolError) -> Self {
         WebCodeGenError::ParseBoolError(value)
+    }
+}
+
+impl From<DiskCacheError> for WebCodeGenError {
+    fn from(value: DiskCacheError) -> Self {
+        WebCodeGenError::DiskCache(value)
     }
 }

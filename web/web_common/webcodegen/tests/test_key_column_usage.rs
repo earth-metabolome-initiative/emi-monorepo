@@ -175,7 +175,7 @@ async fn test_key_column_usage() {
 
     // We check that for both foreign key constraints in `composite_users`, the
     // foreign table is `users`
-    for fk in &composite_users_foreign_keys {
+    for fk in composite_users_foreign_keys.iter() {
         let foreign_table = match fk.foreign_table(&mut conn) {
             Ok(table) => table,
             Err(err) => {

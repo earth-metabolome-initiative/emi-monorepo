@@ -100,7 +100,7 @@ pub enum TablePrimaryKey {
     PositioningDevice(::rosetta_uuid::Uuid),
     PouringProcedureTemplate(i32),
     PouringProcedure(::rosetta_uuid::Uuid),
-    ProcedureAsset((::rosetta_uuid::Uuid, i32)),
+    ProcedureAsset(::rosetta_uuid::Uuid),
     ProcedureTemplateAssetModel(i32),
     ProcedureTemplate(i32),
     Procedure(::rosetta_uuid::Uuid),
@@ -108,8 +108,6 @@ pub enum TablePrimaryKey {
     Project(i32),
     Rank(i16),
     ReagentModel(i32),
-    RegisteringProcedureTemplate(i32),
-    RegisteringProcedure(::rosetta_uuid::Uuid),
     Role(i16),
     Room(i32),
     SampleState(i16),
@@ -441,12 +439,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::Rank(_) => crate::codegen::tables::table_names::TableName::Rank,
             TablePrimaryKey::ReagentModel(_) => {
                 crate::codegen::tables::table_names::TableName::ReagentModel
-            }
-            TablePrimaryKey::RegisteringProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::RegisteringProcedureTemplate
-            }
-            TablePrimaryKey::RegisteringProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::RegisteringProcedure
             }
             TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,

@@ -23,12 +23,20 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute,
-    >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
@@ -46,15 +54,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute,
+        crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -86,37 +91,67 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
             if let Some(freezing_procedure_templates) = crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::foreign_procedure_template(
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_with_model(
                     self,
-                    freezing_procedure_templates.foreign_procedure_template,
+                    freezing_procedure_templates.procedure_template_frozen_with_model,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_container_model(
+                    self,
+                    freezing_procedure_templates
+                        .procedure_template_frozen_container_model,
                 )?;
             }
         }
-        if let Some(foreign_procedure) = self.foreign_procedure {
-            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
-                foreign_procedure,
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_frozen_container),
+        ) = self.procedure_frozen_container
+        {
+            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+                procedure_frozen_container,
                 conn,
             )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::foreign_procedure_template(
+                if let Some(asset) = procedure_assets.asset {
+                    self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_container(
+                        self,
+                        asset,
+                    )?;
+                }
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_container_model(
                     self,
-                    procedures.procedure_template,
+                    procedure_assets.asset_model,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_container_model(
+                    self,
+                    procedure_assets.procedure_template_asset_model,
                 )?;
             }
         }
-        if let Some(frozen_with) = self.frozen_with {
-            if let Some(assets) = crate::codegen::structs_codegen::tables::assets::Asset::read(
-                frozen_with,
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_frozen_with),
+        ) = self.procedure_frozen_with
+        {
+            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+                procedure_frozen_with,
                 conn,
             )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_with(
+                    self,
+                    procedure_assets.asset,
+                )?;
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_with_model(
                     self,
-                    assets.model,
+                    procedure_assets.asset_model,
+                )?;
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_with_model(
+                    self,
+                    procedure_assets.procedure_template_asset_model,
                 )?;
             }
         }
@@ -124,55 +159,129 @@ where
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::ProcedureTemplate,
-                ),
-            )?;
-        let foreign_procedure_template = self
-            .foreign_procedure_template
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::ForeignProcedureTemplate,
-                ),
-            )?;
-        let foreign_procedure = self
-            .foreign_procedure
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::ForeignProcedure,
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let frozen_container = self
             .frozen_container
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::FrozenContainer,
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::FrozenContainer,
+                ),
+            )?;
+        let frozen_container_model = self
+            .frozen_container_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::FrozenContainerModel,
+                ),
+            )?;
+        let procedure_template_frozen_container_model = self
+            .procedure_template_frozen_container_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureTemplateFrozenContainerModel,
                 ),
             )?;
         let frozen_with_model = self
             .frozen_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::FrozenWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::FrozenWithModel,
+                ),
+            )?;
+        let procedure_template_frozen_with_model = self
+            .procedure_template_frozen_with_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureTemplateFrozenWithModel,
                 ),
             )?;
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureExtensionAttribute::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureExtensionAttribute::Procedure(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
                     ),
                 ))
             })?;
+        let procedure_frozen_container = match self.procedure_frozen_container {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenContainer(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_frozen_container,
+            ) => {
+                procedure_frozen_container = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure(
+                        procedure_frozen_container,
+                        procedure,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenContainer,
+                        )
+                    })?;
+                procedure_frozen_container
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenContainer,
+                        )
+                    })?
+            }
+        };
+        let procedure_frozen_with = match self.procedure_frozen_with {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenWith(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_frozen_with,
+            ) => {
+                procedure_frozen_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure(
+                        procedure_frozen_with,
+                        procedure,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenWith,
+                        )
+                    })?;
+                procedure_frozen_with
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenWith,
+                        )
+                    })?
+            }
+        };
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
-            foreign_procedure_template,
-            foreign_procedure,
             frozen_container,
+            frozen_container_model,
+            procedure_template_frozen_container_model,
+            procedure_frozen_container,
             frozen_with: self.frozen_with,
             frozen_with_model,
+            procedure_template_frozen_with_model,
+            procedure_frozen_with,
         })
     }
 }

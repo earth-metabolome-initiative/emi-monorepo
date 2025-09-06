@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableParentProcedureTemplateAttribute {
+pub enum ParentProcedureTemplateAttribute {
     ParentProcedureTemplate,
     ChildProcedureTemplate,
     Snoozable,
@@ -10,7 +10,7 @@ pub enum InsertableParentProcedureTemplateAttribute {
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableParentProcedureTemplateAttribute {
+impl core::str::FromStr for ParentProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -34,7 +34,7 @@ impl core::str::FromStr for InsertableParentProcedureTemplateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableParentProcedureTemplateAttribute {
+impl core::fmt::Display for ParentProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ParentProcedureTemplate => write!(f, "parent_procedure_template"),
@@ -67,38 +67,6 @@ pub struct InsertableParentProcedureTemplate {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableParentProcedureTemplate {
-    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.parent_procedure_template,
-            ),
-            conn,
-        )
-    }
     pub fn child_procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -159,6 +127,38 @@ impl InsertableParentProcedureTemplate {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
                 self.created_by,
+            ),
+            conn,
+        )
+    }
+    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.parent_procedure_template,
             ),
             conn,
         )
@@ -398,7 +398,8 @@ pub trait ParentProcedureTemplateSettable: Sized {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.parent_procedure_templates.parent_procedure_template` column.
     fn parent_procedure_template(
@@ -413,8 +414,8 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ParentProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ChildProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ParentProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ChildProcedureTemplate,
                         )
                 })?;
         }
@@ -435,8 +436,8 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ParentProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateAttribute::ChildProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ParentProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ChildProcedureTemplate,
                         )
                 })?;
         }
@@ -455,7 +456,7 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     {
         let snoozable = snoozable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttribute::Snoozable)
+                .rename_field(ParentProcedureTemplateAttribute::Snoozable)
         })?;
         self.snoozable = Some(snoozable);
         Ok(self)
@@ -472,7 +473,7 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     {
         let copiable = copiable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttribute::Copiable)
+                .rename_field(ParentProcedureTemplateAttribute::Copiable)
         })?;
         self.copiable = Some(copiable);
         Ok(self)
@@ -489,7 +490,7 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     {
         let repeatable = repeatable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttribute::Repeatable)
+                .rename_field(ParentProcedureTemplateAttribute::Repeatable)
         })?;
         self.repeatable = Some(repeatable);
         Ok(self)
@@ -506,7 +507,7 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     {
         let skippable = skippable.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttribute::Skippable)
+                .rename_field(ParentProcedureTemplateAttribute::Skippable)
         })?;
         self.skippable = Some(skippable);
         Ok(self)
@@ -533,7 +534,7 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableParentProcedureTemplateAttribute::CreatedAt)
+                .rename_field(ParentProcedureTemplateAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -553,11 +554,11 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableParentProcedureTemplateAttribute,
+            ParentProcedureTemplateAttribute,
         >,
     >,
 {
-    type Attributes = InsertableParentProcedureTemplateAttribute;
+    type Attributes = ParentProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.parent_procedure_template.is_some()
             && self.child_procedure_template.is_some() && self.snoozable.is_some()

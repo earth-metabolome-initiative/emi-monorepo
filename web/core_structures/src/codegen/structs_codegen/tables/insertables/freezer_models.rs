@@ -1,48 +1,42 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFreezerModelExtensionAttribute {
+pub enum FreezerModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableFreezerModelExtensionAttribute {
+impl core::fmt::Display for FreezerModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableFreezerModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for FreezerModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableFreezerModelAttribute {
-    Extension(InsertableFreezerModelExtensionAttribute),
+pub enum FreezerModelAttribute {
+    Extension(FreezerModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableFreezerModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for FreezerModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableFreezerModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
+        Self::Extension(FreezerModelExtensionAttribute::PhysicalAssetModel(physical_asset_models))
     }
 }
-impl core::str::FromStr for InsertableFreezerModelAttribute {
+impl core::str::FromStr for FreezerModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +44,7 @@ impl core::str::FromStr for InsertableFreezerModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableFreezerModelAttribute {
+impl core::fmt::Display for FreezerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +107,13 @@ pub struct InsertableFreezerModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertableFreezerModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableFreezerModelBuilder>
+{
+    fn from(builder: InsertableFreezerModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `FreezerModel` or
 /// descendant tables.
 pub trait FreezerModelSettable: Sized {
@@ -122,21 +123,20 @@ pub trait FreezerModelSettable: Sized {
 impl<PhysicalAssetModel> FreezerModelSettable
     for InsertableFreezerModelBuilder<PhysicalAssetModel>
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableFreezerModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -301,11 +301,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableFreezerModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -352,11 +352,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-            Error = web_common_traits::database::InsertError<InsertableFreezerModelAttribute>,
+            Error = web_common_traits::database::InsertError<FreezerModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableFreezerModelAttribute;
+    type Attributes = FreezerModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

@@ -1,32 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDigitalAssetModelExtensionAttribute {
-    AssetModel(crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute),
+pub enum DigitalAssetModelExtensionAttribute {
+    AssetModel(crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute),
 }
-impl core::fmt::Display for InsertableDigitalAssetModelExtensionAttribute {
+impl core::fmt::Display for DigitalAssetModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::AssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute>
-    for InsertableDigitalAssetModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
+    for DigitalAssetModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
     ) -> Self {
         Self::AssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDigitalAssetModelAttribute {
-    Extension(InsertableDigitalAssetModelExtensionAttribute),
+pub enum DigitalAssetModelAttribute {
+    Extension(DigitalAssetModelExtensionAttribute),
     Id,
     ParentModel,
 }
-impl core::str::FromStr for InsertableDigitalAssetModelAttribute {
+impl core::str::FromStr for DigitalAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -36,7 +36,7 @@ impl core::str::FromStr for InsertableDigitalAssetModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableDigitalAssetModelAttribute {
+impl core::fmt::Display for DigitalAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -128,6 +128,34 @@ impl InsertableDigitalAssetModel {
             )
             .map(Some)
     }
+    #[cfg(feature = "postgres")]
+    pub fn digital_asset_models_id_parent_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(parent_model) = self.parent_model else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(parent_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+            .map(Some)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -136,6 +164,13 @@ pub struct InsertableDigitalAssetModelBuilder<
 > {
     pub(crate) parent_model: Option<i32>,
     pub(crate) id: AssetModel,
+}
+impl From<InsertableDigitalAssetModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableDigitalAssetModelBuilder>
+{
+    fn from(builder: InsertableDigitalAssetModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `DigitalAssetModel`
 /// or descendant tables.
@@ -167,33 +202,35 @@ pub trait DigitalAssetModelSettable: Sized {
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
         >,
-> DigitalAssetModelSettable for InsertableDigitalAssetModelBuilder<AssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttribute;
-    ///Sets the value of the `public.digital_asset_models.parent_model` column.
+> DigitalAssetModelSettable for InsertableDigitalAssetModelBuilder<AssetModel>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute;
+    /// Sets the value of the `public.digital_asset_models.parent_model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`asset_models`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`asset_models`"]
     ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 directly-involved-column
-    ///end
-    ///subgraph v3 ["`digital_asset_models`"]
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v3 ["`digital_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    ///class v1 column-of-interest
-    ///end
-    ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
-    ///```
+    /// class v1 column-of-interest
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
@@ -213,16 +250,16 @@ impl<
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableDigitalAssetModelBuilder<AssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -409,11 +446,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
-            Error = web_common_traits::database::InsertError<InsertableDigitalAssetModelAttribute>,
+            Error = web_common_traits::database::InsertError<DigitalAssetModelAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableDigitalAssetModelAttribute;
+    type Attributes = DigitalAssetModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

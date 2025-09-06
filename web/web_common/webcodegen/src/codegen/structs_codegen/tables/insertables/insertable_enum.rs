@@ -22,8 +22,8 @@ impl Table {
     ///
     /// * If the name of the insertable variant builder attributes cannot be
     ///   retrieved.
-    pub fn insertable_enum_name(&self) -> Result<String, WebCodeGenError> {
-        Ok(format!("Insertable{}Attribute", self.struct_name()?))
+    pub fn attributes_enum_name(&self) -> Result<String, WebCodeGenError> {
+        Ok(format!("{}Attribute", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the attributes that may be set in
@@ -33,25 +33,25 @@ impl Table {
     ///
     /// * If the name of the insertable variant builder attributes cannot be
     ///   retrieved.
-    pub fn insertable_enum_ident(&self) -> Result<Ident, WebCodeGenError> {
-        Ok(Ident::new(&self.insertable_enum_name()?, proc_macro2::Span::call_site()))
+    pub fn attributes_enum_ident(&self) -> Result<Ident, WebCodeGenError> {
+        Ok(Ident::new(&self.attributes_enum_name()?, proc_macro2::Span::call_site()))
     }
 
     /// Returns the name for the extension attributes.
-    pub fn insertable_extension_enum_name(&self) -> Result<String, WebCodeGenError> {
-        Ok(format!("Insertable{}ExtensionAttribute", self.struct_name()?))
+    fn attributes_extension_enum_name(&self) -> Result<String, WebCodeGenError> {
+        Ok(format!("{}ExtensionAttribute", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the extension attributes.
-    pub fn insertable_extension_enum_ident(&self) -> Result<Ident, WebCodeGenError> {
-        Ok(Ident::new(&self.insertable_extension_enum_name()?, proc_macro2::Span::call_site()))
+    pub(super) fn attributes_extension_enum_ident(&self) -> Result<Ident, WebCodeGenError> {
+        Ok(Ident::new(&self.attributes_extension_enum_name()?, proc_macro2::Span::call_site()))
     }
 
     /// Returns the [`Type`](syn::Type) for the extension attributes.
-    pub fn insertable_extension_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
+    fn attributes_extension_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
         Ok(syn::parse_str(&format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.insertable_extension_enum_name()?
+            self.attributes_extension_enum_name()?
         ))?)
     }
 
@@ -68,8 +68,8 @@ impl Table {
         extension_table: &Table,
         ident: Ident,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let insertable_enum = self.insertable_enum_ident()?;
-        let insertable_extension_enum = self.insertable_extension_enum_ident()?;
+        let insertable_enum = self.attributes_enum_ident()?;
+        let insertable_extension_enum = self.attributes_extension_enum_ident()?;
         let struct_ident = extension_table.struct_ident()?;
 
         Ok(quote::quote! {
@@ -107,7 +107,7 @@ impl Table {
     pub fn insertable_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
         Ok(syn::parse_str(&format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
-            self.insertable_enum_name()?
+            self.attributes_enum_name()?
         ))?)
     }
 
@@ -133,12 +133,12 @@ impl Table {
             return Ok(None);
         }
 
-        let insertable_extension_enum = self.insertable_extension_enum_ident()?;
+        let insertable_extension_enum = self.attributes_extension_enum_ident()?;
         let mut display_insertable_extension_enum_variants = Vec::new();
         let mut insertable_extension_enum_variants = Vec::new();
         let mut from_implementations = Vec::new();
 
-        for extension_table in extension_tables {
+        for extension_table in extension_tables.iter() {
             let struct_ident = extension_table.struct_ident()?;
             let extension_table_enum_ty = extension_table.insertable_enum_ty()?;
             display_insertable_extension_enum_variants.push(quote::quote! {
@@ -194,7 +194,7 @@ impl Table {
         let insertable_columns = self.insertable_columns(conn, false)?;
 
         // We obtain the enum identifier.
-        let insertable_enum = self.insertable_enum_ident()?;
+        let insertable_enum = self.attributes_enum_ident()?;
 
         // We obtain the identifiers for the columns.
         let mut column_camel_case_idents = Vec::new();
@@ -207,7 +207,7 @@ impl Table {
             let column_camel_case_name = insertable_column.camel_case_name()?;
 
             column_camel_case_idents.push(
-                if let Some(partial_builder_constraint) =
+                if let Some((partial_builder_kind, _, partial_builder_constraint)) =
                     insertable_column.requires_partial_builder(conn)?
                 {
                     let foreign_table = partial_builder_constraint
@@ -273,7 +273,7 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let insertable_columns = self.columns(conn)?;
-        let insertable_enum = self.insertable_enum_ident()?;
+        let insertable_enum = self.attributes_enum_ident()?;
         let extension_tables = self.extension_tables(conn)?;
         let insertable_extension_enum_definition =
             self.insertable_extension_enum_definition(conn)?;
@@ -281,7 +281,7 @@ impl Table {
         let mut display_insertable_enum_variants = Vec::new();
 
         if !extension_tables.is_empty() {
-            let insertable_extension_enum = self.insertable_extension_enum_ident()?;
+            let insertable_extension_enum = self.attributes_extension_enum_ident()?;
             insertable_enum_variants.push(quote::quote! {
                 Extension(#insertable_extension_enum)
             });
@@ -290,10 +290,12 @@ impl Table {
             });
         }
 
-        for insertable_column in insertable_columns {
+        for insertable_column in insertable_columns.iter() {
             let enum_variant = insertable_column.camel_case_ident()?;
 
-            if let Some(foreign_key) = insertable_column.requires_partial_builder(conn)? {
+            if let Some((partial_builder_kind, _, foreign_key)) =
+                insertable_column.requires_partial_builder(conn)?
+            {
                 let foreign_table_enum = foreign_key.foreign_table(conn)?.insertable_enum_ty()?;
                 insertable_enum_variants.push(quote::quote! {
                     #enum_variant(#foreign_table_enum)
@@ -321,12 +323,12 @@ impl Table {
 
         let mut singleton_foreign_keys = Vec::new();
 
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.iter() {
             if foreign_key.is_singleton_foreign_key(conn)?
-                && (foreign_key.is_same_as_constraint(conn)?.is_some()
+                && (foreign_key.is_partial_builder_constraint(conn)?.is_some()
                     || foreign_key.is_extension(conn)?)
             {
-                singleton_foreign_keys.push(foreign_key);
+                singleton_foreign_keys.push(foreign_key.clone());
             }
         }
 
@@ -338,22 +340,14 @@ impl Table {
                 let foreign_table_snake_case_ident = foreign_table.snake_case_ident()?;
                 let foreign_table_camel_case_ident = foreign_table.struct_ident()?;
                 let conversion = if foreign_key.is_extension(conn)? {
-                    let extension_table_enum_ident = self.insertable_extension_enum_ident()?;
+                    let extension_table_enum_ident = self.attributes_extension_enum_ident()?;
                     quote::quote! {
                         Self::Extension(
                             #extension_table_enum_ident::#foreign_table_camel_case_ident(#foreign_table_snake_case_ident)
                         )
                     }
-                } else if foreign_key.is_same_as_constraint(conn)?.is_some() {
+                } else if foreign_key.is_partial_builder_constraint(conn)?.is_some() {
                     let local_columns = foreign_key.columns(conn)?;
-                    assert_eq!(
-                        local_columns.len(),
-                        1,
-                        "Foreign key `{}` on `{}.{}` must have exactly one column",
-                        foreign_key.constraint_name,
-                        foreign_key.table_name,
-                        foreign_key.column_name
-                    );
                     let local_column_camel_cased = local_columns[0].camel_case_ident()?;
 
                     quote::quote! {
@@ -508,7 +502,7 @@ impl Codegen<'_> {
         if let Some(passing_through) = passing_through {
             if table.has_column(passing_through) {
                 let passing_through_ident = passing_through.camel_case_ident()?;
-                let foreign_key = passing_through
+                let (partial_builder_kind, _, foreign_key) = passing_through
                     .requires_partial_builder(conn)?
                     .expect("Passing through column must require a partial builder");
                 let foreign_table = foreign_key.foreign_table(conn)?;
@@ -525,7 +519,7 @@ impl Codegen<'_> {
         }
 
         let path = self.table_extension_network().unwrap().extension_path(table, column).unwrap();
-        let insertable_extension_enum = table.insertable_extension_enum_ty()?;
+        let insertable_extension_enum = table.attributes_extension_enum_ty()?;
         let extension_table = path[0];
         let extension_table_ident = extension_table.struct_ident()?;
         let recursion = self.column_enum_path(extension_table, column, passing_through, conn)?;

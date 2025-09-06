@@ -35,10 +35,6 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
                             .ne(excluded(centrifuged_container_model)),
                     )
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_centrifuged_container_model
                             .ne(excluded(procedure_template_centrifuged_container_model)),
                     ),
@@ -82,10 +78,6 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
                     .or(
                         centrifuged_container_model
                             .ne(excluded(centrifuged_container_model)),
-                    )
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
                     )
                     .or(
                         procedure_template_centrifuged_container_model

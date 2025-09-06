@@ -10,7 +10,7 @@ use web_common_traits::{
 use crate::{
     AssetModel, ProcedureTemplate,
     codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable,
-    tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+    tables::insertables::ProcedureTemplateAssetModelAttribute,
 };
 
 /// Trait defining the methods for managing parent-child relationships in
@@ -35,10 +35,7 @@ where
         name: &str,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::ProcedureTemplateAssetModel,
-        InsertError<InsertableProcedureTemplateAssetModelAttribute>,
-    >
+    ) -> Result<crate::ProcedureTemplateAssetModel, InsertError<ProcedureTemplateAssetModelAttribute>>
     where
         T: ExtensionTable<AssetModel>,
         for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,

@@ -82,14 +82,14 @@ impl Table {
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut insertable_columns = Vec::new();
 
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_always_automatically_generated()
                 || !include_extension_columns
                     && column.is_part_of_extension_primary_key(conn)?.is_some()
             {
                 continue;
             }
-            insertable_columns.push(column);
+            insertable_columns.push(column.clone());
         }
 
         Ok(insertable_columns)
@@ -122,11 +122,11 @@ impl Codegen<'_> {
         let mut insertables_main_module = TokenStream::new();
 
         for table in tables {
-            let insertable_enum = table.insertable_enum_ident()?;
+            let insertable_enum = table.attributes_enum_ident()?;
             let maybe_insertable_extension_enum = if table.extension_tables(conn)?.is_empty() {
                 None
             } else {
-                Some(table.insertable_extension_enum_ident()?)
+                Some(table.attributes_extension_enum_ident()?)
             };
             let insertable_variant_ident = table.insertable_variant_ident()?;
             let insertable_builder_ident = table.insertable_builder_ident()?;

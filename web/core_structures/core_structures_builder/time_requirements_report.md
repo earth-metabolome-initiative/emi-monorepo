@@ -1,76 +1,61 @@
 # Time Report for Building Core Structures
 
-The total time spent on all tasks was 2 minutes.
-The slowest task was `Init DB Transaction` which took 2 minutes (96.30% of all time).
+The total time spent on all tasks was 19 seconds.
+The slowest task was `Setting up Docker and Database Connection` which took now (42.11% of all time).
 
-| name                | time      | percentage | comment |
-|---------------------|-----------|------------|---------|
-| Init DB Transaction | 2 minutes | 96.30%     |         |
-| Code Generation     | now       | 3.70%      |         |
+| name                                      | time | percentage | comment |
+|-------------------------------------------|------|------------|---------|
+| Setting up Docker and Database Connection | now  | 42.11%     |         |
+| Init DB                                   | now  | 21.05%     |         |
+| Code Generation                           | now  | 31.58%     |         |
 
-## Time Report for Init DB Transaction
+## Time Report for Init DB
 
-The total time spent on all tasks was 2 minutes.
-The slowest task was `Consistency Constraint Checks` which took 2 minutes (96.92% of all time).
+The total time spent on all tasks was now.
+The slowest task was `Init DB Transaction` which took now (100.00% of all time).
 
-| name                          | time      | percentage | comment |
-|-------------------------------|-----------|------------|---------|
-| Initialize CSVs               | now       | 2.31%      |         |
-| Initialize Migrations         | now       | 0.00%      |         |
-| Consistency Constraint Checks | 2 minutes | 96.92%     |         |
+| name                | time | percentage | comment |
+|---------------------|------|------------|---------|
+| Retrieve CSVs       | now  | 0.00%      |         |
+| Init DB Transaction | now  | 100.00%    |         |
 
-### Time Report for Consistency Constraint Checks
+### Time Report for Init DB Transaction
 
-The total time spent on all tasks was 2 minutes.
-The slowest task was `Check constraints in schema 'public'` which took 2 minutes (97.62% of all time).
+The total time spent on all tasks was now.
+The slowest task was `Initialize CSVs` which took now (75.00% of all time).
 
-| name                                               | time      | percentage | comment |
-|----------------------------------------------------|-----------|------------|---------|
-| Check constraints in schema 'public'               | 2 minutes | 97.62%     |         |
-| Procedure and procedure template check constraints | now       | 0.00%      |         |
-| Procedure and procedure template asset constraints | now       | 1.59%      |         |
-
-#### Time Report for Check constraints in schema 'public'
-
-The total time spent on all tasks was 2 minutes.
-The slowest task was `Compatible foreign type constraints` which took 2 minutes (99.19% of all time).
-
-| name                                     | time      | percentage | comment |
-|------------------------------------------|-----------|------------|---------|
-| Compatible foreign type constraints      | 2 minutes | 99.19%     |         |
-| Lowercase column and table names         | now       | 0.00%      |         |
-| Standard column names and types          | now       | 0.00%      |         |
-| Not-null constraints on standard columns | now       | 0.00%      |         |
-| Same-as constraint no cascade            | now       | 0.00%      |         |
-| Word deprecation constraints             | now       | 0.00%      |         |
+| name                  | time | percentage | comment |
+|-----------------------|------|------------|---------|
+| Initialize CSVs       | now  | 75.00%     |         |
+| Initialize Migrations | now  | 0.00%      |         |
 
 ## Time Report for Code Generation
 
 The total time spent on all tasks was now.
-The slowest task was `Code generation` which took now (80.00% of all time).
+The slowest task was `Code generation` which took now (100.00% of all time).
 
 | name              | time | percentage | comment |
 |-------------------|------|------------|---------|
-| Code generation   | now  | 80.00%     |         |
+| Code generation   | now  | 100.00%    |         |
 | Procedure Codegen | now  | 0.00%      |         |
 
 ### Time Report for Code generation
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Structs` which took now (100.00% of all time).
+The slowest task was `Generate Structs` which took now (83.33% of all time).
 
 | name                             | time | percentage | comment |
 |----------------------------------|------|------------|---------|
 | Retrieving tables                | now  | 0.00%      |         |
 | Creating table extension network | now  | 0.00%      |         |
 | Generating Diesel code           | now  | 0.00%      |         |
-| Generate Structs                 | now  | 100.00%    |         |
+| Generate Structs                 | now  | 83.33%     |         |
 | Generate Web Common Traits       | now  | 0.00%      |         |
 
 #### Time Report for Generating Diesel code
 
 The total time spent on all tasks was now.
-The slowest task was `Generating tables schema` which took now (NaN% of all time).
+The slowest task was `Generating allow tables to appear in same query schema` which took now (NaN% of all time).
 
 | name                                                   | time | percentage | comment |
 |--------------------------------------------------------|------|------------|---------|

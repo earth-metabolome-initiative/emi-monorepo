@@ -165,6 +165,30 @@ impl CommercialPositioningDeviceModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn commercial_positioning_device_id_positioning_device_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.positioning_device_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_positioning_device_model(
         positioning_device_model: &i32,
         conn: &mut diesel::PgConnection,

@@ -49,7 +49,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -62,13 +62,13 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.asset_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.asset_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,49 +89,49 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Name,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::ProcedureTemplate,
                 ),
             )?;
         let asset_model = self
             .asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::AssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::AssetModel,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

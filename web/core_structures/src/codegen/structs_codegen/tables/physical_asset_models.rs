@@ -98,6 +98,34 @@ impl PhysicalAssetModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn physical_asset_models_id_parent_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(parent_model) = self.parent_model else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(parent_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+            .map(Some)
+    }
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,

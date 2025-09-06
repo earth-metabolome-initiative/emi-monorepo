@@ -17,15 +17,11 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
             .do_update()
             .set(self)
             .filter(
-                container_model
-                    .ne(excluded(container_model))
+                capped_container_model
+                    .ne(excluded(capped_container_model))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
-                        procedure_template_container_model
-                            .ne(excluded(procedure_template_container_model)),
+                        procedure_template_capped_container_model
+                            .ne(excluded(procedure_template_capped_container_model)),
                     )
                     .or(capped_with_model.ne(excluded(capped_with_model)))
                     .or(
@@ -56,15 +52,11 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
             .do_update()
             .set(self)
             .filter(
-                container_model
-                    .ne(excluded(container_model))
+                capped_container_model
+                    .ne(excluded(capped_container_model))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
-                        procedure_template_container_model
-                            .ne(excluded(procedure_template_container_model)),
+                        procedure_template_capped_container_model
+                            .ne(excluded(procedure_template_capped_container_model)),
                     )
                     .or(capped_with_model.ne(excluded(capped_with_model)))
                     .or(

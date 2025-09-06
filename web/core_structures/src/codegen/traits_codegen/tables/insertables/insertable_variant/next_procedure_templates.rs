@@ -49,7 +49,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -62,19 +62,7 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         if !insertable_struct.current(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct.successor(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -89,10 +77,22 @@ where
                     .into(),
             );
         }
+        if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
         if !insertable_struct
             .next_procedure_templates_parent_successor_id_fkey(conn)?
             .can_update(user_id, conn)?
         {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct.successor(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -113,35 +113,35 @@ where
             .parent
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Parent,
+                    crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Parent,
                 ),
             )?;
         let current = self
             .current
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::Current,
+                    crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Current,
                 ),
             )?;
         let successor_id = self
             .successor_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::SuccessorId,
+                    crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::SuccessorId,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::CreatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

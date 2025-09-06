@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::camera_models::CameraModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::CameraModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

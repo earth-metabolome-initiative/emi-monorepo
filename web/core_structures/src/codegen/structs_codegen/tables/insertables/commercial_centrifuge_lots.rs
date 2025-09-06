@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeLotExtensionAttribute {
+pub enum CommercialCentrifugeLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ),
-    CentrifugeModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
-    ),
+    CentrifugeModel(crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute),
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeLotExtensionAttribute {
+impl core::fmt::Display for CommercialCentrifugeLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -16,32 +14,32 @@ impl core::fmt::Display for InsertableCommercialCentrifugeLotExtensionAttribute 
         }
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
-> for InsertableCommercialCentrifugeLotExtensionAttribute {
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute>
+    for CommercialCentrifugeLotExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute>
-    for InsertableCommercialCentrifugeLotExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute>
+    for CommercialCentrifugeLotExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
     ) -> Self {
         Self::CentrifugeModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeLotAttribute {
-    Extension(InsertableCommercialCentrifugeLotExtensionAttribute),
+pub enum CommercialCentrifugeLotAttribute {
+    Extension(CommercialCentrifugeLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialCentrifugeLotAttribute {
+impl core::str::FromStr for CommercialCentrifugeLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialCentrifugeLotAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeLotAttribute {
+impl core::fmt::Display for CommercialCentrifugeLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -170,6 +168,30 @@ impl InsertableCommercialCentrifugeLot {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_centrifuge_lots_id_product_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.product_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -188,6 +210,13 @@ pub struct InsertableCommercialCentrifugeLotBuilder<
     pub(crate) product_model: Option<i32>,
     pub(crate) commercial_centrifuge_lots_id_fkey: CommercialProductLot,
     pub(crate) commercial_centrifuge_lots_id_fkey1: CentrifugeModel,
+}
+impl From<InsertableCommercialCentrifugeLotBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCentrifugeLotBuilder>
+{
+    fn from(builder: InsertableCommercialCentrifugeLotBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialCentrifugeLot` or descendant tables.
@@ -220,14 +249,14 @@ pub trait CommercialCentrifugeLotSettable: Sized {
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
         >,
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
 > CommercialCentrifugeLotSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute;
     ///Sets the value of the `public.commercial_centrifuge_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -257,18 +286,18 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
+    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -298,17 +327,17 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
         >,
     CommercialProductLot,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -475,21 +504,22 @@ impl<CentrifugeModel, CommercialProductLot>
     crate::codegen::structs_codegen::tables::insertables::CentrifugeModelSettable
     for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute;
 }
 impl<
     CentrifugeModel,
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -559,10 +589,10 @@ impl<
 for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -593,10 +623,10 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v7 --->|"`extends`"| v4
@@ -659,7 +689,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialCentrifugeLotAttribute,
+            CommercialCentrifugeLotAttribute,
         >,
     >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -668,7 +698,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialCentrifugeLotAttribute;
+    type Attributes = CommercialCentrifugeLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_centrifuge_lots_id_fkey1.is_complete()
             && self.commercial_centrifuge_lots_id_fkey.is_complete()

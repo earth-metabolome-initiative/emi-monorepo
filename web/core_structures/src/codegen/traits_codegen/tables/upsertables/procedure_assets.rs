@@ -14,12 +14,14 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((procedure, asset_model))
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                procedure_template
-                    .ne(excluded(procedure_template))
+                procedure
+                    .ne(excluded(procedure))
+                    .or(procedure_template.ne(excluded(procedure_template)))
+                    .or(asset_model.ne(excluded(asset_model)))
                     .or(asset.ne(excluded(asset)))
                     .or(procedure_template_asset_model.ne(excluded(procedure_template_asset_model)))
                     .or(ancestor_model.ne(excluded(ancestor_model)))
@@ -46,12 +48,14 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((procedure, asset_model))
+            .on_conflict(id)
             .do_update()
             .set(self)
             .filter(
-                procedure_template
-                    .ne(excluded(procedure_template))
+                procedure
+                    .ne(excluded(procedure))
+                    .or(procedure_template.ne(excluded(procedure_template)))
+                    .or(asset_model.ne(excluded(asset_model)))
                     .or(asset.ne(excluded(asset)))
                     .or(procedure_template_asset_model.ne(excluded(procedure_template_asset_model)))
                     .or(ancestor_model.ne(excluded(ancestor_model)))

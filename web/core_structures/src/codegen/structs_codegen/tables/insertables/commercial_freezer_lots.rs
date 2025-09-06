@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezerLotExtensionAttribute {
+pub enum CommercialFreezerLotExtensionAttribute {
     CommercialProductLot(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ),
-    FreezerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
-    ),
+    FreezerModel(crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute),
 }
-impl core::fmt::Display for InsertableCommercialFreezerLotExtensionAttribute {
+impl core::fmt::Display for CommercialFreezerLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CommercialProductLot(e) => write!(f, "{e}"),
@@ -16,32 +14,32 @@ impl core::fmt::Display for InsertableCommercialFreezerLotExtensionAttribute {
         }
     }
 }
-impl From<
-    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
-> for InsertableCommercialFreezerLotExtensionAttribute {
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute>
+    for CommercialFreezerLotExtensionAttribute
+{
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
     ) -> Self {
         Self::CommercialProductLot(attribute)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute>
-    for InsertableCommercialFreezerLotExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute>
+    for CommercialFreezerLotExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
     ) -> Self {
         Self::FreezerModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezerLotAttribute {
-    Extension(InsertableCommercialFreezerLotExtensionAttribute),
+pub enum CommercialFreezerLotAttribute {
+    Extension(CommercialFreezerLotExtensionAttribute),
     Id,
     ProductModel,
 }
-impl core::str::FromStr for InsertableCommercialFreezerLotAttribute {
+impl core::str::FromStr for CommercialFreezerLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialFreezerLotAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialFreezerLotAttribute {
+impl core::fmt::Display for CommercialFreezerLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -169,6 +167,30 @@ impl InsertableCommercialFreezerLot {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_freezer_lots_id_product_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.product_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -187,6 +209,13 @@ pub struct InsertableCommercialFreezerLotBuilder<
     pub(crate) product_model: Option<i32>,
     pub(crate) commercial_freezer_lots_id_fkey: CommercialProductLot,
     pub(crate) commercial_freezer_lots_id_fkey1: FreezerModel,
+}
+impl From<InsertableCommercialFreezerLotBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialFreezerLotBuilder>
+{
+    fn from(builder: InsertableCommercialFreezerLotBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialFreezerLot` or descendant tables.
@@ -219,15 +248,15 @@ pub trait CommercialFreezerLotSettable: Sized {
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
         + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     FreezerModel,
 > CommercialFreezerLotSettable
 for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute;
     ///Sets the value of the `public.commercial_freezer_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -257,18 +286,18 @@ for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel> {
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v2 --->|"`ancestral same as`"| v3
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
     ///```
     fn product_model(
         mut self,
@@ -298,17 +327,17 @@ for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel> {
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     FreezerModel,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -473,17 +502,17 @@ where
 }
 impl<
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     FreezerModel,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
 for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
     fn lot<L>(
@@ -550,7 +579,8 @@ impl<CommercialProductLot, FreezerModel>
     crate::codegen::structs_codegen::tables::insertables::FreezerModelSettable
     for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute;
 }
 impl<
     CommercialProductLot,
@@ -559,10 +589,10 @@ impl<
 for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -593,17 +623,17 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
@@ -658,9 +688,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
-        Error = web_common_traits::database::InsertError<
-            InsertableCommercialFreezerLotAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<CommercialFreezerLotAttribute>,
     >,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
         C,
@@ -668,7 +696,7 @@ where
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCommercialFreezerLotAttribute;
+    type Attributes = CommercialFreezerLotAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_freezer_lots_id_fkey.is_complete()
             && self.commercial_freezer_lots_id_fkey1.is_complete()

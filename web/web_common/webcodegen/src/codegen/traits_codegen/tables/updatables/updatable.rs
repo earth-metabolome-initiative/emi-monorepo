@@ -164,7 +164,7 @@ impl Codegen<'_> {
                         >,
                     });
 
-                    if &parent_table != table {
+                    if parent_table.as_ref() != table {
                         current_constraints.extend(quote::quote! {
                             #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
                         });

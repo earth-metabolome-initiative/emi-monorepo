@@ -30,7 +30,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -59,7 +59,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_cap_lots_id_fkey1.is_complete() {
@@ -67,9 +67,9 @@ where
                 .commercial_cap_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotExtensionAttribute::CapModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotExtensionAttribute::CapModel(
+                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -78,9 +78,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -90,9 +90,9 @@ where
                 .commercial_cap_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -101,9 +101,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLotExtensionAttribute::CapModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCapModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotExtensionAttribute::CapModel(
+                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute::Id,
                         ),
                     ))
                 })?;

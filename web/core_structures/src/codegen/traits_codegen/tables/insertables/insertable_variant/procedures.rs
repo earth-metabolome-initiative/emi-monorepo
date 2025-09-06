@@ -16,7 +16,7 @@ where
     >,
     C: diesel::connection::LoadConnection,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
     >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
         C,
@@ -26,7 +26,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::procedures::Procedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedure;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -67,56 +67,56 @@ where
             .procedure
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::Procedure,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::ProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
         let most_concrete_table = self
             .most_concrete_table
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::MostConcreteTable,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::MostConcreteTable,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {
             procedure,
+            procedure_template,
             parent_procedure: self.parent_procedure,
             parent_procedure_template: self.parent_procedure_template,
-            procedure_template,
             most_concrete_table,
             created_by,
             created_at,

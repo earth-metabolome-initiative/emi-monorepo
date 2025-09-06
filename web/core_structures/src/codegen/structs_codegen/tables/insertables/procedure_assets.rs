@@ -1,6 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProcedureAssetAttribute {
+pub enum ProcedureAssetAttribute {
+    Id,
     Procedure,
     ProcedureTemplate,
     AssetModel,
@@ -10,10 +11,11 @@ pub enum InsertableProcedureAssetAttribute {
     CreatedBy,
     CreatedAt,
 }
-impl core::str::FromStr for InsertableProcedureAssetAttribute {
+impl core::str::FromStr for ProcedureAssetAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "AssetModel" => Ok(Self::AssetModel),
@@ -22,6 +24,7 @@ impl core::str::FromStr for InsertableProcedureAssetAttribute {
             "AncestorModel" => Ok(Self::AncestorModel),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
+            "id" => Ok(Self::Id),
             "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "asset_model" => Ok(Self::AssetModel),
@@ -34,9 +37,10 @@ impl core::str::FromStr for InsertableProcedureAssetAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableProcedureAssetAttribute {
+impl core::fmt::Display for ProcedureAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
+            Self::Id => write!(f, "id"),
             Self::Procedure => write!(f, "procedure"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
             Self::AssetModel => write!(f, "asset_model"),
@@ -59,6 +63,7 @@ impl core::fmt::Display for InsertableProcedureAssetAttribute {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureAsset {
+    pub(crate) id: ::rosetta_uuid::Uuid,
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
     pub(crate) asset_model: i32,
@@ -69,66 +74,123 @@ pub struct InsertableProcedureAsset {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureAsset {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
+    pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
+            crate::codegen::structs_codegen::tables::asset_models::AssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.procedure,
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
+                self.ancestor_model,
             ),
             conn,
         )
     }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_asset_asset_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(asset) = self.asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.asset_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .map(Some)
+    }
+    pub fn asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        Option<crate::codegen::structs_codegen::tables::assets::Asset>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::assets::Asset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+            crate::codegen::structs_codegen::tables::assets::Asset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(asset) = self.asset else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+            QueryDsl::find(crate::codegen::structs_codegen::tables::assets::Asset::table(), asset),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn procedure_assets_asset_model_ancestor_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.procedure_template,
+                crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::table(),
+                (self.asset_model, self.ancestor_model),
             ),
             conn,
         )
@@ -165,38 +227,115 @@ impl InsertableProcedureAsset {
             conn,
         )
     }
-    pub fn asset<C: diesel::connection::LoadConnection>(
+    pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::assets::Asset>,
+        crate::codegen::structs_codegen::tables::users::User,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::assets::Asset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::assets::Asset,
+            crate::codegen::structs_codegen::tables::users::User,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(asset) = self.asset else {
-            return Ok(None);
-        };
         RunQueryDsl::first(
-            QueryDsl::find(crate::codegen::structs_codegen::tables::assets::Asset::table(), asset),
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
+            ),
             conn,
         )
-        .map(Some)
+    }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedures::Procedure,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
+                self.procedure,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_procedure_template_asset_model_ancestor_m_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_asset_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.ancestor_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_asset_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -230,100 +369,58 @@ impl InsertableProcedureAsset {
             conn,
         )
     }
-    pub fn ancestor_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_procedure_template_asset_model_procedure_fkey(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
-                self.ancestor_model,
-            ),
-            conn,
-        )
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_asset_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::users::User,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
-    }
-    pub fn procedure_assets_asset_model_ancestor_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::table(),
-                (self.asset_model, self.ancestor_model),
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.procedure_template,
             ),
             conn,
         )
@@ -332,6 +429,7 @@ impl InsertableProcedureAsset {
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureAssetBuilder {
+    pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_template: Option<i32>,
     pub(crate) asset_model: Option<i32>,
@@ -341,9 +439,20 @@ pub struct InsertableProcedureAssetBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl From<InsertableProcedureAssetBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableProcedureAssetBuilder,
+    >
+{
+    fn from(builder: InsertableProcedureAssetBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 impl Default for InsertableProcedureAssetBuilder {
     fn default() -> Self {
         Self {
+            id: Some(rosetta_uuid::Uuid::new_v4()),
             procedure: Default::default(),
             procedure_template: Default::default(),
             asset_model: Default::default(),
@@ -360,6 +469,28 @@ impl Default for InsertableProcedureAssetBuilder {
 pub trait ProcedureAssetSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
+    /// Sets the value of the `public.procedure_assets.id` column.
+    ///
+    /// # Arguments
+    /// * `id`: The value to set for the `public.procedure_assets.id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn id(
+        self,
+        id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the `public.procedure_assets.procedure` column.
     ///
     /// # Arguments
@@ -547,9 +678,36 @@ pub trait ProcedureAssetSettable: Sized {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute;
+    /// Sets the value of the `public.procedure_assets.id` column.
+    fn id(
+        mut self,
+        id: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        let id = id.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(ProcedureAssetAttribute::Id)
+        })?;
+        self.id = Some(id);
+        Ok(self)
+    }
     /// Sets the value of the `public.procedure_assets.procedure` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "procedure"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "procedure_template"}
+    /// class v1 directly-involved-column
+    /// v0 -.->|"`foreign defines`"| v1
+    /// ```
     fn procedure(
         mut self,
         procedure: ::rosetta_uuid::Uuid,
@@ -567,6 +725,24 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_assets.asset_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "ancestor_model"}
+    /// class v0 directly-involved-column
+    /// v1@{shape: rounded, label: "asset_model"}
+    /// class v1 column-of-interest
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v1 -.->|"`foreign defines`"| v0
+    /// ```
     fn asset_model(
         mut self,
         asset_model: i32,
@@ -575,6 +751,23 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_assets.asset` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "asset"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
+    /// v0 -.->|"`foreign defines`"| v1
+    /// ```
     fn asset(
         mut self,
         asset: Option<::rosetta_uuid::Uuid>,
@@ -584,6 +777,26 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
     }
     /// Sets the value of the
     /// `public.procedure_assets.procedure_template_asset_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "ancestor_model"}
+    /// class v0 directly-involved-column
+    /// v1@{shape: rounded, label: "procedure_template"}
+    /// class v1 directly-involved-column
+    /// v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 column-of-interest
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
+    /// ```
     fn procedure_template_asset_model(
         mut self,
         procedure_template_asset_model: i32,
@@ -592,6 +805,24 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_assets.ancestor_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "ancestor_model"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v0 -.->|"`foreign defines`"| v1
+    /// ```
     fn ancestor_model(
         mut self,
         ancestor_model: i32,
@@ -619,15 +850,16 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProcedureAssetAttribute::CreatedAt)
+                .rename_field(ProcedureAssetAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
     }
 }
 impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureAssetBuilder {
-    type PrimaryKey = (::rosetta_uuid::Uuid, i32);
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = Some(primary_key);
         self
     }
 }
@@ -637,12 +869,13 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            Error = web_common_traits::database::InsertError<InsertableProcedureAssetAttribute>,
+            Error = web_common_traits::database::InsertError<ProcedureAssetAttribute>,
         >,
 {
-    type Attributes = InsertableProcedureAssetAttribute;
+    type Attributes = ProcedureAssetAttribute;
     fn is_complete(&self) -> bool {
-        self.procedure.is_some()
+        self.id.is_some()
+            && self.procedure.is_some()
             && self.procedure_template.is_some()
             && self.asset_model.is_some()
             && self.procedure_template_asset_model.is_some()

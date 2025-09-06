@@ -4,6 +4,5 @@ diesel::table! {
     kelvin_tolerance_percentage -> diesel::sql_types::Float, stored_into_model ->
     diesel::sql_types::Integer, procedure_template_stored_into_model ->
     diesel::sql_types::Integer, stored_asset_model -> diesel::sql_types::Integer,
-    foreign_procedure_template -> diesel::sql_types::Integer,
     procedure_template_stored_asset_model -> diesel::sql_types::Integer }
 }

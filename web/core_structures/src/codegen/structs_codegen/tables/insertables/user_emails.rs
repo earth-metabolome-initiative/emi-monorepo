@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableUserEmailAttribute {
+pub enum UserEmailAttribute {
     Id,
     Email,
     CreatedBy,
     CreatedAt,
     PrimaryEmail,
 }
-impl core::str::FromStr for InsertableUserEmailAttribute {
+impl core::str::FromStr for UserEmailAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableUserEmailAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableUserEmailAttribute {
+impl core::fmt::Display for UserEmailAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -87,6 +87,13 @@ pub struct InsertableUserEmailBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) primary_email: Option<bool>,
+}
+impl From<InsertableUserEmailBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableUserEmailBuilder>
+{
+    fn from(builder: InsertableUserEmailBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableUserEmailBuilder {
     fn default() -> Self {
@@ -204,8 +211,7 @@ pub trait UserEmailSettable: Sized {
         validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
 }
 impl UserEmailSettable for InsertableUserEmailBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute;
     /// Sets the value of the `public.user_emails.email` column.
     fn email<E>(
         mut self,
@@ -216,16 +222,13 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
         validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         let email = email.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserEmailAttribute::Email)
+            validation_errors::SingleFieldError::from(err).rename_field(UserEmailAttribute::Email)
         })?;
-        pgrx_validation::must_be_email(email.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute::Email,
-                    )
-            })?;
+        pgrx_validation::must_be_email(email.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute::Email,
+            )
+        })?;
         self.email = Some(email);
         Ok(self)
     }
@@ -249,7 +252,7 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
     {
         let created_at = created_at.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserEmailAttribute::CreatedAt)
+                .rename_field(UserEmailAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
         Ok(self)
@@ -265,7 +268,7 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
     {
         let primary_email = primary_email.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserEmailAttribute::PrimaryEmail)
+                .rename_field(UserEmailAttribute::PrimaryEmail)
         })?;
         self.primary_email = Some(primary_email);
         Ok(self)
@@ -283,10 +286,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_emails::UserEmail,
-            Error = web_common_traits::database::InsertError<InsertableUserEmailAttribute>,
+            Error = web_common_traits::database::InsertError<UserEmailAttribute>,
         >,
 {
-    type Attributes = InsertableUserEmailAttribute;
+    type Attributes = UserEmailAttribute;
     fn is_complete(&self) -> bool {
         self.email.is_some()
             && self.created_by.is_some()

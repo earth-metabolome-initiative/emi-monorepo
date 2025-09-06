@@ -15,7 +15,13 @@
 pub struct PackagingProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
+    pub sample: ::rosetta_uuid::Uuid,
+    pub sample_model: i32,
+    pub procedure_template_sample_model: i32,
+    pub procedure_sample: ::rosetta_uuid::Uuid,
     pub packaged_with_model: i32,
+    pub procedure_template_packaged_with_model: i32,
+    pub procedure_packaged_with: ::rosetta_uuid::Uuid,
 }
 impl web_common_traits::prelude::TableName for PackagingProcedure {
     const TABLE_NAME: &'static str = "packaging_procedures";
@@ -43,6 +49,72 @@ impl diesel::Identifiable for PackagingProcedure {
     }
 }
 impl PackagingProcedure {
+    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
+                self.packaged_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn packaging_procedures_packaged_with_model_sample_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::table(),
+                (self.packaged_with_model, self.sample_model),
+            ),
+            conn,
+        )
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -74,6 +146,212 @@ impl PackagingProcedure {
             ),
             conn,
         )
+    }
+    pub fn procedure_packaged_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_packaged_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_packaged_with_packaged_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_packaged_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_packaged_with_procedure_tem_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_packaged_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_sample,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_procedure_template_s_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_sample_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.sample),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_sample_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
@@ -107,68 +385,178 @@ impl PackagingProcedure {
             conn,
         )
     }
-    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_packaged_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
-                self.packaged_with_model,
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_packaged_with_model,
             ),
             conn,
         )
     }
-    pub fn packaging_procedures_procedure_packaged_with_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_template_procedure_templat_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_sample_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_template_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_packaged_with_model
+                            .eq(&self.procedure_template_packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+            >(conn)
+    }
+    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                (self.procedure, self.packaged_with_model),
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_sample_model,
+            ),
+            conn,
+        )
+    }
+    pub fn sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
+                self.sample,
+            ),
+            conn,
+        )
+    }
+    pub fn sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::table(),
+                self.sample_model,
             ),
             conn,
         )
@@ -187,6 +575,61 @@ impl PackagingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_sample(
+        sample: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::sample.eq(sample))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_sample_model(
+        sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::sample_model.eq(sample_model))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_sample_model(
+        procedure_template_sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template_sample_model
+                    .eq(procedure_template_sample_model),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample(
+        procedure_sample: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure_sample.eq(procedure_sample))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_packaged_with_model(
         packaged_with_model: &i32,
         conn: &mut diesel::PgConnection,
@@ -196,6 +639,96 @@ impl PackagingProcedure {
         use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
         Self::table()
             .filter(packaging_procedures::packaged_with_model.eq(packaged_with_model))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_packaged_with_model(
+        procedure_template_packaged_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template_packaged_with_model
+                    .eq(procedure_template_packaged_with_model),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_packaged_with(
+        procedure_packaged_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure_packaged_with.eq(procedure_packaged_with))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_packaged_with_model_and_sample_model(
+        packaged_with_model: &i32,
+        sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::packaged_with_model
+                    .eq(packaged_with_model)
+                    .and(packaging_procedures::sample_model.eq(sample_model)),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_packaged_with_and_packaged_with_model(
+        procedure_packaged_with: &::rosetta_uuid::Uuid,
+        packaged_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_packaged_with
+                    .eq(procedure_packaged_with)
+                    .and(packaging_procedures::packaged_with_model.eq(packaged_with_model)),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_packaged_with_and_procedure_template_packaged_with_model(
+        procedure_packaged_with: &::rosetta_uuid::Uuid,
+        procedure_template_packaged_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_packaged_with.eq(procedure_packaged_with).and(
+                    packaging_procedures::procedure_template_packaged_with_model
+                        .eq(procedure_template_packaged_with_model),
+                ),
+            )
             .order_by(packaging_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -220,9 +753,9 @@ impl PackagingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_packaged_with_model(
-        procedure: &::rosetta_uuid::Uuid,
-        packaged_with_model: &i32,
+    pub fn from_procedure_sample_and_procedure_template_sample_model(
+        procedure_sample: &::rosetta_uuid::Uuid,
+        procedure_template_sample_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -232,9 +765,92 @@ impl PackagingProcedure {
         use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
         Self::table()
             .filter(
-                packaging_procedures::procedure
-                    .eq(procedure)
-                    .and(packaging_procedures::packaged_with_model.eq(packaged_with_model)),
+                packaging_procedures::procedure_sample.eq(procedure_sample).and(
+                    packaging_procedures::procedure_template_sample_model
+                        .eq(procedure_template_sample_model),
+                ),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_and_sample(
+        procedure_sample: &::rosetta_uuid::Uuid,
+        sample: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_sample
+                    .eq(procedure_sample)
+                    .and(packaging_procedures::sample.eq(sample)),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_and_sample_model(
+        procedure_sample: &::rosetta_uuid::Uuid,
+        sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_sample
+                    .eq(procedure_sample)
+                    .and(packaging_procedures::sample_model.eq(sample_model)),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure_template_sample_model(
+        procedure_template: &i32,
+        procedure_template_sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template.eq(procedure_template).and(
+                    packaging_procedures::procedure_template_sample_model
+                        .eq(procedure_template_sample_model),
+                ),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure_template_packaged_with_model(
+        procedure_template: &i32,
+        procedure_template_packaged_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template.eq(procedure_template).and(
+                    packaging_procedures::procedure_template_packaged_with_model
+                        .eq(procedure_template_packaged_with_model),
+                ),
             )
             .order_by(packaging_procedures::procedure.asc())
             .load::<Self>(conn)

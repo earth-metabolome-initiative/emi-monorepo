@@ -1,9 +1,9 @@
 impl<
     C: diesel::connection::LoadConnection,
-    PhysicalAssetModel,
+    AssetModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-    PhysicalAssetModel,
+    AssetModel,
 >
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
@@ -17,17 +17,14 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     >,
+    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProduct;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -56,16 +53,16 @@ where
             .brand_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::BrandId,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::BrandId,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::CommercialProductExtensionAttribute::AssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id,
                     ),
                 ))
             })?;

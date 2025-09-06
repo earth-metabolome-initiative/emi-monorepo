@@ -1,48 +1,44 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableWeighingDeviceModelExtensionAttribute {
+pub enum WeighingDeviceModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableWeighingDeviceModelExtensionAttribute {
+impl core::fmt::Display for WeighingDeviceModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableWeighingDeviceModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for WeighingDeviceModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableWeighingDeviceModelAttribute {
-    Extension(InsertableWeighingDeviceModelExtensionAttribute),
+pub enum WeighingDeviceModelAttribute {
+    Extension(WeighingDeviceModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableWeighingDeviceModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for WeighingDeviceModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableWeighingDeviceModelExtensionAttribute::PhysicalAssetModel(
+        Self::Extension(WeighingDeviceModelExtensionAttribute::PhysicalAssetModel(
             physical_asset_models,
         ))
     }
 }
-impl core::str::FromStr for InsertableWeighingDeviceModelAttribute {
+impl core::str::FromStr for WeighingDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +46,7 @@ impl core::str::FromStr for InsertableWeighingDeviceModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableWeighingDeviceModelAttribute {
+impl core::fmt::Display for WeighingDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +109,13 @@ pub struct InsertableWeighingDeviceModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertableWeighingDeviceModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableWeighingDeviceModelBuilder>
+{
+    fn from(builder: InsertableWeighingDeviceModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of
 /// `WeighingDeviceModel` or descendant tables.
 pub trait WeighingDeviceModelSettable: Sized {
@@ -122,20 +125,21 @@ pub trait WeighingDeviceModelSettable: Sized {
 impl<PhysicalAssetModel> WeighingDeviceModelSettable
     for InsertableWeighingDeviceModelBuilder<PhysicalAssetModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableWeighingDeviceModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -300,11 +304,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableWeighingDeviceModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -351,16 +355,14 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        Error = web_common_traits::database::InsertError<
-            InsertableWeighingDeviceModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<WeighingDeviceModelAttribute>,
     >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableWeighingDeviceModelAttribute;
+    type Attributes = WeighingDeviceModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

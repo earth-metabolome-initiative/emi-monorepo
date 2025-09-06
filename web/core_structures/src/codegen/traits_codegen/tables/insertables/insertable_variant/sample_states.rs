@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::sample_states::SampleState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSampleState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

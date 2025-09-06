@@ -25,7 +25,7 @@ impl CustomTableConstraint for DuplicatedUniqueIndexConstraint {
             if !clauses.insert(columns.clone()) {
                 return Err(ConstraintError::RedundantUniqueIndices {
                     table: Box::new(table.clone()),
-                    columns,
+                    columns: columns.iter().cloned().collect(),
                 }
                 .into());
             }

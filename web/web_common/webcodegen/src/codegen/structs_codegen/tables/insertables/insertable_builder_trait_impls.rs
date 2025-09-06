@@ -44,7 +44,7 @@ impl Table {
 
         let mut candidates = Vec::new();
 
-        for ancestor in self.extension_tables(conn)? {
+        for ancestor in self.extension_tables(conn)?.as_ref() {
             if let Some((distance, matching_column)) =
                 ancestor.closest_same_as_column_in_table_or_ancestor(ancestor_column, conn)?
             {
@@ -105,7 +105,7 @@ impl Table {
             let setter_method = closest_same_as_column.getter_ident()?;
             let camel_case_ident = closest_same_as_column.camel_case_ident()?;
             let table = closest_same_as_column.table(conn)?;
-            let setter_trait = if self == &table {
+            let setter_trait = if self == table.as_ref() {
                 let trait_ident = self.setter_trait_ident()?;
                 quote! { #trait_ident }
             } else {
@@ -122,7 +122,10 @@ impl Table {
                 let foreign_key_ident = foreign_key.constraint_ident(conn)?;
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 let foreign_table_ident = foreign_table.struct_ident()?;
-                extension_table_traits.get_mut(&foreign_table).unwrap().insert(table);
+                extension_table_traits
+                    .get_mut(&foreign_table)
+                    .unwrap()
+                    .insert(table.as_ref().clone());
                 Ok((
                     true,
                     true,
@@ -136,7 +139,7 @@ impl Table {
                     },
                 ))
             } else {
-                extension_table_traits.get_mut(self).unwrap().insert(table);
+                extension_table_traits.get_mut(self).unwrap().insert(table.as_ref().clone());
                 Ok((
                     true,
                     false,
@@ -414,7 +417,7 @@ impl Table {
             check_constraints_extensions,
         )?];
 
-        for ancestor in self.ancestral_extension_tables(conn)? {
+        for ancestor in self.ancestral_extension_tables(conn)?.iter() {
             impls.push(self.generate_builder_trait_impl_for_ancestral_table(
                 extension_network,
                 conn,

@@ -55,9 +55,9 @@ impl ProcedureTemplate {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.as_ref() {
             if let Some(fk) = is_asset_model_foreign_key(&column, conn)? {
-                asset_model_fk_columns.push((column, fk));
+                asset_model_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_model_fk_columns)
@@ -78,9 +78,9 @@ impl ProcedureTemplate {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.as_ref() {
             if let Some(fk) = is_procedure_template_asset_model_foreign_key(&column, conn)? {
-                asset_model_fk_columns.push((column, fk));
+                asset_model_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_model_fk_columns)
@@ -100,10 +100,10 @@ impl ProcedureTemplate {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, crate::errors::Error> {
         let mut rule_table_fks = Vec::new();
-        for foreign_key in self.table.foreign_keys(conn)? {
+        for foreign_key in self.table.foreign_keys(conn)?.as_ref() {
             let foreign_table = foreign_key.foreign_table(conn)?;
             if foreign_table.table_name.ends_with("_compatibility_rules") {
-                rule_table_fks.push(foreign_key);
+                rule_table_fks.push(foreign_key.clone());
             }
         }
         Ok(rule_table_fks)
@@ -204,11 +204,11 @@ impl ProcedureTemplate {
         conn: &mut PgConnection,
     ) -> Result<Vec<Self>, crate::errors::Error> {
         let mut procedure_templates = Vec::new();
-        for table in Table::load_all(conn, table_catalog, "public")? {
+        for table in Table::load_all(conn, table_catalog, "public")?.as_ref() {
             if Self::must_be_procedure_template_table(&table, conn).is_err() {
                 continue;
             }
-            procedure_templates.push(Self { table });
+            procedure_templates.push(Self { table: table.clone() });
         }
         Ok(procedure_templates)
     }
@@ -255,7 +255,7 @@ impl ProcedureTemplate {
         if primary_key_columns.len() != 1 {
             unreachable!("Procedure template tables must have exactly one primary key column");
         }
-        Ok(primary_key_columns.into_iter().next().unwrap())
+        Ok(primary_key_columns.as_ref()[0].clone())
     }
 
     /// Returns the same-as indices associating the current procedure template
@@ -292,7 +292,7 @@ impl ProcedureTemplate {
 
             // The second column of the index must be a foreign key referencing the primary
             // key column of another procedure template table.
-            for foreign_key in columns[1].foreign_keys(conn)? {
+            for foreign_key in columns[1].foreign_keys(conn)?.as_ref() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if Self::must_be_procedure_template_table(&foreign_table, conn).is_ok() {
                     foreign_same_as_indices.push(same_as_index.clone());

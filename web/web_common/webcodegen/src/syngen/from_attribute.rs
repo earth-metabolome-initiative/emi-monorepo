@@ -1,15 +1,17 @@
+use std::sync::Arc;
+
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::{Column, Table, errors::WebCodeGenError, traits::TableLike};
 
-type FromMethods = Vec<(Vec<Table>, Vec<Column>, bool, Option<TokenStream>)>;
+type FromMethods = Vec<(Vec<Arc<Table>>, Arc<Vec<Column>>, bool, Option<TokenStream>)>;
 
 impl Table {
     fn ancestral_from_attributes(
         &self,
-        root_table: &Table,
+        root_table: &Arc<Table>,
         conn: &mut PgConnection,
     ) -> Result<FromMethods, WebCodeGenError> {
         let mut ancestral_from_attributes: FromMethods = Vec::new();
@@ -19,7 +21,7 @@ impl Table {
         let root_table_ident = root_table.snake_case_ident()?;
 
         // First, we process the first-level extension tables to cover
-        for extension_table in &extension_tables {
+        for extension_table in extension_tables.as_ref() {
             let extension_table_ident = extension_table.snake_case_ident()?;
             let extension_primary_key_idents = extension_table.primary_key_idents(conn)?;
 
@@ -56,6 +58,10 @@ impl Table {
 
                 let columns = index.columns(conn)?;
 
+                if columns.is_empty() {
+                    continue;
+                }
+
                 ancestral_from_attributes.push((
                     vec![root_table.clone(), extension_table.clone()],
                     columns,
@@ -64,7 +70,7 @@ impl Table {
                 ));
             }
 
-            for column in extension_table.columns(conn)? {
+            for column in extension_table.columns(conn)?.as_ref() {
                 // If the column is a UNIQUE index or a foreign key, skip it, as
                 // the method generation is already taken care of elsewhere.
                 if column.is_unique(conn)? || !column.supports_eq(conn)? {
@@ -73,13 +79,13 @@ impl Table {
 
                 ancestral_from_attributes.push((
                     vec![root_table.clone(), extension_table.clone()],
-                    vec![column],
+                    Arc::new(vec![column.clone()]),
                     false,
                     Some(join_clause.clone()),
                 ));
             }
 
-            for foreign_key_constraint in extension_table.foreign_keys(conn)? {
+            for foreign_key_constraint in extension_table.foreign_keys(conn)?.as_ref() {
                 let columns = foreign_key_constraint.columns(conn)?;
 
                 // The foreign keys which are either a single column or part
@@ -101,7 +107,7 @@ impl Table {
 
         // Secondly, we recursively call this method on the extension tables
         // to cover the higher-level extension tables.
-        for extension_table in extension_tables {
+        for extension_table in extension_tables.as_ref() {
             ancestral_from_attributes
                 .extend(extension_table.ancestral_from_attributes(root_table, conn)?);
         }
@@ -128,6 +134,7 @@ impl Table {
         let table_ident = self.snake_case_ident()?;
         let mut from_attributes = TokenStream::new();
         let mut from_methods: FromMethods = Vec::new();
+        let arc_table = Arc::new(self.clone());
         let primary_key_order_by = self
             .primary_key_idents(conn)?
             .into_iter()
@@ -148,14 +155,19 @@ impl Table {
             }
         };
 
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             // If the column is a UNIQUE index skip it, as
             // the method generation is already taken care of elsewhere.
             if column.is_unique(conn)? || !column.supports_eq(conn)? {
                 continue;
             }
 
-            from_methods.push((vec![self.clone()], vec![column], false, None));
+            from_methods.push((
+                vec![arc_table.clone()],
+                Arc::new(vec![column.clone()]),
+                false,
+                None,
+            ));
         }
 
         for index in self.unique_indices(conn)? {
@@ -165,10 +177,14 @@ impl Table {
 
             let columns = index.columns(conn)?;
 
-            from_methods.push((vec![self.clone()], columns, true, None));
+            if columns.is_empty() {
+                continue;
+            }
+
+            from_methods.push((vec![arc_table.clone()], columns, true, None));
         }
 
-        for foreign_key_constraint in self.foreign_keys(conn)? {
+        for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
             let columns = foreign_key_constraint.columns(conn)?;
 
             // The foreign keys which are either a single column or part
@@ -177,13 +193,13 @@ impl Table {
                 continue;
             }
 
-            from_methods.push((vec![self.clone()], columns, false, None));
+            from_methods.push((vec![arc_table.clone()], columns, false, None));
         }
 
         let extension_tables = self.ancestral_extension_tables(conn)?;
 
         if !extension_tables.is_empty() {
-            from_methods.extend(self.ancestral_from_attributes(self, conn)?);
+            from_methods.extend(self.ancestral_from_attributes(&arc_table, conn)?);
         }
 
         let mut method_names = std::collections::HashSet::new();
@@ -206,7 +222,7 @@ impl Table {
 
             let mut additional_imports = tables
                 .iter()
-                .map(Table::import_diesel_path)
+                .map(|table| table.import_diesel_path())
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
             let ok_return_type = if is_unique {

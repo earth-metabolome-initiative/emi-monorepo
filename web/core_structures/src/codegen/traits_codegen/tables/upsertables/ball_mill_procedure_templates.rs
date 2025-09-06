@@ -38,10 +38,6 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                     )
                     .or(milled_container_model.ne(excluded(milled_container_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_milled_container_model
                             .ne(excluded(procedure_template_milled_container_model)),
                     ),
@@ -89,10 +85,6 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                             .ne(excluded(procedure_template_milled_with_model)),
                     )
                     .or(milled_container_model.ne(excluded(milled_container_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_milled_container_model
                             .ne(excluded(procedure_template_milled_container_model)),

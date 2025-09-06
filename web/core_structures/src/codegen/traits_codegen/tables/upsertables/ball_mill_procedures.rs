@@ -20,12 +20,19 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(bead_model.ne(excluded(bead_model)))
+                    .or(procedure_template_bead_model.ne(excluded(procedure_template_bead_model)))
+                    .or(procedure_bead.ne(excluded(procedure_bead)))
                     .or(milled_with_model.ne(excluded(milled_with_model)))
+                    .or(procedure_template_milled_with_model
+                        .ne(excluded(procedure_template_milled_with_model)))
+                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
                     .or(milled_with.ne(excluded(milled_with)))
-                    .or(milled_container.ne(excluded(milled_container))),
+                    .or(milled_container.ne(excluded(milled_container)))
+                    .or(milled_container_model.ne(excluded(milled_container_model)))
+                    .or(procedure_template_milled_container_model
+                        .ne(excluded(procedure_template_milled_container_model)))
+                    .or(procedure_milled_container.ne(excluded(procedure_milled_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -53,12 +60,19 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(bead_model.ne(excluded(bead_model)))
+                    .or(procedure_template_bead_model.ne(excluded(procedure_template_bead_model)))
+                    .or(procedure_bead.ne(excluded(procedure_bead)))
                     .or(milled_with_model.ne(excluded(milled_with_model)))
+                    .or(procedure_template_milled_with_model
+                        .ne(excluded(procedure_template_milled_with_model)))
+                    .or(procedure_milled_with.ne(excluded(procedure_milled_with)))
                     .or(milled_with.ne(excluded(milled_with)))
-                    .or(milled_container.ne(excluded(milled_container))),
+                    .or(milled_container.ne(excluded(milled_container)))
+                    .or(milled_container_model.ne(excluded(milled_container_model)))
+                    .or(procedure_template_milled_container_model
+                        .ne(excluded(procedure_template_milled_container_model)))
+                    .or(procedure_milled_container.ne(excluded(procedure_milled_container))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

@@ -34,7 +34,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::team_members::TeamMember;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttribute,
+        crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -68,14 +68,14 @@ where
             .team_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttribute::TeamId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute::TeamId,
                 ),
             )?;
         let member_id = self
             .member_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberAttribute::MemberId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute::MemberId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -10,7 +10,7 @@ use web_common_traits::{
 use crate::{
     ProcedureTemplate,
     codegen::structs_codegen::tables::insertables::ParentProcedureTemplateSettable,
-    tables::insertables::InsertableParentProcedureTemplateAttribute,
+    tables::insertables::ParentProcedureTemplateAttribute,
 };
 
 #[derive(Default, Copy, Clone, Hash, PartialEq, Eq)]
@@ -70,10 +70,7 @@ where
         options: ChildOptions,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::ParentProcedureTemplate,
-        InsertError<InsertableParentProcedureTemplateAttribute>,
-    >
+    ) -> Result<crate::ParentProcedureTemplate, InsertError<ParentProcedureTemplateAttribute>>
     where
         C: ExtensionTable<ProcedureTemplate>,
         for<'a> &'a C: diesel::Identifiable<Id = &'a i32>,

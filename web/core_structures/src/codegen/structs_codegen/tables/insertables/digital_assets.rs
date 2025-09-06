@@ -1,32 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDigitalAssetExtensionAttribute {
-    Asset(crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute),
+pub enum DigitalAssetExtensionAttribute {
+    Asset(crate::codegen::structs_codegen::tables::insertables::AssetAttribute),
 }
-impl core::fmt::Display for InsertableDigitalAssetExtensionAttribute {
+impl core::fmt::Display for DigitalAssetExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Asset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute>
-    for InsertableDigitalAssetExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::AssetAttribute>
+    for DigitalAssetExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
     ) -> Self {
         Self::Asset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDigitalAssetAttribute {
-    Extension(InsertableDigitalAssetExtensionAttribute),
+pub enum DigitalAssetAttribute {
+    Extension(DigitalAssetExtensionAttribute),
     Id,
     Model,
 }
-impl core::str::FromStr for InsertableDigitalAssetAttribute {
+impl core::str::FromStr for DigitalAssetAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -36,7 +36,7 @@ impl core::str::FromStr for InsertableDigitalAssetAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableDigitalAssetAttribute {
+impl core::fmt::Display for DigitalAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -122,6 +122,23 @@ impl InsertableDigitalAsset {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn digital_assets_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -130,6 +147,16 @@ pub struct InsertableDigitalAssetBuilder<
 > {
     pub(crate) model: Option<i32>,
     pub(crate) id: Asset,
+}
+impl From<InsertableDigitalAssetBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableDigitalAssetBuilder,
+    >
+{
+    fn from(builder: InsertableDigitalAssetBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `DigitalAsset` or
 /// descendant tables.
@@ -161,45 +188,44 @@ pub trait DigitalAssetSettable: Sized {
 }
 impl<
     Asset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
         >,
-> DigitalAssetSettable for InsertableDigitalAssetBuilder<Asset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute;
-    ///Sets the value of the `public.digital_assets.model` column.
+> DigitalAssetSettable for InsertableDigitalAssetBuilder<Asset>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute;
+    /// Sets the value of the `public.digital_assets.model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`assets`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`assets`"]
     ///    v0@{shape: rounded, label: "model"}
-    ///class v0 directly-involved-column
-    ///end
-    ///subgraph v3 ["`digital_assets`"]
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v3 ["`digital_assets`"]
     ///    v1@{shape: rounded, label: "model"}
-    ///class v1 column-of-interest
-    ///end
-    ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
-    ///```
+    /// class v1 column-of-interest
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
     fn model(
         mut self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <Asset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::model(
-                self.id,
-                model,
+        self.id =
+            <Asset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::model(
+                self.id, model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
-                    attribute.into(),
-                ))
+                err.into_field_name(|attribute| Self::Attributes::Extension(attribute.into()))
             })?;
         self.model = Some(model);
         Ok(self)
@@ -207,16 +233,16 @@ impl<
 }
 impl<
     Asset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableDigitalAssetBuilder<Asset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -419,11 +445,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
-            Error = web_common_traits::database::InsertError<InsertableDigitalAssetAttribute>,
+            Error = web_common_traits::database::InsertError<DigitalAssetAttribute>,
         >,
     Asset: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableDigitalAssetAttribute;
+    type Attributes = DigitalAssetAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.model.is_some()
     }

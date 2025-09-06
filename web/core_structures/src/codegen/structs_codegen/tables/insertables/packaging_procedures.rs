@@ -1,51 +1,91 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePackagingProcedureExtensionAttribute {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
+pub enum PackagingProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute),
 }
-impl core::fmt::Display for InsertablePackagingProcedureExtensionAttribute {
+impl core::fmt::Display for PackagingProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
-    for InsertablePackagingProcedureExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute>
+    for PackagingProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePackagingProcedureAttribute {
-    Extension(InsertablePackagingProcedureExtensionAttribute),
+pub enum PackagingProcedureAttribute {
+    Extension(PackagingProcedureExtensionAttribute),
     Procedure,
     ProcedureTemplate,
+    Sample,
+    SampleModel,
+    ProcedureTemplateSampleModel,
+    ProcedureSample(crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute),
     PackagedWithModel,
+    ProcedureTemplatePackagedWithModel,
+    ProcedurePackagedWith(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+    ),
 }
-impl core::str::FromStr for InsertablePackagingProcedureAttribute {
+impl core::str::FromStr for PackagingProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
+            "Sample" => Ok(Self::Sample),
+            "SampleModel" => Ok(Self::SampleModel),
+            "ProcedureTemplateSampleModel" => Ok(Self::ProcedureTemplateSampleModel),
+            "ProcedureSample" => Ok(Self::ProcedureSample(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             "PackagedWithModel" => Ok(Self::PackagedWithModel),
+            "ProcedureTemplatePackagedWithModel" => Ok(Self::ProcedureTemplatePackagedWithModel),
+            "ProcedurePackagedWith" => Ok(Self::ProcedurePackagedWith(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             "procedure_template" => Ok(Self::ProcedureTemplate),
+            "sample" => Ok(Self::Sample),
+            "sample_model" => Ok(Self::SampleModel),
+            "procedure_template_sample_model" => Ok(Self::ProcedureTemplateSampleModel),
+            "procedure_sample" => Ok(Self::ProcedureSample(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             "packaged_with_model" => Ok(Self::PackagedWithModel),
+            "procedure_template_packaged_with_model" => {
+                Ok(Self::ProcedureTemplatePackagedWithModel)
+            }
+            "procedure_packaged_with" => Ok(Self::ProcedurePackagedWith(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
 }
-impl core::fmt::Display for InsertablePackagingProcedureAttribute {
+impl core::fmt::Display for PackagingProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Procedure => write!(f, "procedure"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::Sample => write!(f, "sample"),
+            Self::SampleModel => write!(f, "sample_model"),
+            Self::ProcedureTemplateSampleModel => {
+                write!(f, "procedure_template_sample_model")
+            }
+            Self::ProcedureSample(e) => write!(f, "{e}"),
             Self::PackagedWithModel => write!(f, "packaged_with_model"),
+            Self::ProcedureTemplatePackagedWithModel => {
+                write!(f, "procedure_template_packaged_with_model")
+            }
+            Self::ProcedurePackagedWith(e) => write!(f, "{e}"),
         }
     }
 }
@@ -60,9 +100,81 @@ impl core::fmt::Display for InsertablePackagingProcedureAttribute {
 pub struct InsertablePackagingProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
+    pub(crate) sample: ::rosetta_uuid::Uuid,
+    pub(crate) sample_model: i32,
+    pub(crate) procedure_template_sample_model: i32,
+    pub(crate) procedure_sample: ::rosetta_uuid::Uuid,
     pub(crate) packaged_with_model: i32,
+    pub(crate) procedure_template_packaged_with_model: i32,
+    pub(crate) procedure_packaged_with: ::rosetta_uuid::Uuid,
 }
 impl InsertablePackagingProcedure {
+    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
+                self.packaged_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn packaging_procedures_packaged_with_model_sample_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::table(),
+                (self.packaged_with_model, self.sample_model),
+            ),
+            conn,
+        )
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -94,6 +206,212 @@ impl InsertablePackagingProcedure {
             ),
             conn,
         )
+    }
+    pub fn procedure_packaged_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_packaged_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_packaged_with_packaged_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_packaged_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_packaged_with_procedure_tem_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_packaged_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_sample,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_procedure_template_s_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_sample_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.sample),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_sample_sample_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_sample)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
@@ -127,68 +445,178 @@ impl InsertablePackagingProcedure {
             conn,
         )
     }
-    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_packaged_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
-                self.packaged_with_model,
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_packaged_with_model,
             ),
             conn,
         )
     }
-    pub fn packaging_procedures_procedure_packaged_with_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_template_procedure_templat_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_sample_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn packaging_procedures_procedure_template_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_packaged_with_model
+                            .eq(&self.procedure_template_packaged_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+            >(conn)
+    }
+    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                (self.procedure, self.packaged_with_model),
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_sample_model,
+            ),
+            conn,
+        )
+    }
+    pub fn sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
+                self.sample,
+            ),
+            conn,
+        )
+    }
+    pub fn sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::table(),
+                self.sample_model,
             ),
             conn,
         )
@@ -200,8 +628,30 @@ pub struct InsertablePackagingProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
 > {
     pub(crate) procedure_template: Option<i32>,
+    pub(crate) sample: Option<::rosetta_uuid::Uuid>,
+    pub(crate) sample_model: Option<i32>,
+    pub(crate) procedure_template_sample_model: Option<i32>,
+    pub(crate) procedure_sample: web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+    >,
     pub(crate) packaged_with_model: Option<i32>,
+    pub(crate) procedure_template_packaged_with_model: Option<i32>,
+    pub(crate) procedure_packaged_with: web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+    >,
     pub(crate) procedure: Procedure,
+}
+impl From<InsertablePackagingProcedureBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertablePackagingProcedureBuilder,
+    >
+{
+    fn from(builder: InsertablePackagingProcedureBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `PackagingProcedure`
 /// or descendant tables.
@@ -231,6 +681,105 @@ pub trait PackagingProcedureSettable: Sized {
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.packaging_procedures.sample` column.
+    ///
+    /// # Arguments
+    /// * `sample`: The value to set for the
+    ///   `public.packaging_procedures.sample` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn sample(
+        self,
+        sample: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.packaging_procedures.sample_model` column.
+    ///
+    /// # Arguments
+    /// * `sample_model`: The value to set for the
+    ///   `public.packaging_procedures.sample_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn sample_model(
+        self,
+        sample_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_template_sample_model` column.
+    ///
+    /// # Arguments
+    /// * `procedure_template_sample_model`: The value to set for the
+    ///   `public.packaging_procedures.procedure_template_sample_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template_sample_model(
+        self,
+        procedure_template_sample_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.packaging_procedures.procedure_sample`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `procedure_sample`: The value to set for the
+    ///   `public.packaging_procedures.procedure_sample` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_sample<PS>(
+        self,
+        procedure_sample: PS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PS: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >;
     /// Sets the value of the `public.packaging_procedures.packaged_with_model`
     /// column.
     ///
@@ -254,36 +803,109 @@ pub trait PackagingProcedureSettable: Sized {
         self,
         packaged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_template_packaged_with_model`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `procedure_template_packaged_with_model`: The value to set for the
+    ///   `public.packaging_procedures.procedure_template_packaged_with_model`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template_packaged_with_model(
+        self,
+        procedure_template_packaged_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_packaged_with` column.
+    ///
+    /// # Arguments
+    /// * `procedure_packaged_with`: The value to set for the
+    ///   `public.packaging_procedures.procedure_packaged_with` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_packaged_with<PPW>(
+        self,
+        procedure_packaged_with: PPW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPW: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >;
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
-> PackagingProcedureSettable for InsertablePackagingProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute;
-    ///Sets the value of the `public.packaging_procedures.procedure_template` column.
+> PackagingProcedureSettable for InsertablePackagingProcedureBuilder<Procedure>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute;
+    /// Sets the value of the `public.packaging_procedures.procedure_template`
+    /// column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`packaging_procedures`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v5 ["`packaging_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v3 ["`procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v0 --->|"`ancestral same as`"| v1
-    ///v2 --->|"`extends`"| v3
-    ///```
+    /// class v0 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_sample_model"}
+    /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_packaged_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v6 ["`procedure_assets`"]
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 undirectly-involved-column
+    /// end
+    /// subgraph v7 ["`procedures`"]
+    ///    v3@{shape: rounded, label: "procedure_template"}
+    /// class v3 directly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v2 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v5 --->|"`extends`"| v7
+    /// v5 ---o|"`associated with`"| v6
+    /// ```
     fn procedure_template(
         mut self,
         procedure_template: i32,
@@ -300,27 +922,584 @@ impl<
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.packaging_procedures.packaged_with_model` column.
+    /// Sets the value of the `public.packaging_procedures.sample` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`packaging_procedures`"]
+    ///    v1@{shape: rounded, label: "sample"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_sample"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
+    fn sample(
+        mut self,
+        sample: ::rosetta_uuid::Uuid,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_sample) =
+            self.procedure_sample
+        {
+            self.procedure_sample = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                    procedure_sample,
+                    Some(sample),
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureSample(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.sample = Some(sample);
+        Ok(self)
+    }
+    /// Sets the value of the `public.packaging_procedures.sample_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v5 ["`packaging_procedures`"]
+    ///    v0@{shape: rounded, label: "packaged_with_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_sample"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "sample_model"}
+    /// class v2 column-of-interest
+    /// end
+    /// subgraph v6 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v3
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v5 ---o|"`associated with`"| v6
+    /// ```
+    fn sample_model(
+        mut self,
+        sample_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_sample) =
+            self.procedure_sample
+        {
+            self.procedure_sample = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                    procedure_sample,
+                    sample_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureSample(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.sample_model = Some(sample_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_template_sample_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`packaging_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template_sample_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_sample"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
+    fn procedure_template_sample_model(
+        mut self,
+        procedure_template_sample_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_sample) =
+            self.procedure_sample
+        {
+            self.procedure_sample = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                    procedure_sample,
+                    procedure_template_sample_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureSample(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.procedure_template_sample_model = Some(procedure_template_sample_model);
+        Ok(self)
+    }
+    /// Sets the value of the `public.packaging_procedures.procedure_sample`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v8 ["`packaging_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template_sample_model"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "sample"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "sample_model"}
+    /// class v3 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_sample"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v9 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v6
+    /// v2 --->|"`associated same as`"| v4
+    /// v4 -.->|"`foreign defines`"| v5
+    /// v3 --->|"`associated same as`"| v5
+    /// v0 --->|"`associated same as`"| v7
+    /// v0 --->|"`associated same as`"| v7
+    /// v0 --->|"`associated same as`"| v7
+    /// v0 --->|"`associated same as`"| v7
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v0 -.->|"`foreign defines`"| v3
+    /// v8 ---o|"`associated with`"| v9
+    /// ```
+    fn procedure_sample<PS>(
+        mut self,
+        procedure_sample: PS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PS: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >,
+    {
+        let mut procedure_sample = procedure_sample.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
+            procedure_sample = if let (
+                Some(procedure_template_sample_model),
+                Some(procedure_template_asset_model),
+            ) =
+                (self.procedure_template_sample_model, builder.procedure_template_asset_model)
+            {
+                if procedure_template_sample_model != procedure_template_asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::ProcedureTemplateSampleModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_sample_model = Some(procedure_template_asset_model);
+                builder.into()
+            } else if let Some(procedure_template_sample_model) =
+                self.procedure_template_sample_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                        builder,
+                        procedure_template_sample_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSample(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
+            procedure_sample = if let (Some(sample), Some(asset)) = (self.sample, builder.asset) {
+                if sample != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::Sample,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.sample = Some(asset);
+                builder.into()
+            } else if let Some(sample) = self.sample {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(sample),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSample(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
+            procedure_sample = if let (Some(sample_model), Some(asset_model)) =
+                (self.sample_model, builder.asset_model)
+            {
+                if sample_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::SampleModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.sample_model = Some(asset_model);
+                builder.into()
+            } else if let Some(sample_model) = self.sample_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        sample_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSample(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_sample = procedure_sample;
+        Ok(self)
+    }
+    /// Sets the value of the `public.packaging_procedures.packaged_with_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v5 ["`packaging_procedures`"]
+    ///    v0@{shape: rounded, label: "packaged_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_packaged_with"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "sample_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// subgraph v6 ["`procedure_assets`"]
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v2 --->|"`associated same as`"| v3
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v5 ---o|"`associated with`"| v6
+    /// ```
     fn packaged_with_model(
         mut self,
         packaged_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_packaged_with) =
+            self.procedure_packaged_with
+        {
+            self.procedure_packaged_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                    procedure_packaged_with,
+                    packaged_with_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedurePackagedWith(attribute)
+                    })
+                })?
+                .into();
+        }
         self.packaged_with_model = Some(packaged_with_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_template_packaged_with_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`packaging_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template_packaged_with_model"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_packaged_with"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
+    fn procedure_template_packaged_with_model(
+        mut self,
+        procedure_template_packaged_with_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_packaged_with) =
+            self.procedure_packaged_with
+        {
+            self.procedure_packaged_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                    procedure_packaged_with,
+                    procedure_template_packaged_with_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedurePackagedWith(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.procedure_template_packaged_with_model = Some(procedure_template_packaged_with_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.packaging_procedures.procedure_packaged_with` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v6 ["`packaging_procedures`"]
+    ///    v0@{shape: rounded, label: "packaged_with_model"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_packaged_with"}
+    /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_packaged_with_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
+    /// v6 ---o|"`associated with`"| v7
+    /// ```
+    fn procedure_packaged_with<PPW>(
+        mut self,
+        procedure_packaged_with: PPW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPW: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >,
+    {
+        let mut procedure_packaged_with = procedure_packaged_with.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_packaged_with
+        {
+            procedure_packaged_with = if let (Some(packaged_with_model), Some(asset_model)) =
+                (self.packaged_with_model, builder.asset_model)
+            {
+                if packaged_with_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PackagedWithModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.packaged_with_model = Some(asset_model);
+                builder.into()
+            } else if let Some(packaged_with_model) = self.packaged_with_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        packaged_with_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePackagedWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_packaged_with
+        {
+            procedure_packaged_with = if let (
+                Some(procedure_template_packaged_with_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_packaged_with_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_packaged_with_model != procedure_template_asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::ProcedureTemplatePackagedWithModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_packaged_with_model = Some(procedure_template_asset_model);
+                builder.into()
+            } else if let Some(procedure_template_packaged_with_model) =
+                self.procedure_template_packaged_with_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                        builder,
+                        procedure_template_packaged_with_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePackagedWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_packaged_with = procedure_packaged_with;
         Ok(self)
     }
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertablePackagingProcedureBuilder<Procedure>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
@@ -330,42 +1509,6 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
-        mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
-                self.procedure,
-                parent_procedure,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
-        mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
-                self.procedure,
-                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -407,6 +1550,42 @@ where
             self,
             procedure_template,
         )
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -520,15 +1699,23 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
-            Error = web_common_traits::database::InsertError<InsertablePackagingProcedureAttribute>,
+            Error = web_common_traits::database::InsertError<PackagingProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        web_common_traits::database::TryInsertGeneric<C>,
 {
-    type Attributes = InsertablePackagingProcedureAttribute;
+    type Attributes = PackagingProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()
+            && self.sample.is_some()
+            && self.sample_model.is_some()
+            && self.procedure_template_sample_model.is_some()
+            && self.procedure_sample.is_complete()
             && self.packaged_with_model.is_some()
+            && self.procedure_template_packaged_with_model.is_some()
+            && self.procedure_packaged_with.is_complete()
     }
     fn mint_primary_key(
         self,

@@ -59,6 +59,10 @@ CREATE TABLE IF NOT EXISTS asset_compatibility_rules (
         must_be_distinct_i32(left_asset_model, right_asset_model)
     )
 );
+CREATE UNIQUE INDEX unique_asset_compatibility_pair ON asset_compatibility_rules (
+    LEAST(left_asset_model, right_asset_model),
+    GREATEST(left_asset_model, right_asset_model)
+);
 CREATE TABLE IF NOT EXISTS asset_model_ancestors (
     descendant_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
     ancestor_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,

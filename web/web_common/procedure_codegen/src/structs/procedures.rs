@@ -60,10 +60,12 @@ fn procedure_template_foreign_key(
 
     for foreign_key in procedure_table.ancestral_same_as_foreign_keys(conn)? {
         let local_columns = foreign_key.columns(conn)?;
-        assert_eq!(local_columns.len(), 2);
+        if local_columns.len() != 2 {
+            continue;
+        }
         for foreign_key in local_columns[1].foreign_primary_keys(conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
-            if ProcedureTemplate::from_table(foreign_table.clone(), conn).is_ok() {
+            if ProcedureTemplate::from_table(foreign_table.as_ref().clone(), conn).is_ok() {
                 return Ok(Some(foreign_key));
             }
         }
@@ -124,9 +126,9 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.iter() {
             if let Some(fk) = is_procedure_template_asset_model_foreign_key(&column, conn)? {
-                asset_model_fk_columns.push((column, fk));
+                asset_model_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_model_fk_columns)
@@ -147,9 +149,9 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.iter() {
             if let Some(fk) = is_asset_model_foreign_key(&column, conn)? {
-                asset_model_fk_columns.push((column, fk));
+                asset_model_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_model_fk_columns)
@@ -170,9 +172,9 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.iter() {
             if let Some(fk) = is_asset_foreign_key(&column, conn)? {
-                asset_fk_columns.push((column, fk));
+                asset_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_fk_columns)
@@ -193,9 +195,9 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_fk_columns = Vec::new();
-        for column in self.table.columns(conn)? {
+        for column in self.table.columns(conn)?.iter() {
             if let Some(fk) = is_procedure_assets_foreign_key(&column, conn)? {
-                asset_fk_columns.push((column, fk));
+                asset_fk_columns.push((column.clone(), fk));
             }
         }
         Ok(asset_fk_columns)
@@ -215,10 +217,10 @@ impl Procedure {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, crate::errors::Error> {
         let mut rule_table_fks = Vec::new();
-        for foreign_key in self.table.foreign_keys(conn)? {
+        for foreign_key in self.table.foreign_keys(conn)?.iter() {
             let foreign_table = foreign_key.foreign_table(conn)?;
             if foreign_table.table_name.ends_with("_compatibility_rules") {
-                rule_table_fks.push(foreign_key);
+                rule_table_fks.push(foreign_key.clone());
             }
         }
         Ok(rule_table_fks)
@@ -264,7 +266,9 @@ impl Procedure {
                     "public",
                     &self.table.table_catalog,
                 )?
-            },
+            }
+            .as_ref()
+            .clone(),
             conn,
         )
     }
@@ -289,7 +293,7 @@ impl Procedure {
     ) -> Result<Self, crate::errors::Error> {
         let table = Table::load(conn, table_name, "public", table_catalog)?;
         Self::must_be_procedure_table(&table, conn)?;
-        Ok(Self { table })
+        Ok(Self { table: table.as_ref().clone() })
     }
 
     /// Returns the set of `Procedure`s tables defined in the database.
@@ -308,11 +312,11 @@ impl Procedure {
     ) -> Result<Vec<Self>, crate::errors::Error> {
         let mut procedures = Vec::new();
 
-        for table in Table::load_all(conn, table_catalog, "public")? {
+        for table in Table::load_all(conn, table_catalog, "public")?.as_ref() {
             if Self::must_be_procedure_table(&table, conn).is_err() {
                 continue;
             }
-            procedures.push(Self { table });
+            procedures.push(Self { table: table.clone() });
         }
         Ok(procedures)
     }

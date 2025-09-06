@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::ranks::Rank;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRank;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableRankAttribute,
+        crate::codegen::structs_codegen::tables::insertables::RankAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,14 +46,14 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRankAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::RankAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableRankAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::RankAttribute::Description,
                 ),
             )?;
         Ok(Self::InsertableVariant {

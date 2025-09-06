@@ -5,6 +5,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+mod from_builder_to_id_or_builder_impl;
 use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
@@ -93,12 +94,15 @@ impl Codegen<'_> {
                 }
                 let nullable_column = column.to_nullable();
                 let column_name = column.snake_case_ident().ok()?;
-                let column_type =
-                    if let Some(foreign_key) = column.requires_partial_builder(conn).ok()? {
-                        foreign_key.foreign_table(conn).ok()?.insertable_builder_ty().ok()?
-                    } else {
-                        nullable_column.rust_data_type(conn).ok()?
-                    };
+                let column_type = if let Some((partial_builder_kind, _, foreign_key)) =
+                    column.requires_partial_builder(conn).ok()?
+                {
+                    let foreign_table = foreign_key.foreign_table(conn).ok()?;
+                    partial_builder_kind.formatted_type(&foreign_table, conn).ok()?
+                } else {
+                    let nullable_column_type = nullable_column.rust_data_type(conn).ok()?;
+                    quote! { #nullable_column_type }
+                };
                 Some(Ok(quote::quote! {
                     pub(crate) #column_name: #column_type
                 }))
@@ -116,6 +120,8 @@ impl Codegen<'_> {
             }),
         );
 
+        let from_builder_to_id_or_builder_impl =
+            self.from_builder_to_id_or_builder_impl(table, conn)?;
         let builder_trait_definition = table.generate_builder_trait(conn)?;
         let builder_trait_impls = table.generate_builder_trait_impl_for_ancestral_tables(
             extension_network,
@@ -130,6 +136,7 @@ impl Codegen<'_> {
                 #(#insertable_builder_attributes),*
             }
 
+            #from_builder_to_id_or_builder_impl
             #insertable_builder_default_impl
 
             #builder_trait_definition

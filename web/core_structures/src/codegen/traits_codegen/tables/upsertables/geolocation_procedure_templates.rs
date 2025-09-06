@@ -25,10 +25,6 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                     )
                     .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_geolocated_asset_model
                             .ne(excluded(procedure_template_geolocated_asset_model)),
                     ),
@@ -63,10 +59,6 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                             .ne(excluded(procedure_template_geolocated_with_model)),
                     )
                     .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_geolocated_asset_model
                             .ne(excluded(procedure_template_geolocated_asset_model)),

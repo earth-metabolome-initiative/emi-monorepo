@@ -44,10 +44,10 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.team(conn)?.can_update(user_id, conn)? {
+        if !self.project(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.project(conn)?.can_update(user_id, conn)? {
+        if !self.team(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

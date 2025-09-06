@@ -1,42 +1,40 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableOrganismExtensionAttribute {
-    PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
-    ),
+pub enum OrganismExtensionAttribute {
+    PhysicalAsset(crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute),
 }
-impl core::fmt::Display for InsertableOrganismExtensionAttribute {
+impl core::fmt::Display for OrganismExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
-    for InsertableOrganismExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute>
+    for OrganismExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableOrganismAttribute {
-    Extension(InsertableOrganismExtensionAttribute),
+pub enum OrganismAttribute {
+    Extension(OrganismExtensionAttribute),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
-    for InsertableOrganismAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute>
+    for OrganismAttribute
 {
     fn from(
-        physical_assets: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+        physical_assets: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
     ) -> Self {
-        Self::Extension(InsertableOrganismExtensionAttribute::PhysicalAsset(physical_assets))
+        Self::Extension(OrganismExtensionAttribute::PhysicalAsset(physical_assets))
     }
 }
-impl core::str::FromStr for InsertableOrganismAttribute {
+impl core::str::FromStr for OrganismAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -44,7 +42,7 @@ impl core::str::FromStr for InsertableOrganismAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableOrganismAttribute {
+impl core::fmt::Display for OrganismAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -105,6 +103,13 @@ pub struct InsertableOrganismBuilder<
 > {
     pub(crate) id: PhysicalAsset,
 }
+impl From<InsertableOrganismBuilder>
+    for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableOrganismBuilder>
+{
+    fn from(builder: InsertableOrganismBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `Organism` or
 /// descendant tables.
 pub trait OrganismSettable: Sized {
@@ -112,21 +117,20 @@ pub trait OrganismSettable: Sized {
     type Attributes;
 }
 impl<PhysicalAsset> OrganismSettable for InsertableOrganismBuilder<PhysicalAsset> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableOrganismBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -309,11 +313,11 @@ where
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableOrganismBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     fn model(
@@ -360,12 +364,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organisms::Organism,
-            Error = web_common_traits::database::InsertError<InsertableOrganismAttribute>,
+            Error = web_common_traits::database::InsertError<OrganismAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableOrganismAttribute;
+    type Attributes = OrganismAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

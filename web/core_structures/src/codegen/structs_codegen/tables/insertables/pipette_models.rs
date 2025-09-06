@@ -1,48 +1,42 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePipetteModelExtensionAttribute {
+pub enum PipetteModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertablePipetteModelExtensionAttribute {
+impl core::fmt::Display for PipetteModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePipetteModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PipetteModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePipetteModelAttribute {
-    Extension(InsertablePipetteModelExtensionAttribute),
+pub enum PipetteModelAttribute {
+    Extension(PipetteModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePipetteModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PipetteModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertablePipetteModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
+        Self::Extension(PipetteModelExtensionAttribute::PhysicalAssetModel(physical_asset_models))
     }
 }
-impl core::str::FromStr for InsertablePipetteModelAttribute {
+impl core::str::FromStr for PipetteModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +44,7 @@ impl core::str::FromStr for InsertablePipetteModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePipetteModelAttribute {
+impl core::fmt::Display for PipetteModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +107,13 @@ pub struct InsertablePipetteModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertablePipetteModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertablePipetteModelBuilder>
+{
+    fn from(builder: InsertablePipetteModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `PipetteModel` or
 /// descendant tables.
 pub trait PipetteModelSettable: Sized {
@@ -122,21 +123,20 @@ pub trait PipetteModelSettable: Sized {
 impl<PhysicalAssetModel> PipetteModelSettable
     for InsertablePipetteModelBuilder<PhysicalAssetModel>
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertablePipetteModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -301,11 +301,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertablePipetteModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -352,11 +352,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-            Error = web_common_traits::database::InsertError<InsertablePipetteModelAttribute>,
+            Error = web_common_traits::database::InsertError<PipetteModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertablePipetteModelAttribute;
+    type Attributes = PipetteModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

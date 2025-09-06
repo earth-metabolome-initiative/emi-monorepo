@@ -39,7 +39,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -75,9 +75,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModelExtensionAttribute::AssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelExtensionAttribute::AssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id,
                     ),
                 ))
             })?;

@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::user_emails::UserEmail;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUserEmail;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute,
+        crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .email
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute::Email,
+                    crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute::Email,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute::CreatedAt,
                 ),
             )?;
         let primary_email = self
             .primary_email
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailAttribute::PrimaryEmail,
+                    crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute::PrimaryEmail,
                 ),
             )?;
         Ok(Self::InsertableVariant {

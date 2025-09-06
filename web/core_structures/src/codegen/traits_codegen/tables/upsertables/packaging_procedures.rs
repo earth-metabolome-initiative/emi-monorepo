@@ -20,7 +20,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(packaged_with_model.ne(excluded(packaged_with_model))),
+                    .or(sample.ne(excluded(sample)))
+                    .or(sample_model.ne(excluded(sample_model)))
+                    .or(procedure_template_sample_model
+                        .ne(excluded(procedure_template_sample_model)))
+                    .or(procedure_sample.ne(excluded(procedure_sample)))
+                    .or(packaged_with_model.ne(excluded(packaged_with_model)))
+                    .or(procedure_template_packaged_with_model
+                        .ne(excluded(procedure_template_packaged_with_model)))
+                    .or(procedure_packaged_with.ne(excluded(procedure_packaged_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -48,7 +56,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(packaged_with_model.ne(excluded(packaged_with_model))),
+                    .or(sample.ne(excluded(sample)))
+                    .or(sample_model.ne(excluded(sample_model)))
+                    .or(procedure_template_sample_model
+                        .ne(excluded(procedure_template_sample_model)))
+                    .or(procedure_sample.ne(excluded(procedure_sample)))
+                    .or(packaged_with_model.ne(excluded(packaged_with_model)))
+                    .or(procedure_template_packaged_with_model
+                        .ne(excluded(procedure_template_packaged_with_model)))
+                    .or(procedure_packaged_with.ne(excluded(procedure_packaged_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

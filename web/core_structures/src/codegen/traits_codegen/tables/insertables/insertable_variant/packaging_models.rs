@@ -27,7 +27,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::packaging_models::PackagingModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -56,9 +56,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::PackagingModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

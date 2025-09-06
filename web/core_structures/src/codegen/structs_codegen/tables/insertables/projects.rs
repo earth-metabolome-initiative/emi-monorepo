@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProjectAttribute {
+pub enum ProjectAttribute {
     Id,
     Name,
     Description,
@@ -17,7 +17,7 @@ pub enum InsertableProjectAttribute {
     ExpectedEndDate,
     EndDate,
 }
-impl core::str::FromStr for InsertableProjectAttribute {
+impl core::str::FromStr for ProjectAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -55,7 +55,7 @@ impl core::str::FromStr for InsertableProjectAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableProjectAttribute {
+impl core::fmt::Display for ProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -100,102 +100,6 @@ pub struct InsertableProject {
     pub(crate) end_date: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProject {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::project_states::ProjectState: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
-                self.state_id,
-            ),
-            conn,
-        )
-    }
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -224,6 +128,38 @@ impl InsertableProject {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::colors::Color::table(),
                 self.color_id,
+            ),
+            conn,
+        )
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.created_by,
             ),
             conn,
         )
@@ -264,6 +200,70 @@ impl InsertableProject {
         )
         .map(Some)
     }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::project_states::ProjectState: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
+                self.state_id,
+            ),
+            conn,
+        )
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.updated_by,
+            ),
+            conn,
+        )
+    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -283,6 +283,13 @@ pub struct InsertableProjectBuilder {
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) expected_end_date: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) end_date: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl From<InsertableProjectBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableProjectBuilder>
+{
+    fn from(builder: InsertableProjectBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableProjectBuilder {
     fn default() -> Self {
@@ -676,24 +683,22 @@ pub trait ProjectSettable: Sized {
             From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ProjectSettable for InsertableProjectBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ProjectAttribute;
     /// Sets the value of the `public.projects.id` column.
     fn id(
         mut self,
         id: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Id)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Id)
         })?;
         if let Some(parent_project_id) = self.parent_project_id {
             pgrx_validation::must_be_distinct_i32(parent_project_id, id)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::ParentProjectId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Id,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::ParentProjectId,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Id,
                         )
                 })?;
         }
@@ -710,26 +715,23 @@ impl ProjectSettable for InsertableProjectBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Name)
         })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Description,
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Name,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Name,
+            )
+        })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -744,25 +746,23 @@ impl ProjectSettable for InsertableProjectBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Description)
+                .rename_field(ProjectAttribute::Description)
         })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Description,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Description,
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Description,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(description.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Description,
+            )
+        })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -784,16 +784,13 @@ impl ProjectSettable for InsertableProjectBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Icon)
         })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Icon,
-                    )
-            })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Icon,
+            )
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
@@ -815,8 +812,8 @@ impl ProjectSettable for InsertableProjectBuilder {
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::ParentProjectId,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Id,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::ParentProjectId,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Id,
                         )
                 })?;
         }
@@ -833,8 +830,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
     {
         let budget = budget.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Budget)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Budget)
         })?;
         self.budget = budget;
         Ok(self)
@@ -849,8 +845,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
     {
         let expenses = expenses.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::Expenses)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Expenses)
         })?;
         self.expenses = expenses;
         Ok(self)
@@ -891,16 +886,15 @@ impl ProjectSettable for InsertableProjectBuilder {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::CreatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -926,16 +920,15 @@ impl ProjectSettable for InsertableProjectBuilder {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::UpdatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::UpdatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::CreatedAt,
+                            crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::UpdatedAt,
                         )
                 })?;
         }
@@ -954,7 +947,7 @@ impl ProjectSettable for InsertableProjectBuilder {
     {
         let expected_end_date = expected_end_date.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::ExpectedEndDate)
+                .rename_field(ProjectAttribute::ExpectedEndDate)
         })?;
         self.expected_end_date = Some(expected_end_date);
         Ok(self)
@@ -970,8 +963,7 @@ impl ProjectSettable for InsertableProjectBuilder {
             From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let end_date = end_date.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectAttribute::EndDate)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::EndDate)
         })?;
         self.end_date = Some(end_date);
         Ok(self)
@@ -989,10 +981,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::projects::Project,
-            Error = web_common_traits::database::InsertError<InsertableProjectAttribute>,
+            Error = web_common_traits::database::InsertError<ProjectAttribute>,
         >,
 {
-    type Attributes = InsertableProjectAttribute;
+    type Attributes = ProjectAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_some()
             && self.name.is_some()

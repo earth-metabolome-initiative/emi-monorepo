@@ -11,7 +11,6 @@ mod packaging_procedure_templates;
 mod photograph_procedure_templates;
 mod pouring_procedure_templates;
 mod procedure_templates;
-mod registering_procedure_templates;
 mod storage_procedure_templates;
 mod supernatant_procedure_templates;
 mod weighing_procedure_templates;

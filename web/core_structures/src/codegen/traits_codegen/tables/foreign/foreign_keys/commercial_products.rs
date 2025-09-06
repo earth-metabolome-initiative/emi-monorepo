@@ -1,8 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialProductForeignKeys {
-    pub id:
-        Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+    pub id: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
     pub brand: Option<crate::codegen::structs_codegen::tables::brands::Brand>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -15,9 +14,7 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                self.id,
-            ),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.id),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Brand(self.brand_id),
@@ -35,6 +32,26 @@ impl web_common_traits::prelude::HasForeignKeys
         let mut updated = false;
         match (row, crud) {
             (
+                crate::codegen::tables::row::Row::AssetModel(asset_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.id == asset_models.id {
+                    foreign_keys.id = Some(asset_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::AssetModel(asset_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.id == asset_models.id {
+                    foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
                 crate::codegen::tables::row::Row::Brand(brands),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
@@ -51,26 +68,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.brand_id == brands.id {
                     foreign_keys.brand = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.id == physical_asset_models.id {
-                    foreign_keys.id = Some(physical_asset_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.id == physical_asset_models.id {
-                    foreign_keys.id = None;
                     updated = true;
                 }
             }

@@ -21,10 +21,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                     .ne(excluded(liters))
                     .or(aliquoted_from_model.ne(excluded(aliquoted_from_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_aliquoted_from_model
                             .ne(excluded(procedure_template_aliquoted_from_model)),
                     )
@@ -70,10 +66,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                 liters
                     .ne(excluded(liters))
                     .or(aliquoted_from_model.ne(excluded(aliquoted_from_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_aliquoted_from_model
                             .ne(excluded(procedure_template_aliquoted_from_model)),

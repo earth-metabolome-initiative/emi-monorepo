@@ -4,6 +4,7 @@
 use std::{
     collections::{HashMap, HashSet},
     path::Path,
+    sync::Arc,
 };
 
 use diesel::PgConnection;
@@ -11,7 +12,9 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Codegen, Table, errors::WebCodeGenError, traits::TableLike};
+use crate::{
+    Codegen, Table, errors::WebCodeGenError, table_metadata::PartialBuilderKind, traits::TableLike,
+};
 mod foreign_defined_completions;
 
 impl Codegen<'_> {
@@ -65,7 +68,7 @@ impl Codegen<'_> {
         let mut additional_where_requirements = vec![quote! {
             C: diesel::connection::LoadConnection
         }];
-        let mut try_insert_generic_constraint: HashSet<Table> = HashSet::new();
+        let mut try_insert_generic_constraint: HashSet<Arc<Table>> = HashSet::new();
         let mut attribute_availability_checks = Vec::new();
 
         let generics_recursive_operation = if !right_generics.is_empty() {
@@ -280,16 +283,82 @@ impl Codegen<'_> {
         //
 
         let mut dependant_tables_completion: Vec<TokenStream> = Vec::new();
+        let primary_key_columns = table.primary_key_columns(conn)?;
 
         // Then, for each column in the primary key, we determine the same-as
         // relationships and complete the dependant tables. It is possible that
         // multiple primary key columns have the same local same-as column attribute,
         // in which case it is needful to group by the foreign keys by the local same-as
         // column.
-        for (partial_builder_column, constraint) in table.partial_builder_columns(conn)? {
+        for (
+            partial_builder_column,
+            partial_builder_kind,
+            potential_same_as_constraint,
+            constraint,
+        ) in table.partial_builder_columns(conn)?
+        {
             let partial_builder_table = constraint.foreign_table(conn)?;
+            let partial_builder_table_ref = partial_builder_table.as_ref();
             let foreign_builder = partial_builder_table.insertable_builder_ty()?;
             let partial_builder_table_trait = partial_builder_table.setter_trait_ty()?;
+
+            let local_column_ident = partial_builder_column.snake_case_ident()?;
+            let camel_cased_column_ident = partial_builder_column.camel_case_ident()?;
+            let partial_builder_attributes_enum = partial_builder_table.insertable_enum_ty()?;
+            let partial_builder_primary_key_camel_cased =
+                partial_builder_table.primary_key_columns(conn)?[0].camel_case_ident()?;
+            let builder_ident = match partial_builder_kind {
+                PartialBuilderKind::Mandatory => quote! {self.#local_column_ident},
+                PartialBuilderKind::Discretional => quote! {#local_column_ident},
+            };
+            let mut missing_same_as_assignments = primary_key_columns
+                .iter()
+                .map(|primary_key_column| {
+                    let column_ident = primary_key_column.snake_case_ident()?;
+                    Ok(primary_key_column
+                        .associated_same_as_columns(true, conn)?
+                        .into_iter()
+                        .filter_map(|(remote_column, _associated_same_as_constraint)| {
+                            let remote_table = remote_column.table(conn).ok()?;
+                            if remote_table.as_ref() != partial_builder_table_ref {
+                                return None;
+                            }
+                            let remote_column_setter = remote_column.snake_case_ident().ok()?;
+                            Some(quote!{
+                                #builder_ident = <#foreign_builder as #partial_builder_table_trait>::#remote_column_setter(
+                                    #builder_ident,
+                                    #column_ident
+                                ).map_err(|err| {
+                                    err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                })?;
+                            })
+                        })
+                        .collect())
+                })
+                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?
+                .into_iter()
+                .filter(|ts| !ts.is_empty())
+                .collect::<Vec<TokenStream>>();
+
+            if partial_builder_kind.is_discretional() {
+                for (primary_key_column, remote_column) in primary_key_columns
+                    .iter()
+                    .zip(potential_same_as_constraint.columns(conn)?.iter())
+                {
+                    let column_ident = primary_key_column.snake_case_ident()?;
+                    let remote_column_setter = remote_column.snake_case_ident()?;
+                    missing_same_as_assignments.push(quote!{
+                        #builder_ident = <#foreign_builder as #partial_builder_table_trait>::#remote_column_setter(
+                            #builder_ident,
+                            #column_ident
+                        ).map_err(|err| {
+                            err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                        })?;
+                    })
+                }
+            } else if !missing_same_as_assignments.is_empty() {
+                maybe_mut_self = true;
+            }
 
             if !try_insert_generic_constraint.contains(&partial_builder_table) {
                 let foreign_attributes = partial_builder_table.insertable_enum_ty()?;
@@ -305,47 +374,48 @@ impl Codegen<'_> {
                 try_insert_generic_constraint.insert(partial_builder_table);
             }
 
-            let local_column_ident = partial_builder_column.snake_case_ident()?;
-            let camel_cased_column_ident = partial_builder_column.camel_case_ident()?;
+            let maybe_mut_builder = if missing_same_as_assignments.is_empty() {
+                quote! {}
+            } else {
+                quote! {mut}
+            };
 
-            let missing_same_as_assignments = table
-                .primary_key_columns(conn)?
-                .into_iter()
-                .map(|primary_key_column| {
-                    let column_ident = primary_key_column.snake_case_ident()?;
-                    Ok(primary_key_column
-                        .associated_same_as_columns(true, conn)?
-                        .into_iter()
-                        .filter_map(|(remote_column, associated_same_as_constraint)| {
-                            let local_columns = associated_same_as_constraint.columns(conn).ok()?;
-                            if !local_columns.contains(&partial_builder_column) {
-                                return None;
+            dependant_tables_completion.push(match partial_builder_kind {
+                PartialBuilderKind::Mandatory => {
+                    quote! {
+                        #(#missing_same_as_assignments)*
+                        let #local_column_ident = self.#local_column_ident
+                            .mint_primary_key(user_id, conn)
+                            .map_err(|err| {
+                                err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                            })?;
+                    }
+                }
+                PartialBuilderKind::Discretional => {
+                    quote! {
+                        let #local_column_ident = match self.#local_column_ident {
+                            web_common_traits::database::IdOrBuilder::Id(id) => {
+                                id
+                                    .mint_primary_key(user_id, conn)
+                                    .map_err(|_| {
+                                        common_traits::prelude::BuilderError::IncompleteBuild(
+                                            #insertable_enum::#camel_cased_column_ident(
+                                                #partial_builder_attributes_enum::#partial_builder_primary_key_camel_cased
+                                            )
+                                        )
+                                    })?
+                            },
+                            web_common_traits::database::IdOrBuilder::Builder(#maybe_mut_builder #local_column_ident) => {
+                                #(#missing_same_as_assignments)*
+                                #local_column_ident
+                                    .mint_primary_key(user_id, conn)
+                                    .map_err(|err| {
+                                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                    })?
                             }
-                            let remote_column_setter = remote_column.snake_case_ident().ok()?;
-                            Some(quote!{
-                                self.#local_column_ident = <#foreign_builder as #partial_builder_table_trait>::#remote_column_setter(
-                                    self.#local_column_ident,
-                                    #column_ident
-                                ).map_err(|err| {
-                                    err.into_field_name(#insertable_enum::#camel_cased_column_ident)
-                                })?;
-                            })
-                        })
-                        .collect())
-                })
-                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-
-            if !missing_same_as_assignments.is_empty() {
-                maybe_mut_self = true;
-            }
-
-            dependant_tables_completion.push(quote! {
-                #(#missing_same_as_assignments)*
-                let #local_column_ident = self.#local_column_ident
-                    .mint_primary_key(user_id, conn)
-                    .map_err(|err| {
-                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
-                    })?;
+                        };
+                    }
+                }
             });
         }
 

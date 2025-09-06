@@ -23,11 +23,11 @@ where
         PrimaryKey = i32,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -44,6 +44,9 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
@@ -68,7 +71,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -83,16 +86,16 @@ where
         self.set_most_concrete_table("geolocation_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_geolocated_with_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct
-            .procedure_template_geolocated_with_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -111,8 +114,23 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template_geolocated_asset_model) = self
-            .procedure_template_geolocated_asset_model
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_geolocated_with_model),
+        ) = self.procedure_template_geolocated_with_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_geolocated_with_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateSettable>::geolocated_with_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_geolocated_asset_model),
+        ) = self.procedure_template_geolocated_asset_model
         {
             if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_geolocated_asset_model,
@@ -122,73 +140,105 @@ where
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateSettable>::foreign_procedure_template(
-                    self,
-                    procedure_template_asset_models.procedure_template,
-                )?;
             }
         }
         let geolocated_with_model = self
             .geolocated_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::GeolocatedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::GeolocatedWithModel,
                 ),
             )?;
         let geolocated_asset_model = self
             .geolocated_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::GeolocatedAssetModel,
-                ),
-            )?;
-        let foreign_procedure_template = self
-            .foreign_procedure_template
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::ForeignProcedureTemplate,
-                ),
-            )?;
-        let procedure_template_geolocated_asset_model = self
-            .procedure_template_geolocated_asset_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel,
+                    crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::GeolocatedAssetModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateExtensionAttribute::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
             })?;
-        self.procedure_template_geolocated_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_geolocated_with_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
-                )
-            })?;
-        let procedure_template_geolocated_with_model = self
+        let procedure_template_geolocated_with_model = match self
             .procedure_template_geolocated_with_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
-                )
-            })?;
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_geolocated_with_model,
+            ) => {
+                procedure_template_geolocated_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_geolocated_with_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
+                        )
+                    })?;
+                procedure_template_geolocated_with_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_geolocated_asset_model = match self
+            .procedure_template_geolocated_asset_model
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_geolocated_asset_model,
+            ) => {
+                procedure_template_geolocated_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_geolocated_asset_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel,
+                        )
+                    })?;
+                procedure_template_geolocated_asset_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel,
+                        )
+                    })?
+            }
+        };
         Ok(Self::InsertableVariant {
             procedure_template,
             geolocated_with_model,
             procedure_template_geolocated_with_model,
             geolocated_asset_model,
-            foreign_procedure_template,
             procedure_template_geolocated_asset_model,
         })
     }

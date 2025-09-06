@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::colors::Color;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableColor;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableColorAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ColorAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,21 +46,21 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableColorAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::ColorAttribute::Name,
                 ),
             )?;
         let hexadecimal_value = self
             .hexadecimal_value
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableColorAttribute::HexadecimalValue,
+                    crate::codegen::structs_codegen::tables::insertables::ColorAttribute::HexadecimalValue,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableColorAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::ColorAttribute::Description,
                 ),
             )?;
         Ok(Self::InsertableVariant {

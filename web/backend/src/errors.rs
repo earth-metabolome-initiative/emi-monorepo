@@ -2,8 +2,7 @@
 //! server.
 
 use core_structures::tables::insertables::{
-    InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes,
-    InsertableUserEmailAttributes,
+    EmailProviderAttributes, TemporaryUserAttributes, UserEmailAttributes,
 };
 use web_common_traits::database::InsertError;
 
@@ -37,11 +36,11 @@ pub enum BackendError {
     /// An error occurred while encoding or decoding a `JSONWebToken`.
     JWT(jsonwebtoken::errors::Error),
     /// When inserting a new user email failed.
-    UserEmailInsert(InsertError<InsertableUserEmailAttributes>),
+    UserEmailInsert(InsertError<UserEmailAttributes>),
     /// When inserting a new email provider failed.
-    EmailProviderInsert(InsertError<InsertableEmailProviderAttributes>),
+    EmailProviderInsert(InsertError<EmailProviderAttributes>),
     /// When inserting a temporary user failed.
-    TemporaryUserInsert(InsertError<InsertableTemporaryUserAttributes>),
+    TemporaryUserInsert(InsertError<TemporaryUserAttributes>),
     /// When a login provider is not found in the database.
     UnknownLoginProvider(String),
     /// When there is a failure in the `ListenNotify` server.

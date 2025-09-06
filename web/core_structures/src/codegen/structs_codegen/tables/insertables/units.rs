@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableUnitAttribute {
+pub enum UnitAttribute {
     Name,
     Unit,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableUnitAttribute {
+impl core::str::FromStr for UnitAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableUnitAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableUnitAttribute {
+impl core::fmt::Display for UnitAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -87,6 +87,13 @@ pub struct InsertableUnitBuilder {
     pub(crate) unit: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
+}
+impl From<InsertableUnitBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableUnitBuilder>
+{
+    fn from(builder: InsertableUnitBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `Unit` or descendant
 /// tables.
@@ -191,7 +198,7 @@ pub trait UnitSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl UnitSettable for InsertableUnitBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::UnitAttribute;
     /// Sets the value of the `public.units.name` column.
     fn name<N>(
         mut self,
@@ -202,8 +209,7 @@ impl UnitSettable for InsertableUnitBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUnitAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -218,8 +224,7 @@ impl UnitSettable for InsertableUnitBuilder {
         validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         let unit = unit.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUnitAttribute::Unit)
+            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Unit)
         })?;
         self.unit = Some(unit);
         Ok(self)
@@ -234,8 +239,7 @@ impl UnitSettable for InsertableUnitBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUnitAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -261,10 +265,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::units::Unit,
-            Error = web_common_traits::database::InsertError<InsertableUnitAttribute>,
+            Error = web_common_traits::database::InsertError<UnitAttribute>,
         >,
 {
-    type Attributes = InsertableUnitAttribute;
+    type Attributes = UnitAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.unit.is_some() && self.icon.is_some() && self.color_id.is_some()
     }

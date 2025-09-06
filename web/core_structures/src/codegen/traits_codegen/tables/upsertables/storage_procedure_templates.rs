@@ -30,10 +30,6 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                     )
                     .or(stored_asset_model.ne(excluded(stored_asset_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_stored_asset_model
                             .ne(excluded(procedure_template_stored_asset_model)),
                     ),
@@ -73,10 +69,6 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                             .ne(excluded(procedure_template_stored_into_model)),
                     )
                     .or(stored_asset_model.ne(excluded(stored_asset_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_stored_asset_model
                             .ne(excluded(procedure_template_stored_asset_model)),

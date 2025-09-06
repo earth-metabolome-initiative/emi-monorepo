@@ -48,7 +48,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLot;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -87,7 +87,7 @@ where
             .product_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute::ProductModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute::ProductModel,
                 ),
             )?;
         let id = if self.commercial_positioning_device_lots_id_fkey.is_complete() {
@@ -95,9 +95,9 @@ where
                 .commercial_positioning_device_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;
@@ -106,9 +106,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -118,9 +118,9 @@ where
                 .commercial_positioning_device_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -129,9 +129,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceLotExtensionAttribute::CommercialProductLot(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
                         ),
                     ))
                 })?;

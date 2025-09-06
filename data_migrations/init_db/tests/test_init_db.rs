@@ -25,7 +25,7 @@ async fn test_init_db() {
     test_time_tracker.add_completed_task(task);
 
     // We initialize the database into the docker container
-    match init_database(DATABASE_NAME, &mut conn).await {
+    match init_database(DATABASE_NAME, false, &mut conn).await {
         Ok(time_tracker) => {
             test_time_tracker.extend(time_tracker);
             Report::new(test_time_tracker)

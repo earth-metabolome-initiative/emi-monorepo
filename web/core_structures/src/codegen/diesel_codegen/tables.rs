@@ -105,8 +105,6 @@ pub mod project_states;
 pub mod projects;
 pub mod ranks;
 pub mod reagent_models;
-pub mod registering_procedure_templates;
-pub mod registering_procedures;
 pub mod roles;
 pub mod rooms;
 pub mod sample_states;

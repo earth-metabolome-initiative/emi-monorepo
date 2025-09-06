@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableEmailProviderAttribute {
+pub enum EmailProviderAttribute {
     EmailId,
     LoginProviderId,
 }
-impl core::str::FromStr for InsertableEmailProviderAttribute {
+impl core::str::FromStr for EmailProviderAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableEmailProviderAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableEmailProviderAttribute {
+impl core::fmt::Display for EmailProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::EmailId => write!(f, "email_id"),
@@ -159,8 +159,7 @@ pub trait EmailProviderSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl EmailProviderSettable for InsertableEmailProviderBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::EmailProviderAttribute;
     /// Sets the value of the `public.email_providers.email_id` column.
     fn email(
         mut self,
@@ -190,10 +189,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
-            Error = web_common_traits::database::InsertError<InsertableEmailProviderAttribute>,
+            Error = web_common_traits::database::InsertError<EmailProviderAttribute>,
         >,
 {
-    type Attributes = InsertableEmailProviderAttribute;
+    type Attributes = EmailProviderAttribute;
     fn is_complete(&self) -> bool {
         self.email_id.is_some() && self.login_provider_id.is_some()
     }

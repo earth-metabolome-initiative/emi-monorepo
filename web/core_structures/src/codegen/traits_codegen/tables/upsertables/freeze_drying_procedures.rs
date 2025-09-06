@@ -20,11 +20,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(freeze_dryed_container.ne(excluded(freeze_dryed_container)))
-                    .or(freeze_dryed_with.ne(excluded(freeze_dryed_with)))
-                    .or(freeze_dryed_with_model.ne(excluded(freeze_dryed_with_model))),
+                    .or(freeze_dried_container.ne(excluded(freeze_dried_container)))
+                    .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
+                    .or(procedure_template_freeze_dried_container_model
+                        .ne(excluded(procedure_template_freeze_dried_container_model)))
+                    .or(procedure_freeze_dried_container
+                        .ne(excluded(procedure_freeze_dried_container)))
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(freeze_dried_with_model.ne(excluded(freeze_dried_with_model)))
+                    .or(procedure_template_freeze_dried_with_model
+                        .ne(excluded(procedure_template_freeze_dried_with_model)))
+                    .or(procedure_freeze_dried_with.ne(excluded(procedure_freeze_dried_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -52,11 +58,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
-                    .or(freeze_dryed_container.ne(excluded(freeze_dryed_container)))
-                    .or(freeze_dryed_with.ne(excluded(freeze_dryed_with)))
-                    .or(freeze_dryed_with_model.ne(excluded(freeze_dryed_with_model))),
+                    .or(freeze_dried_container.ne(excluded(freeze_dried_container)))
+                    .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
+                    .or(procedure_template_freeze_dried_container_model
+                        .ne(excluded(procedure_template_freeze_dried_container_model)))
+                    .or(procedure_freeze_dried_container
+                        .ne(excluded(procedure_freeze_dried_container)))
+                    .or(freeze_dried_with.ne(excluded(freeze_dried_with)))
+                    .or(freeze_dried_with_model.ne(excluded(freeze_dried_with_model)))
+                    .or(procedure_template_freeze_dried_with_model
+                        .ne(excluded(procedure_template_freeze_dried_with_model)))
+                    .or(procedure_freeze_dried_with.ne(excluded(procedure_freeze_dried_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

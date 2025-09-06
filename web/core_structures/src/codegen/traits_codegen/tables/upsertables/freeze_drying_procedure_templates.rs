@@ -35,10 +35,6 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::
                             .ne(excluded(freeze_dried_container_model)),
                     )
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_freeze_dried_container_model
                             .ne(
                                 excluded(procedure_template_freeze_dried_container_model),
@@ -84,10 +80,6 @@ for crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::
                     .or(
                         freeze_dried_container_model
                             .ne(excluded(freeze_dried_container_model)),
-                    )
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
                     )
                     .or(
                         procedure_template_freeze_dried_container_model

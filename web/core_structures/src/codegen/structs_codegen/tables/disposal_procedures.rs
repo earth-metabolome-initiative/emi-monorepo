@@ -15,9 +15,9 @@
 pub struct DisposalProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
-    pub foreign_procedure_template: i32,
-    pub foreign_procedure: ::rosetta_uuid::Uuid,
-    pub disposed_asset: ::rosetta_uuid::Uuid,
+    pub disposed_asset: Option<::rosetta_uuid::Uuid>,
+    pub procedure_template_disposed_asset_model: i32,
+    pub procedure_disposed_asset: ::rosetta_uuid::Uuid,
 }
 impl web_common_traits::prelude::TableName for DisposalProcedure {
     const TABLE_NAME: &'static str = "disposal_procedures";
@@ -109,75 +109,11 @@ impl DisposalProcedure {
             conn,
         )
     }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
-            ),
-            conn,
-        )
-    }
-    pub fn foreign_procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.foreign_procedure,
-            ),
-            conn,
-        )
-    }
     pub fn disposed_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
@@ -197,16 +133,132 @@ impl DisposalProcedure {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(disposed_asset) = self.disposed_asset else {
+            return Ok(None);
+        };
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
-                self.disposed_asset,
+                disposed_asset,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn procedure_template_disposed_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_disposed_asset_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_disposed_asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_disposed_asset,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn disposal_procedures_foreign_procedure_disposed_asset_fkey(
+    pub fn disposal_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_template_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template_disposed_asset_model
+                            .eq(&self.procedure_template_disposed_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_disposed_asset_procedure_tem_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -218,16 +270,44 @@ impl DisposalProcedure {
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.foreign_procedure)
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_disposed_asset)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.disposed_asset),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_disposed_asset_model),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_disposed_asset_disposed_asse_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(disposed_asset) = self.disposed_asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_disposed_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(disposed_asset),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .map(Some)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template(
@@ -243,32 +323,6 @@ impl DisposalProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_template(
-        foreign_procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
-        Self::table()
-            .filter(disposal_procedures::foreign_procedure_template.eq(foreign_procedure_template))
-            .order_by(disposal_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure(
-        foreign_procedure: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
-        Self::table()
-            .filter(disposal_procedures::foreign_procedure.eq(foreign_procedure))
-            .order_by(disposal_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_disposed_asset(
         disposed_asset: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
@@ -278,6 +332,35 @@ impl DisposalProcedure {
         use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
         Self::table()
             .filter(disposal_procedures::disposed_asset.eq(disposed_asset))
+            .order_by(disposal_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_disposed_asset_model(
+        procedure_template_disposed_asset_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
+        Self::table()
+            .filter(
+                disposal_procedures::procedure_template_disposed_asset_model
+                    .eq(procedure_template_disposed_asset_model),
+            )
+            .order_by(disposal_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_disposed_asset(
+        procedure_disposed_asset: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
+        Self::table()
+            .filter(disposal_procedures::procedure_disposed_asset.eq(procedure_disposed_asset))
             .order_by(disposal_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -302,9 +385,9 @@ impl DisposalProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_and_foreign_procedure_template(
-        foreign_procedure: &::rosetta_uuid::Uuid,
-        foreign_procedure_template: &i32,
+    pub fn from_procedure_template_and_procedure_template_disposed_asset_model(
+        procedure_template: &i32,
+        procedure_template_disposed_asset_model: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -313,15 +396,39 @@ impl DisposalProcedure {
 
         use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
         Self::table()
-            .filter(disposal_procedures::foreign_procedure.eq(foreign_procedure).and(
-                disposal_procedures::foreign_procedure_template.eq(foreign_procedure_template),
-            ))
+            .filter(
+                disposal_procedures::procedure_template.eq(procedure_template).and(
+                    disposal_procedures::procedure_template_disposed_asset_model
+                        .eq(procedure_template_disposed_asset_model),
+                ),
+            )
             .order_by(disposal_procedures::procedure.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_foreign_procedure_and_disposed_asset(
-        foreign_procedure: &::rosetta_uuid::Uuid,
+    pub fn from_procedure_disposed_asset_and_procedure_template_disposed_asset_model(
+        procedure_disposed_asset: &::rosetta_uuid::Uuid,
+        procedure_template_disposed_asset_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
+        Self::table()
+            .filter(
+                disposal_procedures::procedure_disposed_asset.eq(procedure_disposed_asset).and(
+                    disposal_procedures::procedure_template_disposed_asset_model
+                        .eq(procedure_template_disposed_asset_model),
+                ),
+            )
+            .order_by(disposal_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_disposed_asset_and_disposed_asset(
+        procedure_disposed_asset: &::rosetta_uuid::Uuid,
         disposed_asset: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -332,28 +439,10 @@ impl DisposalProcedure {
         use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
         Self::table()
             .filter(
-                disposal_procedures::foreign_procedure
-                    .eq(foreign_procedure)
+                disposal_procedures::procedure_disposed_asset
+                    .eq(procedure_disposed_asset)
                     .and(disposal_procedures::disposed_asset.eq(disposed_asset)),
             )
-            .order_by(disposal_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_foreign_procedure_template(
-        procedure_template: &i32,
-        foreign_procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures;
-        Self::table()
-            .filter(disposal_procedures::procedure_template.eq(procedure_template).and(
-                disposal_procedures::foreign_procedure_template.eq(foreign_procedure_template),
-            ))
             .order_by(disposal_procedures::procedure.asc())
             .load::<Self>(conn)
     }

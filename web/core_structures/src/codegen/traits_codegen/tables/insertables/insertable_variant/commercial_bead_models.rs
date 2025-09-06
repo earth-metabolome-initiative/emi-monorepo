@@ -30,7 +30,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -59,7 +59,7 @@ where
             .bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute::BeadModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::BeadModel,
                 ),
             )?;
         let id = if self.commercial_bead_models_id_fkey.is_complete() {
@@ -67,9 +67,9 @@ where
                 .commercial_bead_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelExtensionAttribute::BeadModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute::BeadModel(
+                            crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -78,9 +78,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -90,9 +90,9 @@ where
                 .commercial_bead_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -101,9 +101,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelExtensionAttribute::BeadModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute::BeadModel(
+                            crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute::Id,
                         ),
                     ))
                 })?;

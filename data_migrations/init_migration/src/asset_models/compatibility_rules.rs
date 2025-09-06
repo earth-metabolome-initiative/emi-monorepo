@@ -8,7 +8,7 @@ use crate::asset_models::compatibility_rules::{
     conical_centrifugal_tube_rules::init_conical_centrifugal_tube_rules,
     freeze_dryer::init_freeze_dryer_rules, freezer::init_freezer_rules,
     pipette_rules::init_pipette_rules, safelock_tubes_rules::init_safelock_tubes_rules,
-    vial_rules::init_vial_rules,
+    samples::init_sample_rules, vial_rules::init_vial_rules,
 };
 
 mod ball_mill;
@@ -17,6 +17,7 @@ mod freeze_dryer;
 mod freezer;
 mod pipette_rules;
 mod safelock_tubes_rules;
+mod samples;
 mod vial_rules;
 
 /// Initializes the compatibility rules for asset_models.
@@ -40,5 +41,6 @@ pub(crate) fn init_compatibility_rules(
     init_freezer_rules(user, conn)?;
     init_freeze_dryer_rules(user, conn)?;
     init_ball_mill_rules(user, conn)?;
+    init_sample_rules(user, conn)?;
     Ok(())
 }

@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamProjectAttribute {
+pub enum TeamProjectAttribute {
     TeamId,
     ProjectId,
 }
-impl core::str::FromStr for InsertableTeamProjectAttribute {
+impl core::str::FromStr for TeamProjectAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableTeamProjectAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamProjectAttribute {
+impl core::fmt::Display for TeamProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::TeamId => write!(f, "team_id"),
@@ -37,38 +37,6 @@ pub struct InsertableTeamProject {
     pub(crate) project_id: i32,
 }
 impl InsertableTeamProject {
-    pub fn team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::teams::Team,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::teams::Team,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::teams::Team::table(),
-                self.team_id,
-            ),
-            conn,
-        )
-    }
     pub fn project<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -97,6 +65,38 @@ impl InsertableTeamProject {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::projects::Project::table(),
                 self.project_id,
+            ),
+            conn,
+        )
+    }
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::teams::Team,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::teams::Team,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::teams::Team::table(),
+                self.team_id,
             ),
             conn,
         )
@@ -159,8 +159,7 @@ pub trait TeamProjectSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl TeamProjectSettable for InsertableTeamProjectBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute;
     /// Sets the value of the `public.team_projects.team_id` column.
     fn team(
         mut self,
@@ -190,10 +189,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject,
-            Error = web_common_traits::database::InsertError<InsertableTeamProjectAttribute>,
+            Error = web_common_traits::database::InsertError<TeamProjectAttribute>,
         >,
 {
-    type Attributes = InsertableTeamProjectAttribute;
+    type Attributes = TeamProjectAttribute;
     fn is_complete(&self) -> bool {
         self.team_id.is_some() && self.project_id.is_some()
     }

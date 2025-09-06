@@ -20,11 +20,16 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(frozen_container.ne(excluded(frozen_container)))
+                    .or(frozen_container_model.ne(excluded(frozen_container_model)))
+                    .or(procedure_template_frozen_container_model
+                        .ne(excluded(procedure_template_frozen_container_model)))
+                    .or(procedure_frozen_container.ne(excluded(procedure_frozen_container)))
                     .or(frozen_with.ne(excluded(frozen_with)))
-                    .or(frozen_with_model.ne(excluded(frozen_with_model))),
+                    .or(frozen_with_model.ne(excluded(frozen_with_model)))
+                    .or(procedure_template_frozen_with_model
+                        .ne(excluded(procedure_template_frozen_with_model)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -52,11 +57,16 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(frozen_container.ne(excluded(frozen_container)))
+                    .or(frozen_container_model.ne(excluded(frozen_container_model)))
+                    .or(procedure_template_frozen_container_model
+                        .ne(excluded(procedure_template_frozen_container_model)))
+                    .or(procedure_frozen_container.ne(excluded(procedure_frozen_container)))
                     .or(frozen_with.ne(excluded(frozen_with)))
-                    .or(frozen_with_model.ne(excluded(frozen_with_model))),
+                    .or(frozen_with_model.ne(excluded(frozen_with_model)))
+                    .or(procedure_template_frozen_with_model
+                        .ne(excluded(procedure_template_frozen_with_model)))
+                    .or(procedure_frozen_with.ne(excluded(procedure_frozen_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

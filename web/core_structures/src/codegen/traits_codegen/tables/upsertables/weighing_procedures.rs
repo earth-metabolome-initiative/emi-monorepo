@@ -20,12 +20,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(weighed_container.ne(excluded(weighed_container)))
+                    .or(procedure_template_weighed_container_model
+                        .ne(excluded(procedure_template_weighed_container_model)))
+                    .or(procedure_weighed_container.ne(excluded(procedure_weighed_container)))
                     .or(kilograms.ne(excluded(kilograms)))
-                    .or(weighed_with_model.ne(excluded(weighed_with_model)))
-                    .or(weighed_with.ne(excluded(weighed_with))),
+                    .or(weighed_with.ne(excluded(weighed_with)))
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -53,12 +56,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 procedure_template
                     .ne(excluded(procedure_template))
-                    .or(foreign_procedure_template.ne(excluded(foreign_procedure_template)))
-                    .or(foreign_procedure.ne(excluded(foreign_procedure)))
                     .or(weighed_container.ne(excluded(weighed_container)))
+                    .or(procedure_template_weighed_container_model
+                        .ne(excluded(procedure_template_weighed_container_model)))
+                    .or(procedure_weighed_container.ne(excluded(procedure_weighed_container)))
                     .or(kilograms.ne(excluded(kilograms)))
-                    .or(weighed_with_model.ne(excluded(weighed_with_model)))
-                    .or(weighed_with.ne(excluded(weighed_with))),
+                    .or(weighed_with.ne(excluded(weighed_with)))
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
+                    .or(procedure_weighed_with.ne(excluded(procedure_weighed_with))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

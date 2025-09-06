@@ -47,7 +47,7 @@ impl Codegen<'_> {
 
             let primary_key_columns: Vec<TokenStream> = table
                 .primary_key_columns(conn)?
-                .into_iter()
+                .iter()
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;
                     Ok(quote! {

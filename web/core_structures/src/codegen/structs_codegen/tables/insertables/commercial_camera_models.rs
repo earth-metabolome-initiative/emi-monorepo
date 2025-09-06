@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCameraModelExtensionAttribute {
-    CameraModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
-    ),
+pub enum CommercialCameraModelExtensionAttribute {
+    CameraModel(crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialCameraModelExtensionAttribute {
+impl core::fmt::Display for CommercialCameraModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CameraModel(e) => write!(f, "{e}"),
@@ -16,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialCameraModelExtensionAttribute {
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute>
-    for InsertableCommercialCameraModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute>
+    for CommercialCameraModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
     ) -> Self {
         Self::CameraModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialCameraModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialCameraModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCameraModelAttribute {
-    Extension(InsertableCommercialCameraModelExtensionAttribute),
+pub enum CommercialCameraModelAttribute {
+    Extension(CommercialCameraModelExtensionAttribute),
     Id,
     CameraModel,
 }
-impl core::str::FromStr for InsertableCommercialCameraModelAttribute {
+impl core::str::FromStr for CommercialCameraModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialCameraModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialCameraModelAttribute {
+impl core::fmt::Display for CommercialCameraModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -170,6 +167,30 @@ impl InsertableCommercialCameraModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_camera_models_id_camera_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.camera_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -188,6 +209,13 @@ pub struct InsertableCommercialCameraModelBuilder<
     pub(crate) camera_model: Option<i32>,
     pub(crate) commercial_camera_models_id_fkey: CameraModel,
     pub(crate) commercial_camera_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialCameraModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCameraModelBuilder>
+{
+    fn from(builder: InsertableCommercialCameraModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialCameraModel` or descendant tables.
@@ -220,44 +248,47 @@ pub trait CommercialCameraModelSettable: Sized {
 }
 impl<
     CameraModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
         >,
     CommercialProduct,
 > CommercialCameraModelSettable
-for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute;
-    ///Sets the value of the `public.commercial_camera_models.camera_model` column.
+    for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute;
+    /// Sets the value of the `public.commercial_camera_models.camera_model`
+    /// column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`asset_models`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`asset_models`"]
     ///    v2@{shape: rounded, label: "parent_model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`commercial_camera_models`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`commercial_camera_models`"]
     ///    v0@{shape: rounded, label: "camera_model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`physical_asset_models`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v3
-    ///v4 -.->|"`descendant of`"| v3
-    ///v4 -.->|"`descendant of`"| v5
-    ///```
+    /// class v1 directly-involved-column
+    /// end
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v4 -.->|"`descendant of`"| v3
+    /// v4 -.->|"`descendant of`"| v5
+    /// v5 --->|"`extends`"| v3
+    /// ```
     fn camera_model(
         mut self,
         camera_model: i32,
@@ -277,17 +308,17 @@ for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct> {
 }
 impl<
     CameraModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -454,16 +485,17 @@ impl<CameraModel, CommercialProduct>
     crate::codegen::structs_codegen::tables::insertables::CameraModelSettable
     for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute;
 }
 impl<
     CameraModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -514,10 +546,10 @@ impl<
 for InsertableCommercialCameraModelBuilder<CameraModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -544,9 +576,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
@@ -599,9 +631,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
-        Error = web_common_traits::database::InsertError<
-            InsertableCommercialCameraModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<CommercialCameraModelAttribute>,
     >,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -609,7 +639,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialCameraModelAttribute;
+    type Attributes = CommercialCameraModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_camera_models_id_fkey.is_complete()
             && self.commercial_camera_models_id_fkey1.is_complete()

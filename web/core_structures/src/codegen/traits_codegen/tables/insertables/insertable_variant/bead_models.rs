@@ -27,7 +27,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::bead_models::BeadModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -56,16 +56,16 @@ where
             .diameter_millimeters
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute::DiameterMillimeters,
+                    crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute::DiameterMillimeters,
                 ),
             )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::BeadModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

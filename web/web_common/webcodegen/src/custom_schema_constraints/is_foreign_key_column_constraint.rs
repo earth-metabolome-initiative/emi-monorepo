@@ -29,7 +29,7 @@ impl CustomColumnConstraint for IsForeignKeyConstraint {
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name == self.column_name
-            && column.foreign_keys(conn)?.into_iter().any(|foreign_key| {
+            && column.foreign_keys(conn)?.iter().any(|foreign_key| {
                 foreign_key
                     .foreign_table(conn)
                     .ok()

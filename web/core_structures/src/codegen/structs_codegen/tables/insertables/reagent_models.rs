@@ -1,43 +1,43 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableReagentModelExtensionAttribute {
-    AssetModel(crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute),
+pub enum ReagentModelExtensionAttribute {
+    AssetModel(crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute),
 }
-impl core::fmt::Display for InsertableReagentModelExtensionAttribute {
+impl core::fmt::Display for ReagentModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::AssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute>
-    for InsertableReagentModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
+    for ReagentModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
     ) -> Self {
         Self::AssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableReagentModelAttribute {
-    Extension(InsertableReagentModelExtensionAttribute),
+pub enum ReagentModelAttribute {
+    Extension(ReagentModelExtensionAttribute),
     Id,
     Purity,
     CasCode,
     MolecularFormula,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute>
-    for InsertableReagentModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
+    for ReagentModelAttribute
 {
     fn from(
-        asset_models: crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+        asset_models: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableReagentModelExtensionAttribute::AssetModel(asset_models))
+        Self::Extension(ReagentModelExtensionAttribute::AssetModel(asset_models))
     }
 }
-impl core::str::FromStr for InsertableReagentModelAttribute {
+impl core::str::FromStr for ReagentModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -51,7 +51,7 @@ impl core::str::FromStr for InsertableReagentModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableReagentModelAttribute {
+impl core::fmt::Display for ReagentModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -119,6 +119,13 @@ pub struct InsertableReagentModelBuilder<
     pub(crate) cas_code: Option<::cas_codes::CAS>,
     pub(crate) molecular_formula: Option<::molecular_formulas::MolecularFormula>,
     pub(crate) id: AssetModel,
+}
+impl From<InsertableReagentModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableReagentModelBuilder>
+{
+    fn from(builder: InsertableReagentModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `ReagentModel` or
 /// descendant tables.
@@ -205,8 +212,7 @@ pub trait ReagentModelSettable: Sized {
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
 impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetModel> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute;
     /// Sets the value of the `public.reagent_models.purity` column.
     fn purity<P>(
         mut self,
@@ -218,13 +224,13 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
     {
         let purity = purity.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableReagentModelAttribute::Purity)
+                .rename_field(ReagentModelAttribute::Purity)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(purity)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::Purity,
+                        crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute::Purity,
                     )
             })
             .and_then(|_| {
@@ -232,7 +238,7 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
                     .map_err(|e| {
                         e
                             .rename_field(
-                                crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute::Purity,
+                                crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute::Purity,
                             )
                     })
             })?;
@@ -250,7 +256,7 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
     {
         let cas_code = cas_code.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableReagentModelAttribute::CasCode)
+                .rename_field(ReagentModelAttribute::CasCode)
         })?;
         self.cas_code = Some(cas_code);
         Ok(self)
@@ -267,7 +273,7 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
     {
         let molecular_formula = molecular_formula.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableReagentModelAttribute::MolecularFormula)
+                .rename_field(ReagentModelAttribute::MolecularFormula)
         })?;
         self.molecular_formula = Some(molecular_formula);
         Ok(self)
@@ -275,13 +281,14 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-for InsertableReagentModelBuilder<AssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelAttribute;
+    for InsertableReagentModelBuilder<AssetModel>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute;
     #[inline]
-    ///Sets the value of the `public.asset_models.name` column.
+    /// Sets the value of the `public.asset_models.name` column.
     fn name<N>(
         mut self,
         name: N,
@@ -303,7 +310,7 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.description` column.
+    /// Sets the value of the `public.asset_models.description` column.
     fn description<D>(
         mut self,
         description: D,
@@ -325,7 +332,7 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.parent_model` column.
+    /// Sets the value of the `public.asset_models.parent_model` column.
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
@@ -343,7 +350,7 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.created_by` column.
+    /// Sets the value of the `public.asset_models.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
@@ -361,16 +368,15 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.created_at` column.
+    /// Sets the value of the `public.asset_models.created_at` column.
     fn created_at<CA>(
         mut self,
         created_at: CA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
-            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
-        >,
+        validation_errors::SingleFieldError:
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
@@ -385,7 +391,7 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.updated_by` column.
+    /// Sets the value of the `public.asset_models.updated_by` column.
     fn updated_by(
         mut self,
         updated_by: i32,
@@ -403,16 +409,15 @@ for InsertableReagentModelBuilder<AssetModel> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.asset_models.updated_at` column.
+    /// Sets the value of the `public.asset_models.updated_at` column.
     fn updated_at<UA>(
         mut self,
         updated_at: UA,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
-            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
-        >,
+        validation_errors::SingleFieldError:
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
@@ -454,11 +459,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
-            Error = web_common_traits::database::InsertError<InsertableReagentModelAttribute>,
+            Error = web_common_traits::database::InsertError<ReagentModelAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableReagentModelAttribute;
+    type Attributes = ReagentModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
             && self.purity.is_some()

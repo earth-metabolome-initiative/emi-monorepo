@@ -140,7 +140,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Capping")?
         .description("Capping procedure template to cap the long term storage vial")?
         .created_by(user.id)?
-        .procedure_template_container_model(long_term_vial)?
+        .procedure_template_capped_container_model(long_term_vial)?
         .procedure_template_capped_with_model(sealed_cap_vial_1_5ml_builder(user, conn)?)?
         .insert(user.id, conn)?;
 

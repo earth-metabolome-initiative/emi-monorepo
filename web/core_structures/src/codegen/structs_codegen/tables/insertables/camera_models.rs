@@ -1,48 +1,42 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCameraModelExtensionAttribute {
+pub enum CameraModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCameraModelExtensionAttribute {
+impl core::fmt::Display for CameraModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableCameraModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for CameraModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCameraModelAttribute {
-    Extension(InsertableCameraModelExtensionAttribute),
+pub enum CameraModelAttribute {
+    Extension(CameraModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertableCameraModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for CameraModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableCameraModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
+        Self::Extension(CameraModelExtensionAttribute::PhysicalAssetModel(physical_asset_models))
     }
 }
-impl core::str::FromStr for InsertableCameraModelAttribute {
+impl core::str::FromStr for CameraModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +44,7 @@ impl core::str::FromStr for InsertableCameraModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCameraModelAttribute {
+impl core::fmt::Display for CameraModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +107,13 @@ pub struct InsertableCameraModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertableCameraModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCameraModelBuilder>
+{
+    fn from(builder: InsertableCameraModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `CameraModel` or
 /// descendant tables.
 pub trait CameraModelSettable: Sized {
@@ -120,21 +121,20 @@ pub trait CameraModelSettable: Sized {
     type Attributes;
 }
 impl<PhysicalAssetModel> CameraModelSettable for InsertableCameraModelBuilder<PhysicalAssetModel> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCameraModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -299,11 +299,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCameraModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -350,11 +350,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-            Error = web_common_traits::database::InsertError<InsertableCameraModelAttribute>,
+            Error = web_common_traits::database::InsertError<CameraModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCameraModelAttribute;
+    type Attributes = CameraModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

@@ -23,11 +23,11 @@ where
         PrimaryKey = i32,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable
@@ -44,6 +44,12 @@ where
         'a,
         C,
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
@@ -68,7 +74,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -120,8 +126,23 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template_fragment_container_model) = self
-            .procedure_template_fragment_container_model
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_weighed_with_model),
+        ) = self.procedure_template_weighed_with_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_weighed_with_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::weighed_with_model(
+                    self,
+                    procedure_template_asset_models.asset_model,
+                )?;
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_fragment_container_model),
+        ) = self.procedure_template_fragment_container_model
         {
             if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_fragment_container_model,
@@ -131,9 +152,19 @@ where
                     self,
                     procedure_template_asset_models.asset_model,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::foreign_procedure_template(
+            }
+        }
+        if let web_common_traits::database::IdOrBuilder::Id(
+            Some(procedure_template_fragment_placed_into_model),
+        ) = self.procedure_template_fragment_placed_into_model
+        {
+            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                procedure_template_fragment_placed_into_model,
+                conn,
+            )? {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::fragment_placed_into_model(
                     self,
-                    procedure_template_asset_models.procedure_template,
+                    procedure_template_asset_models.asset_model,
                 )?;
             }
         }
@@ -141,95 +172,149 @@ where
             .kilograms
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::Kilograms,
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::Kilograms,
                 ),
             )?;
         let tolerance_percentage = self
             .tolerance_percentage
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::TolerancePercentage,
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::TolerancePercentage,
                 ),
             )?;
         let weighed_with_model = self
             .weighed_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::WeighedWithModel,
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::WeighedWithModel,
                 ),
             )?;
         let fragment_container_model = self
             .fragment_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::FragmentContainerModel,
-                ),
-            )?;
-        let foreign_procedure_template = self
-            .foreign_procedure_template
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ForeignProcedureTemplate,
-                ),
-            )?;
-        let procedure_template_fragment_container_model = self
-            .procedure_template_fragment_container_model
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel,
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::FragmentContainerModel,
                 ),
             )?;
         let fragment_placed_into_model = self
             .fragment_placed_into_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::FragmentPlacedIntoModel,
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::FragmentPlacedIntoModel,
                 ),
             )?;
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateExtensionAttribute::ProcedureTemplate(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute::ProcedureTemplate,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateExtensionAttribute::ProcedureTemplate(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate,
                     ),
                 ))
             })?;
-        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_weighed_with_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
-                )
-            })?;
-        let procedure_template_weighed_with_model = self
+        let procedure_template_weighed_with_model = match self
             .procedure_template_weighed_with_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
-                )
-            })?;
-        self.procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                self.procedure_template_fragment_placed_into_model,
-                procedure_template,
-            )
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
-                )
-            })?;
-        let procedure_template_fragment_placed_into_model = self
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_weighed_with_model,
+            ) => {
+                procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_weighed_with_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
+                        )
+                    })?;
+                procedure_template_weighed_with_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_fragment_container_model = match self
+            .procedure_template_fragment_container_model
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_fragment_container_model,
+            ) => {
+                procedure_template_fragment_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_fragment_container_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel,
+                        )
+                    })?;
+                procedure_template_fragment_container_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel,
+                        )
+                    })?
+            }
+        };
+        let procedure_template_fragment_placed_into_model = match self
             .procedure_template_fragment_placed_into_model
-            .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
-                )
-            })?;
+        {
+            web_common_traits::database::IdOrBuilder::Id(id) => {
+                id.mint_primary_key(user_id, conn)
+                    .map_err(|_| {
+                        common_traits::prelude::BuilderError::IncompleteBuild(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel(
+                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                            ),
+                        )
+                    })?
+            }
+            web_common_traits::database::IdOrBuilder::Builder(
+                mut procedure_template_fragment_placed_into_model,
+            ) => {
+                procedure_template_fragment_placed_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_fragment_placed_into_model,
+                        procedure_template,
+                    )
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
+                        )
+                    })?;
+                procedure_template_fragment_placed_into_model
+                    .mint_primary_key(user_id, conn)
+                    .map_err(|err| {
+                        err.into_field_name(
+                            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
+                        )
+                    })?
+            }
+        };
         Ok(Self::InsertableVariant {
             procedure_template,
             kilograms,
@@ -237,7 +322,6 @@ where
             weighed_with_model,
             procedure_template_weighed_with_model,
             fragment_container_model,
-            foreign_procedure_template,
             procedure_template_fragment_container_model,
             fragment_placed_into_model,
             procedure_template_fragment_placed_into_model,

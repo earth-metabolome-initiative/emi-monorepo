@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezerModelExtensionAttribute {
-    FreezerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
-    ),
+pub enum CommercialFreezerModelExtensionAttribute {
+    FreezerModel(crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialFreezerModelExtensionAttribute {
+impl core::fmt::Display for CommercialFreezerModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::FreezerModel(e) => write!(f, "{e}"),
@@ -16,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialFreezerModelExtensionAttribute {
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute>
-    for InsertableCommercialFreezerModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute>
+    for CommercialFreezerModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
     ) -> Self {
         Self::FreezerModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialFreezerModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialFreezerModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialFreezerModelAttribute {
-    Extension(InsertableCommercialFreezerModelExtensionAttribute),
+pub enum CommercialFreezerModelAttribute {
+    Extension(CommercialFreezerModelExtensionAttribute),
     Id,
     FreezerModel,
 }
-impl core::str::FromStr for InsertableCommercialFreezerModelAttribute {
+impl core::str::FromStr for CommercialFreezerModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialFreezerModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialFreezerModelAttribute {
+impl core::fmt::Display for CommercialFreezerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -170,24 +167,55 @@ impl InsertableCommercialFreezerModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_freezer_models_id_freezer_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.freezer_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialFreezerModelBuilder<
     CommercialProduct
         = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-            >,
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
         >,
     FreezerModel
         = crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
-            Option<i32>,
+            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+                Option<i32>,
+            >,
         >,
 > {
     pub(crate) freezer_model: Option<i32>,
     pub(crate) commercial_freezer_models_id_fkey: FreezerModel,
     pub(crate) commercial_freezer_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialFreezerModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialFreezerModelBuilder>
+{
+    fn from(builder: InsertableCommercialFreezerModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialFreezerModel` or descendant tables.
@@ -219,13 +247,13 @@ pub trait CommercialFreezerModelSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+    CommercialProduct,
+    FreezerModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
         >,
-    FreezerModel,
 > CommercialFreezerModelSettable
 for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute;
     ///Sets the value of the `public.commercial_freezer_models.freezer_model` column.
     ///
     ///# Implementation notes
@@ -262,8 +290,8 @@ for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel> {
         mut self,
         freezer_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_freezer_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
-                self.commercial_freezer_models_id_fkey1,
+        self.commercial_freezer_models_id_fkey = <FreezerModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.commercial_freezer_models_id_fkey,
                 Some(freezer_model),
             )
             .map_err(|err| {
@@ -277,17 +305,17 @@ for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel> {
 }
 impl<
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
     FreezerModel,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -452,12 +480,12 @@ where
 }
 impl<
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
     FreezerModel,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -505,7 +533,8 @@ impl<CommercialProduct, FreezerModel>
     crate::codegen::structs_codegen::tables::insertables::FreezerModelSettable
     for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute;
 }
 impl<
     CommercialProduct,
@@ -514,10 +543,10 @@ impl<
 for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -599,9 +628,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        Error = web_common_traits::database::InsertError<
-            InsertableCommercialFreezerModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<CommercialFreezerModelAttribute>,
     >,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
@@ -609,7 +636,7 @@ where
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCommercialFreezerModelAttribute;
+    type Attributes = CommercialFreezerModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_freezer_models_id_fkey1.is_complete()
             && self.commercial_freezer_models_id_fkey.is_complete()

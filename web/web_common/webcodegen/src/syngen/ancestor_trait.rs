@@ -12,7 +12,7 @@ impl crate::Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
-        let mut homogeneous_parent_columns = self.homogeneous_parent_columns(conn)?;
+        let homogeneous_parent_columns = self.homogeneous_parent_columns(conn)?;
 
         if homogeneous_parent_columns.is_empty() {
             // If there are no homogeneous parent columns, we cannot implement the Ancestor
@@ -36,12 +36,12 @@ impl crate::Table {
 
         let struct_ident = self.struct_ident()?;
 
-        let homogeneous_parent_column = homogeneous_parent_columns.pop().unwrap().pop().unwrap();
+        let homogeneous_parent_column = &homogeneous_parent_columns[0][0];
         let parent_ident = homogeneous_parent_column.snake_case_ident()?;
-        let parent = homogeneous_parent_column.column_name;
-        let primary_key_column = self.primary_key_columns(conn)?.pop().unwrap();
+        let parent = &homogeneous_parent_column.column_name;
+        let primary_key_column = &self.primary_key_columns(conn)?[0];
         let primary_key_type = primary_key_column.diesel_type(conn)?;
-        let primary_key_name = primary_key_column.column_name;
+        let primary_key_name = &primary_key_column.column_name;
 
         Ok(Some(quote! {
             impl<C> web_common_traits::prelude::Ancestor<C> for #struct_ident

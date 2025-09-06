@@ -1,34 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePipetteExtensionAttribute {
-    PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
-    ),
+pub enum PipetteExtensionAttribute {
+    PhysicalAsset(crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute),
 }
-impl core::fmt::Display for InsertablePipetteExtensionAttribute {
+impl core::fmt::Display for PipetteExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
-    for InsertablePipetteExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute>
+    for PipetteExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePipetteAttribute {
-    Extension(InsertablePipetteExtensionAttribute),
+pub enum PipetteAttribute {
+    Extension(PipetteExtensionAttribute),
     Id,
     Model,
 }
-impl core::str::FromStr for InsertablePipetteAttribute {
+impl core::str::FromStr for PipetteAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +36,7 @@ impl core::str::FromStr for InsertablePipetteAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePipetteAttribute {
+impl core::fmt::Display for PipetteAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -90,6 +88,23 @@ impl InsertablePipette {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn pipettes_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -134,6 +149,13 @@ pub struct InsertablePipetteBuilder<
     pub(crate) model: Option<i32>,
     pub(crate) id: PhysicalAsset,
 }
+impl From<InsertablePipetteBuilder>
+    for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertablePipetteBuilder>
+{
+    fn from(builder: InsertablePipetteBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `Pipette` or
 /// descendant tables.
 pub trait PipetteSettable: Sized {
@@ -163,10 +185,10 @@ pub trait PipetteSettable: Sized {
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > PipetteSettable for InsertablePipetteBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteAttribute;
     ///Sets the value of the `public.pipettes.model` column.
     ///
     ///# Implementation notes
@@ -192,9 +214,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///v5 -.->|"`descendant of`"| v3
@@ -218,16 +240,16 @@ impl<
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertablePipetteBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -408,49 +430,47 @@ where
         Ok(self)
     }
 }
-impl<
-    PhysicalAsset,
-> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
-for InsertablePipetteBuilder<PhysicalAsset>
+impl<PhysicalAsset> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
+    for InsertablePipetteBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PipetteSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute,
-    >,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteAttribute,
+        >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteAttribute;
     #[inline]
-    ///Sets the value of the `public.physical_assets.model` column.
+    /// Sets the value of the `public.physical_assets.model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`assets`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`assets`"]
     ///    v2@{shape: rounded, label: "model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`physical_assets`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`physical_assets`"]
     ///    v0@{shape: rounded, label: "model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`pipettes`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`pipettes`"]
     ///    v1@{shape: rounded, label: "model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v4
-    ///v5 -.->|"`descendant of`"| v3
-    ///v4 --->|"`extends`"| v3
-    ///```
+    /// class v1 directly-involved-column
+    /// end
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v1 -.->|"`inferred ancestral same as`"| v0
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v4 --->|"`extends`"| v3
+    /// v5 --->|"`extends`"| v4
+    /// v5 -.->|"`descendant of`"| v3
+    /// ```
     fn model(
         self,
         model: i32,
@@ -485,12 +505,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::pipettes::Pipette,
-            Error = web_common_traits::database::InsertError<InsertablePipetteAttribute>,
+            Error = web_common_traits::database::InsertError<PipetteAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertablePipetteAttribute;
+    type Attributes = PipetteAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.model.is_some()
     }

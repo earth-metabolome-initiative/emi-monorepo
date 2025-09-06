@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableAddressAttribute {
+pub enum AddressAttribute {
     Id,
     CityId,
     StreetName,
@@ -8,7 +8,7 @@ pub enum InsertableAddressAttribute {
     PostalCode,
     Geolocation,
 }
-impl core::str::FromStr for InsertableAddressAttribute {
+impl core::str::FromStr for AddressAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -26,7 +26,7 @@ impl core::str::FromStr for InsertableAddressAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableAddressAttribute {
+impl core::fmt::Display for AddressAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -93,6 +93,13 @@ pub struct InsertableAddressBuilder {
     pub(crate) street_number: Option<String>,
     pub(crate) postal_code: Option<String>,
     pub(crate) geolocation: Option<postgis_diesel::types::Point>,
+}
+impl From<InsertableAddressBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableAddressBuilder>
+{
+    fn from(builder: InsertableAddressBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `Address` or
 /// descendant tables.
@@ -227,8 +234,7 @@ pub trait AddressSettable: Sized {
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
 }
 impl AddressSettable for InsertableAddressBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableAddressAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::AddressAttribute;
     /// Sets the value of the `public.addresses.city_id` column.
     fn city(
         mut self,
@@ -248,7 +254,7 @@ impl AddressSettable for InsertableAddressBuilder {
     {
         let street_name = street_name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAddressAttribute::StreetName)
+                .rename_field(AddressAttribute::StreetName)
         })?;
         self.street_name = Some(street_name);
         Ok(self)
@@ -264,7 +270,7 @@ impl AddressSettable for InsertableAddressBuilder {
     {
         let street_number = street_number.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAddressAttribute::StreetNumber)
+                .rename_field(AddressAttribute::StreetNumber)
         })?;
         self.street_number = Some(street_number);
         Ok(self)
@@ -280,7 +286,7 @@ impl AddressSettable for InsertableAddressBuilder {
     {
         let postal_code = postal_code.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAddressAttribute::PostalCode)
+                .rename_field(AddressAttribute::PostalCode)
         })?;
         self.postal_code = Some(postal_code);
         Ok(self)
@@ -297,7 +303,7 @@ impl AddressSettable for InsertableAddressBuilder {
     {
         let geolocation = geolocation.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableAddressAttribute::Geolocation)
+                .rename_field(AddressAttribute::Geolocation)
         })?;
         self.geolocation = Some(geolocation);
         Ok(self)
@@ -315,10 +321,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::addresses::Address,
-            Error = web_common_traits::database::InsertError<InsertableAddressAttribute>,
+            Error = web_common_traits::database::InsertError<AddressAttribute>,
         >,
 {
-    type Attributes = InsertableAddressAttribute;
+    type Attributes = AddressAttribute;
     fn is_complete(&self) -> bool {
         self.city_id.is_some()
             && self.street_name.is_some()

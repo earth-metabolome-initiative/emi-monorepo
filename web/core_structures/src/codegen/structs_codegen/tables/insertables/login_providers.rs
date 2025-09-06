@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableLoginProviderAttribute {
+pub enum LoginProviderAttribute {
     Id,
     Name,
     Icon,
@@ -9,7 +9,7 @@ pub enum InsertableLoginProviderAttribute {
     OauthUrl,
     Scope,
 }
-impl core::str::FromStr for InsertableLoginProviderAttribute {
+impl core::str::FromStr for LoginProviderAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -29,7 +29,7 @@ impl core::str::FromStr for InsertableLoginProviderAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableLoginProviderAttribute {
+impl core::fmt::Display for LoginProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -68,6 +68,13 @@ pub struct InsertableLoginProviderBuilder {
     pub(crate) redirect_uri: Option<String>,
     pub(crate) oauth_url: Option<String>,
     pub(crate) scope: Option<String>,
+}
+impl From<InsertableLoginProviderBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableLoginProviderBuilder>
+{
+    fn from(builder: InsertableLoginProviderBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `LoginProvider` or
 /// descendant tables.
@@ -230,8 +237,7 @@ pub trait LoginProviderSettable: Sized {
         validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>;
 }
 impl LoginProviderSettable for InsertableLoginProviderBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute;
     /// Sets the value of the `public.login_providers.name` column.
     fn name<N>(
         mut self,
@@ -243,15 +249,13 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let name = name.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::Name)
+                .rename_field(LoginProviderAttribute::Name)
         })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Name,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Name,
+            )
+        })?;
         self.name = Some(name);
         Ok(self)
     }
@@ -266,15 +270,13 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let icon = icon.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::Icon)
+                .rename_field(LoginProviderAttribute::Icon)
         })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Icon,
-                    )
-            })?;
+        pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Icon,
+            )
+        })?;
         self.icon = Some(icon);
         Ok(self)
     }
@@ -289,13 +291,13 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let client_id = client_id.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::ClientId)
+                .rename_field(LoginProviderAttribute::ClientId)
         })?;
         pgrx_validation::must_be_paragraph(client_id.as_ref())
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::ClientId,
+                        crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::ClientId,
                     )
             })?;
         self.client_id = Some(client_id);
@@ -312,7 +314,7 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let redirect_uri = redirect_uri.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::RedirectUri)
+                .rename_field(LoginProviderAttribute::RedirectUri)
         })?;
         self.redirect_uri = Some(redirect_uri);
         Ok(self)
@@ -328,7 +330,7 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let oauth_url = oauth_url.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::OauthUrl)
+                .rename_field(LoginProviderAttribute::OauthUrl)
         })?;
         self.oauth_url = Some(oauth_url);
         Ok(self)
@@ -344,15 +346,13 @@ impl LoginProviderSettable for InsertableLoginProviderBuilder {
     {
         let scope = scope.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableLoginProviderAttribute::Scope)
+                .rename_field(LoginProviderAttribute::Scope)
         })?;
-        pgrx_validation::must_be_paragraph(scope.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Scope,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(scope.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Scope,
+            )
+        })?;
         self.scope = Some(scope);
         Ok(self)
     }
@@ -369,10 +369,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-            Error = web_common_traits::database::InsertError<InsertableLoginProviderAttribute>,
+            Error = web_common_traits::database::InsertError<LoginProviderAttribute>,
         >,
 {
-    type Attributes = InsertableLoginProviderAttribute;
+    type Attributes = LoginProviderAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.icon.is_some()

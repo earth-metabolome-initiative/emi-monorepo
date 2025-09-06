@@ -37,20 +37,20 @@ impl Codegen<'_> {
 
             let mut table_hashmap: HashMap<&Table, Option<TokenStream>> = HashMap::new();
 
-            for foreign_key in table.foreign_keys(conn)? {
+            for foreign_key in table.foreign_keys(conn)?.iter() {
                 // For each table we retrieve the foreign key(s).
                 // First we fetch the foreign table (and its primary key)
                 let foreign_table = foreign_key.foreign_table(conn)?;
 
                 // There is no need to implement this macro for the case of a foreign table that
                 // curresponds with the table itself.
-                if &foreign_table == table {
+                if foreign_table.as_ref() == table {
                     continue;
                 }
 
                 // We check wether for the current table we havce already created a given token
                 // stream.
-                if let Some(maybe_token_stream) = table_hashmap.get_mut(&foreign_table) {
+                if let Some(maybe_token_stream) = table_hashmap.get_mut(foreign_table.as_ref()) {
                     // Since there is already a foreign_table present in our HashMap we set the
                     // TakenStrem to None
                     *maybe_token_stream = None;
@@ -61,7 +61,8 @@ impl Codegen<'_> {
                 // current for loop (foreign_table dying here), we iterate over
                 // tge tables array defined out there (tables: &[Table],) and find an entry
                 // matching &foreign_table.
-                let Some(foreign_table_ref) = tables.iter().find(|t| t == &&foreign_table) else {
+                let Some(foreign_table_ref) = tables.iter().find(|t| t == &foreign_table.as_ref())
+                else {
                     continue;
                 };
 

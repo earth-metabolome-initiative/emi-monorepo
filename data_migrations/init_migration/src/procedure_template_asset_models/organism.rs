@@ -40,5 +40,5 @@ pub(crate) fn sample_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, sample(user, conn)?)
+    default_pmt(user, sample(user, conn)?.id(conn)?)
 }

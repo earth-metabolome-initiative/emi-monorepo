@@ -7,7 +7,7 @@ use init_db::init_database;
 use procedure_codegen::ProcedureCodegen;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
-use webcodegen::{Codegen, PgExtension, PgStatStatement, Table, errors::WebCodeGenError};
+use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};
 
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
@@ -70,16 +70,18 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
 #[allow(clippy::too_many_lines)]
 /// Main function to build the core structures.
 pub async fn main() {
+    // We ensure that the migrations directory has all expected properties.
+    let mut time_tracker = TimeTracker::new("Building Core Structures");
+
+    let task = Task::new("Setting up Docker and Database Connection");
     // Get the output directory
     let (docker, mut conn) = reference_docker_with_connection(DATABASE_NAME, DATABASE_PORT)
         .await
         .expect("Failed to connect to the database");
-
-    // We ensure that the migrations directory has all expected properties.
-    let mut time_tracker = TimeTracker::new("Building Core Structures");
+    time_tracker.add_completed_task(task);
 
     // We initialize the database into the docker container
-    match init_database(DATABASE_NAME, &mut conn).await {
+    match init_database(DATABASE_NAME, true, &mut conn).await {
         Ok(tracker) => time_tracker.extend(tracker),
         Err(err) => {
             docker.stop().await.expect("Failed to stop the docker container");
@@ -93,34 +95,11 @@ pub async fn main() {
             time_tracker.extend(tracker);
         }
         Err(err) => {
-            let expensive_statements =
-                PgStatStatement::most_expensive_queries(&mut conn).unwrap_or_default();
-
-            // We only keep the top 100 most expensive statements
-            let expensive_statements =
-                expensive_statements.into_iter().take(100).collect::<Vec<_>>();
-
-            // We serialize the expensive statements to JSON and save them to a file
-            let json = serde_json::to_string_pretty(&expensive_statements).unwrap_or_default();
-            std::fs::write("most_expensive_queries.json", json)
-                .expect("Failed to write most_expensive_queries.json");
-
             docker.stop().await.expect("Failed to stop the docker container");
             eprintln!("Failed to build core structures: {err:?}");
             return;
         }
     }
-
-    let expensive_statements =
-        PgStatStatement::most_expensive_queries(&mut conn).unwrap_or_default();
-
-    // We only keep the top 100 most expensive statements
-    let expensive_statements = expensive_statements.into_iter().take(100).collect::<Vec<_>>();
-
-    // We serialize the expensive statements to JSON and save them to a file
-    let json = serde_json::to_string_pretty(&expensive_statements).unwrap_or_default();
-    std::fs::write("most_expensive_queries.json", json)
-        .expect("Failed to write most_expensive_queries.json");
 
     // We stop the docker container
     if let Err(err) = docker.stop().await {

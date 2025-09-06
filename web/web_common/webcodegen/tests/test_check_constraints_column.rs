@@ -34,7 +34,7 @@ async fn test_check_constraints_column() {
             "Column `{column_name}` has an unexpected number of check constraints: {column_check_constraints:?}"
         );
 
-        for check_constraint in column_check_constraints {
+        for check_constraint in column_check_constraints.as_ref() {
             let functions = check_constraint.functions(&mut conn).unwrap_or_else(|_| {
                 panic!(
                     "Failed to query functions for check constraint `{check_constraint_name}`",

@@ -1,48 +1,42 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePackagingModelExtensionAttribute {
+pub enum PackagingModelExtensionAttribute {
     PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ),
 }
-impl core::fmt::Display for InsertablePackagingModelExtensionAttribute {
+impl core::fmt::Display for PackagingModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePackagingModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PackagingModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         Self::PhysicalAssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePackagingModelAttribute {
-    Extension(InsertablePackagingModelExtensionAttribute),
+pub enum PackagingModelAttribute {
+    Extension(PackagingModelExtensionAttribute),
     Id,
 }
-impl
-    From<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
-    > for InsertablePackagingModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for PackagingModelAttribute
 {
     fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::Extension(InsertablePackagingModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
+        Self::Extension(PackagingModelExtensionAttribute::PhysicalAssetModel(physical_asset_models))
     }
 }
-impl core::str::FromStr for InsertablePackagingModelAttribute {
+impl core::str::FromStr for PackagingModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +44,7 @@ impl core::str::FromStr for InsertablePackagingModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePackagingModelAttribute {
+impl core::fmt::Display for PackagingModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -113,6 +107,13 @@ pub struct InsertablePackagingModelBuilder<
 > {
     pub(crate) id: PhysicalAssetModel,
 }
+impl From<InsertablePackagingModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertablePackagingModelBuilder>
+{
+    fn from(builder: InsertablePackagingModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `PackagingModel` or
 /// descendant tables.
 pub trait PackagingModelSettable: Sized {
@@ -122,21 +123,20 @@ pub trait PackagingModelSettable: Sized {
 impl<PhysicalAssetModel> PackagingModelSettable
     for InsertablePackagingModelBuilder<PhysicalAssetModel>
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute;
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertablePackagingModelBuilder<PhysicalAssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -301,11 +301,11 @@ where
 }
 impl<
     PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertablePackagingModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -352,11 +352,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-            Error = web_common_traits::database::InsertError<InsertablePackagingModelAttribute>,
+            Error = web_common_traits::database::InsertError<PackagingModelAttribute>,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertablePackagingModelAttribute;
+    type Attributes = PackagingModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

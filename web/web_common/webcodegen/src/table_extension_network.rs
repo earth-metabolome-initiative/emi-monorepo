@@ -52,7 +52,7 @@ impl TableExtensionNetwork {
                 let same_as_edges: Vec<(usize, usize)> = table
                     .extension_tables(conn)
                     .ok()?
-                    .into_iter()
+                    .iter()
                     .filter_map(|same_as_column| {
                         let dst_id = tables.binary_search(&same_as_column).ok()?;
                         Some((src_id, dst_id))
@@ -528,14 +528,15 @@ impl TableExtensionNetwork {
                     let foreign_key = table
                         .foreign_keys(conn)
                         .unwrap_or_default()
-                        .into_iter()
+                        .iter()
                         .find(|fk| {
                             fk.is_extension(conn).unwrap_or(false)
                                 && fk
                                     .foreign_table(conn)
                                     .ok()
-                                    .map_or(false, |fk_table| &fk_table == ancestor_table)
+                                    .map_or(false, |fk_table| fk_table.as_ref() == ancestor_table)
                         })
+                        .cloned()
                         .unwrap();
 
                     ancestor_foreign_keys_path.insert(0, foreign_key);
@@ -597,7 +598,7 @@ impl TableExtensionNetwork {
             let foreign_table = extension_foreign_key.foreign_table(conn)?;
             let expected_position = extension_tables
                 .iter()
-                .position(|&t| t == &foreign_table)
+                .position(|&t| t == foreign_table.as_ref())
                 .expect("Failed to find the foreign table in the extension tables");
             sorted_extension_foreign_keys[expected_position] = extension_foreign_key;
         }

@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableUserOrganizationAttribute {
+pub enum UserOrganizationAttribute {
     UserId,
     OrganizationId,
 }
-impl core::str::FromStr for InsertableUserOrganizationAttribute {
+impl core::str::FromStr for UserOrganizationAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableUserOrganizationAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableUserOrganizationAttribute {
+impl core::fmt::Display for UserOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::UserId => write!(f, "user_id"),
@@ -37,38 +37,6 @@ pub struct InsertableUserOrganization {
     pub(crate) organization_id: i16,
 }
 impl InsertableUserOrganization {
-    pub fn user<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.user_id,
-            ),
-            conn,
-        )
-    }
     pub fn organization<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -97,6 +65,38 @@ impl InsertableUserOrganization {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::organizations::Organization::table(),
                 self.organization_id,
+            ),
+            conn,
+        )
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::users::User,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::users::User,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::users::User::table(),
+                self.user_id,
             ),
             conn,
         )
@@ -161,7 +161,7 @@ pub trait UserOrganizationSettable: Sized {
 }
 impl UserOrganizationSettable for InsertableUserOrganizationBuilder {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationAttribute;
+        crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute;
     /// Sets the value of the `public.user_organizations.user_id` column.
     fn user(
         mut self,
@@ -192,10 +192,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-            Error = web_common_traits::database::InsertError<InsertableUserOrganizationAttribute>,
+            Error = web_common_traits::database::InsertError<UserOrganizationAttribute>,
         >,
 {
-    type Attributes = InsertableUserOrganizationAttribute;
+    type Attributes = UserOrganizationAttribute;
     fn is_complete(&self) -> bool {
         self.user_id.is_some() && self.organization_id.is_some()
     }

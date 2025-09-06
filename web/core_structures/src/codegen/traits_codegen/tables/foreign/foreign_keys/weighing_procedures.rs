@@ -7,23 +7,23 @@ pub struct WeighingProcedureForeignKeys {
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
     >,
-    pub foreign_procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    pub procedure_template_weighed_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub foreign_procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    pub procedure_template_weighed_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_weighed_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_weighed_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     pub weighed_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
-    pub weighed_with_model: Option<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-    >,
     pub weighed_with: Option<
         crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
-    >,
-    pub weighing_procedures_procedure_weighed_with_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -43,24 +43,35 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_template,
             ),
         ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_weighed_container_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_weighed_with_model,
+                    ),
+                ),
+            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.foreign_procedure_template,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_weighed_container,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
-                self.foreign_procedure,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_weighed_with,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.weighed_container,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
-                self.weighed_with_model,
             ),
         ));
         if let Some(weighed_with) = self.weighed_with {
@@ -70,22 +81,16 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset((
-                self.procedure,
-                self.weighed_with_model,
-            )),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
-            && foreign_keys.foreign_procedure.is_some()
+            && foreign_keys.procedure_template_weighed_container_model.is_some()
+            && foreign_keys.procedure_template_weighed_with_model.is_some()
+            && foreign_keys.procedure_weighed_container.is_some()
+            && foreign_keys.procedure_weighed_with.is_some()
             && foreign_keys.weighed_container.is_some()
-            && foreign_keys.weighed_with_model.is_some()
             && (foreign_keys.weighed_with.is_some() || self.weighed_with.is_some())
-            && foreign_keys.weighing_procedures_procedure_weighed_with_model_fkey.is_some()
     }
     fn update(
         &self,
@@ -101,11 +106,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.weighed_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.weighing_procedures_procedure_weighed_with_model_fkey =
-                        Some(procedure_assets);
+                if self.procedure_weighed_container == procedure_assets.id {
+                    foreign_keys.procedure_weighed_container = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_weighed_with == procedure_assets.id {
+                    foreign_keys.procedure_weighed_with = Some(procedure_assets);
                     updated = true;
                 }
             }
@@ -113,30 +119,52 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure == procedure_assets.procedure
-                    && self.weighed_with_model == procedure_assets.asset_model
-                {
-                    foreign_keys.weighing_procedures_procedure_weighed_with_model_fkey = None;
+                if self.procedure_weighed_container == procedure_assets.id {
+                    foreign_keys.procedure_weighed_container = None;
+                    updated = true;
+                }
+                if self.procedure_weighed_with == procedure_assets.id {
+                    foreign_keys.procedure_weighed_with = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                crate::codegen::tables::row::Row::ProcedureTemplateAssetModel(
+                    procedure_template_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = Some(procedure_templates);
+                if self.procedure_template_weighed_container_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_weighed_container_model =
+                        Some(procedure_template_asset_models.clone());
+                    updated = true;
+                }
+                if self.procedure_template_weighed_with_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_weighed_with_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
+                crate::codegen::tables::row::Row::ProcedureTemplateAssetModel(
+                    procedure_template_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.foreign_procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.foreign_procedure_template = None;
+                if self.procedure_template_weighed_container_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_weighed_container_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_weighed_with_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_weighed_with_model = None;
                     updated = true;
                 }
             }
@@ -147,11 +175,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure == procedures.procedure {
-                    foreign_keys.procedure = Some(procedures.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = Some(procedures.clone());
+                    foreign_keys.procedure = Some(procedures);
                     updated = true;
                 }
             }
@@ -161,10 +185,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = None;
-                    updated = true;
-                }
-                if self.foreign_procedure == procedures.procedure {
-                    foreign_keys.foreign_procedure = None;
                     updated = true;
                 }
             }
@@ -185,26 +205,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.weighed_container == volumetric_containers.id {
                     foreign_keys.weighed_container = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.weighed_with_model == weighing_device_models.id {
-                    foreign_keys.weighed_with_model = Some(weighing_device_models);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.weighed_with_model == weighing_device_models.id {
-                    foreign_keys.weighed_with_model = None;
                     updated = true;
                 }
             }

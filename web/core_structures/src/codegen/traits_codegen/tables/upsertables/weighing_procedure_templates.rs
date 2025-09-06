@@ -20,10 +20,6 @@ for crate::codegen::structs_codegen::tables::weighing_procedure_templates::Weigh
                 weighed_container_model
                     .ne(excluded(weighed_container_model))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_weighed_container_model
                             .ne(excluded(procedure_template_weighed_container_model)),
                     )
@@ -58,10 +54,6 @@ for crate::codegen::structs_codegen::tables::weighing_procedure_templates::Weigh
             .filter(
                 weighed_container_model
                     .ne(excluded(weighed_container_model))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_weighed_container_model
                             .ne(excluded(procedure_template_weighed_container_model)),

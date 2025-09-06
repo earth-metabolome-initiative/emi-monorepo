@@ -1,11 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhotographProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub photographed_with_model: Option<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+    pub procedure_template_photographed_asset_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_template_photographed_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
@@ -13,11 +10,11 @@ pub struct PhotographProcedureTemplateForeignKeys {
     pub photographed_asset_model: Option<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
-    pub foreign_procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    pub photographed_with_model: Option<
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
     >,
-    pub procedure_template_photographed_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -31,16 +28,8 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CameraModel(
-                        self.photographed_with_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_photographed_asset_model,
                     ),
                 ),
             );
@@ -63,27 +52,26 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.foreign_procedure_template,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CameraModel(
+                        self.photographed_with_model,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_photographed_asset_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
-            && foreign_keys.photographed_with_model.is_some()
+        foreign_keys.procedure_template_photographed_asset_model.is_some()
             && foreign_keys.procedure_template_photographed_with_model.is_some()
             && foreign_keys.photographed_asset_model.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
-            && foreign_keys.procedure_template_photographed_asset_model.is_some()
+            && foreign_keys.photographed_with_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,
@@ -145,18 +133,18 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_photographed_with_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_photographed_with_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
-                    updated = true;
-                }
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_photographed_asset_model = Some(
+                        procedure_template_asset_models.clone(),
+                    );
+                    updated = true;
+                }
+                if self.procedure_template_photographed_with_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_photographed_with_model = Some(
                         procedure_template_asset_models.clone(),
                     );
                     updated = true;
@@ -168,16 +156,16 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_photographed_with_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_photographed_with_model = None;
-                    updated = true;
-                }
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_photographed_asset_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_photographed_with_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_photographed_with_model = None;
                     updated = true;
                 }
             }
@@ -188,15 +176,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
+                    foreign_keys.procedure_template = Some(procedure_templates);
                     updated = true;
                 }
             }
@@ -206,12 +186,6 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
                     foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = None;
                     updated = true;
                 }
             }

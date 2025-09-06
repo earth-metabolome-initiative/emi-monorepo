@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::projects::Project;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProject;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProjectAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,84 +46,84 @@ where
             .id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Id,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Id,
                 ),
             )?;
         let name = self
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Description,
                 ),
             )?;
         let state_id = self
             .state_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::StateId,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::StateId,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::ColorId,
                 ),
             )?;
         let created_by = self
             .created_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::CreatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::CreatedBy,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::CreatedAt,
                 ),
             )?;
         let updated_by = self
             .updated_by
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::UpdatedBy,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::UpdatedBy,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::UpdatedAt,
                 ),
             )?;
         let expected_end_date = self
             .expected_end_date
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::ExpectedEndDate,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::ExpectedEndDate,
                 ),
             )?;
         let end_date = self
             .end_date
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableProjectAttribute::EndDate,
+                    crate::codegen::structs_codegen::tables::insertables::ProjectAttribute::EndDate,
                 ),
             )?;
         Ok(Self::InsertableVariant {

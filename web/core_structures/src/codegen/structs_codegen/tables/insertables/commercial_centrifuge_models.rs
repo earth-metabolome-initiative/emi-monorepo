@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeModelExtensionAttribute {
-    CentrifugeModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
-    ),
+pub enum CommercialCentrifugeModelExtensionAttribute {
+    CentrifugeModel(crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeModelExtensionAttribute {
+impl core::fmt::Display for CommercialCentrifugeModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::CentrifugeModel(e) => write!(f, "{e}"),
@@ -16,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialCentrifugeModelExtensionAttribut
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute>
-    for InsertableCommercialCentrifugeModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute>
+    for CommercialCentrifugeModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
     ) -> Self {
         Self::CentrifugeModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialCentrifugeModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialCentrifugeModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialCentrifugeModelAttribute {
-    Extension(InsertableCommercialCentrifugeModelExtensionAttribute),
+pub enum CommercialCentrifugeModelAttribute {
+    Extension(CommercialCentrifugeModelExtensionAttribute),
     Id,
     CentrifugeModel,
 }
-impl core::str::FromStr for InsertableCommercialCentrifugeModelAttribute {
+impl core::str::FromStr for CommercialCentrifugeModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialCentrifugeModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialCentrifugeModelAttribute {
+impl core::fmt::Display for CommercialCentrifugeModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -172,6 +169,30 @@ impl InsertableCommercialCentrifugeModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_centrifuge_models_id_centrifuge_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.centrifuge_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -190,6 +211,13 @@ pub struct InsertableCommercialCentrifugeModelBuilder<
     pub(crate) centrifuge_model: Option<i32>,
     pub(crate) commercial_centrifuge_models_id_fkey: CentrifugeModel,
     pub(crate) commercial_centrifuge_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialCentrifugeModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCentrifugeModelBuilder>
+{
+    fn from(builder: InsertableCommercialCentrifugeModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialCentrifugeModel` or descendant tables.
@@ -222,12 +250,12 @@ pub trait CommercialCentrifugeModelSettable: Sized {
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
         >,
     CommercialProduct,
 > CommercialCentrifugeModelSettable
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
     ///Sets the value of the `public.commercial_centrifuge_models.centrifuge_model` column.
     ///
     ///# Implementation notes
@@ -279,17 +307,17 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -456,16 +484,17 @@ impl<CentrifugeModel, CommercialProduct>
     crate::codegen::structs_codegen::tables::insertables::CentrifugeModelSettable
     for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
 }
 impl<
     CentrifugeModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -516,10 +545,10 @@ impl<
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -546,9 +575,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
     ///v5 --->|"`extends`"| v3
@@ -606,7 +635,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialCentrifugeModelAttribute,
+            CommercialCentrifugeModelAttribute,
         >,
     >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -615,7 +644,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialCentrifugeModelAttribute;
+    type Attributes = CommercialCentrifugeModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_centrifuge_models_id_fkey.is_complete()
             && self.commercial_centrifuge_models_id_fkey1.is_complete()

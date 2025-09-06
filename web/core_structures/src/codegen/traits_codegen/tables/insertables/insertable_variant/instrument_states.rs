@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::instrument_states::InstrumentState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -55,7 +55,7 @@ impl Table {
 
         let mut attributes = Vec::new();
 
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             let column_attribute: Ident = column.snake_case_ident()?;
             let column_type = column.rust_data_type(conn)?;
             attributes.push(quote! {

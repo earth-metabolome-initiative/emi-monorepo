@@ -31,10 +31,6 @@ for crate::codegen::structs_codegen::tables::freezing_procedure_templates::Freez
                     )
                     .or(frozen_container_model.ne(excluded(frozen_container_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_frozen_container_model
                             .ne(excluded(procedure_template_frozen_container_model)),
                     ),
@@ -75,10 +71,6 @@ for crate::codegen::structs_codegen::tables::freezing_procedure_templates::Freez
                             .ne(excluded(procedure_template_frozen_with_model)),
                     )
                     .or(frozen_container_model.ne(excluded(frozen_container_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_frozen_container_model
                             .ne(excluded(procedure_template_frozen_container_model)),

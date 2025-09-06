@@ -105,8 +105,6 @@ mod project_states;
 mod projects;
 mod ranks;
 mod reagent_models;
-mod registering_procedure_templates;
-mod registering_procedures;
 mod roles;
 mod rooms;
 mod sample_states;

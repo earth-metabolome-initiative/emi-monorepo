@@ -1,32 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerExtensionAttribute {
-    Container(crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute),
+pub enum VolumetricContainerExtensionAttribute {
+    Container(crate::codegen::structs_codegen::tables::insertables::ContainerAttribute),
 }
-impl core::fmt::Display for InsertableVolumetricContainerExtensionAttribute {
+impl core::fmt::Display for VolumetricContainerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Container(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute>
-    for InsertableVolumetricContainerExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ContainerAttribute>
+    for VolumetricContainerExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
     ) -> Self {
         Self::Container(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerAttribute {
-    Extension(InsertableVolumetricContainerExtensionAttribute),
+pub enum VolumetricContainerAttribute {
+    Extension(VolumetricContainerExtensionAttribute),
     Id,
     VolumetricContainerModel,
 }
-impl core::str::FromStr for InsertableVolumetricContainerAttribute {
+impl core::str::FromStr for VolumetricContainerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -36,7 +36,7 @@ impl core::str::FromStr for InsertableVolumetricContainerAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumetricContainerAttribute {
+impl core::fmt::Display for VolumetricContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -90,6 +90,23 @@ impl InsertableVolumetricContainer {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn volumetric_containers_id_volumetric_container_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.volumetric_container_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
     pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -135,6 +152,16 @@ pub struct InsertableVolumetricContainerBuilder<
     pub(crate) volumetric_container_model: Option<i32>,
     pub(crate) id: Container,
 }
+impl From<InsertableVolumetricContainerBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableVolumetricContainerBuilder,
+    >
+{
+    fn from(builder: InsertableVolumetricContainerBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of
 /// `VolumetricContainer` or descendant tables.
 pub trait VolumetricContainerSettable: Sized {
@@ -166,55 +193,57 @@ pub trait VolumetricContainerSettable: Sized {
 }
 impl<
     Container: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
-        >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+        > + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
         >,
-> VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
-    ///Sets the value of the `public.volumetric_containers.volumetric_container_model` column.
+> VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
+    /// Sets the value of the
+    /// `public.volumetric_containers.volumetric_container_model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`assets`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`assets`"]
     ///    v3@{shape: rounded, label: "model"}
-    ///class v3 undirectly-involved-column
-    ///end
-    ///subgraph v5 ["`containers`"]
+    /// class v3 undirectly-involved-column
+    /// end
+    /// subgraph v5 ["`containers`"]
     ///    v0@{shape: rounded, label: "container_model"}
-    ///class v0 directly-involved-column
-    ///end
-    ///subgraph v6 ["`physical_assets`"]
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v6 ["`physical_assets`"]
     ///    v1@{shape: rounded, label: "model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///subgraph v7 ["`volumetric_containers`"]
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v7 ["`volumetric_containers`"]
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
-    ///class v2 column-of-interest
-    ///end
-    ///v2 --->|"`ancestral same as`"| v3
-    ///v2 -.->|"`inferred ancestral same as`"| v0
-    ///v2 -.->|"`inferred ancestral same as`"| v1
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v5 --->|"`extends`"| v6
-    ///v5 -.->|"`descendant of`"| v4
-    ///v6 --->|"`extends`"| v4
-    ///v7 --->|"`extends`"| v5
-    ///v7 -.->|"`descendant of`"| v4
-    ///v7 -.->|"`descendant of`"| v6
-    ///```
+    /// class v2 column-of-interest
+    /// end
+    /// v2 --->|"`ancestral same as`"| v3
+    /// v2 -.->|"`inferred ancestral same as`"| v0
+    /// v2 -.->|"`inferred ancestral same as`"| v1
+    /// v0 --->|"`ancestral same as`"| v3
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v3
+    /// v6 --->|"`extends`"| v4
+    /// v7 --->|"`extends`"| v5
+    /// v7 -.->|"`descendant of`"| v4
+    /// v7 -.->|"`descendant of`"| v6
+    /// v5 --->|"`extends`"| v6
+    /// v5 -.->|"`descendant of`"| v4
+    /// ```
     fn volumetric_container_model(
         mut self,
         volumetric_container_model: i32,
@@ -243,16 +272,16 @@ impl<
 }
 impl<
     Container: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -437,10 +466,10 @@ impl<Container> crate::codegen::structs_codegen::tables::insertables::ContainerS
 for InsertableVolumetricContainerBuilder<Container>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.containers.container_model` column.
     ///
@@ -490,10 +519,10 @@ impl<
 for InsertableVolumetricContainerBuilder<Container>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -571,16 +600,14 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        Error = web_common_traits::database::InsertError<
-            InsertableVolumetricContainerAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<VolumetricContainerAttribute>,
     >,
     Container: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
-    type Attributes = InsertableVolumetricContainerAttribute;
+    type Attributes = VolumetricContainerAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.volumetric_container_model.is_some()
     }

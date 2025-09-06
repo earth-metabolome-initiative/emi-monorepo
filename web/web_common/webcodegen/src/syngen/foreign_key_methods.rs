@@ -25,11 +25,7 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         let mut foreign_key_methods = TokenStream::new();
 
-        for foreign_key_constraint in self.foreign_keys(conn)? {
-            if foreign_key_constraint.is_same_as_constraint(conn)?.is_some() {
-                continue;
-            }
-
+        for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
             let foreign_key_table = foreign_key_constraint.foreign_table(conn)?;
 
             let columns = foreign_key_constraint.columns(conn)?;
@@ -48,7 +44,7 @@ impl Table {
             // is None. If so, we return None as well.
             let mut column_values_retrieval = TokenStream::new();
 
-            for column in &columns {
+            for column in columns.as_ref() {
                 let current_column_ident: Ident = column.snake_case_ident()?;
 
                 if column.is_nullable() {

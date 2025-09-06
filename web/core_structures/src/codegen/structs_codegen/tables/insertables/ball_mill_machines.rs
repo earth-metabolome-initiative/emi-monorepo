@@ -1,34 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillMachineExtensionAttribute {
-    PhysicalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
-    ),
+pub enum BallMillMachineExtensionAttribute {
+    PhysicalAsset(crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute),
 }
-impl core::fmt::Display for InsertableBallMillMachineExtensionAttribute {
+impl core::fmt::Display for BallMillMachineExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PhysicalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute>
-    for InsertableBallMillMachineExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute>
+    for BallMillMachineExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
     ) -> Self {
         Self::PhysicalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableBallMillMachineAttribute {
-    Extension(InsertableBallMillMachineExtensionAttribute),
+pub enum BallMillMachineAttribute {
+    Extension(BallMillMachineExtensionAttribute),
     Id,
     Model,
 }
-impl core::str::FromStr for InsertableBallMillMachineAttribute {
+impl core::str::FromStr for BallMillMachineAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,7 +36,7 @@ impl core::str::FromStr for InsertableBallMillMachineAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableBallMillMachineAttribute {
+impl core::fmt::Display for BallMillMachineAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -124,6 +122,23 @@ impl InsertableBallMillMachine {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_machines_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -135,6 +150,16 @@ pub struct InsertableBallMillMachineBuilder<
 > {
     pub(crate) model: Option<i32>,
     pub(crate) id: PhysicalAsset,
+}
+impl From<InsertableBallMillMachineBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableBallMillMachineBuilder,
+    >
+{
+    fn from(builder: InsertableBallMillMachineBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `BallMillMachine` or
 /// descendant tables.
@@ -166,10 +191,10 @@ pub trait BallMillMachineSettable: Sized {
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > BallMillMachineSettable for InsertableBallMillMachineBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillMachineAttribute;
     ///Sets the value of the `public.ball_mill_machines.model` column.
     ///
     ///# Implementation notes
@@ -221,16 +246,16 @@ impl<
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableBallMillMachineBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillMachineAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillMachineAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -417,10 +442,10 @@ impl<
 for InsertableBallMillMachineBuilder<PhysicalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::BallMillMachineSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillMachineAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillMachineAttribute;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -488,12 +513,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
-            Error = web_common_traits::database::InsertError<InsertableBallMillMachineAttribute>,
+            Error = web_common_traits::database::InsertError<BallMillMachineAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableBallMillMachineAttribute;
+    type Attributes = BallMillMachineAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.model.is_some()
     }

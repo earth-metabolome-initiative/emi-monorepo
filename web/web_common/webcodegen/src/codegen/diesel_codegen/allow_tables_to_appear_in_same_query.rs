@@ -47,11 +47,12 @@ impl Codegen<'_> {
             let table_name = table.snake_case_ident()?;
             for foreign_table in table
                 .foreign_tables(conn)?
-                .into_iter()
-                .chain(table.ancestral_extension_tables(conn)?)
+                .iter()
+                .map(|table| table.as_ref())
+                .chain(table.ancestral_extension_tables(conn)?.iter())
             {
                 // if the foreign table is the same as table we continue
-                if &foreign_table == table {
+                if foreign_table == table {
                     continue;
                 }
 
@@ -62,7 +63,7 @@ impl Codegen<'_> {
                     continue;
                 }
 
-                let Some(foreign_table_ref) = tables.iter().find(|&t| *t == foreign_table) else {
+                let Some(foreign_table_ref) = tables.iter().find(|&t| t == foreign_table) else {
                     continue;
                 };
                 table_hashset.insert((table, foreign_table_ref));

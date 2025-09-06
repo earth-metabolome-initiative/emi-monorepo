@@ -2,7 +2,7 @@
 
 use core_structures::{
     BeadModel, User,
-    tables::insertables::{AssetModelSettable, BeadModelSettable, InsertableBeadModelAttribute},
+    tables::insertables::{AssetModelSettable, BeadModelAttribute, BeadModelSettable},
 };
 use diesel::PgConnection;
 use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
@@ -22,7 +22,7 @@ use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
 pub(crate) fn bead_3mm(
     user: &User,
     conn: &mut PgConnection,
-) -> Result<BeadModel, InsertError<InsertableBeadModelAttribute>> {
+) -> Result<BeadModel, InsertError<BeadModelAttribute>> {
     const METAL_BEADS_3MM: &str = "Metal Bead 3mm";
 
     if let Ok(bead) = BeadModel::from_name(METAL_BEADS_3MM, conn) {

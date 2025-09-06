@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fmt::Display};
+use std::{collections::HashSet, fmt::Display, sync::Arc};
 
-use cached::proc_macro::cached;
+use cached::{DiskCache, proc_macro::io_cached};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, PgConnection,
     QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
@@ -11,10 +11,21 @@ use quote::quote;
 use syn::{Ident, Type, parse_str};
 
 use super::{KeyColumnUsage, PgTrigger};
-use crate::{CheckConstraint, Column, PgIndex, TableConstraint, errors::WebCodeGenError};
+use crate::{
+    CheckConstraint, Column, PgIndex, TableConstraint, errors::WebCodeGenError,
+    table_metadata::key_column_usage::PartialBuilderKind,
+};
 
-#[cached(
-    result = true,
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.load_all_tables")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
     key = "String",
     convert = r#"{ format!("{}-{}", table_catalog, table_schema) }"#
 )]
@@ -22,19 +33,29 @@ fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
     conn: &mut PgConnection,
-) -> Result<Vec<Table>, diesel::result::Error> {
+) -> Result<Arc<Vec<Table>>, WebCodeGenError> {
     use crate::schema::tables;
-    tables::table
-        .filter(tables::table_catalog.eq(table_catalog))
-        .filter(tables::table_schema.eq(table_schema))
-        .filter(tables::table_name.ne("__diesel_schema_migrations"))
-        .order_by(tables::table_name)
-        .select(Table::as_select())
-        .load::<Table>(conn)
+    Ok(Arc::new(
+        tables::table
+            .filter(tables::table_catalog.eq(table_catalog))
+            .filter(tables::table_schema.eq(table_schema))
+            .filter(tables::table_name.ne("__diesel_schema_migrations"))
+            .order_by(tables::table_name)
+            .select(Table::as_select())
+            .load::<Table>(conn)?,
+    ))
 }
 
-#[cached(
-    result = true,
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.load_table")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
     key = "String",
     convert = r#"{ format!("{}-{}-{}", table_name, table_schema, table_catalog) }"#
 )]
@@ -43,33 +64,61 @@ fn load_table(
     table_name: &str,
     table_schema: &str,
     table_catalog: &str,
-) -> Result<Table, diesel::result::Error> {
+) -> Result<Arc<Table>, WebCodeGenError> {
     use crate::schema::tables;
-    tables::table
-        .filter(tables::table_name.eq(table_name))
-        .filter(tables::table_schema.eq(table_schema))
-        .filter(tables::table_catalog.eq(table_catalog))
-        .first::<Table>(conn)
+    Ok(Arc::new(
+        tables::table
+            .filter(tables::table_name.eq(table_name))
+            .filter(tables::table_schema.eq(table_schema))
+            .filter(tables::table_catalog.eq(table_catalog))
+            .first::<Table>(conn)?,
+    ))
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
-fn columns(table: &Table, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.columns")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
+fn columns(table: &Table, conn: &mut PgConnection) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
     use crate::schema::columns;
-    columns::table
-        .filter(columns::table_name.eq(&table.table_name))
-        .filter(columns::table_schema.eq(&table.table_schema))
-        .filter(columns::table_catalog.eq(&table.table_catalog))
-        .order_by(columns::ordinal_position)
-        .load::<Column>(conn)
+    Ok(Arc::new(
+        columns::table
+            .filter(columns::table_name.eq(&table.table_name))
+            .filter(columns::table_schema.eq(&table.table_schema))
+            .filter(columns::table_catalog.eq(&table.table_catalog))
+            .order_by(columns::ordinal_position)
+            .load::<Column>(conn)?,
+    ))
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.unique_columns")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn unique_columns(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Vec<Column>>, diesel::result::Error> {
+) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
     use crate::schema::{columns, key_column_usage, table_constraints};
-    key_column_usage::table
+    Ok(key_column_usage::table
         .inner_join(
             columns::table.on(key_column_usage::table_name
                 .nullable()
@@ -127,103 +176,148 @@ fn unique_columns(
                     group.into_iter().map(|(_, column)| column).collect::<Vec<Column>>()
                 })
                 .collect()
-        })
+        })?)
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.primary_key_columns")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn primary_key_columns(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, diesel::result::Error> {
+) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
     use crate::schema::{columns, key_column_usage, table_constraints};
-    key_column_usage::table
-        .inner_join(
-            columns::table.on(key_column_usage::table_name
-                .nullable()
-                .eq(columns::table_name.nullable())
-                .and(key_column_usage::table_schema.nullable().eq(columns::table_schema.nullable()))
-                .and(
-                    key_column_usage::table_catalog
-                        .nullable()
-                        .eq(columns::table_catalog.nullable()),
-                )
-                .and(key_column_usage::column_name.nullable().eq(columns::column_name.nullable()))),
-        )
-        .inner_join(
-            table_constraints::table.on(key_column_usage::constraint_name
-                .nullable()
-                .eq(table_constraints::constraint_name.nullable())
-                .and(
-                    key_column_usage::constraint_schema
-                        .nullable()
-                        .eq(table_constraints::constraint_schema.nullable()),
-                )
-                .and(
-                    key_column_usage::constraint_catalog
-                        .nullable()
-                        .eq(table_constraints::constraint_catalog.nullable()),
-                )
-                .and(
-                    key_column_usage::table_name
-                        .nullable()
-                        .eq(table_constraints::table_name.nullable()),
-                )
-                .and(
-                    key_column_usage::table_schema
-                        .nullable()
-                        .eq(table_constraints::table_schema.nullable()),
-                )
-                .and(
-                    key_column_usage::table_catalog
-                        .nullable()
-                        .eq(table_constraints::table_catalog.nullable()),
-                )),
-        )
-        .filter(key_column_usage::table_name.eq(&table.table_name))
-        .filter(key_column_usage::table_schema.eq(&table.table_schema))
-        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
-        .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
-        .select(Column::as_select())
-        .load::<Column>(conn)
+    Ok(Arc::new(
+        key_column_usage::table
+            .inner_join(
+                columns::table.on(key_column_usage::table_name
+                    .nullable()
+                    .eq(columns::table_name.nullable())
+                    .and(
+                        key_column_usage::table_schema
+                            .nullable()
+                            .eq(columns::table_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_catalog
+                            .nullable()
+                            .eq(columns::table_catalog.nullable()),
+                    )
+                    .and(
+                        key_column_usage::column_name
+                            .nullable()
+                            .eq(columns::column_name.nullable()),
+                    )),
+            )
+            .inner_join(
+                table_constraints::table.on(key_column_usage::constraint_name
+                    .nullable()
+                    .eq(table_constraints::constraint_name.nullable())
+                    .and(
+                        key_column_usage::constraint_schema
+                            .nullable()
+                            .eq(table_constraints::constraint_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .nullable()
+                            .eq(table_constraints::constraint_catalog.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_name
+                            .nullable()
+                            .eq(table_constraints::table_name.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_schema
+                            .nullable()
+                            .eq(table_constraints::table_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_catalog
+                            .nullable()
+                            .eq(table_constraints::table_catalog.nullable()),
+                    )),
+            )
+            .filter(key_column_usage::table_name.eq(&table.table_name))
+            .filter(key_column_usage::table_schema.eq(&table.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+            .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
+            .select(Column::as_select())
+            .load::<Column>(conn)?,
+    ))
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.foreign_keys")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
+) -> Result<Arc<Vec<KeyColumnUsage>>, WebCodeGenError> {
     use crate::schema::{key_column_usage, referential_constraints};
-    key_column_usage::table
-        .inner_join(
-            referential_constraints::table.on(key_column_usage::constraint_name
-                .eq(referential_constraints::constraint_name)
-                .and(
-                    key_column_usage::constraint_schema
-                        .eq(referential_constraints::constraint_schema),
-                )
-                .and(
-                    key_column_usage::constraint_catalog
-                        .eq(referential_constraints::constraint_catalog),
-                )),
-        )
-        .filter(key_column_usage::table_name.eq(&table.table_name))
-        .filter(key_column_usage::table_schema.eq(&table.table_schema))
-        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
-        .filter(key_column_usage::ordinal_position.eq(1))
-        .select(KeyColumnUsage::as_select())
-        .load::<KeyColumnUsage>(conn)
+    Ok(Arc::new(
+        key_column_usage::table
+            .inner_join(
+                referential_constraints::table.on(key_column_usage::constraint_name
+                    .eq(referential_constraints::constraint_name)
+                    .and(
+                        key_column_usage::constraint_schema
+                            .eq(referential_constraints::constraint_schema),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .eq(referential_constraints::constraint_catalog),
+                    )),
+            )
+            .filter(key_column_usage::table_name.eq(&table.table_name))
+            .filter(key_column_usage::table_schema.eq(&table.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+            .filter(key_column_usage::ordinal_position.eq(1))
+            .select(KeyColumnUsage::as_select())
+            .load::<KeyColumnUsage>(conn)?,
+    ))
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
-fn unique_indices(
-    table: &Table,
-    conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, diesel::result::Error> {
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.unique_indices")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
+fn unique_indices(table: &Table, conn: &mut PgConnection) -> Result<Vec<PgIndex>, WebCodeGenError> {
     use crate::schema::{pg_class, pg_index};
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
 
-    pg_index::table
+    Ok(pg_index::table
         .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
         .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
         .filter(pg_class2.field(pg_class::relname).eq(&table.table_name).and(
@@ -231,49 +325,99 @@ fn unique_indices(
         ))
         .filter(pg_index::indisunique.eq(true))
         .select(PgIndex::as_select())
-        .load::<PgIndex>(conn)
+        .load::<PgIndex>(conn)?)
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.same_as_indices")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn same_as_indices(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, diesel::result::Error> {
+) -> Result<Vec<PgIndex>, WebCodeGenError> {
     Ok(unique_indices(table, conn)?
         .into_iter()
-        .filter(|pg_index| pg_index.is_same_as(conn).map(|fk| fk.is_some()).unwrap_or(false))
+        .filter(|pg_index| pg_index.is_same_as(conn).unwrap_or(false))
         .collect())
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.ancestral_extension_tables")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn ancestral_extension_tables(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Table>, diesel::result::Error> {
+) -> Result<Arc<Vec<Table>>, WebCodeGenError> {
     let mut tables = Vec::new();
-    for extended_table in table.extension_tables(conn)? {
-        tables.extend(extended_table.ancestral_extension_tables(conn)?);
-        tables.push(extended_table);
+    for extended_table in table.extension_tables(conn)?.as_ref() {
+        tables
+            .extend(extended_table.ancestral_extension_tables(conn)?.as_ref().into_iter().cloned());
+        tables.push(extended_table.as_ref().clone());
     }
     tables.sort_unstable();
     tables.dedup();
-    Ok(tables)
+    Ok(Arc::new(tables))
 }
 
-#[cached(result = true, key = "String", convert = r#"{ table.to_string() }"#)]
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("table.extension_tables")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
 fn extension_tables(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Table>, diesel::result::Error> {
-    Ok(table
-        .extension_foreign_keys(conn)?
-        .into_iter()
-        .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok())
-        .collect())
+) -> Result<Arc<Vec<Arc<Table>>>, WebCodeGenError> {
+    Ok(Arc::new(
+        table
+            .extension_foreign_keys(conn)?
+            .into_iter()
+            .filter_map(|foreign_key| foreign_key.foreign_table(conn).ok())
+            .collect(),
+    ))
 }
 
 #[derive(
-    Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash,
+    Queryable,
+    QueryableByName,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Selectable,
+    Debug,
+    Clone,
+    Hash,
+    serde::Serialize,
+    serde::Deserialize,
 )]
 #[diesel(table_name = crate::schema::tables)]
 /// Struct defining the `information_schema.tables` table.
@@ -360,11 +504,11 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<Column>, WebCodeGenError> {
-        let mut primary_key_columns = self.primary_key_columns(conn)?;
+        let primary_key_columns = self.primary_key_columns(conn)?;
         if primary_key_columns.len() != 1 {
             return Ok(None);
         }
-        let primary_key_column = primary_key_columns.pop().unwrap();
+        let primary_key_column = primary_key_columns.as_ref()[0].clone();
         if !primary_key_column.is_uuid() {
             return Ok(None);
         }
@@ -392,7 +536,8 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<Ident>, WebCodeGenError> {
         self.primary_key_columns(conn)?
-            .into_iter()
+            .as_ref()
+            .iter()
             .map(|column| column.snake_case_ident())
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
     }
@@ -500,7 +645,7 @@ impl Table {
     pub fn foreign_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
+    ) -> Result<Arc<Vec<KeyColumnUsage>>, WebCodeGenError> {
         foreign_keys(self, conn)
     }
 
@@ -522,12 +667,12 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut parent_keys = Vec::new();
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.as_ref() {
             if foreign_key.has_on_delete_cascade(conn)?
                 && foreign_key.is_foreign_primary_key(conn)?
                 && !foreign_key.is_self_referential(conn)?
             {
-                parent_keys.push(foreign_key);
+                parent_keys.push(foreign_key.clone());
             }
         }
         Ok(parent_keys)
@@ -546,15 +691,17 @@ impl Table {
     /// # Errors
     ///
     /// * If the parent tables cannot be loaded from the database.
-    pub fn parent_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
-        let mut tables = Vec::new();
+    pub fn parent_tables(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Arc<Table>>, WebCodeGenError> {
+        let mut parent_tables = Vec::new();
         for foreign_key in self.parent_keys(conn)? {
-            let foreign_table = foreign_key.foreign_table(conn)?;
-            if !tables.contains(&foreign_table) {
-                tables.push(foreign_table);
-            }
+            parent_tables.push(foreign_key.foreign_table(conn)?);
         }
-        Ok(tables)
+        parent_tables.sort_unstable();
+        parent_tables.dedup();
+        Ok(parent_tables)
     }
 
     /// Returns the foreign key columns which point to the current table.
@@ -569,11 +716,11 @@ impl Table {
     pub fn homogeneous_parent_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
+    ) -> Result<Vec<Arc<Vec<Column>>>, WebCodeGenError> {
         let mut homogeneous_parent_columns = Vec::new();
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.as_ref() {
             let foreign_table = foreign_key.foreign_table(conn)?;
-            if foreign_table == *self && foreign_key.is_foreign_primary_key(conn)? {
+            if foreign_table.as_ref() == self && foreign_key.is_foreign_primary_key(conn)? {
                 homogeneous_parent_columns.push(foreign_key.columns(conn)?);
             }
         }
@@ -612,12 +759,15 @@ impl Table {
     /// # Errors
     ///
     /// * If the foreign tables cannot be loaded from the database.
-    pub fn foreign_tables(&self, conn: &mut PgConnection) -> Result<Vec<Table>, WebCodeGenError> {
+    pub fn foreign_tables(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Arc<Table>>, WebCodeGenError> {
         let mut tables = HashSet::new();
-        for foreign_key_constraint in self.foreign_keys(conn)? {
+        for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
             tables.insert(foreign_key_constraint.foreign_table(conn)?);
         }
-        let mut tables = tables.into_iter().collect::<Vec<Table>>();
+        let mut tables = tables.into_iter().collect::<Vec<Arc<Table>>>();
         tables.sort_unstable();
         Ok(tables)
     }
@@ -638,14 +788,14 @@ impl Table {
         include_ancestors: bool,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_created_by(conn)? {
                 return Ok(true);
             }
         }
 
         if include_ancestors {
-            for table in self.extension_tables(conn)? {
+            for table in self.extension_tables(conn)?.as_ref() {
                 if table.has_created_by_column(true, conn)? {
                     return Ok(true);
                 }
@@ -671,15 +821,15 @@ impl Table {
         include_ancestors: bool,
         conn: &mut PgConnection,
     ) -> Result<Option<Column>, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_most_concrete_table(conn)? {
-                return Ok(Some(column));
+                return Ok(Some(column.clone()));
             }
         }
 
         if include_ancestors {
             let extension_tables = self.extension_tables(conn)?;
-            for table in &extension_tables {
+            for table in extension_tables.as_ref() {
                 if let Some(column) = table.most_concrete_table_column(true, conn)? {
                     return Ok(Some(column));
                 }
@@ -732,13 +882,13 @@ impl Table {
         include_ancestors: bool,
         conn: &mut PgConnection,
     ) -> Result<Option<Column>, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_updated_by(conn)? {
-                return Ok(Some(column));
+                return Ok(Some(column.clone()));
             }
         }
         if include_ancestors {
-            for table in self.extension_tables(conn)? {
+            for table in self.extension_tables(conn)?.as_ref() {
                 if let Some(column) = table.updated_by_column(true, conn)? {
                     return Ok(Some(column));
                 }
@@ -779,10 +929,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    pub fn unique_indices(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
+    pub fn unique_indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, WebCodeGenError> {
         unique_indices(self, conn)
     }
 
@@ -802,7 +949,7 @@ impl Table {
     pub fn same_as_indices(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
+    ) -> Result<Vec<PgIndex>, WebCodeGenError> {
         same_as_indices(self, conn)
     }
 
@@ -820,9 +967,9 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<(KeyColumnUsage, PgIndex)>, WebCodeGenError> {
         let mut same_as_foreign_keys = Vec::new();
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.as_ref() {
             if let Some(index) = foreign_key.is_same_as_constraint(conn)? {
-                same_as_foreign_keys.push((foreign_key, index));
+                same_as_foreign_keys.push((foreign_key.clone(), index));
             }
         }
         Ok(same_as_foreign_keys)
@@ -847,7 +994,7 @@ impl Table {
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: &str,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    ) -> Result<Arc<Vec<Self>>, WebCodeGenError> {
         load_all_tables(table_catalog, table_schema, conn)
     }
 
@@ -861,7 +1008,7 @@ impl Table {
     ///
     /// * If database connection fails.
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if !column.supports_copy(conn)? {
                 return Ok(false);
             }
@@ -879,7 +1026,7 @@ impl Table {
     ///
     /// * If database connection fails.
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if !column.supports_eq(conn)? {
                 return Ok(false);
             }
@@ -897,7 +1044,7 @@ impl Table {
     ///
     /// * If database connection fails.
     pub fn supports_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if !column.supports_ord(conn)? {
                 return Ok(false);
             }
@@ -915,7 +1062,7 @@ impl Table {
     ///
     /// * If database connection fails.
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if !column.supports_hash(conn)? {
                 return Ok(false);
             }
@@ -944,7 +1091,7 @@ impl Table {
         table_name: &str,
         table_schema: &str,
         table_catalog: &str,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Arc<Self>, WebCodeGenError> {
         load_table(conn, table_name, table_schema, table_catalog)
     }
 
@@ -961,7 +1108,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the columns cannot be loaded from the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
         columns(self, conn)
     }
 
@@ -978,13 +1125,21 @@ impl Table {
     pub fn partial_builder_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<(Column, KeyColumnUsage)>, diesel::result::Error> {
+    ) -> Result<Vec<(Column, PartialBuilderKind, KeyColumnUsage, KeyColumnUsage)>, WebCodeGenError>
+    {
         Ok(self
             .columns(conn)?
-            .into_iter()
+            .as_ref()
+            .iter()
             .filter_map(|column| {
-                let foreign_key = column.requires_partial_builder(conn).ok().flatten()?;
-                Some((column, foreign_key))
+                let (partial_builder_kind, potential_same_as_constraint, foreign_key) =
+                    column.requires_partial_builder(conn).ok().flatten()?;
+                Some((
+                    column.clone(),
+                    partial_builder_kind,
+                    potential_same_as_constraint,
+                    foreign_key,
+                ))
             })
             .collect())
     }
@@ -1007,14 +1162,14 @@ impl Table {
         &self,
         conn: &mut PgConnection,
         column_name: &str,
-    ) -> Result<Column, diesel::result::Error> {
+    ) -> Result<Column, WebCodeGenError> {
         use crate::schema::columns;
-        columns::table
+        Ok(columns::table
             .filter(columns::table_name.eq(&self.table_name))
             .filter(columns::table_schema.eq(&self.table_schema))
             .filter(columns::table_catalog.eq(&self.table_catalog))
             .filter(columns::column_name.eq(column_name))
-            .first::<Column>(conn)
+            .first::<Column>(conn)?)
     }
 
     /// Returns the groups of columns defining unique constraints.
@@ -1033,7 +1188,7 @@ impl Table {
     pub fn unique_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Vec<Column>>, diesel::result::Error> {
+    ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
         unique_columns(self, conn)
     }
 
@@ -1050,7 +1205,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
+    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
@@ -1066,11 +1221,13 @@ impl Table {
     pub fn extension_foreign_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         Ok(self
             .foreign_keys(conn)?
-            .into_iter()
+            .as_ref()
+            .iter()
             .filter(|foreign_key| foreign_key.is_extension(conn).unwrap_or(false))
+            .cloned()
             .collect())
     }
 
@@ -1092,7 +1249,7 @@ impl Table {
     pub fn extension_tables(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Table>, diesel::result::Error> {
+    ) -> Result<Arc<Vec<Arc<Table>>>, WebCodeGenError> {
         extension_tables(self, conn)
     }
 
@@ -1105,7 +1262,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the database connection is invalid.
-    pub fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
+    pub fn is_extension(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(!self.extension_tables(conn)?.is_empty())
     }
 
@@ -1126,12 +1283,12 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut associated_foreign_key = Vec::new();
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.as_ref() {
             if foreign_key
                 .is_associated_same_as_constraint(include_local_primary_key, conn)?
                 .is_some()
             {
-                associated_foreign_key.push(foreign_key);
+                associated_foreign_key.push(foreign_key.clone());
             }
         }
 
@@ -1152,9 +1309,9 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut ancestral_foreign_key = Vec::new();
-        for foreign_key in self.foreign_keys(conn)? {
+        for foreign_key in self.foreign_keys(conn)?.as_ref() {
             if foreign_key.is_ancestral_same_as_constraint(conn)?.is_some() {
-                ancestral_foreign_key.push(foreign_key);
+                ancestral_foreign_key.push(foreign_key.clone());
             }
         }
 
@@ -1185,7 +1342,7 @@ impl Table {
         &self,
         include_local_primary_key: bool,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Table>, WebCodeGenError> {
+    ) -> Result<Vec<Arc<Table>>, WebCodeGenError> {
         let mut associated_tables = Vec::new();
         for foreign_key in self.associated_same_as_foreign_keys(include_local_primary_key, conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
@@ -1216,7 +1373,7 @@ impl Table {
     pub fn ancestral_extension_tables(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Table>, diesel::result::Error> {
+    ) -> Result<Arc<Vec<Table>>, WebCodeGenError> {
         ancestral_extension_tables(self, conn)
     }
 
@@ -1234,8 +1391,35 @@ impl Table {
         &self,
         ancestor: &Table,
         conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
+    ) -> Result<bool, WebCodeGenError> {
         self.ancestral_extension_tables(conn).map(|tables| tables.contains(ancestor))
+    }
+
+    /// Returns whether the table shares any ancestor with the provided table.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other table.
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the table cannot be loaded from the database.
+    pub fn share_ancestors(
+        &self,
+        other: &Table,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        let self_ancestors = self.ancestral_extension_tables(conn)?;
+        let other_ancestors = other.ancestral_extension_tables(conn)?;
+
+        for ancestor in self_ancestors.as_ref() {
+            if other_ancestors.contains(ancestor) {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
     }
 
     /// Returns whether the table has columns that are NOT primary keys.
@@ -1283,7 +1467,7 @@ impl Table {
             // types.
             let mut primary_key_types = Vec::new();
 
-            for column in primary_key_columns {
+            for column in primary_key_columns.as_ref() {
                 let column_type = column.rust_data_type(conn)?;
                 primary_key_types.push(column_type);
             }
@@ -1358,7 +1542,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
-        let mut columns = self.columns(conn)?;
+        let mut columns = self.columns(conn)?.as_ref().clone();
         let primary_key_columns = self.primary_key_columns(conn)?;
         columns.retain(|column| !primary_key_columns.contains(column));
         Ok(columns)
@@ -1380,7 +1564,7 @@ impl Table {
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, diesel::result::Error> {
+    ) -> Result<Arc<Vec<Column>>, WebCodeGenError> {
         primary_key_columns(self, conn)
     }
 
@@ -1400,7 +1584,7 @@ impl Table {
     pub fn has_composite_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
+    ) -> Result<bool, WebCodeGenError> {
         Ok(self.primary_key_columns(conn)?.len() > 1)
     }
 
@@ -1411,9 +1595,9 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut foreign_definer_columns = Vec::new();
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_foreign_definer(conn)? {
-                foreign_definer_columns.push(column);
+                foreign_definer_columns.push(column.clone());
             }
         }
         Ok(foreign_definer_columns)
@@ -1435,10 +1619,10 @@ impl Table {
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
+    ) -> Result<Vec<CheckConstraint>, WebCodeGenError> {
         use crate::schema::{check_constraints, table_constraints};
 
-        check_constraints::table
+        Ok(check_constraints::table
             .inner_join(
                 table_constraints::table.on(check_constraints::constraint_name
                     .eq(table_constraints::constraint_name)
@@ -1455,7 +1639,7 @@ impl Table {
             .filter(table_constraints::table_schema.eq(&self.table_schema))
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .select(CheckConstraint::as_select())
-            .load::<CheckConstraint>(conn)
+            .load::<CheckConstraint>(conn)?)
     }
 
     /// Returns the list of Triggers associates to the current table.
@@ -1471,18 +1655,15 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub fn triggers(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
+    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, WebCodeGenError> {
         use crate::schema::{pg_class, pg_namespace, pg_trigger};
-        pg_trigger::table
+        Ok(pg_trigger::table
             .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
             .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
             .filter(pg_class::relname.eq(&self.table_name))
             .filter(pg_namespace::nspname.eq(&self.table_schema))
             .select(PgTrigger::as_select())
-            .load::<PgTrigger>(conn)
+            .load::<PgTrigger>(conn)?)
     }
 }
 

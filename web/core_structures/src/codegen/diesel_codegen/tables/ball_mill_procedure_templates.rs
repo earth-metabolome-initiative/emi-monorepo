@@ -7,6 +7,5 @@ diesel::table! {
     diesel::sql_types::Integer, number_of_beads -> diesel::sql_types::SmallInt,
     milled_with_model -> diesel::sql_types::Integer, procedure_template_milled_with_model
     -> diesel::sql_types::Integer, milled_container_model -> diesel::sql_types::Integer,
-    foreign_procedure_template -> diesel::sql_types::Integer,
     procedure_template_milled_container_model -> diesel::sql_types::Integer }
 }

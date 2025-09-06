@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableMaterialAttribute {
+pub enum MaterialAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableMaterialAttribute {
+impl core::str::FromStr for MaterialAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableMaterialAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableMaterialAttribute {
+impl core::fmt::Display for MaterialAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -87,6 +87,13 @@ pub struct InsertableMaterialBuilder {
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
+}
+impl From<InsertableMaterialBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableMaterialBuilder>
+{
+    fn from(builder: InsertableMaterialBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `Material` or
 /// descendant tables.
@@ -193,8 +200,7 @@ pub trait MaterialSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl MaterialSettable for InsertableMaterialBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableMaterialAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::MaterialAttribute;
     /// Sets the value of the `public.materials.name` column.
     fn name<N>(
         mut self,
@@ -205,8 +211,7 @@ impl MaterialSettable for InsertableMaterialBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableMaterialAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(MaterialAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -222,7 +227,7 @@ impl MaterialSettable for InsertableMaterialBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableMaterialAttribute::Description)
+                .rename_field(MaterialAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -237,8 +242,7 @@ impl MaterialSettable for InsertableMaterialBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableMaterialAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(MaterialAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -264,10 +268,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::materials::Material,
-            Error = web_common_traits::database::InsertError<InsertableMaterialAttribute>,
+            Error = web_common_traits::database::InsertError<MaterialAttribute>,
         >,
 {
-    type Attributes = InsertableMaterialAttribute;
+    type Attributes = MaterialAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

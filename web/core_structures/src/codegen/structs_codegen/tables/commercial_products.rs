@@ -30,14 +30,6 @@ where
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for CommercialProduct
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
-impl
-    web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     > for CommercialProduct
 where
@@ -55,29 +47,29 @@ impl CommercialProduct {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >,
-        <<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        <<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel as diesel::Identifiable>::Id,
+        <<<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
         >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
             'a,
             C,
-            crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+            crate::codegen::structs_codegen::tables::asset_models::AssetModel,
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
         RunQueryDsl::first(
             QueryDsl::find(
-                crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::table(),
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
                 self.id,
             ),
             conn,
@@ -139,29 +131,6 @@ impl CommercialProduct {
         Self::table()
             .filter(commercial_products::brand_id.eq(brand_id))
             .order_by(commercial_products::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            commercial_products::commercial_products, physical_asset_models::physical_asset_models,
-        };
-        Self::table()
-            .inner_join(
-                physical_asset_models::table
-                    .on(commercial_products::id.eq(physical_asset_models::id)),
-            )
-            .filter(physical_asset_models::parent_model.eq(parent_model))
-            .order_by(commercial_products::id.asc())
-            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -241,6 +210,26 @@ impl CommercialProduct {
         Self::table()
             .inner_join(asset_models::table.on(commercial_products::id.eq(asset_models::id)))
             .filter(asset_models::description.eq(description))
+            .order_by(commercial_products::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, commercial_products::commercial_products,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(commercial_products::id.eq(asset_models::id)))
+            .filter(asset_models::parent_model.eq(parent_model))
             .order_by(commercial_products::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -11,6 +11,7 @@ use crate::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
+    table_metadata::PartialBuilderKind,
 };
 
 impl Table {
@@ -50,13 +51,22 @@ impl Table {
         insertable_column: &Column,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
+        let column_acronym = insertable_column.acronym_ident()?;
+
+        if let Some((partial_builder_kind, _, _partial_builder_foreign_key)) =
+            insertable_column.requires_partial_builder(conn)?
+        {
+            return match partial_builder_kind {
+                PartialBuilderKind::Mandatory => Ok(None),
+                PartialBuilderKind::Discretional => Ok(Some(quote! { <#column_acronym> })),
+            };
+        }
+
         if insertable_column.is_foreign_primary_key(conn)?
             || insertable_column.is_part_of_primary_key(conn)?
         {
             return Ok(None);
         }
-
-        let column_acronym = insertable_column.acronym_ident()?;
 
         Ok(Some(quote! {
             <#column_acronym>
@@ -68,12 +78,19 @@ impl Table {
         insertable_column: &Column,
         conn: &mut diesel::PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        if let Some(partial_builder_foreign_key) =
+        if let Some((partial_builder_kind, _, partial_builder_foreign_key)) =
             insertable_column.requires_partial_builder(conn)?
         {
-            let foreign_table = partial_builder_foreign_key.foreign_table(conn)?;
-            let foreign_builder_type = foreign_table.insertable_builder_ty()?;
-            Ok(quote! {#foreign_builder_type})
+            match partial_builder_kind {
+                PartialBuilderKind::Mandatory => {
+                    let foreign_table = partial_builder_foreign_key.foreign_table(conn)?;
+                    partial_builder_kind.formatted_type(&foreign_table, conn)
+                }
+                PartialBuilderKind::Discretional => {
+                    let column_acronym = insertable_column.acronym_ident()?;
+                    Ok(quote! { #column_acronym })
+                }
+            }
         } else if insertable_column.is_foreign_primary_key(conn)?
             || insertable_column.is_part_of_primary_key(conn)?
         {
@@ -90,13 +107,31 @@ impl Table {
         insertable_column: &Column,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
+        let column_acronym = insertable_column.acronym_ident()?;
+
+        if let Some((partial_builder_kind, _, partial_builder_foreign_key)) =
+            insertable_column.requires_partial_builder(conn)?
+        {
+            return match partial_builder_kind {
+                PartialBuilderKind::Mandatory => Ok(None),
+                PartialBuilderKind::Discretional => {
+                    let foreign_table = partial_builder_foreign_key.foreign_table(conn)?;
+                    let argument_type =
+                        partial_builder_kind.formatted_type(&foreign_table, conn)?;
+                    Ok(Some(quote! {
+                        where
+                            #column_acronym: Into<#argument_type>
+                    }))
+                }
+            };
+        }
+
         if insertable_column.is_foreign_primary_key(conn)?
             || insertable_column.is_part_of_primary_key(conn)?
         {
             return Ok(None);
         }
 
-        let column_acronym = insertable_column.acronym_ident()?;
         let argument_type = insertable_column.rust_data_type(conn)?;
 
         Ok(Some(quote! {

@@ -28,7 +28,7 @@ pub use column::Column;
 pub use constraint_column_usage::ConstraintColumnUsage;
 pub use constraint_table_usage::ConstraintTableUsage;
 pub use domain_constraint::DomainConstraint;
-pub use key_column_usage::KeyColumnUsage;
+pub use key_column_usage::{KeyColumnUsage, PartialBuilderKind};
 pub use pg_attribute::PgAttribute;
 pub use pg_class::PGClass;
 pub use pg_constraint::PgConstraint;

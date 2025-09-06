@@ -1,26 +1,23 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PouringProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
     pub measured_with_model: Option<
         crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
-    >,
-    pub procedure_template_measured_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub poured_from_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub foreign_procedure_template: Option<
+    pub poured_into_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub procedure_template_measured_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_template_poured_from_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub poured_into_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
     pub procedure_template_poured_into_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
@@ -37,24 +34,8 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDeviceModel(
                         self.measured_with_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_measured_with_model,
                     ),
                 ),
             );
@@ -69,8 +50,24 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.poured_into_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.foreign_procedure_template,
+                        self.procedure_template,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_measured_with_model,
                     ),
                 ),
             );
@@ -85,14 +82,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                        self.poured_into_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                         self.procedure_template_poured_into_model,
                     ),
@@ -100,13 +89,12 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
-            && foreign_keys.measured_with_model.is_some()
-            && foreign_keys.procedure_template_measured_with_model.is_some()
+        foreign_keys.measured_with_model.is_some()
             && foreign_keys.poured_from_model.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
-            && foreign_keys.procedure_template_poured_from_model.is_some()
             && foreign_keys.poured_into_model.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.procedure_template_measured_with_model.is_some()
+            && foreign_keys.procedure_template_poured_from_model.is_some()
             && foreign_keys.procedure_template_poured_into_model.is_some()
     }
     fn update(
@@ -182,15 +170,7 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
+                    foreign_keys.procedure_template = Some(procedure_templates);
                     updated = true;
                 }
             }
@@ -200,12 +180,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
                     foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = None;
                     updated = true;
                 }
             }

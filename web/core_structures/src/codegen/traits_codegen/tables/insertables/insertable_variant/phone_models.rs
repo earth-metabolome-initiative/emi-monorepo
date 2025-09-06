@@ -60,7 +60,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -104,9 +104,9 @@ where
                 .phone_models_camera
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -115,9 +115,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -127,9 +127,9 @@ where
                 .phone_models_positioning
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::PositioningDeviceModel(
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -138,9 +138,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
                         ),
                     ))
                 })?;

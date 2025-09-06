@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableProjectStateAttribute {
+pub enum ProjectStateAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertableProjectStateAttribute {
+impl core::str::FromStr for ProjectStateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableProjectStateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableProjectStateAttribute {
+impl core::fmt::Display for ProjectStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Name => write!(f, "name"),
@@ -89,6 +89,13 @@ pub struct InsertableProjectStateBuilder {
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
+}
+impl From<InsertableProjectStateBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertableProjectStateBuilder>
+{
+    fn from(builder: InsertableProjectStateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `ProjectState` or
 /// descendant tables.
@@ -195,8 +202,7 @@ pub trait ProjectStateSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl ProjectStateSettable for InsertableProjectStateBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableProjectStateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::ProjectStateAttribute;
     /// Sets the value of the `public.project_states.name` column.
     fn name<N>(
         mut self,
@@ -207,8 +213,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectStateAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectStateAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -224,7 +229,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
     {
         let description = description.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectStateAttribute::Description)
+                .rename_field(ProjectStateAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -239,8 +244,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableProjectStateAttribute::Icon)
+            validation_errors::SingleFieldError::from(err).rename_field(ProjectStateAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)
@@ -266,10 +270,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::project_states::ProjectState,
-            Error = web_common_traits::database::InsertError<InsertableProjectStateAttribute>,
+            Error = web_common_traits::database::InsertError<ProjectStateAttribute>,
         >,
 {
-    type Attributes = InsertableProjectStateAttribute;
+    type Attributes = ProjectStateAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()

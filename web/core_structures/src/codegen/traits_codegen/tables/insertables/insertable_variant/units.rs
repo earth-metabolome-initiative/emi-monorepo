@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::units::Unit;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUnit;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute,
+        crate::codegen::structs_codegen::tables::insertables::UnitAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::UnitAttribute::Name,
                 ),
             )?;
         let unit = self
             .unit
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute::Unit,
+                    crate::codegen::structs_codegen::tables::insertables::UnitAttribute::Unit,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::UnitAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUnitAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::UnitAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

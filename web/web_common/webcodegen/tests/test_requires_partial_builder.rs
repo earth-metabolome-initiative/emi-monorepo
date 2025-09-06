@@ -42,7 +42,7 @@ async fn test_requires_partial_builder() {
         .columns(&mut conn)
         .expect("Failed to retrieve columns from table `procedure_template_trackables`.");
 
-    for column in procedure_template_trackable_columns {
+    for column in procedure_template_trackable_columns.iter() {
         assert!(
             column
                 .requires_partial_builder(&mut conn)

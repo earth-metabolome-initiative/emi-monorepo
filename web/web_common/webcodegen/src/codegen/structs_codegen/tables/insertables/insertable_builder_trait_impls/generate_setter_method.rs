@@ -43,7 +43,7 @@ impl Table {
         // We assert that the provided column is not part of the primary key,
         // as the primary key setter methods are generated separately.
 
-        let insertable_enum = self.insertable_enum_ident()?;
+        let insertable_enum = self.attributes_enum_ident()?;
         let mut involved_columns = vec![column.clone()];
         let check_constraints: Vec<TokenStream> =
             self.generate_method_check_constraints(&[column], check_constraints_extensions, conn)?;
@@ -74,7 +74,7 @@ impl Table {
             None
         };
 
-        let (requires_attribute_mutability, same_as_assignments, same_as_columns) = self
+        let (mut requires_attribute_mutability, same_as_assignments, same_as_columns) = self
             .generate_same_as_assignments(
                 column,
                 extension_network,
@@ -91,7 +91,16 @@ impl Table {
         let mut maybe_column_preprocessing = None;
 
         let column_assignment =
-            if let Some(_partial_builder_foreign_key) = column.requires_partial_builder(conn)? {
+            if let Some((partial_builder_kind, _, _partial_builder_foreign_key)) =
+                column.requires_partial_builder(conn)?
+            {
+                if partial_builder_kind.is_discretional() {
+                    let maybe_mut = requires_attribute_mutability.then(|| quote! { mut });
+                    maybe_column_preprocessing = Some(quote! {
+                        let #maybe_mut #column_snake_case_ident = #column_snake_case_ident.into();
+                    });
+                    requires_attribute_mutability = false;
+                }
                 quote! {
                     self.#column_snake_case_ident = #column_snake_case_ident;
                 }

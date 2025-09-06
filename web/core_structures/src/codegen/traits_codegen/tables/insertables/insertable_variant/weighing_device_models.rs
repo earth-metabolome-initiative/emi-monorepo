@@ -42,7 +42,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -78,9 +78,9 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelExtensionAttribute::PhysicalAssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute::Id,
+                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute::Extension(
+                    crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelExtensionAttribute::PhysicalAssetModel(
+                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id,
                     ),
                 ))
             })?;

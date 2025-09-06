@@ -108,8 +108,6 @@ impl super::Rows {
             super::Rows::Project(rows) => rows.len(),
             super::Rows::Rank(rows) => rows.len(),
             super::Rows::ReagentModel(rows) => rows.len(),
-            super::Rows::RegisteringProcedureTemplate(rows) => rows.len(),
-            super::Rows::RegisteringProcedure(rows) => rows.len(),
             super::Rows::Role(rows) => rows.len(),
             super::Rows::Room(rows) => rows.len(),
             super::Rows::SampleState(rows) => rows.len(),

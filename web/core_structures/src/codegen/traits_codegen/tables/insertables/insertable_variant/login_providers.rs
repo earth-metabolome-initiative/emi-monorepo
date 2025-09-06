@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::login_providers::LoginProvider;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableLoginProvider;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute,
+        crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,42 +46,42 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Name,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Icon,
                 ),
             )?;
         let client_id = self
             .client_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::ClientId,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::ClientId,
                 ),
             )?;
         let redirect_uri = self
             .redirect_uri
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::RedirectUri,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::RedirectUri,
                 ),
             )?;
         let oauth_url = self
             .oauth_url
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::OauthUrl,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::OauthUrl,
                 ),
             )?;
         let scope = self
             .scope
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderAttribute::Scope,
+                    crate::codegen::structs_codegen::tables::insertables::LoginProviderAttribute::Scope,
                 ),
             )?;
         Ok(Self::InsertableVariant {

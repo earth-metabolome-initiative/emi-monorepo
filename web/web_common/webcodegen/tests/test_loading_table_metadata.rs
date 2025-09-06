@@ -51,13 +51,13 @@ async fn test_user_table() {
 
     test_check_constraints(&database_name, &mut conn).unwrap();
 
-    let columns: Result<Vec<Column>, _> = users.columns(&mut conn);
+    let columns = users.columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
     assert_eq!(columns.len(), 4);
 
-    let primary_key_columns: Result<Vec<Column>, _> = users.primary_key_columns(&mut conn);
+    let primary_key_columns = users.primary_key_columns(&mut conn);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
@@ -76,9 +76,8 @@ async fn test_user_table() {
     let composite_users =
         Table::load(&mut conn, "composite_users", "public", &database_name).unwrap();
 
-    let columns: Result<Vec<Column>, _> = composite_users.columns(&mut conn);
-    let primary_key_columns: Result<Vec<Column>, _> =
-        composite_users.primary_key_columns(&mut conn);
+    let columns = composite_users.columns(&mut conn);
+    let primary_key_columns = composite_users.primary_key_columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();

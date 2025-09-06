@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::{io::Write, sync::Arc};
 
 use diesel::{
     ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
@@ -159,7 +159,7 @@ impl TableConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Arc<Table>, WebCodeGenError> {
         Table::load(conn, &self.table_name, &self.table_schema, &self.table_catalog)
     }
 

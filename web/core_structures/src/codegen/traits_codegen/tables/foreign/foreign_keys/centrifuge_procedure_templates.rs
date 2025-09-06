@@ -13,9 +13,6 @@ pub struct CentrifugeProcedureTemplateForeignKeys {
     pub centrifuged_container_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub foreign_procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
     pub procedure_template_centrifuged_container_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
@@ -66,14 +63,6 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.foreign_procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                         self.procedure_template_centrifuged_container_model,
                     ),
@@ -94,7 +83,6 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
             && foreign_keys.centrifuged_with_model.is_some()
             && foreign_keys.procedure_template_centrifuged_with_model.is_some()
             && foreign_keys.centrifuged_container_model.is_some()
-            && foreign_keys.foreign_procedure_template.is_some()
             && foreign_keys.procedure_template_centrifuged_container_model.is_some()
             && foreign_keys.centrifuge_pm_compatibility_rules.is_some()
     }
@@ -211,15 +199,7 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = Some(
-                        procedure_templates.clone(),
-                    );
+                    foreign_keys.procedure_template = Some(procedure_templates);
                     updated = true;
                 }
             }
@@ -229,12 +209,6 @@ for crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::Cen
             ) => {
                 if self.procedure_template == procedure_templates.procedure_template {
                     foreign_keys.procedure_template = None;
-                    updated = true;
-                }
-                if self.foreign_procedure_template
-                    == procedure_templates.procedure_template
-                {
-                    foreign_keys.foreign_procedure_template = None;
                     updated = true;
                 }
             }

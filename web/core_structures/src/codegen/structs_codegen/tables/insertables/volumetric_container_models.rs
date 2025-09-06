@@ -1,45 +1,43 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelExtensionAttribute {
-    ContainerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
-    ),
+pub enum VolumetricContainerModelExtensionAttribute {
+    ContainerModel(crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute),
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelExtensionAttribute {
+impl core::fmt::Display for VolumetricContainerModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ContainerModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute>
-    for InsertableVolumetricContainerModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute>
+    for VolumetricContainerModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
     ) -> Self {
         Self::ContainerModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelAttribute {
-    Extension(InsertableVolumetricContainerModelExtensionAttribute),
+pub enum VolumetricContainerModelAttribute {
+    Extension(VolumetricContainerModelExtensionAttribute),
     Id,
     Liters,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute>
-    for InsertableVolumetricContainerModelAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute>
+    for VolumetricContainerModelAttribute
 {
     fn from(
-        container_models: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
+        container_models: crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
     ) -> Self {
-        Self::Extension(InsertableVolumetricContainerModelExtensionAttribute::ContainerModel(
+        Self::Extension(VolumetricContainerModelExtensionAttribute::ContainerModel(
             container_models,
         ))
     }
 }
-impl core::str::FromStr for InsertableVolumetricContainerModelAttribute {
+impl core::str::FromStr for VolumetricContainerModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -49,7 +47,7 @@ impl core::str::FromStr for InsertableVolumetricContainerModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelAttribute {
+impl core::fmt::Display for VolumetricContainerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -117,6 +115,13 @@ pub struct InsertableVolumetricContainerModelBuilder<
     pub(crate) liters: Option<f32>,
     pub(crate) id: ContainerModel,
 }
+impl From<InsertableVolumetricContainerModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableVolumetricContainerModelBuilder>
+{
+    fn from(builder: InsertableVolumetricContainerModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of
 /// `VolumetricContainerModel` or descendant tables.
 pub trait VolumetricContainerModelSettable: Sized {
@@ -152,7 +157,8 @@ pub trait VolumetricContainerModelSettable: Sized {
 impl<ContainerModel> VolumetricContainerModelSettable
     for InsertableVolumetricContainerModelBuilder<ContainerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute;
     /// Sets the value of the `public.volumetric_container_models.liters`
     /// column.
     fn liters<L>(
@@ -165,13 +171,13 @@ impl<ContainerModel> VolumetricContainerModelSettable
     {
         let liters = liters.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableVolumetricContainerModelAttribute::Liters)
+                .rename_field(VolumetricContainerModelAttribute::Liters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute::Liters,
+                        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute::Liters,
                     )
             })?;
         self.liters = Some(liters);
@@ -180,16 +186,16 @@ impl<ContainerModel> VolumetricContainerModelSettable
 }
 impl<
     ContainerModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableVolumetricContainerModelBuilder<ContainerModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -355,15 +361,16 @@ where
 impl<ContainerModel> crate::codegen::structs_codegen::tables::insertables::ContainerModelSettable
     for InsertableVolumetricContainerModelBuilder<ContainerModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute;
 }
 impl<
     ContainerModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableVolumetricContainerModelBuilder<ContainerModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
@@ -411,12 +418,12 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         Error = web_common_traits::database::InsertError<
-            InsertableVolumetricContainerModelAttribute,
+            VolumetricContainerModelAttribute,
         >,
     >,
     ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableVolumetricContainerModelAttribute;
+    type Attributes = VolumetricContainerModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete() && self.liters.is_some()
     }

@@ -30,7 +30,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -59,7 +59,7 @@ where
             .packaging_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute::PackagingModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::PackagingModel,
                 ),
             )?;
         let id = if self.commercial_packaging_models_id_fkey1.is_complete() {
@@ -67,9 +67,9 @@ where
                 .commercial_packaging_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -78,9 +78,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelExtensionAttribute::PackagingModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute::PackagingModel(
+                            crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -90,9 +90,9 @@ where
                 .commercial_packaging_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelExtensionAttribute::PackagingModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute::PackagingModel(
+                            crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -101,9 +101,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;

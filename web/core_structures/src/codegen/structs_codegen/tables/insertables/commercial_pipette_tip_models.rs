@@ -1,14 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPipetteTipModelExtensionAttribute {
-    PipetteTipModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute,
-    ),
+pub enum CommercialPipetteTipModelExtensionAttribute {
+    PipetteTipModel(crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialPipetteTipModelExtensionAttribute {
+impl core::fmt::Display for CommercialPipetteTipModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::PipetteTipModel(e) => write!(f, "{e}"),
@@ -16,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialPipetteTipModelExtensionAttribut
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute>
-    for InsertableCommercialPipetteTipModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute>
+    for CommercialPipetteTipModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
     ) -> Self {
         Self::PipetteTipModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialPipetteTipModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialPipetteTipModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialPipetteTipModelAttribute {
-    Extension(InsertableCommercialPipetteTipModelExtensionAttribute),
+pub enum CommercialPipetteTipModelAttribute {
+    Extension(CommercialPipetteTipModelExtensionAttribute),
     Id,
     PipetteTipModel,
 }
-impl core::str::FromStr for InsertableCommercialPipetteTipModelAttribute {
+impl core::str::FromStr for CommercialPipetteTipModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialPipetteTipModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialPipetteTipModelAttribute {
+impl core::fmt::Display for CommercialPipetteTipModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -172,24 +169,55 @@ impl InsertableCommercialPipetteTipModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_pipette_tip_models_id_pipette_tip_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialPipetteTipModelBuilder<
     CommercialProduct
         = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-            >,
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
         >,
     PipetteTipModel
         = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelBuilder<
-            Option<i32>,
+            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+                Option<i32>,
+            >,
         >,
 > {
     pub(crate) pipette_tip_model: Option<i32>,
     pub(crate) commercial_pipette_tip_models_id_fkey: PipetteTipModel,
     pub(crate) commercial_pipette_tip_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialPipetteTipModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialPipetteTipModelBuilder>
+{
+    fn from(builder: InsertableCommercialPipetteTipModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialPipetteTipModel` or descendant tables.
@@ -221,13 +249,13 @@ pub trait CommercialPipetteTipModelSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+    CommercialProduct,
+    PipetteTipModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
         >,
-    PipetteTipModel,
 > CommercialPipetteTipModelSettable
 for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
     ///Sets the value of the `public.commercial_pipette_tip_models.pipette_tip_model` column.
     ///
     ///# Implementation notes
@@ -253,19 +281,19 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
     ///v4 -.->|"`descendant of`"| v3
     ///v4 -.->|"`descendant of`"| v5
-    ///v5 --->|"`extends`"| v3
     ///```
     fn pipette_tip_model(
         mut self,
         pipette_tip_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.commercial_pipette_tip_models_id_fkey,
                 Some(pipette_tip_model),
             )
             .map_err(|err| {
@@ -279,17 +307,17 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
 }
 impl<
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
     PipetteTipModel,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -454,12 +482,12 @@ where
 }
 impl<
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
     PipetteTipModel,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -510,10 +538,10 @@ impl<
 for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -566,7 +594,8 @@ impl<CommercialProduct, PipetteTipModel>
     crate::codegen::structs_codegen::tables::insertables::PipetteTipModelSettable
     for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModelAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
 }
 impl<PipetteTipModel, CommercialProduct> web_common_traits::database::MostConcreteTable
     for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
@@ -606,7 +635,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
         Error = web_common_traits::database::InsertError<
-            InsertableCommercialPipetteTipModelAttribute,
+            CommercialPipetteTipModelAttribute,
         >,
     >,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -615,7 +644,7 @@ where
     >,
     PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCommercialPipetteTipModelAttribute;
+    type Attributes = CommercialPipetteTipModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_pipette_tip_models_id_fkey1.is_complete()
             && self.commercial_pipette_tip_models_id_fkey.is_complete()

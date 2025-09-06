@@ -34,7 +34,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestor;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttribute,
+        crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -74,14 +74,14 @@ where
             .descendant_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttribute::DescendantModel,
+                    crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute::DescendantModel,
                 ),
             )?;
         let ancestor_model = self
             .ancestor_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorAttribute::AncestorModel,
+                    crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute::AncestorModel,
                 ),
             )?;
         Ok(Self::InsertableVariant {

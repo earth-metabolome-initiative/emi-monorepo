@@ -18,12 +18,8 @@ impl CustomTableConstraint for CompatibleForeignTypeConstraint {
         conn: &mut PgConnection,
         table: &crate::Table,
     ) -> Result<(), crate::errors::WebCodeGenError> {
-        for foreign_key in table.foreign_keys(conn)? {
-            for (local_column, foreign_column) in foreign_key
-                .columns(conn)?
-                .into_iter()
-                .zip(foreign_key.foreign_columns(conn)?.into_iter())
-            {
+        for foreign_key in table.foreign_keys(conn)?.as_ref() {
+            for (local_column, foreign_column) in foreign_key.column_mappings(conn)? {
                 if !local_column.has_compatible_data_type(&foreign_column, conn)? {
                     return Err(super::ConstraintError::IncompatibleForeignType {
                         column: Box::new(local_column),

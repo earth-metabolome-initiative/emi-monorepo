@@ -2,7 +2,10 @@
 //! insertable builder into an insertable object after having processed the
 //! necessary parent builders, if any.
 
-use crate::{database::InsertError, prelude::SetPrimaryKey};
+use crate::{
+    database::{IdOrBuilder, InsertError},
+    prelude::SetPrimaryKey,
+};
 
 /// Trait defining the properties that any generic associated with a type
 /// implementing `TryInsert` must have.
@@ -53,5 +56,54 @@ where
         self.ok_or(InsertError::BuilderError(
             common_traits::prelude::BuilderError::IncompleteBuild(()),
         ))
+    }
+}
+
+impl<Id, Builder> SetPrimaryKey for IdOrBuilder<Id, Builder>
+where
+    Id: SetPrimaryKey<PrimaryKey = Id>,
+    Builder: SetPrimaryKey<PrimaryKey = Id>,
+{
+    type PrimaryKey = Id;
+
+    fn set_primary_key(self, primary_key: Self::PrimaryKey) -> Self {
+        match self {
+            Self::Id(maybe_id) => {
+                Self::Id(<Option<Id> as SetPrimaryKey>::set_primary_key(maybe_id, primary_key))
+            }
+            Self::Builder(builder) => Self::Builder(builder.set_primary_key(primary_key)),
+        }
+    }
+}
+
+impl<C, Id, Builder> TryInsertGeneric<C> for IdOrBuilder<Id, Builder>
+where
+    Id: SetPrimaryKey<PrimaryKey = Id>,
+    Builder: TryInsertGeneric<C, PrimaryKey = Id>,
+{
+    type Attributes = Builder::Attributes;
+
+    fn is_complete(&self) -> bool {
+        match self {
+            Self::Id(maybe_id) => <Option<Id> as TryInsertGeneric<C>>::is_complete(maybe_id),
+            Self::Builder(builder) => builder.is_complete(),
+        }
+    }
+
+    fn mint_primary_key(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::PrimaryKey, InsertError<Self::Attributes>> {
+        match self {
+            Self::Id(id) => {
+                if let Some(id) = id {
+                    Ok(id)
+                } else {
+                    unreachable!("Checked completeness before calling mint_primary_key")
+                }
+            }
+            Self::Builder(builder) => builder.mint_primary_key(user_id, conn),
+        }
     }
 }

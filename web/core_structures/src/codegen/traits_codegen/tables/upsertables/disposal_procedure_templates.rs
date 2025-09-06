@@ -20,10 +20,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
                 disposed_asset_model
                     .ne(excluded(disposed_asset_model))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_disposed_asset_model
                             .ne(excluded(procedure_template_disposed_asset_model)),
                     ),
@@ -53,10 +49,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
             .filter(
                 disposed_asset_model
                     .ne(excluded(disposed_asset_model))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_disposed_asset_model
                             .ne(excluded(procedure_template_disposed_asset_model)),

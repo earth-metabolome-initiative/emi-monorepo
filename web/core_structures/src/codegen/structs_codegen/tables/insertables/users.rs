@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableUserAttribute {
+pub enum UserAttribute {
     Id,
     FirstName,
     LastName,
     CreatedAt,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableUserAttribute {
+impl core::str::FromStr for UserAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,7 +23,7 @@ impl core::str::FromStr for InsertableUserAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableUserAttribute {
+impl core::fmt::Display for UserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -54,6 +54,13 @@ pub struct InsertableUserBuilder {
     pub(crate) last_name: Option<String>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl From<InsertableUserBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableUserBuilder>
+{
+    fn from(builder: InsertableUserBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableUserBuilder {
     fn default() -> Self {
@@ -177,7 +184,7 @@ pub trait UserSettable: Sized {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl UserSettable for InsertableUserBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::UserAttribute;
     /// Sets the value of the `public.users.first_name` column.
     fn first_name<FN>(
         mut self,
@@ -188,16 +195,13 @@ impl UserSettable for InsertableUserBuilder {
         validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
     {
         let first_name = first_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserAttribute::FirstName)
+            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::FirstName)
         })?;
-        pgrx_validation::must_be_paragraph(first_name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::FirstName,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(first_name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::UserAttribute::FirstName,
+            )
+        })?;
         self.first_name = Some(first_name);
         Ok(self)
     }
@@ -211,16 +215,13 @@ impl UserSettable for InsertableUserBuilder {
         validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
     {
         let last_name = last_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserAttribute::LastName)
+            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::LastName)
         })?;
-        pgrx_validation::must_be_paragraph(last_name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::LastName,
-                    )
-            })?;
+        pgrx_validation::must_be_paragraph(last_name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::UserAttribute::LastName,
+            )
+        })?;
         self.last_name = Some(last_name);
         Ok(self)
     }
@@ -235,18 +236,15 @@ impl UserSettable for InsertableUserBuilder {
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserAttribute::CreatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.created_at = Some(created_at);
         Ok(self)
@@ -262,18 +260,15 @@ impl UserSettable for InsertableUserBuilder {
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableUserAttribute::UpdatedAt)
+            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableUserAttribute::UpdatedAt,
-                        )
-                })?;
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::UpdatedAt,
+                )
+            })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)
@@ -291,10 +286,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::users::User,
-            Error = web_common_traits::database::InsertError<InsertableUserAttribute>,
+            Error = web_common_traits::database::InsertError<UserAttribute>,
         >,
 {
-    type Attributes = InsertableUserAttribute;
+    type Attributes = UserAttribute;
     fn is_complete(&self) -> bool {
         self.first_name.is_some()
             && self.last_name.is_some()

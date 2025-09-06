@@ -1,46 +1,46 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePouringProcedureTemplateExtensionAttribute {
+pub enum PouringProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertablePouringProcedureTemplateExtensionAttribute {
+impl core::fmt::Display for PouringProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
-    for InsertablePouringProcedureTemplateExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute>
+    for PouringProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePouringProcedureTemplateAttribute {
-    Extension(InsertablePouringProcedureTemplateExtensionAttribute),
+pub enum PouringProcedureTemplateAttribute {
+    Extension(PouringProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     MeasuredWithModel,
     ProcedureTemplateMeasuredWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     ),
     PouredFromModel,
-    ForeignProcedureTemplate,
-    ProcedureTemplatePouredFromModel,
+    ProcedureTemplatePouredFromModel(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+    ),
     PouredIntoModel,
     ProcedureTemplatePouredIntoModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     ),
     Liters,
 }
-impl core::str::FromStr for InsertablePouringProcedureTemplateAttribute {
+impl core::str::FromStr for PouringProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -48,20 +48,23 @@ impl core::str::FromStr for InsertablePouringProcedureTemplateAttribute {
             "ProcedureTemplateMeasuredWithModel" => {
                 Ok(
                     Self::ProcedureTemplateMeasuredWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "PouredFromModel" => Ok(Self::PouredFromModel),
-            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplatePouredFromModel" => {
-                Ok(Self::ProcedureTemplatePouredFromModel)
+                Ok(
+                    Self::ProcedureTemplatePouredFromModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "PouredIntoModel" => Ok(Self::PouredIntoModel),
             "ProcedureTemplatePouredIntoModel" => {
                 Ok(
                     Self::ProcedureTemplatePouredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -70,20 +73,23 @@ impl core::str::FromStr for InsertablePouringProcedureTemplateAttribute {
             "procedure_template_measured_with_model" => {
                 Ok(
                     Self::ProcedureTemplateMeasuredWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "poured_from_model" => Ok(Self::PouredFromModel),
-            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_poured_from_model" => {
-                Ok(Self::ProcedureTemplatePouredFromModel)
+                Ok(
+                    Self::ProcedureTemplatePouredFromModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "poured_into_model" => Ok(Self::PouredIntoModel),
             "procedure_template_poured_into_model" => {
                 Ok(
                     Self::ProcedureTemplatePouredIntoModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -98,7 +104,7 @@ impl core::str::FromStr for InsertablePouringProcedureTemplateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePouringProcedureTemplateAttribute {
+impl core::fmt::Display for PouringProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -106,10 +112,7 @@ impl core::fmt::Display for InsertablePouringProcedureTemplateAttribute {
             Self::MeasuredWithModel => write!(f, "measured_with_model"),
             Self::ProcedureTemplateMeasuredWithModel(e) => write!(f, "{e}"),
             Self::PouredFromModel => write!(f, "poured_from_model"),
-            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplatePouredFromModel => {
-                write!(f, "procedure_template_poured_from_model")
-            }
+            Self::ProcedureTemplatePouredFromModel(e) => write!(f, "{e}"),
             Self::PouredIntoModel => write!(f, "poured_into_model"),
             Self::ProcedureTemplatePouredIntoModel(e) => write!(f, "{e}"),
             Self::Liters => write!(f, "liters"),
@@ -129,45 +132,12 @@ pub struct InsertablePouringProcedureTemplate {
     pub(crate) measured_with_model: i32,
     pub(crate) procedure_template_measured_with_model: i32,
     pub(crate) poured_from_model: i32,
-    pub(crate) foreign_procedure_template: i32,
     pub(crate) procedure_template_poured_from_model: i32,
     pub(crate) poured_into_model: i32,
     pub(crate) procedure_template_poured_into_model: i32,
     pub(crate) liters: f32,
 }
 impl InsertablePouringProcedureTemplate {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.procedure_template,
-            ),
-            conn,
-        )
-    }
     pub fn measured_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -196,38 +166,6 @@ impl InsertablePouringProcedureTemplate {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel::table(),
                 self.measured_with_model,
-            ),
-            conn,
-        )
-    }
-    pub fn procedure_template_measured_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
-                self.procedure_template_measured_with_model,
             ),
             conn,
         )
@@ -264,7 +202,39 @@ impl InsertablePouringProcedureTemplate {
             conn,
         )
     }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn poured_into_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.poured_into_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -291,10 +261,90 @@ impl InsertablePouringProcedureTemplate {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
+                self.procedure_template,
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedure_templates_procedure_template_measured_w_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_measured_with_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.measured_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    pub fn procedure_template_measured_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_measured_with_model,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedure_templates_procedure_template_poured_fro_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_poured_from_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.poured_from_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_poured_from_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -328,37 +378,29 @@ impl InsertablePouringProcedureTemplate {
             conn,
         )
     }
-    pub fn poured_into_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedure_templates_procedure_template_poured_int_fkey1(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.poured_into_model,
-            ),
-            conn,
-        )
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_poured_into_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.poured_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_poured_into_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -400,14 +442,29 @@ pub struct InsertablePouringProcedureTemplateBuilder<
         = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
 > {
     pub(crate) measured_with_model: Option<i32>,
-    pub(crate) procedure_template_measured_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_measured_with_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) poured_from_model: Option<i32>,
-    pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_poured_from_model: Option<i32>,
+    pub(crate) procedure_template_poured_from_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) poured_into_model: Option<i32>,
-    pub(crate) procedure_template_poured_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_poured_into_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) liters: Option<f32>,
     pub(crate) procedure_template: ProcedureTemplate,
+}
+impl From<InsertablePouringProcedureTemplateBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertablePouringProcedureTemplateBuilder>
+{
+    fn from(builder: InsertablePouringProcedureTemplateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `PouringProcedureTemplate` or descendant tables.
@@ -458,10 +515,17 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_measured_with_model(
+    fn procedure_template_measured_with_model<PTMWM>(
         self,
-        procedure_template_measured_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_measured_with_model: PTMWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.poured_from_model` column.
     ///
@@ -486,30 +550,6 @@ pub trait PouringProcedureTemplateSettable: Sized {
         poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `public.pouring_procedure_templates.foreign_procedure_template` column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure_template`: The value to set for the
-    ///   `public.pouring_procedure_templates.foreign_procedure_template`
-    ///   column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure_template(
-        self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
     /// `public.pouring_procedure_templates.
     /// procedure_template_poured_from_model` column.
     ///
@@ -530,10 +570,17 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_poured_from_model(
+    fn procedure_template_poured_from_model<PTPFM>(
         self,
-        procedure_template_poured_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_poured_from_model: PTPFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPFM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.poured_into_model` column.
     ///
@@ -578,10 +625,17 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_poured_into_model(
+    fn procedure_template_poured_into_model<PTPIM>(
         self,
-        procedure_template_poured_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_poured_into_model: PTPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPIM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the `public.pouring_procedure_templates.liters`
     /// column.
     ///
@@ -612,7 +666,8 @@ pub trait PouringProcedureTemplateSettable: Sized {
 impl<ProcedureTemplate> PouringProcedureTemplateSettable
     for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.measured_with_model` column.
     ///
@@ -628,35 +683,42 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "measured_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "measured_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn measured_with_model(
         mut self,
         measured_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_measured_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                self.procedure_template_measured_with_model,
-                measured_with_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplateMeasuredWithModel(attribute)
-                })
-            })?;
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_measured_with_model,
+        ) = self.procedure_template_measured_with_model
+        {
+            self.procedure_template_measured_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_measured_with_model,
+                    measured_with_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateMeasuredWithModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.measured_with_model = Some(measured_with_model);
         Ok(self)
     }
@@ -676,10 +738,96 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "measured_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "measured_with_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
+    fn procedure_template_measured_with_model<PTMWM>(
+        mut self,
+        procedure_template_measured_with_model: PTMWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_measured_with_model =
+            procedure_template_measured_with_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_measured_with_model
+        {
+            procedure_template_measured_with_model = if let (
+                Some(measured_with_model),
+                Some(asset_model),
+            ) =
+                (self.measured_with_model, builder.asset_model)
+            {
+                if measured_with_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::MeasuredWithModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.measured_with_model = Some(asset_model);
+                builder.into()
+            } else if let Some(measured_with_model) = self.measured_with_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        measured_with_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateMeasuredWithModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_template_measured_with_model = procedure_template_measured_with_model;
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.pouring_procedure_templates.poured_from_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "poured_from_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_poured_from_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -690,54 +838,29 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_measured_with_model(
-        mut self,
-        mut procedure_template_measured_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) =
-            (self.measured_with_model, procedure_template_measured_with_model.asset_model)
-        {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::MeasuredWithModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) = procedure_template_measured_with_model.asset_model {
-            self.measured_with_model = Some(asset_model);
-        } else if let Some(local) = self.measured_with_model {
-            procedure_template_measured_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_measured_with_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateMeasuredWithModel(attribute)
-                    })
-                })?;
-        }
-        self.procedure_template_measured_with_model = procedure_template_measured_with_model;
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.pouring_procedure_templates.poured_from_model` column.
     fn poured_from_model(
         mut self,
         poured_from_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_poured_from_model,
+        ) = self.procedure_template_poured_from_model
+        {
+            self.procedure_template_poured_from_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_poured_from_model,
+                    poured_from_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplatePouredFromModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.poured_from_model = Some(poured_from_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.pouring_procedure_templates.foreign_procedure_template` column.
-    fn foreign_procedure_template(
-        mut self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.foreign_procedure_template = Some(foreign_procedure_template);
         Ok(self)
     }
     /// Sets the value of the
@@ -754,17 +877,74 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "foreign_procedure_template"}
-    /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "procedure_template_poured_from_model"}
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`pouring_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_poured_from_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "poured_from_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_poured_from_model(
+    fn procedure_template_poured_from_model<PTPFM>(
         mut self,
-        procedure_template_poured_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_poured_from_model = Some(procedure_template_poured_from_model);
+        procedure_template_poured_from_model: PTPFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPFM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_poured_from_model = procedure_template_poured_from_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_poured_from_model
+        {
+            procedure_template_poured_from_model = if let (
+                Some(poured_from_model),
+                Some(asset_model),
+            ) =
+                (self.poured_from_model, builder.asset_model)
+            {
+                if poured_from_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PouredFromModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.poured_from_model = Some(asset_model);
+                builder.into()
+            } else if let Some(poured_from_model) = self.poured_from_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        poured_from_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplatePouredFromModel(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_template_poured_from_model = procedure_template_poured_from_model;
         Ok(self)
     }
     /// Sets the value of the
@@ -782,35 +962,42 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "poured_into_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn poured_into_model(
         mut self,
         poured_into_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_poured_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                self.procedure_template_poured_into_model,
-                poured_into_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplatePouredIntoModel(attribute)
-                })
-            })?;
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_poured_into_model,
+        ) = self.procedure_template_poured_into_model
+        {
+            self.procedure_template_poured_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_poured_into_model,
+                    poured_into_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplatePouredIntoModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.poured_into_model = Some(poured_into_model);
         Ok(self)
     }
@@ -843,35 +1030,57 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_poured_into_model(
+    fn procedure_template_poured_into_model<PTPIM>(
         mut self,
-        mut procedure_template_poured_into_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) =
-            (self.poured_into_model, procedure_template_poured_into_model.asset_model)
+        procedure_template_poured_into_model: PTPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPIM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_poured_into_model = procedure_template_poured_into_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_poured_into_model
         {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::PouredIntoModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) = procedure_template_poured_into_model.asset_model {
-            self.poured_into_model = Some(asset_model);
-        } else if let Some(local) = self.poured_into_model {
-            procedure_template_poured_into_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_poured_into_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplatePouredIntoModel(attribute)
-                    })
-                })?;
+            procedure_template_poured_into_model = if let (
+                Some(poured_into_model),
+                Some(asset_model),
+            ) =
+                (self.poured_into_model, builder.asset_model)
+            {
+                if poured_into_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PouredIntoModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.poured_into_model = Some(asset_model);
+                builder.into()
+            } else if let Some(poured_into_model) = self.poured_into_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        poured_into_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplatePouredIntoModel(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
         }
         self.procedure_template_poured_into_model = procedure_template_poured_into_model;
         Ok(self)
@@ -888,13 +1097,13 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     {
         let liters = liters.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertablePouringProcedureTemplateAttribute::Liters)
+                .rename_field(PouringProcedureTemplateAttribute::Liters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateAttribute::Liters,
+                        crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::Liters,
                     )
             })?;
         self.liters = Some(liters);
@@ -903,11 +1112,11 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -1109,7 +1318,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertablePouringProcedureTemplateAttribute,
+            PouringProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -1120,13 +1329,12 @@ where
         C,
     >,
 {
-    type Attributes = InsertablePouringProcedureTemplateAttribute;
+    type Attributes = PouringProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.measured_with_model.is_some()
             && self.procedure_template_measured_with_model.is_complete()
             && self.poured_from_model.is_some()
-            && self.foreign_procedure_template.is_some()
-            && self.procedure_template_poured_from_model.is_some()
+            && self.procedure_template_poured_from_model.is_complete()
             && self.poured_into_model.is_some()
             && self.procedure_template_poured_into_model.is_complete()
             && self.liters.is_some()

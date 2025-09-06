@@ -1,42 +1,40 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpectraCollectionExtensionAttribute {
-    DigitalAsset(
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
-    ),
+pub enum SpectraCollectionExtensionAttribute {
+    DigitalAsset(crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute),
 }
-impl core::fmt::Display for InsertableSpectraCollectionExtensionAttribute {
+impl core::fmt::Display for SpectraCollectionExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::DigitalAsset(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute>
-    for InsertableSpectraCollectionExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute>
+    for SpectraCollectionExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
     ) -> Self {
         Self::DigitalAsset(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpectraCollectionAttribute {
-    Extension(InsertableSpectraCollectionExtensionAttribute),
+pub enum SpectraCollectionAttribute {
+    Extension(SpectraCollectionExtensionAttribute),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute>
-    for InsertableSpectraCollectionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute>
+    for SpectraCollectionAttribute
 {
     fn from(
-        digital_assets: crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
+        digital_assets: crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
     ) -> Self {
-        Self::Extension(InsertableSpectraCollectionExtensionAttribute::DigitalAsset(digital_assets))
+        Self::Extension(SpectraCollectionExtensionAttribute::DigitalAsset(digital_assets))
     }
 }
-impl core::str::FromStr for InsertableSpectraCollectionAttribute {
+impl core::str::FromStr for SpectraCollectionAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -44,7 +42,7 @@ impl core::str::FromStr for InsertableSpectraCollectionAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableSpectraCollectionAttribute {
+impl core::fmt::Display for SpectraCollectionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -107,6 +105,16 @@ pub struct InsertableSpectraCollectionBuilder<
 > {
     pub(crate) id: DigitalAsset,
 }
+impl From<InsertableSpectraCollectionBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableSpectraCollectionBuilder,
+    >
+{
+    fn from(builder: InsertableSpectraCollectionBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `SpectraCollection`
 /// or descendant tables.
 pub trait SpectraCollectionSettable: Sized {
@@ -115,20 +123,20 @@ pub trait SpectraCollectionSettable: Sized {
 }
 impl<DigitalAsset> SpectraCollectionSettable for InsertableSpectraCollectionBuilder<DigitalAsset> {
     type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute;
+        crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute;
 }
 impl<
     DigitalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableSpectraCollectionBuilder<DigitalAsset>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
     fn id(
@@ -311,11 +319,11 @@ where
 }
 impl<
     DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable
 for InsertableSpectraCollectionBuilder<DigitalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute;
     #[inline]
     ///Sets the value of the `public.digital_assets.model` column.
     fn model(
@@ -362,12 +370,12 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-            Error = web_common_traits::database::InsertError<InsertableSpectraCollectionAttribute>,
+            Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>,
         >,
     DigitalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableSpectraCollectionAttribute;
+    type Attributes = SpectraCollectionAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

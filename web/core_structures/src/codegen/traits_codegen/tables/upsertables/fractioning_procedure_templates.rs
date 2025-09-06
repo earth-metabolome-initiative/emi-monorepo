@@ -27,10 +27,6 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::Fr
                     )
                     .or(fragment_container_model.ne(excluded(fragment_container_model)))
                     .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
-                    .or(
                         procedure_template_fragment_container_model
                             .ne(excluded(procedure_template_fragment_container_model)),
                     )
@@ -75,10 +71,6 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::Fr
                             .ne(excluded(procedure_template_weighed_with_model)),
                     )
                     .or(fragment_container_model.ne(excluded(fragment_container_model)))
-                    .or(
-                        foreign_procedure_template
-                            .ne(excluded(foreign_procedure_template)),
-                    )
                     .or(
                         procedure_template_fragment_container_model
                             .ne(excluded(procedure_template_fragment_container_model)),

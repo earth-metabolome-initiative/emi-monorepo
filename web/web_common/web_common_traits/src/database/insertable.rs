@@ -5,6 +5,45 @@ use std::{convert::Infallible, str::FromStr};
 use common_traits::prelude::BuilderError;
 use generic_backend_request_errors::GenericBackendRequestError;
 
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+/// Enumeration defining either an identifier or a builder.
+pub enum IdOrBuilder<Id, Builder> {
+    /// An identifier.
+    Id(Option<Id>),
+    /// A builder.
+    Builder(Builder),
+}
+
+impl<Id, B: Default> Default for IdOrBuilder<Id, B> {
+    fn default() -> Self {
+        IdOrBuilder::Builder(B::default())
+    }
+}
+
+impl<B> From<i16> for IdOrBuilder<i16, B> {
+    fn from(id: i16) -> Self {
+        IdOrBuilder::Id(Some(id))
+    }
+}
+
+impl<B> From<i32> for IdOrBuilder<i32, B> {
+    fn from(id: i32) -> Self {
+        IdOrBuilder::Id(Some(id))
+    }
+}
+
+impl<B> From<i64> for IdOrBuilder<i64, B> {
+    fn from(id: i64) -> Self {
+        IdOrBuilder::Id(Some(id))
+    }
+}
+
+impl<B> From<rosetta_uuid::Uuid> for IdOrBuilder<rosetta_uuid::Uuid, B> {
+    fn from(id: rosetta_uuid::Uuid) -> Self {
+        IdOrBuilder::Id(Some(id))
+    }
+}
+
 /// A trait for types that can be inserted into the database.
 pub trait Insertable {
     /// The associated builder type which can be constructed in the frontend or

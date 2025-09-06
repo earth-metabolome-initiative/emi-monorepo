@@ -45,7 +45,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModel;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -90,7 +90,7 @@ where
             .camera_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::CameraModel,
+                    crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute::CameraModel,
                 ),
             )?;
         let id = if self.commercial_camera_models_id_fkey.is_complete() {
@@ -98,9 +98,9 @@ where
                 .commercial_camera_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
                         ),
                     ))
                 })?;
@@ -109,9 +109,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -121,9 +121,9 @@ where
                 .commercial_camera_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelExtensionAttribute::CommercialProduct(
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
                         ),
                     ))
                 })?;
@@ -132,9 +132,9 @@ where
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelAttribute::Id,
+                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute::Extension(
+                        crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelExtensionAttribute::CameraModel(
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
                         ),
                     ))
                 })?;

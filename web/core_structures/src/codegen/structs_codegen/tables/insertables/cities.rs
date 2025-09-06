@@ -1,11 +1,11 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCityAttribute {
+pub enum CityAttribute {
     Id,
     Name,
     Iso,
 }
-impl core::str::FromStr for InsertableCityAttribute {
+impl core::str::FromStr for CityAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -17,7 +17,7 @@ impl core::str::FromStr for InsertableCityAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCityAttribute {
+impl core::fmt::Display for CityAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Id => write!(f, "id"),
@@ -76,6 +76,13 @@ pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
     pub(crate) iso: Option<::iso_codes::CountryCode>,
 }
+impl From<InsertableCityBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCityBuilder>
+{
+    fn from(builder: InsertableCityBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `City` or descendant
 /// tables.
 pub trait CitySettable: Sized {
@@ -130,7 +137,7 @@ pub trait CitySettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl CitySettable for InsertableCityBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCityAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CityAttribute;
     /// Sets the value of the `public.cities.name` column.
     fn name<N>(
         mut self,
@@ -141,8 +148,7 @@ impl CitySettable for InsertableCityBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCityAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(CityAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -168,10 +174,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::cities::City,
-            Error = web_common_traits::database::InsertError<InsertableCityAttribute>,
+            Error = web_common_traits::database::InsertError<CityAttribute>,
         >,
 {
-    type Attributes = InsertableCityAttribute;
+    type Attributes = CityAttribute;
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.iso.is_some()
     }

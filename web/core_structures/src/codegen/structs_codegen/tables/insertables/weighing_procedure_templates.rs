@@ -1,67 +1,73 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableWeighingProcedureTemplateExtensionAttribute {
+pub enum WeighingProcedureTemplateExtensionAttribute {
     ProcedureTemplate(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ),
 }
-impl core::fmt::Display for InsertableWeighingProcedureTemplateExtensionAttribute {
+impl core::fmt::Display for WeighingProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
         }
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute>
-    for InsertableWeighingProcedureTemplateExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute>
+    for WeighingProcedureTemplateExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
     ) -> Self {
         Self::ProcedureTemplate(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableWeighingProcedureTemplateAttribute {
-    Extension(InsertableWeighingProcedureTemplateExtensionAttribute),
+pub enum WeighingProcedureTemplateAttribute {
+    Extension(WeighingProcedureTemplateExtensionAttribute),
     ProcedureTemplate,
     WeighedContainerModel,
-    ForeignProcedureTemplate,
-    ProcedureTemplateWeighedContainerModel,
+    ProcedureTemplateWeighedContainerModel(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+    ),
     WeighedWithModel,
     ProcedureTemplateWeighedWithModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     ),
 }
-impl core::str::FromStr for InsertableWeighingProcedureTemplateAttribute {
+impl core::str::FromStr for WeighingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "WeighedContainerModel" => Ok(Self::WeighedContainerModel),
-            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
             "ProcedureTemplateWeighedContainerModel" => {
-                Ok(Self::ProcedureTemplateWeighedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateWeighedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "WeighedWithModel" => Ok(Self::WeighedWithModel),
             "ProcedureTemplateWeighedWithModel" => {
                 Ok(
                     Self::ProcedureTemplateWeighedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
             "weighed_container_model" => Ok(Self::WeighedContainerModel),
-            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
             "procedure_template_weighed_container_model" => {
-                Ok(Self::ProcedureTemplateWeighedContainerModel)
+                Ok(
+                    Self::ProcedureTemplateWeighedContainerModel(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
+                    ),
+                )
             }
             "weighed_with_model" => Ok(Self::WeighedWithModel),
             "procedure_template_weighed_with_model" => {
                 Ok(
                     Self::ProcedureTemplateWeighedWithModel(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelAttribute::Id,
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
                     ),
                 )
             }
@@ -75,16 +81,13 @@ impl core::str::FromStr for InsertableWeighingProcedureTemplateAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableWeighingProcedureTemplateAttribute {
+impl core::fmt::Display for WeighingProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
             Self::WeighedContainerModel => write!(f, "weighed_container_model"),
-            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ProcedureTemplateWeighedContainerModel => {
-                write!(f, "procedure_template_weighed_container_model")
-            }
+            Self::ProcedureTemplateWeighedContainerModel(e) => write!(f, "{e}"),
             Self::WeighedWithModel => write!(f, "weighed_with_model"),
             Self::ProcedureTemplateWeighedWithModel(e) => write!(f, "{e}"),
         }
@@ -101,7 +104,6 @@ impl core::fmt::Display for InsertableWeighingProcedureTemplateAttribute {
 pub struct InsertableWeighingProcedureTemplate {
     pub(crate) procedure_template: i32,
     pub(crate) weighed_container_model: i32,
-    pub(crate) foreign_procedure_template: i32,
     pub(crate) procedure_template_weighed_container_model: i32,
     pub(crate) weighed_with_model: i32,
     pub(crate) procedure_template_weighed_with_model: i32,
@@ -139,69 +141,29 @@ impl InsertableWeighingProcedureTemplate {
             conn,
         )
     }
-    pub fn weighed_container_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn weighing_procedure_templates_procedure_template_weighed_c_fkey1(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.weighed_container_model,
-            ),
-            conn,
-        )
-    }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
-            ),
-            conn,
-        )
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_weighed_container_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.weighed_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_weighed_container_model<
         C: diesel::connection::LoadConnection,
@@ -233,6 +195,94 @@ impl InsertableWeighingProcedureTemplate {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
                 self.procedure_template_weighed_container_model,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn weighing_procedure_templates_procedure_template_weighed_w_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_weighed_with_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.weighed_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_weighed_with_model,
+            ),
+            conn,
+        )
+    }
+    pub fn weighed_container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
+                self.weighed_container_model,
             ),
             conn,
         )
@@ -269,38 +319,6 @@ impl InsertableWeighingProcedureTemplate {
             conn,
         )
     }
-    pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
-                self.procedure_template_weighed_with_model,
-            ),
-            conn,
-        )
-    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -309,11 +327,23 @@ pub struct InsertableWeighingProcedureTemplateBuilder<
         = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
 > {
     pub(crate) weighed_container_model: Option<i32>,
-    pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) procedure_template_weighed_container_model: Option<i32>,
+    pub(crate) procedure_template_weighed_container_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) weighed_with_model: Option<i32>,
-    pub(crate) procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    pub(crate) procedure_template_weighed_with_model: web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+    >,
     pub(crate) procedure_template: ProcedureTemplate,
+}
+impl From<InsertableWeighingProcedureTemplateBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableWeighingProcedureTemplateBuilder>
+{
+    fn from(builder: InsertableWeighingProcedureTemplateBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `WeighingProcedureTemplate` or descendant tables.
@@ -344,30 +374,6 @@ pub trait WeighingProcedureTemplateSettable: Sized {
         weighed_container_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
-    /// `public.weighing_procedure_templates.foreign_procedure_template` column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure_template`: The value to set for the
-    ///   `public.weighing_procedure_templates.foreign_procedure_template`
-    ///   column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure_template(
-        self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
     /// `public.weighing_procedure_templates.
     /// procedure_template_weighed_container_model` column.
     ///
@@ -388,10 +394,17 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_weighed_container_model(
+    fn procedure_template_weighed_container_model<PTWCM>(
         self,
-        procedure_template_weighed_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_weighed_container_model: PTWCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWCM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
     /// Sets the value of the
     /// `public.weighing_procedure_templates.weighed_with_model` column.
     ///
@@ -436,66 +449,25 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_weighed_with_model(
+    fn procedure_template_weighed_with_model<PTWWM>(
         self,
-        procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_weighed_with_model: PTWWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >;
 }
 impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute;
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute;
     /// Sets the value of the
     /// `public.weighing_procedure_templates.weighed_container_model` column.
-    fn weighed_container_model(
-        mut self,
-        weighed_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.weighed_container_model = Some(weighed_container_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.foreign_procedure_template` column.
-    fn foreign_procedure_template(
-        mut self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.foreign_procedure_template = Some(foreign_procedure_template);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.
-    /// procedure_template_weighed_container_model` column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart LR
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "foreign_procedure_template"}
-    /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v1 column-of-interest
-    /// v2@{shape: rounded, label: "weighed_container_model"}
-    /// class v2 directly-involved-column
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// ```
-    fn procedure_template_weighed_container_model(
-        mut self,
-        procedure_template_weighed_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_weighed_container_model =
-            Some(procedure_template_weighed_container_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.weighed_with_model` column.
     ///
     /// # Implementation notes
     /// This method also set the values of other columns, due to
@@ -515,6 +487,150 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "weighed_container_model"}
+    /// class v2 column-of-interest
+    /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
+    /// v5 ---o|"`associated with`"| v4
+    /// ```
+    fn weighed_container_model(
+        mut self,
+        weighed_container_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_weighed_container_model,
+        ) = self.procedure_template_weighed_container_model
+        {
+            self.procedure_template_weighed_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_weighed_container_model,
+                    weighed_container_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateWeighedContainerModel(
+                            attribute,
+                        )
+                    })
+                })?
+                .into();
+        }
+        self.weighed_container_model = Some(weighed_container_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.weighing_procedure_templates.
+    /// procedure_template_weighed_container_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "weighed_container_model"}
+    /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v5 ---o|"`associated with`"| v4
+    /// ```
+    fn procedure_template_weighed_container_model<PTWCM>(
+        mut self,
+        procedure_template_weighed_container_model: PTWCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWCM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_weighed_container_model =
+            procedure_template_weighed_container_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_weighed_container_model
+        {
+            procedure_template_weighed_container_model = if let (
+                Some(weighed_container_model),
+                Some(asset_model),
+            ) =
+                (self.weighed_container_model, builder.asset_model)
+            {
+                if weighed_container_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::WeighedContainerModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.weighed_container_model = Some(asset_model);
+                builder.into()
+            } else if let Some(weighed_container_model) = self.weighed_container_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        weighed_container_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateWeighedContainerModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_template_weighed_container_model =
+            procedure_template_weighed_container_model;
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.weighing_procedure_templates.weighed_with_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_with_model"}
@@ -522,6 +638,7 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
@@ -529,15 +646,21 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
         mut self,
         weighed_with_model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                self.procedure_template_weighed_with_model,
-                weighed_with_model,
-            )
-            .map_err(|e| {
-                e.into_field_name(|attribute| {
-                    Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
-                })
-            })?;
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_weighed_with_model,
+        ) = self.procedure_template_weighed_with_model
+        {
+            self.procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_weighed_with_model,
+                    weighed_with_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
+                    })
+                })?
+                .into();
+        }
         self.weighed_with_model = Some(weighed_with_model);
         Ok(self)
     }
@@ -557,10 +680,10 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
@@ -570,35 +693,60 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn procedure_template_weighed_with_model(
+    fn procedure_template_weighed_with_model<PTWWM>(
         mut self,
-        mut procedure_template_weighed_with_model: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let (Some(local), Some(foreign)) =
-            (self.weighed_with_model, procedure_template_weighed_with_model.asset_model)
+        procedure_template_weighed_with_model: PTWWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWWM: Into<
+            web_common_traits::database::IdOrBuilder<
+                i32,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+            >,
+        >,
+    {
+        let mut procedure_template_weighed_with_model =
+            procedure_template_weighed_with_model.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_template_weighed_with_model
         {
-            if local != foreign {
-                return Err(web_common_traits::database::InsertError::BuilderError(
-                    web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                        Self::Attributes::WeighedWithModel,
-                    ),
-                ));
-            }
-        } else if let Some(asset_model) = procedure_template_weighed_with_model.asset_model {
-            self.weighed_with_model = Some(asset_model);
-        } else if let Some(local) = self.weighed_with_model {
-            procedure_template_weighed_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_weighed_with_model,
-                    local,
-                )
-                .map_err(|e| {
-                    e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
-                    })
-                })?;
+            procedure_template_weighed_with_model = if let (
+                Some(weighed_with_model),
+                Some(asset_model),
+            ) =
+                (self.weighed_with_model, builder.asset_model)
+            {
+                if weighed_with_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::WeighedWithModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.weighed_with_model = Some(asset_model);
+                builder.into()
+            } else if let Some(weighed_with_model) = self.weighed_with_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                        builder,
+                        weighed_with_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTemplateWeighedWithModel(
+                                attribute,
+                            )
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
         }
         self.procedure_template_weighed_with_model = procedure_template_weighed_with_model;
         Ok(self)
@@ -606,11 +754,11 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
 for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
     fn name<N>(
@@ -812,7 +960,7 @@ where
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
         Error = web_common_traits::database::InsertError<
-            InsertableWeighingProcedureTemplateAttribute,
+            WeighingProcedureTemplateAttribute,
         >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -823,11 +971,10 @@ where
         C,
     >,
 {
-    type Attributes = InsertableWeighingProcedureTemplateAttribute;
+    type Attributes = WeighingProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete() && self.weighed_container_model.is_some()
-            && self.foreign_procedure_template.is_some()
-            && self.procedure_template_weighed_container_model.is_some()
+            && self.procedure_template_weighed_container_model.is_complete()
             && self.weighed_with_model.is_some()
             && self.procedure_template_weighed_with_model.is_complete()
     }

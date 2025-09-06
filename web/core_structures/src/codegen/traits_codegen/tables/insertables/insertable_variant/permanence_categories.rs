@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategory;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

@@ -1,59 +1,69 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDisposalProcedureExtensionAttribute {
-    Procedure(crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute),
+pub enum DisposalProcedureExtensionAttribute {
+    Procedure(crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute),
 }
-impl core::fmt::Display for InsertableDisposalProcedureExtensionAttribute {
+impl core::fmt::Display for DisposalProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Procedure(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute>
-    for InsertableDisposalProcedureExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute>
+    for DisposalProcedureExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
     ) -> Self {
         Self::Procedure(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableDisposalProcedureAttribute {
-    Extension(InsertableDisposalProcedureExtensionAttribute),
+pub enum DisposalProcedureAttribute {
+    Extension(DisposalProcedureExtensionAttribute),
     Procedure,
     ProcedureTemplate,
-    ForeignProcedureTemplate,
-    ForeignProcedure,
     DisposedAsset,
+    ProcedureTemplateDisposedAssetModel,
+    ProcedureDisposedAsset(
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+    ),
 }
-impl core::str::FromStr for InsertableDisposalProcedureAttribute {
+impl core::str::FromStr for DisposalProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
-            "ForeignProcedureTemplate" => Ok(Self::ForeignProcedureTemplate),
-            "ForeignProcedure" => Ok(Self::ForeignProcedure),
             "DisposedAsset" => Ok(Self::DisposedAsset),
+            "ProcedureTemplateDisposedAssetModel" => Ok(Self::ProcedureTemplateDisposedAssetModel),
+            "ProcedureDisposedAsset" => Ok(Self::ProcedureDisposedAsset(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             "procedure_template" => Ok(Self::ProcedureTemplate),
-            "foreign_procedure_template" => Ok(Self::ForeignProcedureTemplate),
-            "foreign_procedure" => Ok(Self::ForeignProcedure),
             "disposed_asset" => Ok(Self::DisposedAsset),
+            "procedure_template_disposed_asset_model" => {
+                Ok(Self::ProcedureTemplateDisposedAssetModel)
+            }
+            "procedure_disposed_asset" => Ok(Self::ProcedureDisposedAsset(
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
+            )),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
 }
-impl core::fmt::Display for InsertableDisposalProcedureAttribute {
+impl core::fmt::Display for DisposalProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Procedure => write!(f, "procedure"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::ForeignProcedureTemplate => write!(f, "foreign_procedure_template"),
-            Self::ForeignProcedure => write!(f, "foreign_procedure"),
             Self::DisposedAsset => write!(f, "disposed_asset"),
+            Self::ProcedureTemplateDisposedAssetModel => {
+                write!(f, "procedure_template_disposed_asset_model")
+            }
+            Self::ProcedureDisposedAsset(e) => write!(f, "{e}"),
         }
     }
 }
@@ -68,9 +78,9 @@ impl core::fmt::Display for InsertableDisposalProcedureAttribute {
 pub struct InsertableDisposalProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
-    pub(crate) foreign_procedure_template: i32,
-    pub(crate) foreign_procedure: ::rosetta_uuid::Uuid,
-    pub(crate) disposed_asset: ::rosetta_uuid::Uuid,
+    pub(crate) disposed_asset: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_template_disposed_asset_model: i32,
+    pub(crate) procedure_disposed_asset: ::rosetta_uuid::Uuid,
 }
 impl InsertableDisposalProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
@@ -137,75 +147,11 @@ impl InsertableDisposalProcedure {
             conn,
         )
     }
-    pub fn foreign_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.foreign_procedure_template,
-            ),
-            conn,
-        )
-    }
-    pub fn foreign_procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.foreign_procedure,
-            ),
-            conn,
-        )
-    }
     pub fn disposed_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
@@ -225,16 +171,132 @@ impl InsertableDisposalProcedure {
         >,
     {
         use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(disposed_asset) = self.disposed_asset else {
+            return Ok(None);
+        };
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
-                self.disposed_asset,
+                disposed_asset,
+            ),
+            conn,
+        )
+        .map(Some)
+    }
+    pub fn procedure_template_disposed_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                self.procedure_template_disposed_asset_model,
+            ),
+            conn,
+        )
+    }
+    pub fn procedure_disposed_asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_disposed_asset,
             ),
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn disposal_procedures_foreign_procedure_disposed_asset_fkey(
+    pub fn disposal_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_template_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template_disposed_asset_model
+                            .eq(&self.procedure_template_disposed_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_disposed_asset_procedure_tem_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -246,16 +308,44 @@ impl InsertableDisposalProcedure {
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure
-                    .eq(&self.foreign_procedure)
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_disposed_asset)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.disposed_asset),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_disposed_asset_model),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn disposal_procedures_procedure_disposed_asset_disposed_asse_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(disposed_asset) = self.disposed_asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_disposed_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(disposed_asset),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .map(Some)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -264,10 +354,23 @@ pub struct InsertableDisposalProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
 > {
     pub(crate) procedure_template: Option<i32>,
-    pub(crate) foreign_procedure_template: Option<i32>,
-    pub(crate) foreign_procedure: Option<::rosetta_uuid::Uuid>,
     pub(crate) disposed_asset: Option<::rosetta_uuid::Uuid>,
+    pub(crate) procedure_template_disposed_asset_model: Option<i32>,
+    pub(crate) procedure_disposed_asset: web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+    >,
     pub(crate) procedure: Procedure,
+}
+impl From<InsertableDisposalProcedureBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableDisposalProcedureBuilder,
+    >
+{
+    fn from(builder: InsertableDisposalProcedureBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `DisposalProcedure`
 /// or descendant tables.
@@ -297,53 +400,6 @@ pub trait DisposalProcedureSettable: Sized {
         self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `public.disposal_procedures.foreign_procedure_template` column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure_template`: The value to set for the
-    ///   `public.disposal_procedures.foreign_procedure_template` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure_template(
-        self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `public.disposal_procedures.foreign_procedure`
-    /// column.
-    ///
-    /// # Arguments
-    /// * `foreign_procedure`: The value to set for the
-    ///   `public.disposal_procedures.foreign_procedure` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `::rosetta_uuid::Uuid`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn foreign_procedure(
-        self,
-        foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the `public.disposal_procedures.disposed_asset`
     /// column.
     ///
@@ -366,41 +422,107 @@ pub trait DisposalProcedureSettable: Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn disposed_asset(
         self,
-        disposed_asset: ::rosetta_uuid::Uuid,
+        disposed_asset: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `public.disposal_procedures.procedure_template_disposed_asset_model`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `procedure_template_disposed_asset_model`: The value to set for the
+    ///   `public.disposal_procedures.procedure_template_disposed_asset_model`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_template_disposed_asset_model(
+        self,
+        procedure_template_disposed_asset_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the
+    /// `public.disposal_procedures.procedure_disposed_asset` column.
+    ///
+    /// # Arguments
+    /// * `procedure_disposed_asset`: The value to set for the
+    ///   `public.disposal_procedures.procedure_disposed_asset` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn procedure_disposed_asset<PDA>(
+        self,
+        procedure_disposed_asset: PDA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PDA: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >;
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
-> DisposalProcedureSettable for InsertableDisposalProcedureBuilder<Procedure> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute;
-    ///Sets the value of the `public.disposal_procedures.procedure_template` column.
+> DisposalProcedureSettable for InsertableDisposalProcedureBuilder<Procedure>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute;
+    /// Sets the value of the `public.disposal_procedures.procedure_template`
+    /// column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v3 ["`disposal_procedures`"]
-    ///    v0@{shape: rounded, label: "foreign_procedure_template"}
-    ///class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    ///class v1 column-of-interest
-    ///end
-    ///subgraph v4 ["`procedures`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`disposal_procedures`"]
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// subgraph v6 ["`procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template"}
-    ///class v2 directly-involved-column
-    ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`foreign defines`"| v0
-    ///v3 --->|"`extends`"| v4
-    ///```
+    /// class v2 directly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v3
+    /// v4 --->|"`extends`"| v6
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
     fn procedure_template(
         mut self,
         procedure_template: i32,
@@ -414,89 +536,257 @@ impl<
                     attribute.into(),
                 ))
             })?;
-        if let Some(foreign_procedure_template) = self.foreign_procedure_template {
-            pgrx_validation::must_be_distinct_i32(
-                    procedure_template,
-                    foreign_procedure_template,
-                )
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ForeignProcedureTemplate,
-                        )
-                })?;
-        }
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    ///Sets the value of the `public.disposal_procedures.foreign_procedure_template` column.
-    fn foreign_procedure_template(
-        mut self,
-        foreign_procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(procedure_template) = self.procedure_template {
-            pgrx_validation::must_be_distinct_i32(
-                    procedure_template,
-                    foreign_procedure_template,
-                )
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute::ForeignProcedureTemplate,
-                        )
-                })?;
-        }
-        self.foreign_procedure_template = Some(foreign_procedure_template);
-        Ok(self)
-    }
-    ///Sets the value of the `public.disposal_procedures.foreign_procedure` column.
+    /// Sets the value of the `public.disposal_procedures.disposed_asset`
+    /// column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///v0@{shape: rounded, label: "foreign_procedure"}
-    ///class v0 column-of-interest
-    ///v1@{shape: rounded, label: "foreign_procedure_template"}
-    ///class v1 directly-involved-column
-    ///v0 -.->|"`foreign defines`"| v1
-    ///```
-    fn foreign_procedure(
-        mut self,
-        foreign_procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.foreign_procedure = Some(foreign_procedure);
-        Ok(self)
-    }
-    ///Sets the value of the `public.disposal_procedures.disposed_asset` column.
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`disposal_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "disposed_asset"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
     fn disposed_asset(
         mut self,
-        disposed_asset: ::rosetta_uuid::Uuid,
+        disposed_asset: Option<::rosetta_uuid::Uuid>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.disposed_asset = Some(disposed_asset);
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_disposed_asset) =
+            self.procedure_disposed_asset
+        {
+            self.procedure_disposed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                    procedure_disposed_asset,
+                    disposed_asset,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureDisposedAsset(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.disposed_asset = disposed_asset;
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.disposal_procedures.procedure_template_disposed_asset_model`
+    /// column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v4 ["`disposal_procedures`"]
+    ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v5 ["`procedure_assets`"]
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
+    /// ```
+    fn procedure_template_disposed_asset_model(
+        mut self,
+        procedure_template_disposed_asset_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        if let web_common_traits::database::IdOrBuilder::Builder(procedure_disposed_asset) =
+            self.procedure_disposed_asset
+        {
+            self.procedure_disposed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                    procedure_disposed_asset,
+                    procedure_template_disposed_asset_model,
+                )
+                .map_err(|e| {
+                    e.into_field_name(|attribute| {
+                        Self::Attributes::ProcedureDisposedAsset(attribute)
+                    })
+                })?
+                .into();
+        }
+        self.procedure_template_disposed_asset_model =
+            Some(procedure_template_disposed_asset_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.disposal_procedures.procedure_disposed_asset` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v6 ["`disposal_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "disposed_asset"}
+    /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v2 directly-involved-column
+    /// end
+    /// subgraph v7 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
+    /// end
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 --->|"`associated same as`"| v5
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v4
+    /// v6 ---o|"`associated with`"| v7
+    /// ```
+    fn procedure_disposed_asset<PDA>(
+        mut self,
+        procedure_disposed_asset: PDA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PDA: Into<
+            web_common_traits::database::IdOrBuilder<
+                ::rosetta_uuid::Uuid,
+                crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+            >,
+        >,
+    {
+        let mut procedure_disposed_asset = procedure_disposed_asset.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset
+        {
+            procedure_disposed_asset = if let (
+                Some(procedure_template_disposed_asset_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_disposed_asset_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_disposed_asset_model != procedure_template_asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::ProcedureTemplateDisposedAssetModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_disposed_asset_model = Some(procedure_template_asset_model);
+                builder.into()
+            } else if let Some(procedure_template_disposed_asset_model) =
+                self.procedure_template_disposed_asset_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+                        builder,
+                        procedure_template_disposed_asset_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureDisposedAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset
+        {
+            procedure_disposed_asset = if let (Some(disposed_asset), Some(asset)) =
+                (self.disposed_asset, builder.asset)
+            {
+                if disposed_asset != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::DisposedAsset,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.disposed_asset = Some(asset);
+                builder.into()
+            } else if let Some(disposed_asset) = self.disposed_asset {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(disposed_asset),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureDisposedAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        self.procedure_disposed_asset = procedure_disposed_asset;
         Ok(self)
     }
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableDisposalProcedureBuilder<Procedure>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
     fn procedure(
@@ -506,42 +796,6 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
-        mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
-                self.procedure,
-                parent_procedure,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
-        mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
-                self.procedure,
-                parent_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -580,6 +834,42 @@ where
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         <Self as DisposalProcedureSettable>::procedure_template(self, procedure_template)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure` column.
+    fn parent_procedure(
+        mut self,
+        parent_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                self.procedure,
+                parent_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.parent_procedure_template` column.
+    fn parent_procedure_template(
+        mut self,
+        parent_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self.procedure,
+                parent_procedure_template,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
@@ -693,17 +983,18 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
-            Error = web_common_traits::database::InsertError<InsertableDisposalProcedureAttribute>,
+            Error = web_common_traits::database::InsertError<DisposalProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        web_common_traits::database::TryInsertGeneric<C>,
 {
-    type Attributes = InsertableDisposalProcedureAttribute;
+    type Attributes = DisposalProcedureAttribute;
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()
-            && self.foreign_procedure_template.is_some()
-            && self.foreign_procedure.is_some()
-            && self.disposed_asset.is_some()
+            && self.procedure_template_disposed_asset_model.is_some()
+            && self.procedure_disposed_asset.is_complete()
     }
     fn mint_primary_key(
         self,

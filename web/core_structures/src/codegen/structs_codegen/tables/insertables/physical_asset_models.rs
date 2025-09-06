@@ -1,32 +1,32 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePhysicalAssetModelExtensionAttribute {
-    AssetModel(crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute),
+pub enum PhysicalAssetModelExtensionAttribute {
+    AssetModel(crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute),
 }
-impl core::fmt::Display for InsertablePhysicalAssetModelExtensionAttribute {
+impl core::fmt::Display for PhysicalAssetModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::AssetModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute>
-    for InsertablePhysicalAssetModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
+    for PhysicalAssetModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
     ) -> Self {
         Self::AssetModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePhysicalAssetModelAttribute {
-    Extension(InsertablePhysicalAssetModelExtensionAttribute),
+pub enum PhysicalAssetModelAttribute {
+    Extension(PhysicalAssetModelExtensionAttribute),
     Id,
     ParentModel,
 }
-impl core::str::FromStr for InsertablePhysicalAssetModelAttribute {
+impl core::str::FromStr for PhysicalAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -36,7 +36,7 @@ impl core::str::FromStr for InsertablePhysicalAssetModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertablePhysicalAssetModelAttribute {
+impl core::fmt::Display for PhysicalAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -90,6 +90,34 @@ impl InsertablePhysicalAssetModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn physical_asset_models_id_parent_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(parent_model) = self.parent_model else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(parent_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+            .map(Some)
+    }
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -137,6 +165,13 @@ pub struct InsertablePhysicalAssetModelBuilder<
     pub(crate) parent_model: Option<i32>,
     pub(crate) id: AssetModel,
 }
+impl From<InsertablePhysicalAssetModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertablePhysicalAssetModelBuilder>
+{
+    fn from(builder: InsertablePhysicalAssetModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
 /// Trait defining setters for attributes of an instance of `PhysicalAssetModel`
 /// or descendant tables.
 pub trait PhysicalAssetModelSettable: Sized {
@@ -168,33 +203,36 @@ pub trait PhysicalAssetModelSettable: Sized {
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
         >,
-> PhysicalAssetModelSettable for InsertablePhysicalAssetModelBuilder<AssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute;
-    ///Sets the value of the `public.physical_asset_models.parent_model` column.
+> PhysicalAssetModelSettable for InsertablePhysicalAssetModelBuilder<AssetModel>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute;
+    /// Sets the value of the `public.physical_asset_models.parent_model`
+    /// column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`asset_models`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`asset_models`"]
     ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 directly-involved-column
-    ///end
-    ///subgraph v3 ["`physical_asset_models`"]
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v3 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    ///class v1 column-of-interest
-    ///end
-    ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
-    ///```
+    /// class v1 column-of-interest
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
@@ -214,16 +252,16 @@ impl<
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertablePhysicalAssetModelBuilder<AssetModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -410,13 +448,11 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        Error = web_common_traits::database::InsertError<
-            InsertablePhysicalAssetModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
     >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertablePhysicalAssetModelAttribute;
+    type Attributes = PhysicalAssetModelAttribute;
     fn is_complete(&self) -> bool {
         self.id.is_complete()
     }

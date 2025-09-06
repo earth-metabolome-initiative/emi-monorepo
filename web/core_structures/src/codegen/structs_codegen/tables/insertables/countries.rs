@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCountryAttribute {
+pub enum CountryAttribute {
     Iso,
     Name,
 }
-impl core::str::FromStr for InsertableCountryAttribute {
+impl core::str::FromStr for CountryAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,7 +16,7 @@ impl core::str::FromStr for InsertableCountryAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCountryAttribute {
+impl core::fmt::Display for CountryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Iso => write!(f, "iso"),
@@ -40,6 +40,13 @@ impl InsertableCountry {}
 pub struct InsertableCountryBuilder {
     pub(crate) iso: Option<::iso_codes::CountryCode>,
     pub(crate) name: Option<String>,
+}
+impl From<InsertableCountryBuilder>
+    for web_common_traits::database::IdOrBuilder<::iso_codes::CountryCode, InsertableCountryBuilder>
+{
+    fn from(builder: InsertableCountryBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of `Country` or
 /// descendant tables.
@@ -95,16 +102,14 @@ pub trait CountrySettable: Sized {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
 }
 impl CountrySettable for InsertableCountryBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::InsertableCountryAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CountryAttribute;
     /// Sets the value of the `public.countries.iso` column.
     fn iso(
         mut self,
         iso: ::iso_codes::CountryCode,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         let iso = iso.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCountryAttribute::Iso)
+            validation_errors::SingleFieldError::from(err).rename_field(CountryAttribute::Iso)
         })?;
         self.iso = Some(iso);
         Ok(self)
@@ -119,8 +124,7 @@ impl CountrySettable for InsertableCountryBuilder {
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(InsertableCountryAttribute::Name)
+            validation_errors::SingleFieldError::from(err).rename_field(CountryAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -138,10 +142,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::countries::Country,
-            Error = web_common_traits::database::InsertError<InsertableCountryAttribute>,
+            Error = web_common_traits::database::InsertError<CountryAttribute>,
         >,
 {
-    type Attributes = InsertableCountryAttribute;
+    type Attributes = CountryAttribute;
     fn is_complete(&self) -> bool {
         self.iso.is_some() && self.name.is_some()
     }

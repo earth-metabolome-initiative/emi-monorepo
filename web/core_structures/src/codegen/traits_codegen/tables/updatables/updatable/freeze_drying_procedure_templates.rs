@@ -44,13 +44,13 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
         if !self
             .procedure_template_freeze_dried_with_model(conn)?
             .can_update(user_id, conn)?
         {
+            return Ok(false);
+        }
+        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

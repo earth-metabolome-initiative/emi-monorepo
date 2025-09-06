@@ -41,7 +41,7 @@ impl CustomTableConstraint for UnusedForeignProcedureTemplateConstraint {
 
                 return Err(Error::UnusedForeignProcedureTemplateConstraint {
                     table: Box::new(table.clone()),
-                    columns,
+                    columns: columns.as_ref().clone(),
                 });
             }
         }

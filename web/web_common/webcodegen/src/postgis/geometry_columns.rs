@@ -9,7 +9,9 @@ use crate::errors::WebCodeGenError;
 /// The `geometry_columns` table provides metadata about all geometry columns
 /// stored in the database, including their spatial reference system (SRID)
 /// and geometry type.
-#[derive(Queryable, QueryableByName, Selectable, Debug, Clone)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, Clone, serde::Serialize, serde::Deserialize,
+)]
 #[diesel(table_name = crate::schema::geometry_columns)]
 pub struct GeometryColumn {
     /// Database/catalog name (often the database name).

@@ -1,12 +1,12 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialBeadModelExtensionAttribute {
-    BeadModel(crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute),
+pub enum CommercialBeadModelExtensionAttribute {
+    BeadModel(crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute),
     CommercialProduct(
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ),
 }
-impl core::fmt::Display for InsertableCommercialBeadModelExtensionAttribute {
+impl core::fmt::Display for CommercialBeadModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::BeadModel(e) => write!(f, "{e}"),
@@ -14,33 +14,32 @@ impl core::fmt::Display for InsertableCommercialBeadModelExtensionAttribute {
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute>
-    for InsertableCommercialBeadModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute>
+    for CommercialBeadModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
     ) -> Self {
         Self::BeadModel(attribute)
     }
 }
-impl
-    From<crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute>
-    for InsertableCommercialBeadModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute>
+    for CommercialBeadModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
     ) -> Self {
         Self::CommercialProduct(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCommercialBeadModelAttribute {
-    Extension(InsertableCommercialBeadModelExtensionAttribute),
+pub enum CommercialBeadModelAttribute {
+    Extension(CommercialBeadModelExtensionAttribute),
     Id,
     BeadModel,
 }
-impl core::str::FromStr for InsertableCommercialBeadModelAttribute {
+impl core::str::FromStr for CommercialBeadModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -50,7 +49,7 @@ impl core::str::FromStr for InsertableCommercialBeadModelAttribute {
         }
     }
 }
-impl core::fmt::Display for InsertableCommercialBeadModelAttribute {
+impl core::fmt::Display for CommercialBeadModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
@@ -168,6 +167,30 @@ impl InsertableCommercialBeadModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_bead_models_id_bead_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.bead_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
 }
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -186,6 +209,13 @@ pub struct InsertableCommercialBeadModelBuilder<
     pub(crate) bead_model: Option<i32>,
     pub(crate) commercial_bead_models_id_fkey: BeadModel,
     pub(crate) commercial_bead_models_id_fkey1: CommercialProduct,
+}
+impl From<InsertableCommercialBeadModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialBeadModelBuilder>
+{
+    fn from(builder: InsertableCommercialBeadModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 /// Trait defining setters for attributes of an instance of
 /// `CommercialBeadModel` or descendant tables.
@@ -217,44 +247,46 @@ pub trait CommercialBeadModelSettable: Sized {
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
         >,
     CommercialProduct,
 > CommercialBeadModelSettable
-for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute;
-    ///Sets the value of the `public.commercial_bead_models.bead_model` column.
+    for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
+    /// Sets the value of the `public.commercial_bead_models.bead_model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart LR
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`asset_models`"]
+    /// ```mermaid
+    /// flowchart LR
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`asset_models`"]
     ///    v2@{shape: rounded, label: "parent_model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`commercial_bead_models`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`commercial_bead_models`"]
     ///    v0@{shape: rounded, label: "bead_model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`physical_asset_models`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v4 -.->|"`descendant of`"| v3
-    ///v4 -.->|"`descendant of`"| v5
-    ///v5 --->|"`extends`"| v3
-    ///```
+    /// class v1 directly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v5 --->|"`extends`"| v3
+    /// v4 -.->|"`descendant of`"| v3
+    /// v4 -.->|"`descendant of`"| v5
+    /// ```
     fn bead_model(
         mut self,
         bead_model: i32,
@@ -274,17 +306,17 @@ for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -449,14 +481,16 @@ where
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::BeadModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::BeadModelSettable
-for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute;
+    for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+{
+    type Attributes =
+        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
     #[inline]
-    ///Sets the value of the `public.bead_models.diameter_millimeters` column.
+    /// Sets the value of the `public.bead_models.diameter_millimeters` column.
     fn diameter_millimeters<DM>(
         mut self,
         diameter_millimeters: DM,
@@ -481,11 +515,11 @@ for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
 impl<
     BeadModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductAttribute,
+            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
     fn deprecation_date<DD>(
@@ -536,10 +570,10 @@ impl<
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -621,9 +655,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
-        Error = web_common_traits::database::InsertError<
-            InsertableCommercialBeadModelAttribute,
-        >,
+        Error = web_common_traits::database::InsertError<CommercialBeadModelAttribute>,
     >,
     BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -631,7 +663,7 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = InsertableCommercialBeadModelAttribute;
+    type Attributes = CommercialBeadModelAttribute;
     fn is_complete(&self) -> bool {
         self.commercial_bead_models_id_fkey.is_complete()
             && self.commercial_bead_models_id_fkey1.is_complete()

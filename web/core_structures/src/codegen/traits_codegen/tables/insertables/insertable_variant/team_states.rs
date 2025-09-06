@@ -19,7 +19,7 @@ where
     type Row = crate::codegen::structs_codegen::tables::team_states::TeamState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamState;
     type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute,
+        crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute,
     >;
     type UserId = i32;
     fn insert(
@@ -46,28 +46,28 @@ where
             .name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Name,
+                    crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute::Name,
                 ),
             )?;
         let description = self
             .description
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Description,
+                    crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute::Description,
                 ),
             )?;
         let icon = self
             .icon
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::Icon,
+                    crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute::Icon,
                 ),
             )?;
         let color_id = self
             .color_id
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateAttribute::ColorId,
+                    crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute::ColorId,
                 ),
             )?;
         Ok(Self::InsertableVariant {

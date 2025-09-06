@@ -32,7 +32,7 @@ impl Codegen<'_> {
         let user_id_type = user_table.primary_key_type(conn)?;
         let builder_ident = table.insertable_builder_ident()?;
         let row_path = table.import_struct_path()?;
-        let attributes_enum = table.insertable_enum_ident()?;
+        let attributes_enum = table.attributes_enum_ident()?;
         let table_extension_network = self.table_extension_network().unwrap();
         let extension_tables = table_extension_network.extension_tables(table);
         let extension_foreign_keys = table_extension_network.extension_foreign_keys(table, conn)?;
@@ -80,14 +80,16 @@ impl Codegen<'_> {
             let column_ident = column.snake_case_ident()?;
 
             completeness_statements.push(
-                if let Some(partial_builder_constraint) = column.requires_partial_builder(conn)? {
+                if let Some((partial_builder_kind, _, partial_builder_constraint)) =
+                    column.requires_partial_builder(conn)?
+                {
                     let foreign_table = partial_builder_constraint.foreign_table(conn)?;
                     if !try_insert_generic_where_constraint.contains(&foreign_table) {
                         let foreign_builder_type = foreign_table.insertable_builder_ty()?;
                         where_constraints.push(quote! {
                             #foreign_builder_type: web_common_traits::database::TryInsertGeneric<C>
                         });
-                        try_insert_generic_where_constraint.insert(foreign_table);
+                        try_insert_generic_where_constraint.insert(foreign_table.as_ref().clone());
                     }
                     quote! {
                         self.#column_ident.is_complete()

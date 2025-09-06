@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS commercial_products (
-	id INTEGER PRIMARY KEY REFERENCES physical_asset_models(id),
+	id INTEGER PRIMARY KEY REFERENCES asset_models(id),
 	deprecation_date TIMESTAMP WITH TIME ZONE,
 	brand_id INTEGER NOT NULL REFERENCES brands(id)
 );

@@ -23,6 +23,7 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
                         procedure_template_packaged_with_model
                             .ne(excluded(procedure_template_packaged_with_model)),
                     )
+                    .or(sample_model.ne(excluded(sample_model)))
                     .or(
                         procedure_template_sample_model
                             .ne(excluded(procedure_template_sample_model)),
@@ -57,6 +58,7 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
                         procedure_template_packaged_with_model
                             .ne(excluded(procedure_template_packaged_with_model)),
                     )
+                    .or(sample_model.ne(excluded(sample_model)))
                     .or(
                         procedure_template_sample_model
                             .ne(excluded(procedure_template_sample_model)),
