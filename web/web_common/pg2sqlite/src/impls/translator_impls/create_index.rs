@@ -7,7 +7,7 @@ use crate::prelude::{Pg2Sqlite, Translator};
 
 impl Translator for CreateIndex {
     type Schema = Pg2Sqlite;
-    type SQLiteEntry = Vec<Statement>;
+    type SQLiteEntry = Self;
 
     fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         // If the index is a GIN or GiST index, we need to translate it into a table
@@ -18,6 +18,7 @@ impl Translator for CreateIndex {
             // let _fts5_table = create_fts5_from_index(self);
         }
 
-        unimplemented!("CreateIndex translation for definition `{}` is not yet implemented.", self)
+        // CREATE UNIQUE INDEX unique_asset_compatibility_pair ON asset_compatibility_rules(LEAST(left_asset_model, right_asset_model), GREATEST(left_asset_model, right_asset_model))
+        Ok(self.clone())
     }
 }

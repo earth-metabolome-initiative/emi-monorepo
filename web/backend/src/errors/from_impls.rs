@@ -3,8 +3,7 @@
 use actix_web::HttpResponse;
 use backend_request_errors::BackendRequestError;
 use core_structures::tables::insertables::{
-    InsertableEmailProviderAttributes, InsertableTemporaryUserAttributes,
-    InsertableUserEmailAttributes,
+    EmailProviderAttribute, TemporaryUserAttribute, UserEmailAttribute,
 };
 use generic_backend_request_errors::GenericBackendRequestError;
 use tokio::sync::{mpsc::error::SendError, oneshot::error::RecvError};
@@ -155,20 +154,20 @@ impl From<RecvError> for BackendError {
     }
 }
 
-impl From<InsertError<InsertableUserEmailAttributes>> for BackendError {
-    fn from(error: InsertError<InsertableUserEmailAttributes>) -> Self {
+impl From<InsertError<UserEmailAttribute>> for BackendError {
+    fn from(error: InsertError<UserEmailAttribute>) -> Self {
         BackendError::UserEmailInsert(error)
     }
 }
 
-impl From<InsertError<InsertableEmailProviderAttributes>> for BackendError {
-    fn from(error: InsertError<InsertableEmailProviderAttributes>) -> Self {
+impl From<InsertError<EmailProviderAttribute>> for BackendError {
+    fn from(error: InsertError<EmailProviderAttribute>) -> Self {
         BackendError::EmailProviderInsert(error)
     }
 }
 
-impl From<InsertError<InsertableTemporaryUserAttributes>> for BackendError {
-    fn from(error: InsertError<InsertableTemporaryUserAttributes>) -> Self {
+impl From<InsertError<TemporaryUserAttribute>> for BackendError {
+    fn from(error: InsertError<TemporaryUserAttribute>) -> Self {
         BackendError::TemporaryUserInsert(error)
     }
 }

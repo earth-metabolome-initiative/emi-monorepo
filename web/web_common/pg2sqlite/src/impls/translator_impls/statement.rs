@@ -14,7 +14,9 @@ impl Translator for Statement {
             Self::CreateTable(create_table) => {
                 vec![Self::CreateTable(create_table.translate(schema)?)]
             }
-            Self::CreateIndex(create_index) => create_index.translate(schema)?,
+            Self::CreateIndex(create_index) => {
+                vec![Statement::CreateIndex(create_index.translate(schema)?)]
+            }
             unsupported_statement => {
                 unimplemented!(
                     "Unsupported PostgreSQL statement: `{}` - Parsed as: {unsupported_statement:?}",

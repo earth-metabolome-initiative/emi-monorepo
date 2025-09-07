@@ -33,9 +33,10 @@ impl GitHubConfig {
     /// * If the environment variables are not set, an error is returned.
     /// * If the `LoginProvider` cannot be retrieved, an error is returned.
     fn from_env(connection: &mut crate::Conn) -> Result<GitHubConfig, BackendError> {
-        let provider = LoginProvider::from_name("GitHub", connection)?
-            .ok_or_else(|| BackendError::UnknownLoginProvider("GitHub".to_string()))?;
-        Ok(GitHubConfig { client_secret: env::var("GITHUB_CLIENT_SECRET")?, provider })
+        Ok(GitHubConfig {
+            client_secret: env::var("GITHUB_CLIENT_SECRET")?,
+            provider: LoginProvider::from_name("GitHub", connection)?,
+        })
     }
 }
 
