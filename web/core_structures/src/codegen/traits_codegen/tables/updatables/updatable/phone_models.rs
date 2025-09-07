@@ -1,39 +1,36 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::codegen::structs_codegen::tables::phone_models::PhoneModel
+for crate::PhoneModel
 where
-    crate::codegen::structs_codegen::tables::camera_models::CameraModel: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
+    crate::CameraModel: diesel::Identifiable,
+    <crate::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::CameraModel as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
+    <<crate::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::CameraModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
+    <<<crate::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::CameraModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+        crate::CameraModel,
     >,
-    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
+    crate::CameraModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::PositioningDeviceModel: diesel::Identifiable,
+    <crate::PositioningDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
     >,
-    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
+    <<crate::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
+    <<<crate::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        crate::PositioningDeviceModel,
     >,
-    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Updatable<
+    crate::PositioningDeviceModel: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,

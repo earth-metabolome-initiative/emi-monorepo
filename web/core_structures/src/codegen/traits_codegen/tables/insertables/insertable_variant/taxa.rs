@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table,
+        <crate::Taxon as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTaxon as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table,
+            <crate::Taxon as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::taxa::Taxon,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Taxon>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::taxa::Taxon;
+    type Row = crate::Taxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTaxon;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TaxonAttribute,

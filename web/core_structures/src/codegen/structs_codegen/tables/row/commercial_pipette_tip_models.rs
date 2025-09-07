@@ -1,14 +1,9 @@
-impl From<
-    crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-> for super::Row {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-    ) -> Self {
+impl From<crate::CommercialPipetteTipModel> for super::Row {
+    fn from(value: crate::CommercialPipetteTipModel) -> Self {
         super::Row::CommercialPipetteTipModel(value)
     }
 }
-impl TryFrom<super::Row>
-for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel {
+impl TryFrom<super::Row> for crate::CommercialPipetteTipModel {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

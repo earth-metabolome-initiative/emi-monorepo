@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate {
+    for crate::DisposalProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -19,18 +20,17 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
             .filter(
                 disposed_asset_model
                     .ne(excluded(disposed_asset_model))
-                    .or(
-                        procedure_template_disposed_asset_model
-                            .ne(excluded(procedure_template_disposed_asset_model)),
-                    ),
+                    .or(procedure_template_disposed_asset_model
+                        .ne(excluded(procedure_template_disposed_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate {
+    for crate::DisposalProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -49,12 +49,10 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
             .filter(
                 disposed_asset_model
                     .ne(excluded(disposed_asset_model))
-                    .or(
-                        procedure_template_disposed_asset_model
-                            .ne(excluded(procedure_template_disposed_asset_model)),
-                    ),
+                    .or(procedure_template_disposed_asset_model
+                        .ne(excluded(procedure_template_disposed_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

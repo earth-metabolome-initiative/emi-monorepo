@@ -5,33 +5,29 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAn
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table,
+        <crate::AssetModelAncestor as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestor as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor as diesel::associations::HasTable>::Table,
+            <crate::AssetModelAncestor as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::AssetModelAncestor>,
     C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable
+    crate::AssetModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
+    <crate::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::AssetModel as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
+    <<crate::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::AssetModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
+    <<<crate::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::AssetModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        crate::AssetModel,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor;
+    type Row = crate::AssetModelAncestor;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestor;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute,

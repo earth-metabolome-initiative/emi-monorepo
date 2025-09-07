@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::cameras::Camera
-{
+impl web_common_traits::database::Insertable for crate::Camera {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableCameraBuilder;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCamera;

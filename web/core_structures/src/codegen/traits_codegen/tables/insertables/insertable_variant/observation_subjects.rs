@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableObservationS
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject as diesel::associations::HasTable>::Table,
+        <crate::ObservationSubject as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubject as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject as diesel::associations::HasTable>::Table,
+            <crate::ObservationSubject as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::ObservationSubject>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject;
+    type Row = crate::ObservationSubject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubject;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ObservationSubjectAttribute,

@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset
-{
+impl web_common_traits::database::Insertable for crate::PhysicalAsset {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder;
     type InsertableVariant =

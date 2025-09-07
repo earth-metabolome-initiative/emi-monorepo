@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
-{
+impl web_common_traits::database::Insertable for crate::GeolocationProcedure {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureBuilder;
     type InsertableVariant =

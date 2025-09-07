@@ -1,43 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDryingProcedureForeignKeys {
-    pub freeze_dried_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub freeze_dried_container_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
-    pub freeze_dried_with: Option<
-        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
-    >,
-    pub freeze_dried_with_model: Option<
-        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
-    >,
-    pub freeze_drying_procedures_freeze_dried_with_model_freeze_dr_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_freeze_dried_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_freeze_dried_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
-    >,
-    pub procedure_template_freeze_dried_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_freeze_dried_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
+    pub freeze_dried_container: Option<crate::VolumetricContainer>,
+    pub freeze_dried_container_model: Option<crate::VolumetricContainerModel>,
+    pub freeze_dried_with: Option<crate::FreezeDryer>,
+    pub freeze_dried_with_model: Option<crate::FreezeDryerModel>,
+    pub freeze_drying_procedures_freeze_dried_with_model_freeze_dr_fkey:
+        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_freeze_dried_container: Option<crate::ProcedureAsset>,
+    pub procedure_freeze_dried_with: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::FreezeDryingProcedureTemplate>,
+    pub procedure_template_freeze_dried_container_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_freeze_dried_with_model: Option<crate::ProcedureTemplateAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::FreezeDryingProcedure {
     type ForeignKeys = FreezeDryingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

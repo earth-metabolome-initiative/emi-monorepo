@@ -5,19 +5,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTem
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::ProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::ProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::ProcedureTemplate>,
     C: diesel::connection::LoadConnection,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate;
+    type Row = crate::ProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,

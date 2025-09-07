@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::countries::Country,
-        foreign_key = iso
-    )
-)]
+#[diesel(belongs_to(crate::Country, foreign_key = iso))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cities::cities)]
 pub struct City {
@@ -25,12 +20,8 @@ pub struct City {
 impl web_common_traits::prelude::TableName for City {
     const TABLE_NAME: &'static str = "cities";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::cities::City,
-    > for City
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::City> for City where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
 impl diesel::Identifiable for City {
@@ -43,34 +34,12 @@ impl City {
     pub fn iso<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::countries::Country,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::Country, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::countries::Country: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::countries::Country,
-        >,
+        crate::Country: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::countries::Country::table(),
-                self.iso,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::Country::read(self.iso, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

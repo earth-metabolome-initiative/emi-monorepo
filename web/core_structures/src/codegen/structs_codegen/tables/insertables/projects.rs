@@ -103,166 +103,55 @@ impl InsertableProject {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::colors::Color,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::Color, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::colors::Color,
-        >,
+        crate::Color: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::colors::Color::table(),
-                self.color_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::Color::read(self.color_id, conn)
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::User::read(self.created_by, conn)
     }
     pub fn parent_project<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::projects::Project>,
-        diesel::result::Error,
-    >
+    ) -> Result<Option<crate::Project>, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::projects::Project,
-        >,
+        crate::Project: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use web_common_traits::database::Read;
         let Some(parent_project_id) = self.parent_project_id else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::projects::Project::table(),
-                parent_project_id,
-            ),
-            conn,
-        )
-        .map(Some)
+        crate::Project::read(parent_project_id, conn).map(Some)
     }
     pub fn state<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::ProjectState, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::project_states::ProjectState: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::project_states::ProjectState as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        >,
+        crate::ProjectState: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::project_states::ProjectState::table(),
-                self.state_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::ProjectState::read(self.state_id, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::User::read(self.updated_by, conn)
     }
 }
 #[derive(Clone, Debug)]
@@ -980,7 +869,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::projects::Project,
+            Row = crate::Project,
             Error = web_common_traits::database::InsertError<ProjectAttribute>,
         >,
 {
@@ -1006,8 +895,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::projects::Project =
-            self.insert(user_id, conn)?;
+        let insertable: crate::Project = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

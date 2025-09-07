@@ -18,11 +18,8 @@ pub struct Rank {
 impl web_common_traits::prelude::TableName for Rank {
     const TABLE_NAME: &'static str = "ranks";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::ranks::Rank>
-    for Rank
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+impl web_common_traits::prelude::ExtensionTable<crate::Rank> for Rank where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {
 }
 impl diesel::Identifiable for Rank {

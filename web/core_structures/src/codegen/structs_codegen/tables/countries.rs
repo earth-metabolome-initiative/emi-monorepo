@@ -17,12 +17,8 @@ pub struct Country {
 impl web_common_traits::prelude::TableName for Country {
     const TABLE_NAME: &'static str = "countries";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::countries::Country,
-    > for Country
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::iso_codes::CountryCode>,
+impl web_common_traits::prelude::ExtensionTable<crate::Country> for Country where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::iso_codes::CountryCode>
 {
 }
 impl diesel::Identifiable for Country {

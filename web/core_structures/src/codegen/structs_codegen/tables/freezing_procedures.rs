@@ -9,30 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(belongs_to(crate::VolumetricContainer, foreign_key = frozen_container))]
 #[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        foreign_key = frozen_container
-    )
+    belongs_to(crate::VolumetricContainerModel, foreign_key = frozen_container_model)
 )]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        foreign_key = frozen_container_model
-    )
-)]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::freezers::Freezer,
-        foreign_key = frozen_with
-    )
-)]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-        foreign_key = frozen_with_model
-    )
-)]
+#[diesel(belongs_to(crate::Freezer, foreign_key = frozen_with))]
+#[diesel(belongs_to(crate::FreezerModel, foreign_key = frozen_with_model))]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::freezing_procedures::freezing_procedures
@@ -52,20 +34,12 @@ pub struct FreezingProcedure {
 impl web_common_traits::prelude::TableName for FreezingProcedure {
     const TABLE_NAME: &'static str = "freezing_procedures";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    > for FreezingProcedure
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for FreezingProcedure where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
-    > for FreezingProcedure
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+impl web_common_traits::prelude::ExtensionTable<crate::FreezingProcedure> for FreezingProcedure where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
 impl diesel::Identifiable for FreezingProcedure {
@@ -78,245 +52,90 @@ impl FreezingProcedure {
     pub fn frozen_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        >,
+        crate::VolumetricContainer: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::table(),
-                self.frozen_container,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::VolumetricContainer::read(self.frozen_container, conn)
     }
     pub fn frozen_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        >,
+        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::table(),
-                self.frozen_container_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::VolumetricContainerModel::read(self.frozen_container_model, conn)
     }
     pub fn frozen_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::freezers::Freezer>,
-        diesel::result::Error,
-    >
+    ) -> Result<Option<crate::Freezer>, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::freezers::Freezer: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezers::Freezer as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freezers::Freezer,
-        >,
+        crate::Freezer: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use web_common_traits::database::Read;
         let Some(frozen_with) = self.frozen_with else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freezers::Freezer::table(),
-                frozen_with,
-            ),
-            conn,
-        )
-        .map(Some)
+        crate::Freezer::read(frozen_with, conn).map(Some)
     }
     pub fn frozen_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::FreezerModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-        >,
+        crate::FreezerModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::table(),
-                self.frozen_with_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::FreezerModel::read(self.frozen_with_model, conn)
     }
     pub fn freezing_procedures_frozen_with_model_frozen_container_mod_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        >,
+        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::table(),
-                (self.frozen_with_model, self.frozen_container_model),
-            ),
+        use web_common_traits::database::Read;
+        crate::AssetCompatibilityRule::read(
+            (self.frozen_with_model, self.frozen_container_model),
             conn,
         )
     }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::Procedure, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedures::Procedure,
-        >,
+        crate::Procedure: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedures::Procedure::table(),
-                self.procedure,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::Procedure::read(self.procedure, conn)
     }
     pub fn procedure_frozen_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        >,
+        crate::ProcedureAsset: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                self.procedure_frozen_container,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::ProcedureAsset::read(self.procedure_frozen_container, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_container_frozen_con_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_container)
@@ -325,22 +144,17 @@ impl FreezingProcedure {
                             .eq(&self.frozen_container),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_container_frozen_cont_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_container)
@@ -349,22 +163,17 @@ impl FreezingProcedure {
                             .eq(&self.frozen_container_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_container_procedure_t_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_container)
@@ -373,57 +182,30 @@ impl FreezingProcedure {
                             .eq(&self.procedure_template_frozen_container_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
     }
     pub fn procedure_frozen_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        >,
+        crate::ProcedureAsset: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                self.procedure_frozen_with,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::ProcedureAsset::read(self.procedure_frozen_with, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_with_frozen_with_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
+    ) -> Result<Option<crate::ProcedureAsset>, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
         let Some(frozen_with) = self.frozen_with else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_with)
@@ -432,23 +214,18 @@ impl FreezingProcedure {
                             .eq(frozen_with),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
             .map(Some)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_with_frozen_with_mode_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_with)
@@ -457,22 +234,17 @@ impl FreezingProcedure {
                             .eq(&self.frozen_with_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_frozen_with_procedure_templa_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_frozen_with)
@@ -481,20 +253,17 @@ impl FreezingProcedure {
                             .eq(&self.procedure_template_frozen_with_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+            .first::<crate::ProcedureAsset>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
+    ) -> Result<crate::Procedure, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+        crate::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -503,120 +272,50 @@ impl FreezingProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
+            .first::<crate::Procedure>(conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::FreezingProcedureTemplate, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        >,
+        crate::FreezingProcedureTemplate: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::table(),
-                self.procedure_template,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::FreezingProcedureTemplate::read(self.procedure_template, conn)
     }
-    pub fn procedure_template_frozen_container_model<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn procedure_template_frozen_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
+        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
-                self.procedure_template_frozen_container_model,
-            ),
+        use web_common_traits::database::Read;
+        crate::ProcedureTemplateAssetModel::read(
+            self.procedure_template_frozen_container_model,
             conn,
         )
     }
     pub fn procedure_template_frozen_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
+        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
-                self.procedure_template_frozen_with_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::ProcedureTemplateAssetModel::read(self.procedure_template_frozen_with_model, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_template_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        diesel::result::Error,
-    >{
+    ) -> Result<crate::FreezingProcedureTemplate, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::table()
+        crate::FreezingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -625,22 +324,17 @@ impl FreezingProcedure {
                             .eq(&self.procedure_template_frozen_with_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-            >(conn)
+            .first::<crate::FreezingProcedureTemplate>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_template_procedure_template_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        diesel::result::Error,
-    >{
+    ) -> Result<crate::FreezingProcedureTemplate, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::table()
+        crate::FreezingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -649,9 +343,7 @@ impl FreezingProcedure {
                             .eq(&self.procedure_template_frozen_container_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-            >(conn)
+            .first::<crate::FreezingProcedureTemplate>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_frozen_with_model_and_frozen_container_model(

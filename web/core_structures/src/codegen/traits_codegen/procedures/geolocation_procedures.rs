@@ -1,8 +1,7 @@
-impl<C> web_common_traits::prelude::Procedure<C>
-    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
+impl<C> web_common_traits::prelude::Procedure<C> for crate::GeolocationProcedure
 where
     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     C: diesel::connection::LoadConnection,
 {
-    type Template = crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate;
+    type Template = crate::GeolocationProcedureTemplate;
 }

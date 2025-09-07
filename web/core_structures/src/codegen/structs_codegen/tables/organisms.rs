@@ -10,28 +10,16 @@ pub struct Organism {
 impl web_common_traits::prelude::TableName for Organism {
     const TABLE_NAME: &'static str = "organisms";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::assets::Asset,
-    > for Organism
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Organism where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    > for Organism
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAsset> for Organism where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::organisms::Organism,
-    > for Organism
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+impl web_common_traits::prelude::ExtensionTable<crate::Organism> for Organism where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
 }
 impl diesel::Identifiable for Organism {
@@ -44,34 +32,12 @@ impl Organism {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        >,
+        crate::PhysicalAsset: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PhysicalAsset::read(self.id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id(

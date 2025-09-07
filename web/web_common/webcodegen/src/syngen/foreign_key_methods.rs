@@ -84,16 +84,11 @@ impl Table {
                         &self, conn: &mut C
                     ) -> Result<#return_statement, diesel::result::Error>
                         where
-                            #foreign_key_struct_path: diesel::Identifiable,
-                            <#foreign_key_struct_path as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>,
-                            <<#foreign_key_struct_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-                            <<<#foreign_key_struct_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>>::Output as diesel::query_dsl::methods::LimitDsl>::Output:
-                                for<'a> diesel::query_dsl::LoadQuery<'a, C, #foreign_key_struct_path>,
+                            #foreign_key_struct_path: web_common_traits::database::Read<C>
                     {
-                        use diesel::associations::HasTable;
-                        use diesel::{RunQueryDsl, QueryDsl};
+                        use web_common_traits::database::Read;
                         #column_values_retrieval
-                        RunQueryDsl::first(QueryDsl::find(#foreign_key_struct_path::table(), #formatted_primary_key), conn)#optional
+                        #foreign_key_struct_path::read(#formatted_primary_key, conn)#optional
                     }
                 });
             } else {

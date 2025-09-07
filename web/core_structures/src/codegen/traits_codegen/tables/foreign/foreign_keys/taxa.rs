@@ -1,11 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TaxonForeignKeys {
-    pub rank: Option<crate::codegen::structs_codegen::tables::ranks::Rank>,
+    pub rank: Option<crate::Rank>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::taxa::Taxon
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::Taxon {
     type ForeignKeys = TaxonForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

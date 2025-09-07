@@ -10,14 +10,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPa
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot as diesel::associations::HasTable>::Table,
+        <crate::CommercialPackagingLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLot as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot as diesel::associations::HasTable>::Table,
+            <crate::CommercialPackagingLot as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
+        crate::CommercialPackagingLot,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -27,7 +27,7 @@ where
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot;
+    type Row = crate::CommercialPackagingLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialPackagingLotAttribute,

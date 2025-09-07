@@ -1,11 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ObservationSubjectForeignKeys {
-    pub color: Option<crate::codegen::structs_codegen::tables::colors::Color>,
+    pub color: Option<crate::Color>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::ObservationSubject {
     type ForeignKeys = ObservationSubjectForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

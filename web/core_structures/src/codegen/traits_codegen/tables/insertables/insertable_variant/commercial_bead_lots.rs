@@ -10,15 +10,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBe
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot as diesel::associations::HasTable>::Table,
+        <crate::CommercialBeadLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadLot as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot as diesel::associations::HasTable>::Table,
+            <crate::CommercialBeadLot as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CommercialBeadLot>,
     BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -27,7 +23,7 @@ where
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot;
+    type Row = crate::CommercialBeadLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialBeadLotAttribute,

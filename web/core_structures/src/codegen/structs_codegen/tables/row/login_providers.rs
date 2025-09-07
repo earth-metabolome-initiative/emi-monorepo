@@ -1,13 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::login_providers::LoginProvider> for super::Row {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-    ) -> Self {
+impl From<crate::LoginProvider> for super::Row {
+    fn from(value: crate::LoginProvider) -> Self {
         super::Row::LoginProvider(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::login_providers::LoginProvider
-{
+impl TryFrom<super::Row> for crate::LoginProvider {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

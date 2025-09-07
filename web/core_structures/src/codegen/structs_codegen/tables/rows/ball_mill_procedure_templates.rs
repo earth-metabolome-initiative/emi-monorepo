@@ -1,29 +1,14 @@
-impl From<
-    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-> for super::Rows {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-    ) -> Self {
+impl From<crate::BallMillProcedureTemplate> for super::Rows {
+    fn from(value: crate::BallMillProcedureTemplate) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<
-    Vec<
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-        >,
-    ) -> Self {
+impl From<Vec<crate::BallMillProcedureTemplate>> for super::Rows {
+    fn from(value: Vec<crate::BallMillProcedureTemplate>) -> Self {
         super::Rows::BallMillProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-> {
+impl TryFrom<super::Rows> for Vec<crate::BallMillProcedureTemplate> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

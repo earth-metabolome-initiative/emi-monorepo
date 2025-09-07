@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel {
+    for crate::VolumeMeasuringDeviceModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -12,12 +13,13 @@ for crate::codegen::structs_codegen::tables::volume_measuring_device_models::Vol
             .on_conflict(id)
             .do_nothing()
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel {
+    for crate::VolumeMeasuringDeviceModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -29,6 +31,6 @@ for crate::codegen::structs_codegen::tables::volume_measuring_device_models::Vol
             .on_conflict(id)
             .do_nothing()
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

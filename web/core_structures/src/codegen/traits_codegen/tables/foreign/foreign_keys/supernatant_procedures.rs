@@ -1,58 +1,26 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SupernatantProcedureForeignKeys {
-    pub pipette_tip_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_pipette_tip: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_stratified_source: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_supernatant_destination: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
-    >,
-    pub procedure_template_pipette_tip_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_stratified_source_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_supernatant_destination_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_transferred_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_transferred_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub stratified_source: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub supernatant_destination: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub transferred_with: Option<
-        crate::codegen::structs_codegen::tables::pipettes::Pipette,
-    >,
-    pub transferred_with_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-    >,
-    pub supernatant_procedures_transferred_with_model_pipette_tip_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
+    pub pipette_tip_model: Option<crate::PipetteTipModel>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_pipette_tip: Option<crate::ProcedureAsset>,
+    pub procedure_stratified_source: Option<crate::ProcedureAsset>,
+    pub procedure_supernatant_destination: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::SupernatantProcedureTemplate>,
+    pub procedure_template_pipette_tip_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_stratified_source_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_supernatant_destination_model:
+        Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_transferred_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_transferred_with: Option<crate::ProcedureAsset>,
+    pub stratified_source: Option<crate::VolumetricContainer>,
+    pub supernatant_destination: Option<crate::VolumetricContainer>,
+    pub transferred_with: Option<crate::Pipette>,
+    pub transferred_with_model: Option<crate::PipetteModel>,
+    pub supernatant_procedures_transferred_with_model_pipette_tip_fkey:
+        Option<crate::AssetCompatibilityRule>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::SupernatantProcedure {
     type ForeignKeys = SupernatantProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

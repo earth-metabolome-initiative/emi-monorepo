@@ -1,25 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DisposalProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
-    >,
-    pub disposed_asset: Option<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    >,
-    pub procedure_template_disposed_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_disposed_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_template: Option<crate::DisposalProcedureTemplate>,
+    pub disposed_asset: Option<crate::PhysicalAsset>,
+    pub procedure_template_disposed_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_disposed_asset: Option<crate::ProcedureAsset>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::DisposalProcedure {
     type ForeignKeys = DisposalProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

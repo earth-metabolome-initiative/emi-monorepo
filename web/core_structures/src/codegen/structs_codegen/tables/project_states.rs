@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::colors::Color,
-        foreign_key = color_id
-    )
-)]
+#[diesel(belongs_to(crate::Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::project_states::project_states
@@ -29,12 +24,8 @@ pub struct ProjectState {
 impl web_common_traits::prelude::TableName for ProjectState {
     const TABLE_NAME: &'static str = "project_states";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-    > for ProjectState
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+impl web_common_traits::prelude::ExtensionTable<crate::ProjectState> for ProjectState where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {
 }
 impl diesel::Identifiable for ProjectState {
@@ -47,34 +38,12 @@ impl ProjectState {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::colors::Color,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::Color, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::colors::Color,
-        >,
+        crate::Color: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::colors::Color::table(),
-                self.color_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::Color::read(self.color_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

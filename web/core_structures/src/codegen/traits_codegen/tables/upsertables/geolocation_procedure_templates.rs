@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate {
+    for crate::GeolocationProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -19,23 +20,20 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
             .filter(
                 geolocated_with_model
                     .ne(excluded(geolocated_with_model))
-                    .or(
-                        procedure_template_geolocated_with_model
-                            .ne(excluded(procedure_template_geolocated_with_model)),
-                    )
+                    .or(procedure_template_geolocated_with_model
+                        .ne(excluded(procedure_template_geolocated_with_model)))
                     .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
-                    .or(
-                        procedure_template_geolocated_asset_model
-                            .ne(excluded(procedure_template_geolocated_asset_model)),
-                    ),
+                    .or(procedure_template_geolocated_asset_model
+                        .ne(excluded(procedure_template_geolocated_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate {
+    for crate::GeolocationProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -54,17 +52,13 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
             .filter(
                 geolocated_with_model
                     .ne(excluded(geolocated_with_model))
-                    .or(
-                        procedure_template_geolocated_with_model
-                            .ne(excluded(procedure_template_geolocated_with_model)),
-                    )
+                    .or(procedure_template_geolocated_with_model
+                        .ne(excluded(procedure_template_geolocated_with_model)))
                     .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
-                    .or(
-                        procedure_template_geolocated_asset_model
-                            .ne(excluded(procedure_template_geolocated_asset_model)),
-                    ),
+                    .or(procedure_template_geolocated_asset_model
+                        .ne(excluded(procedure_template_geolocated_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

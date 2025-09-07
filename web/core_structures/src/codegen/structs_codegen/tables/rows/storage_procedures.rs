@@ -1,24 +1,14 @@
-impl From<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>
-    for super::Rows
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
-    ) -> Self {
+impl From<crate::StorageProcedure> for super::Rows {
+    fn from(value: crate::StorageProcedure) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>>
-    for super::Rows
-{
-    fn from(
-        value: Vec<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>,
-    ) -> Self {
+impl From<Vec<crate::StorageProcedure>> for super::Rows {
+    fn from(value: Vec<crate::StorageProcedure>) -> Self {
         super::Rows::StorageProcedure(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>
-{
+impl TryFrom<super::Rows> for Vec<crate::StorageProcedure> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

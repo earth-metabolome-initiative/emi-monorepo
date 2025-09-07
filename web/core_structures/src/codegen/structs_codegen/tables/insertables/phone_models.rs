@@ -69,66 +69,22 @@ impl InsertablePhoneModel {
     pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CameraModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        >,
+        crate::CameraModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::camera_models::CameraModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CameraModel::read(self.id, conn)
     }
     pub fn phone_models_positioning<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
-        >,
+        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PositioningDeviceModel::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -410,7 +366,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
+            Row = crate::PhoneModel,
             Error = web_common_traits::database::InsertError<PhoneModelAttribute>,
         >,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -427,8 +383,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::phone_models::PhoneModel =
-            self.insert(user_id, conn)?;
+        let insertable: crate::PhoneModel = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

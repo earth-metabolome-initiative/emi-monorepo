@@ -5,33 +5,29 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBu
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::team_members::TeamMember as diesel::associations::HasTable>::Table,
+        <crate::TeamMember as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::team_members::TeamMember as diesel::associations::HasTable>::Table,
+            <crate::TeamMember as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::team_members::TeamMember,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::TeamMember>,
     C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable
+    crate::Team: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    <crate::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    <<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    <<<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::teams::Team,
+        crate::Team,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::team_members::TeamMember;
+    type Row = crate::TeamMember;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute,

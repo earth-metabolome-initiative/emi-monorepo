@@ -24,12 +24,8 @@ pub struct Organization {
 impl web_common_traits::prelude::TableName for Organization {
     const TABLE_NAME: &'static str = "organizations";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::organizations::Organization,
-    > for Organization
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+impl web_common_traits::prelude::ExtensionTable<crate::Organization> for Organization where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {
 }
 impl diesel::Identifiable for Organization {

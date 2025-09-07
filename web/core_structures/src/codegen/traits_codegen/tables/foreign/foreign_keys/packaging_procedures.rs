@@ -1,40 +1,19 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PackagingProcedureForeignKeys {
-    pub packaged_with_model: Option<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-    >,
-    pub packaging_procedures_packaged_with_model_sample_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_packaged_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_sample: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-    >,
-    pub procedure_template_packaged_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_sample_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub sample: Option<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    >,
-    pub sample_model: Option<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    >,
+    pub packaged_with_model: Option<crate::PackagingModel>,
+    pub packaging_procedures_packaged_with_model_sample_model_fkey:
+        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_packaged_with: Option<crate::ProcedureAsset>,
+    pub procedure_sample: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::PackagingProcedureTemplate>,
+    pub procedure_template_packaged_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_sample_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub sample: Option<crate::PhysicalAsset>,
+    pub sample_model: Option<crate::PhysicalAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
     type ForeignKeys = PackagingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

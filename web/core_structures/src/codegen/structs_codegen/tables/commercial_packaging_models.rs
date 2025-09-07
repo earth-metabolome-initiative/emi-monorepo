@@ -19,44 +19,32 @@ pub struct CommercialPackagingModel {
 impl web_common_traits::prelude::TableName for CommercialPackagingModel {
     const TABLE_NAME: &'static str = "commercial_packaging_models";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for CommercialPackagingModel
+impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialPackagingModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+{
+}
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct>
+    for CommercialPackagingModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    > for CommercialPackagingModel
+impl web_common_traits::prelude::ExtensionTable<crate::PackagingModel> for CommercialPackagingModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+{
+}
+impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
+    for CommercialPackagingModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-    > for CommercialPackagingModel
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialPackagingModel>
+    for CommercialPackagingModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for CommercialPackagingModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
-> for CommercialPackagingModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
 impl diesel::Identifiable for CommercialPackagingModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -67,111 +55,42 @@ impl CommercialPackagingModel {
     pub fn packaging_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PackagingModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        >,
+        crate::PackagingModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
-                self.packaging_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PackagingModel::read(self.packaging_model, conn)
     }
     pub fn commercial_packaging_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PackagingModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        >,
+        crate::PackagingModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PackagingModel::read(self.id, conn)
     }
     pub fn commercial_packaging_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProduct, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
+        crate::CommercialProduct: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProduct::read(self.id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_packaging_models_id_packaging_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -180,9 +99,7 @@ impl CommercialPackagingModel {
                             .eq(&self.packaging_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_packaging_model(

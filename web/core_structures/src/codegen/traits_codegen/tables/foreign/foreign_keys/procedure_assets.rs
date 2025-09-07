@@ -1,30 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureAssetForeignKeys {
-    pub ancestor_model: Option<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    >,
-    pub asset: Option<crate::codegen::structs_codegen::tables::assets::Asset>,
-    pub procedure_assets_asset_model_ancestor_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-    >,
-    pub asset_model: Option<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    >,
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
+    pub ancestor_model: Option<crate::AssetModel>,
+    pub asset: Option<crate::Asset>,
+    pub procedure_assets_asset_model_ancestor_model_fkey: Option<crate::AssetModelAncestor>,
+    pub asset_model: Option<crate::AssetModel>,
+    pub created_by: Option<crate::User>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_template_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template: Option<crate::ProcedureTemplate>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureAsset {
     type ForeignKeys = ProcedureAssetForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

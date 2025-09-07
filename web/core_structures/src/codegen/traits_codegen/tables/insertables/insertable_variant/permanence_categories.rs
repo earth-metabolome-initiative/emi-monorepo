@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCa
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory as diesel::associations::HasTable>::Table,
+        <crate::PermanenceCategory as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategory as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory as diesel::associations::HasTable>::Table,
+            <crate::PermanenceCategory as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PermanenceCategory>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory;
+    type Row = crate::PermanenceCategory;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategory;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute,

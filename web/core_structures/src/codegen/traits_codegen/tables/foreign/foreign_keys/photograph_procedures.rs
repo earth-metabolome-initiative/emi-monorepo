@@ -1,34 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhotographProcedureForeignKeys {
-    pub photographed_asset: Option<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    >,
-    pub photographed_with: Option<
-        crate::codegen::structs_codegen::tables::cameras::Camera,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_photographed_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_photographed_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
-    >,
-    pub procedure_template_photographed_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_photographed_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
+    pub photographed_asset: Option<crate::PhysicalAsset>,
+    pub photographed_with: Option<crate::Camera>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_photographed_asset: Option<crate::ProcedureAsset>,
+    pub procedure_photographed_with: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::PhotographProcedureTemplate>,
+    pub procedure_template_photographed_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_photographed_with_model: Option<crate::ProcedureTemplateAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::PhotographProcedure {
     type ForeignKeys = PhotographProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

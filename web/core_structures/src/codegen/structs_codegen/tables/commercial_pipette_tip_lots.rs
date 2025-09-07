@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-        foreign_key = product_model
-    )
-)]
+#[diesel(belongs_to(crate::CommercialPipetteTipModel, foreign_key = product_model))]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_pipette_tip_lots::commercial_pipette_tip_lots
@@ -26,44 +21,32 @@ pub struct CommercialPipetteTipLot {
 impl web_common_traits::prelude::TableName for CommercialPipetteTipLot {
     const TABLE_NAME: &'static str = "commercial_pipette_tip_lots";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for CommercialPipetteTipLot
+impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialPipetteTipLot where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+{
+}
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialProductLot>
+    for CommercialPipetteTipLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-    > for CommercialPipetteTipLot
+impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
+    for CommercialPipetteTipLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for CommercialPipetteTipLot
+impl web_common_traits::prelude::ExtensionTable<crate::PipetteTipModel> for CommercialPipetteTipLot where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+{
+}
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialPipetteTipLot>
+    for CommercialPipetteTipLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-    > for CommercialPipetteTipLot
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
-> for CommercialPipetteTipLot
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
 impl diesel::Identifiable for CommercialPipetteTipLot {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -74,112 +57,42 @@ impl CommercialPipetteTipLot {
     pub fn commercial_pipette_tip_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        >,
+        crate::CommercialProductLot: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProductLot::read(self.id, conn)
     }
     pub fn commercial_pipette_tip_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PipetteTipModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-        >,
+        crate::PipetteTipModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::table(
-                ),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PipetteTipModel::read(self.id, conn)
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialPipetteTipModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-        >,
+        crate::CommercialPipetteTipModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel::table(),
-                self.product_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialPipetteTipModel::read(self.product_model, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_pipette_tip_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -188,9 +101,7 @@ impl CommercialPipetteTipLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id(

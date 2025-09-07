@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUse
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser as diesel::associations::HasTable>::Table,
+        <crate::TemporaryUser as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUser as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser as diesel::associations::HasTable>::Table,
+            <crate::TemporaryUser as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::TemporaryUser>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser;
+    type Row = crate::TemporaryUser;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUser;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute,

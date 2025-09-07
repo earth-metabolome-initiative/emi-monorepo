@@ -1,29 +1,14 @@
-impl From<
-    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-> for super::Rows {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-    ) -> Self {
+impl From<crate::PackagingProcedureTemplate> for super::Rows {
+    fn from(value: crate::PackagingProcedureTemplate) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<
-    Vec<
-        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-        >,
-    ) -> Self {
+impl From<Vec<crate::PackagingProcedureTemplate>> for super::Rows {
+    fn from(value: Vec<crate::PackagingProcedureTemplate>) -> Self {
         super::Rows::PackagingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-> {
+impl TryFrom<super::Rows> for Vec<crate::PackagingProcedureTemplate> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

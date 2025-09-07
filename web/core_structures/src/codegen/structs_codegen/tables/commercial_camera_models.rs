@@ -19,42 +19,24 @@ pub struct CommercialCameraModel {
 impl web_common_traits::prelude::TableName for CommercialCameraModel {
     const TABLE_NAME: &'static str = "commercial_camera_models";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for CommercialCameraModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialCameraModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-    > for CommercialCameraModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::CameraModel> for CommercialCameraModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    > for CommercialCameraModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct> for CommercialCameraModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for CommercialCameraModel
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel> for CommercialCameraModel where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
-    > for CommercialCameraModel
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialCameraModel>
+    for CommercialCameraModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
@@ -69,111 +51,42 @@ impl CommercialCameraModel {
     pub fn camera_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CameraModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        >,
+        crate::CameraModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::camera_models::CameraModel::table(),
-                self.camera_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CameraModel::read(self.camera_model, conn)
     }
     pub fn commercial_camera_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CameraModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::camera_models::CameraModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::camera_models::CameraModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-        >,
+        crate::CameraModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::camera_models::CameraModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CameraModel::read(self.id, conn)
     }
     pub fn commercial_camera_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProduct, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
+        crate::CommercialProduct: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProduct::read(self.id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_camera_models_id_camera_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -182,9 +95,7 @@ impl CommercialCameraModel {
                             .eq(&self.camera_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_camera_model(

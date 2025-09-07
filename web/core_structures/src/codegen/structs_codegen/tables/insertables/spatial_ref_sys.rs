@@ -287,7 +287,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
+            Row = crate::SpatialRefSy,
             Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>,
         >,
 {
@@ -302,8 +302,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy =
-            self.insert(user_id, conn)?;
+        let insertable: crate::SpatialRefSy = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

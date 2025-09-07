@@ -76,115 +76,42 @@ impl InsertableCommercialWeighingDeviceModel {
     pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        >,
+        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::table(),
-                self.weighing_device_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::WeighingDeviceModel::read(self.weighing_device_model, conn)
     }
-    pub fn commercial_weighing_device_models_id_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn commercial_weighing_device_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        >,
+        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::WeighingDeviceModel::read(self.id, conn)
     }
-    pub fn commercial_weighing_device_models_id_fkey1<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn commercial_weighing_device_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProduct, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        >,
+        crate::CommercialProduct: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProduct::read(self.id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_weighing_device_models_id_weighing_device_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -193,9 +120,7 @@ impl InsertableCommercialWeighingDeviceModel {
                             .eq(&self.weighing_device_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -638,32 +563,19 @@ where
         self
     }
 }
-impl<
-    CommercialProduct,
-    WeighingDeviceModel,
-    C,
-> web_common_traits::database::TryInsertGeneric<C>
-for InsertableCommercialWeighingDeviceModelBuilder<
-    CommercialProduct,
-    WeighingDeviceModel,
->
+impl<CommercialProduct, WeighingDeviceModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableCommercialWeighingDeviceModelBuilder<CommercialProduct, WeighingDeviceModel>
 where
     Self: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
-        Error = web_common_traits::database::InsertError<
-            CommercialWeighingDeviceModelAttribute,
+            C,
+            UserId = i32,
+            Row = crate::CommercialWeighingDeviceModel,
+            Error = web_common_traits::database::InsertError<
+                CommercialWeighingDeviceModelAttribute,
+            >,
         >,
-    >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    WeighingDeviceModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+    CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    WeighingDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialWeighingDeviceModelAttribute;
     fn is_complete(&self) -> bool {
@@ -675,14 +587,10 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
-    > {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel = self
-            .insert(user_id, conn)?;
+        let insertable: crate::CommercialWeighingDeviceModel = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

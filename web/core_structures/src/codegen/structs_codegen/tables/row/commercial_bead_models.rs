@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
-    ) -> Self {
+impl From<crate::CommercialBeadModel> for super::Row {
+    fn from(value: crate::CommercialBeadModel) -> Self {
         super::Row::CommercialBeadModel(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel
-{
+impl TryFrom<super::Row> for crate::CommercialBeadModel {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

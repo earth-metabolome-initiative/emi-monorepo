@@ -1,24 +1,21 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection
+for crate::SpectraCollection
 where
-    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::Identifiable>::Id,
+    crate::DigitalAsset: diesel::Identifiable,
+    <crate::DigitalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAsset as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::Identifiable>::Id,
+    <<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAsset as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::Identifiable>::Id,
+    <<<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAsset as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+        crate::DigitalAsset,
     >,
-    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
+    crate::DigitalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

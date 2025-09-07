@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::brands::Brand,
-        foreign_key = brand_id
-    )
-)]
+#[diesel(belongs_to(crate::Brand, foreign_key = brand_id))]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_products::commercial_products
@@ -27,20 +22,12 @@ pub struct CommercialProduct {
 impl web_common_traits::prelude::TableName for CommercialProduct {
     const TABLE_NAME: &'static str = "commercial_products";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for CommercialProduct
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialProduct where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-    > for CommercialProduct
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct> for CommercialProduct where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
 impl diesel::Identifiable for CommercialProduct {
@@ -53,66 +40,22 @@ impl CommercialProduct {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::AssetModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        >,
+        crate::AssetModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::AssetModel::read(self.id, conn)
     }
     pub fn brand<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brands::Brand,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::Brand, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::brands::Brand: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::brands::Brand,
-        >,
+        crate::Brand: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::brands::Brand::table(),
-                self.brand_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::Brand::read(self.brand_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id(

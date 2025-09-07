@@ -1,24 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GeolocationProcedureTemplateForeignKeys {
-    pub procedure_template_geolocated_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_geolocated_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub geolocated_asset_model: Option<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    >,
-    pub geolocated_with_model: Option<
-        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
+    pub procedure_template_geolocated_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_geolocated_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub geolocated_asset_model: Option<crate::PhysicalAssetModel>,
+    pub geolocated_with_model: Option<crate::PositioningDeviceModel>,
+    pub procedure_template: Option<crate::ProcedureTemplate>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys for crate::GeolocationProcedureTemplate {
     type ForeignKeys = GeolocationProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -41,30 +30,21 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                     ),
                 ),
             );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.geolocated_asset_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
-                        self.geolocated_with_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.geolocated_asset_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
+                self.geolocated_with_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.procedure_template,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_template_geolocated_asset_model.is_some()
@@ -82,9 +62,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -95,9 +73,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.geolocated_asset_model == physical_asset_models.id {
@@ -106,9 +82,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 }
             }
             (
-                crate::codegen::tables::row::Row::PositioningDeviceModel(
-                    positioning_device_models,
-                ),
+                crate::codegen::tables::row::Row::PositioningDeviceModel(positioning_device_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -119,9 +93,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 }
             }
             (
-                crate::codegen::tables::row::Row::PositioningDeviceModel(
-                    positioning_device_models,
-                ),
+                crate::codegen::tables::row::Row::PositioningDeviceModel(positioning_device_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.geolocated_with_model == positioning_device_models.id {
@@ -140,17 +112,15 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 if self.procedure_template_geolocated_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_geolocated_asset_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
+                    foreign_keys.procedure_template_geolocated_asset_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
                 if self.procedure_template_geolocated_with_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_geolocated_with_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
+                    foreign_keys.procedure_template_geolocated_with_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
             }

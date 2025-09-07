@@ -10,14 +10,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCe
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
+        <crate::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModel as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
+            <crate::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+        crate::CommercialCentrifugeModel,
     >,
     C: diesel::connection::LoadConnection,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -25,24 +25,24 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: diesel::Identifiable
+    crate::CentrifugeModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
+    <crate::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::CentrifugeModel as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
+    <<crate::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::CentrifugeModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
+    <<<crate::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::CentrifugeModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+        crate::CentrifugeModel,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel;
+    type Row = crate::CommercialCentrifugeModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,

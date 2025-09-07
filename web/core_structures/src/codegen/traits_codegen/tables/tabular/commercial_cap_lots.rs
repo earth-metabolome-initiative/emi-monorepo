@@ -1,21 +1,15 @@
-impl web_common_traits::prelude::Tabular
-    for crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot
-{
+impl web_common_traits::prelude::Tabular for crate::CommercialCapLot {
     type TableName = crate::codegen::tables::table_names::TableName;
     fn table_name(&self) -> Self::TableName {
         crate::codegen::tables::table_names::TableName::CommercialCapLot
     }
 }
-impl web_common_traits::prelude::StaticTabular
-    for crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot
-{
+impl web_common_traits::prelude::StaticTabular for crate::CommercialCapLot {
     fn static_table_name() -> Self::TableName {
         crate::codegen::tables::table_names::TableName::CommercialCapLot
     }
 }
-impl web_common_traits::prelude::Row
-    for crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot
-{
+impl web_common_traits::prelude::Row for crate::CommercialCapLot {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCapLot(self.id)

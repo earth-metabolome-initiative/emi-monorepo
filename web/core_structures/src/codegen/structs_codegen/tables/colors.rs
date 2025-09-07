@@ -19,12 +19,8 @@ pub struct Color {
 impl web_common_traits::prelude::TableName for Color {
     const TABLE_NAME: &'static str = "colors";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::colors::Color,
-    > for Color
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+impl web_common_traits::prelude::ExtensionTable<crate::Color> for Color where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {
 }
 impl diesel::Identifiable for Color {

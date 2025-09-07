@@ -1,43 +1,19 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PouringProcedureForeignKeys {
-    pub measured_with: Option<
-        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
-    >,
-    pub poured_from: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub poured_into: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_measured_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_poured_from: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_poured_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
-    >,
-    pub procedure_template_measured_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_poured_from_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_poured_into_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
+    pub measured_with: Option<crate::VolumeMeasuringDevice>,
+    pub poured_from: Option<crate::VolumetricContainer>,
+    pub poured_into: Option<crate::VolumetricContainer>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_measured_with: Option<crate::ProcedureAsset>,
+    pub procedure_poured_from: Option<crate::ProcedureAsset>,
+    pub procedure_poured_into: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::PouringProcedureTemplate>,
+    pub procedure_template_measured_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_poured_from_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_poured_into_model: Option<crate::ProcedureTemplateAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::PouringProcedure {
     type ForeignKeys = PouringProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

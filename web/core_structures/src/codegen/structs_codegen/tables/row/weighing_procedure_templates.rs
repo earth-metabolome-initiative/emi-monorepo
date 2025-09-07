@@ -1,14 +1,9 @@
-impl From<
-    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
-> for super::Row {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
-    ) -> Self {
+impl From<crate::WeighingProcedureTemplate> for super::Row {
+    fn from(value: crate::WeighingProcedureTemplate) -> Self {
         super::Row::WeighingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Row>
-for crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate {
+impl TryFrom<super::Row> for crate::WeighingProcedureTemplate {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

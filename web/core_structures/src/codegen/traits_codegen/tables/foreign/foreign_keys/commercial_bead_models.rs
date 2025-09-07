@@ -1,15 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialBeadModelForeignKeys {
-    pub bead_model: Option<crate::codegen::structs_codegen::tables::bead_models::BeadModel>,
-    pub commercial_bead_models_id_fkey:
-        Option<crate::codegen::structs_codegen::tables::bead_models::BeadModel>,
-    pub commercial_bead_models_id_fkey1:
-        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub bead_model: Option<crate::BeadModel>,
+    pub commercial_bead_models_id_fkey: Option<crate::BeadModel>,
+    pub commercial_bead_models_id_fkey1: Option<crate::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::CommercialBeadModel {
     type ForeignKeys = CommercialBeadModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

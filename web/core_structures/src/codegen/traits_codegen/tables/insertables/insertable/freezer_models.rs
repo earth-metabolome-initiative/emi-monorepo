@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::freezer_models::FreezerModel
-{
+impl web_common_traits::database::Insertable for crate::FreezerModel {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder;
     type InsertableVariant =

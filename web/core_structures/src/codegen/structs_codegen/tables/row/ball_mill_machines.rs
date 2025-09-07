@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
-    ) -> Self {
+impl From<crate::BallMillMachine> for super::Row {
+    fn from(value: crate::BallMillMachine) -> Self {
         super::Row::BallMillMachine(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine
-{
+impl TryFrom<super::Row> for crate::BallMillMachine {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

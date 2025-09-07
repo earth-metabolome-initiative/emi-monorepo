@@ -1,24 +1,21 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice
+for crate::PositioningDevice
 where
-    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+    crate::PhysicalAsset: diesel::Identifiable,
+    <crate::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::PhysicalAsset as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+    <<crate::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::PhysicalAsset as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
+    <<<crate::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::PhysicalAsset as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        crate::PhysicalAsset,
     >,
-    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
+    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

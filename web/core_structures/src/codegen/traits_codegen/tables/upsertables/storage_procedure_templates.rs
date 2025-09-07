@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate {
+    for crate::StorageProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -19,28 +20,22 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(
-                        kelvin_tolerance_percentage
-                            .ne(excluded(kelvin_tolerance_percentage)),
-                    )
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
                     .or(stored_into_model.ne(excluded(stored_into_model)))
-                    .or(
-                        procedure_template_stored_into_model
-                            .ne(excluded(procedure_template_stored_into_model)),
-                    )
+                    .or(procedure_template_stored_into_model
+                        .ne(excluded(procedure_template_stored_into_model)))
                     .or(stored_asset_model.ne(excluded(stored_asset_model)))
-                    .or(
-                        procedure_template_stored_asset_model
-                            .ne(excluded(procedure_template_stored_asset_model)),
-                    ),
+                    .or(procedure_template_stored_asset_model
+                        .ne(excluded(procedure_template_stored_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate {
+    for crate::StorageProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -59,22 +54,15 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(
-                        kelvin_tolerance_percentage
-                            .ne(excluded(kelvin_tolerance_percentage)),
-                    )
+                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
                     .or(stored_into_model.ne(excluded(stored_into_model)))
-                    .or(
-                        procedure_template_stored_into_model
-                            .ne(excluded(procedure_template_stored_into_model)),
-                    )
+                    .or(procedure_template_stored_into_model
+                        .ne(excluded(procedure_template_stored_into_model)))
                     .or(stored_asset_model.ne(excluded(stored_asset_model)))
-                    .or(
-                        procedure_template_stored_asset_model
-                            .ne(excluded(procedure_template_stored_asset_model)),
-                    ),
+                    .or(procedure_template_stored_asset_model
+                        .ne(excluded(procedure_template_stored_asset_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

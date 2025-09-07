@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
-    ) -> Self {
+impl From<crate::CommercialCapModel> for super::Row {
+    fn from(value: crate::CommercialCapModel) -> Self {
         super::Row::CommercialCapModel(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel
-{
+impl TryFrom<super::Row> for crate::CommercialCapModel {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

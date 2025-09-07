@@ -1,12 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TemporaryUserForeignKeys {
-    pub login_provider:
-        Option<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
+    pub login_provider: Option<crate::LoginProvider>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::TemporaryUser {
     type ForeignKeys = TemporaryUserForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

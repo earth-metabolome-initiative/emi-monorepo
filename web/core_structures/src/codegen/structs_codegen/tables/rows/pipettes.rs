@@ -1,14 +1,14 @@
-impl From<crate::codegen::structs_codegen::tables::pipettes::Pipette> for super::Rows {
-    fn from(value: crate::codegen::structs_codegen::tables::pipettes::Pipette) -> Self {
+impl From<crate::Pipette> for super::Rows {
+    fn from(value: crate::Pipette) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>> for super::Rows {
-    fn from(value: Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>) -> Self {
+impl From<Vec<crate::Pipette>> for super::Rows {
+    fn from(value: Vec<crate::Pipette>) -> Self {
         super::Rows::Pipette(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette> {
+impl TryFrom<super::Rows> for Vec<crate::Pipette> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

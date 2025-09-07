@@ -1,29 +1,14 @@
-impl From<
-    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-> for super::Rows {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-    ) -> Self {
+impl From<crate::FreezingProcedureTemplate> for super::Rows {
+    fn from(value: crate::FreezingProcedureTemplate) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<
-    Vec<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        >,
-    ) -> Self {
+impl From<Vec<crate::FreezingProcedureTemplate>> for super::Rows {
+    fn from(value: Vec<crate::FreezingProcedureTemplate>) -> Self {
         super::Rows::FreezingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-> {
+impl TryFrom<super::Rows> for Vec<crate::FreezingProcedureTemplate> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

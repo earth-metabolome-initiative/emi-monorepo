@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table,
+        <crate::Team as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTeam as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table,
+            <crate::Team as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::teams::Team,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Team>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::teams::Team;
+    type Row = crate::Team;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeam;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TeamAttribute,

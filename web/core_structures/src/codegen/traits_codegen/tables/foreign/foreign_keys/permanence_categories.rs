@@ -1,11 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PermanenceCategoryForeignKeys {
-    pub color: Option<crate::codegen::structs_codegen::tables::colors::Color>,
+    pub color: Option<crate::Color>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::PermanenceCategory {
     type ForeignKeys = PermanenceCategoryForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

@@ -1,34 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GeolocationProcedureForeignKeys {
-    pub geolocated_asset: Option<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    >,
-    pub geolocated_with: Option<
-        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_geolocated_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_geolocated_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
-    >,
-    pub procedure_template_geolocated_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_geolocated_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
+    pub geolocated_asset: Option<crate::PhysicalAsset>,
+    pub geolocated_with: Option<crate::PositioningDevice>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_geolocated_asset: Option<crate::ProcedureAsset>,
+    pub procedure_geolocated_with: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::GeolocationProcedureTemplate>,
+    pub procedure_template_geolocated_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_geolocated_with_model: Option<crate::ProcedureTemplateAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::GeolocationProcedure {
     type ForeignKeys = GeolocationProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

@@ -199,7 +199,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::colors::Color,
+            Row = crate::Color,
             Error = web_common_traits::database::InsertError<ColorAttribute>,
         >,
 {
@@ -214,8 +214,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::colors::Color =
-            self.insert(user_id, conn)?;
+        let insertable: crate::Color = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

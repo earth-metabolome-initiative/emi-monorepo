@@ -1,12 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TeamMemberForeignKeys {
-    pub member: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub team: Option<crate::codegen::structs_codegen::tables::teams::Team>,
+    pub member: Option<crate::User>,
+    pub team: Option<crate::Team>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::team_members::TeamMember
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::TeamMember {
     type ForeignKeys = TeamMemberForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

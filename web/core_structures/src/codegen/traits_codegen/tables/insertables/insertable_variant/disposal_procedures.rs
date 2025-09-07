@@ -8,15 +8,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProc
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure as diesel::associations::HasTable>::Table,
+        <crate::DisposalProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedure as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure as diesel::associations::HasTable>::Table,
+            <crate::DisposalProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::DisposalProcedure>,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -25,50 +21,46 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
     >,
-    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: diesel::Identifiable
+    crate::DisposalProcedureTemplate: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::Identifiable>::Id,
+    <crate::DisposalProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::DisposalProcedureTemplate as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::Identifiable>::Id,
+    <<crate::DisposalProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DisposalProcedureTemplate as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::Identifiable>::Id,
+    <<<crate::DisposalProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DisposalProcedureTemplate as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        crate::DisposalProcedureTemplate,
     >,
-    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: web_common_traits::database::Read<
+    crate::DisposalProcedureTemplate: web_common_traits::database::Read<C>,
+    crate::Procedure: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >,
+    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
         C,
+        crate::Procedure,
     >,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure;
+    type Row = crate::DisposalProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
@@ -112,7 +104,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let disposal_procedure_templates = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
+            let disposal_procedure_templates = crate::DisposalProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -124,7 +116,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_disposed_asset) = self
             .procedure_disposed_asset
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_disposed_asset,
                 conn,
             )?;

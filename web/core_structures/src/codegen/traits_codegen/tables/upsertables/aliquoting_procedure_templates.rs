@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate {
+    for crate::AliquotingProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -20,33 +21,26 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                 liters
                     .ne(excluded(liters))
                     .or(aliquoted_from_model.ne(excluded(aliquoted_from_model)))
-                    .or(
-                        procedure_template_aliquoted_from_model
-                            .ne(excluded(procedure_template_aliquoted_from_model)),
-                    )
+                    .or(procedure_template_aliquoted_from_model
+                        .ne(excluded(procedure_template_aliquoted_from_model)))
                     .or(aliquoted_into_model.ne(excluded(aliquoted_into_model)))
-                    .or(
-                        procedure_template_aliquoted_into_model
-                            .ne(excluded(procedure_template_aliquoted_into_model)),
-                    )
+                    .or(procedure_template_aliquoted_into_model
+                        .ne(excluded(procedure_template_aliquoted_into_model)))
                     .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
-                    .or(
-                        procedure_template_aliquoted_with_model
-                            .ne(excluded(procedure_template_aliquoted_with_model)),
-                    )
+                    .or(procedure_template_aliquoted_with_model
+                        .ne(excluded(procedure_template_aliquoted_with_model)))
                     .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
-                    .or(
-                        procedure_template_pipette_tip_model
-                            .ne(excluded(procedure_template_pipette_tip_model)),
-                    ),
+                    .or(procedure_template_pipette_tip_model
+                        .ne(excluded(procedure_template_pipette_tip_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate {
+    for crate::AliquotingProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -66,27 +60,19 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                 liters
                     .ne(excluded(liters))
                     .or(aliquoted_from_model.ne(excluded(aliquoted_from_model)))
-                    .or(
-                        procedure_template_aliquoted_from_model
-                            .ne(excluded(procedure_template_aliquoted_from_model)),
-                    )
+                    .or(procedure_template_aliquoted_from_model
+                        .ne(excluded(procedure_template_aliquoted_from_model)))
                     .or(aliquoted_into_model.ne(excluded(aliquoted_into_model)))
-                    .or(
-                        procedure_template_aliquoted_into_model
-                            .ne(excluded(procedure_template_aliquoted_into_model)),
-                    )
+                    .or(procedure_template_aliquoted_into_model
+                        .ne(excluded(procedure_template_aliquoted_into_model)))
                     .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
-                    .or(
-                        procedure_template_aliquoted_with_model
-                            .ne(excluded(procedure_template_aliquoted_with_model)),
-                    )
+                    .or(procedure_template_aliquoted_with_model
+                        .ne(excluded(procedure_template_aliquoted_with_model)))
                     .or(pipette_tip_model.ne(excluded(pipette_tip_model)))
-                    .or(
-                        procedure_template_pipette_tip_model
-                            .ne(excluded(procedure_template_pipette_tip_model)),
-                    ),
+                    .or(procedure_template_pipette_tip_model
+                        .ne(excluded(procedure_template_pipette_tip_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

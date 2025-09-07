@@ -1,27 +1,14 @@
-impl From<crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure>
-    for super::Rows
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
-    ) -> Self {
+impl From<crate::FractioningProcedure> for super::Rows {
+    fn from(value: crate::FractioningProcedure) -> Self {
         Self::from(vec![value])
     }
 }
-impl
-    From<Vec<crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure>>
-    for super::Rows
-{
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
-        >,
-    ) -> Self {
+impl From<Vec<crate::FractioningProcedure>> for super::Rows {
+    fn from(value: Vec<crate::FractioningProcedure>) -> Self {
         super::Rows::FractioningProcedure(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure>
-{
+impl TryFrom<super::Rows> for Vec<crate::FractioningProcedure> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

@@ -1,7 +1,5 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Deletable
-    for crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer
-{
+impl web_common_traits::prelude::Deletable for crate::VolumetricContainer {
     type Conn = diesel::PgConnection;
     type UserId = i32;
     fn delete(

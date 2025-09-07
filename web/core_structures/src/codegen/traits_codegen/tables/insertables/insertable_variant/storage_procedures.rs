@@ -8,15 +8,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableStorageProce
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure as diesel::associations::HasTable>::Table,
+        <crate::StorageProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedure as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure as diesel::associations::HasTable>::Table,
+            <crate::StorageProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::StorageProcedure>,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -25,38 +21,32 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
     >,
+    crate::Procedure: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >,
+    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::Procedure,
+    >,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::StorageProcedureTemplate: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure;
+    type Row = crate::StorageProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
@@ -94,7 +84,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let storage_procedure_templates = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
+            let storage_procedure_templates = crate::StorageProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -110,7 +100,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_asset) = self
             .procedure_stored_asset
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_stored_asset,
                 conn,
             )?;
@@ -132,7 +122,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_into) = self
             .procedure_stored_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_stored_into,
                 conn,
             )?;

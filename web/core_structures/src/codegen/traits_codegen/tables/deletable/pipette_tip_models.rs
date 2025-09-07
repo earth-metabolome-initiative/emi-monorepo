@@ -1,7 +1,5 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Deletable
-    for crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel
-{
+impl web_common_traits::prelude::Deletable for crate::PipetteTipModel {
     type Conn = diesel::PgConnection;
     type UserId = i32;
     fn delete(

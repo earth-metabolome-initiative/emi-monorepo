@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        foreign_key = product_model
-    )
-)]
+#[diesel(belongs_to(crate::CommercialFreezerModel, foreign_key = product_model))]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_freezer_lots::commercial_freezer_lots
@@ -26,42 +21,26 @@ pub struct CommercialFreezerLot {
 impl web_common_traits::prelude::TableName for CommercialFreezerLot {
     const TABLE_NAME: &'static str = "commercial_freezer_lots";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for CommercialFreezerLot
+impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialFreezerLot where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+{
+}
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialProductLot>
+    for CommercialFreezerLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-    > for CommercialFreezerLot
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::FreezerModel> for CommercialFreezerLot where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-    > for CommercialFreezerLot
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel> for CommercialFreezerLot where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for CommercialFreezerLot
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
-    > for CommercialFreezerLot
+impl web_common_traits::prelude::ExtensionTable<crate::CommercialFreezerLot>
+    for CommercialFreezerLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
@@ -76,111 +55,42 @@ impl CommercialFreezerLot {
     pub fn commercial_freezer_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        >,
+        crate::CommercialProductLot: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProductLot::read(self.id, conn)
     }
     pub fn commercial_freezer_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::FreezerModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-        >,
+        crate::FreezerModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::FreezerModel::read(self.id, conn)
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialFreezerModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        >,
+        crate::CommercialFreezerModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel::table(),
-                self.product_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialFreezerModel::read(self.product_model, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_freezer_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -189,9 +99,7 @@ impl CommercialFreezerLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id(

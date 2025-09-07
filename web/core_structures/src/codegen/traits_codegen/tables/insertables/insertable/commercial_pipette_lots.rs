@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot
-{
+impl web_common_traits::database::Insertable for crate::CommercialPipetteLot {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotBuilder;
     type InsertableVariant =

@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table,
+        <crate::City as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCity as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table,
+            <crate::City as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::cities::City,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::City>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::cities::City;
+    type Row = crate::City;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCity;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CityAttribute,

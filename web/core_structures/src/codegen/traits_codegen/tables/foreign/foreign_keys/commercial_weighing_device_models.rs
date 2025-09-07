@@ -1,47 +1,30 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialWeighingDeviceModelForeignKeys {
-    pub weighing_device_model: Option<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-    >,
-    pub commercial_weighing_device_models_id_fkey: Option<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-    >,
-    pub commercial_weighing_device_models_id_fkey1:
-        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub weighing_device_model: Option<crate::WeighingDeviceModel>,
+    pub commercial_weighing_device_models_id_fkey: Option<crate::WeighingDeviceModel>,
+    pub commercial_weighing_device_models_id_fkey1: Option<crate::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel {
+impl web_common_traits::prelude::HasForeignKeys for crate::CommercialWeighingDeviceModel {
     type ForeignKeys = CommercialWeighingDeviceModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
-                        self.weighing_device_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
-                        self.id,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
-                        self.id,
-                    ),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
+                self.weighing_device_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
+                self.id,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.weighing_device_model.is_some()
@@ -63,9 +46,8 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == commercial_products.id {
-                    foreign_keys.commercial_weighing_device_models_id_fkey1 = Some(
-                        commercial_products,
-                    );
+                    foreign_keys.commercial_weighing_device_models_id_fkey1 =
+                        Some(commercial_products);
                     updated = true;
                 }
             }
@@ -79,9 +61,7 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
                 }
             }
             (
-                crate::codegen::tables::row::Row::WeighingDeviceModel(
-                    weighing_device_models,
-                ),
+                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -91,16 +71,13 @@ for crate::codegen::structs_codegen::tables::commercial_weighing_device_models::
                     updated = true;
                 }
                 if self.id == weighing_device_models.id {
-                    foreign_keys.commercial_weighing_device_models_id_fkey = Some(
-                        weighing_device_models,
-                    );
+                    foreign_keys.commercial_weighing_device_models_id_fkey =
+                        Some(weighing_device_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::WeighingDeviceModel(
-                    weighing_device_models,
-                ),
+                crate::codegen::tables::row::Row::WeighingDeviceModel(weighing_device_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.weighing_device_model == weighing_device_models.id {

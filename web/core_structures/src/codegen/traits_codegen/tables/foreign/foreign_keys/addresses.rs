@@ -1,11 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddressForeignKeys {
-    pub city: Option<crate::codegen::structs_codegen::tables::cities::City>,
+    pub city: Option<crate::City>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::addresses::Address
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::Address {
     type ForeignKeys = AddressForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

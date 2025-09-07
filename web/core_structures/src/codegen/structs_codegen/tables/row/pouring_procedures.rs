@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
-    ) -> Self {
+impl From<crate::PouringProcedure> for super::Row {
+    fn from(value: crate::PouringProcedure) -> Self {
         super::Row::PouringProcedure(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure
-{
+impl TryFrom<super::Row> for crate::PouringProcedure {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

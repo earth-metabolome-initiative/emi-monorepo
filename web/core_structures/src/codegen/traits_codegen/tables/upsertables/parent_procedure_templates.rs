@@ -1,6 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate
+    for crate::ParentProcedureTemplate
 {
     fn upsert(
         &self,
@@ -24,7 +24,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate
+    for crate::ParentProcedureTemplate
 {
     fn upsert(
         &self,

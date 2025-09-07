@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::team_members::TeamMember
-{
+impl web_common_traits::database::Insertable for crate::TeamMember {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder;
     type InsertableVariant =

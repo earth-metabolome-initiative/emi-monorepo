@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateBui
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table,
+        <crate::TeamState as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTeamState as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::team_states::TeamState as diesel::associations::HasTable>::Table,
+            <crate::TeamState as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::team_states::TeamState,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::TeamState>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::team_states::TeamState;
+    type Row = crate::TeamState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamState;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TeamStateAttribute,

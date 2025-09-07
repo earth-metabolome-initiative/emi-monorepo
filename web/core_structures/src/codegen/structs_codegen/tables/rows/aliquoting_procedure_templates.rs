@@ -1,29 +1,14 @@
-impl From<
-    crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-> for super::Rows {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-    ) -> Self {
+impl From<crate::AliquotingProcedureTemplate> for super::Rows {
+    fn from(value: crate::AliquotingProcedureTemplate) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<
-    Vec<
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-        >,
-    ) -> Self {
+impl From<Vec<crate::AliquotingProcedureTemplate>> for super::Rows {
+    fn from(value: Vec<crate::AliquotingProcedureTemplate>) -> Self {
         super::Rows::AliquotingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-> {
+impl TryFrom<super::Rows> for Vec<crate::AliquotingProcedureTemplate> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

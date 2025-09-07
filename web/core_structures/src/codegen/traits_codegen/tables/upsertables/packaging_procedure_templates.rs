@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate {
+    for crate::PackagingProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -19,23 +20,20 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
             .filter(
                 packaged_with_model
                     .ne(excluded(packaged_with_model))
-                    .or(
-                        procedure_template_packaged_with_model
-                            .ne(excluded(procedure_template_packaged_with_model)),
-                    )
+                    .or(procedure_template_packaged_with_model
+                        .ne(excluded(procedure_template_packaged_with_model)))
                     .or(sample_model.ne(excluded(sample_model)))
-                    .or(
-                        procedure_template_sample_model
-                            .ne(excluded(procedure_template_sample_model)),
-                    ),
+                    .or(procedure_template_sample_model
+                        .ne(excluded(procedure_template_sample_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate {
+    for crate::PackagingProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -54,17 +52,13 @@ for crate::codegen::structs_codegen::tables::packaging_procedure_templates::Pack
             .filter(
                 packaged_with_model
                     .ne(excluded(packaged_with_model))
-                    .or(
-                        procedure_template_packaged_with_model
-                            .ne(excluded(procedure_template_packaged_with_model)),
-                    )
+                    .or(procedure_template_packaged_with_model
+                        .ne(excluded(procedure_template_packaged_with_model)))
                     .or(sample_model.ne(excluded(sample_model)))
-                    .or(
-                        procedure_template_sample_model
-                            .ne(excluded(procedure_template_sample_model)),
-                    ),
+                    .or(procedure_template_sample_model
+                        .ne(excluded(procedure_template_sample_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

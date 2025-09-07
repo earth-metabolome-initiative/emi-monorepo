@@ -74,112 +74,42 @@ impl InsertableCommercialCentrifugeLot {
     pub fn commercial_centrifuge_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        >,
+        crate::CommercialProductLot: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialProductLot::read(self.id, conn)
     }
     pub fn commercial_centrifuge_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CentrifugeModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
-        >,
+        crate::CentrifugeModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::table(
-                ),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CentrifugeModel::read(self.id, conn)
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialCentrifugeModel, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
-        >,
+        crate::CommercialCentrifugeModel: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel::table(),
-                self.product_model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialCentrifugeModel::read(self.product_model, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_centrifuge_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<crate::AssetModel, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+        crate::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -188,9 +118,7 @@ impl InsertableCommercialCentrifugeLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .first::<crate::AssetModel>(conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -287,14 +215,14 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
     ///class v2 directly-involved-column
     ///end
     ///v2 --->|"`ancestral same as`"| v3
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v6
     ///```
     fn product_model(
         mut self,
@@ -619,15 +547,15 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v1 -.->|"`inferred ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v7 --->|"`extends`"| v4
-    ///v6 --->|"`extends`"| v7
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///```
     fn parent_model(
         self,
@@ -670,26 +598,17 @@ where
         self
     }
 }
-impl<
-    CentrifugeModel,
-    CommercialProductLot,
-    C,
-> web_common_traits::database::TryInsertGeneric<C>
-for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
+impl<CentrifugeModel, CommercialProductLot, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductLot>
 where
     Self: web_common_traits::database::InsertableVariant<
-        C,
-        UserId = i32,
-        Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialCentrifugeLotAttribute,
+            C,
+            UserId = i32,
+            Row = crate::CommercialCentrifugeLot,
+            Error = web_common_traits::database::InsertError<CommercialCentrifugeLotAttribute>,
         >,
-    >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+    CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialCentrifugeLotAttribute;
     fn is_complete(&self) -> bool {
@@ -701,14 +620,10 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
-    > {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot = self
-            .insert(user_id, conn)?;
+        let insertable: crate::CommercialCentrifugeLot = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

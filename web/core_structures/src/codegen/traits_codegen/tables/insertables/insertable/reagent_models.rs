@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::reagent_models::ReagentModel
-{
+impl web_common_traits::database::Insertable for crate::ReagentModel {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder;
     type InsertableVariant =

@@ -1,7 +1,5 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure
-{
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::FractioningProcedure {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -40,7 +38,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure
+    for crate::FractioningProcedure
 {
     fn upsert(
         &self,

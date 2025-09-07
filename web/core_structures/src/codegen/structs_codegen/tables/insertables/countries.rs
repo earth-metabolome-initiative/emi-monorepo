@@ -141,7 +141,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::countries::Country,
+            Row = crate::Country,
             Error = web_common_traits::database::InsertError<CountryAttribute>,
         >,
 {
@@ -156,8 +156,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::countries::Country =
-            self.insert(user_id, conn)?;
+        let insertable: crate::Country = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

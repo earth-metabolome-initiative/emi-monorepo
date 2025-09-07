@@ -1,43 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CentrifugeProcedureForeignKeys {
-    pub procedure_centrifuged_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
-    >,
-    pub centrifuged_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub centrifuged_container_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
-    pub procedure_template_centrifuged_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_centrifuged_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub centrifuged_with_model: Option<
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
-    >,
-    pub centrifuged_with: Option<
-        crate::codegen::structs_codegen::tables::centrifuges::Centrifuge,
-    >,
-    pub procedure_template_centrifuged_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
+    pub procedure_centrifuged_with: Option<crate::ProcedureAsset>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_template: Option<crate::CentrifugeProcedureTemplate>,
+    pub centrifuged_container: Option<crate::VolumetricContainer>,
+    pub centrifuged_container_model: Option<crate::VolumetricContainerModel>,
+    pub procedure_template_centrifuged_container_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_centrifuged_container: Option<crate::ProcedureAsset>,
+    pub centrifuged_with_model: Option<crate::CentrifugeModel>,
+    pub centrifuged_with: Option<crate::Centrifuge>,
+    pub procedure_template_centrifuged_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey:
+        Option<crate::AssetCompatibilityRule>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
     type ForeignKeys = CentrifugeProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

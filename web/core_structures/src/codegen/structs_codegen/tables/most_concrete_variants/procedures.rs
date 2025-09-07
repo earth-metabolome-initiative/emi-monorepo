@@ -21,352 +21,265 @@
 /// v13@{shape: rect, label: "storage_procedures"}
 /// v14@{shape: rect, label: "supernatant_procedures"}
 /// v15@{shape: rect, label: "weighing_procedures"}
-/// v0 --->|"`extends`"| v12
-/// v3 --->|"`extends`"| v12
-/// v4 --->|"`extends`"| v12
-/// v10 --->|"`extends`"| v12
-/// v5 --->|"`extends`"| v12
-/// v13 --->|"`extends`"| v12
-/// v1 --->|"`extends`"| v12
-/// v15 --->|"`extends`"| v12
-/// v11 --->|"`extends`"| v12
-/// v8 --->|"`extends`"| v12
 /// v14 --->|"`extends`"| v12
-/// v6 --->|"`extends`"| v12
+/// v11 --->|"`extends`"| v12
 /// v7 --->|"`extends`"| v12
+/// v10 --->|"`extends`"| v12
+/// v6 --->|"`extends`"| v12
+/// v3 --->|"`extends`"| v12
 /// v9 --->|"`extends`"| v12
+/// v15 --->|"`extends`"| v12
+/// v1 --->|"`extends`"| v12
+/// v13 --->|"`extends`"| v12
+/// v8 --->|"`extends`"| v12
+/// v5 --->|"`extends`"| v12
 /// v2 --->|"`extends`"| v12
+/// v4 --->|"`extends`"| v12
+/// v0 --->|"`extends`"| v12
 /// ```
 pub enum ProcedureDAG {
     /// Variant representing the `aliquoting_procedures` table.
-    AliquotingProcedure(
-        crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
-    ),
+    AliquotingProcedure(crate::AliquotingProcedure),
     /// Variant representing the `ball_mill_procedures` table.
-    BallMillProcedure(
-        crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
-    ),
+    BallMillProcedure(crate::BallMillProcedure),
     /// Variant representing the `capping_procedures` table.
-    CappingProcedure(crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure),
+    CappingProcedure(crate::CappingProcedure),
     /// Variant representing the `centrifuge_procedures` table.
-    CentrifugeProcedure(
-        crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
-    ),
+    CentrifugeProcedure(crate::CentrifugeProcedure),
     /// Variant representing the `disposal_procedures` table.
-    DisposalProcedure(
-        crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
-    ),
+    DisposalProcedure(crate::DisposalProcedure),
     /// Variant representing the `fractioning_procedures` table.
-    FractioningProcedure(
-        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
-    ),
+    FractioningProcedure(crate::FractioningProcedure),
     /// Variant representing the `freeze_drying_procedures` table.
-    FreezeDryingProcedure(
-        crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
-    ),
+    FreezeDryingProcedure(crate::FreezeDryingProcedure),
     /// Variant representing the `freezing_procedures` table.
-    FreezingProcedure(
-        crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
-    ),
+    FreezingProcedure(crate::FreezingProcedure),
     /// Variant representing the `geolocation_procedures` table.
-    GeolocationProcedure(
-        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
-    ),
+    GeolocationProcedure(crate::GeolocationProcedure),
     /// Variant representing the `packaging_procedures` table.
-    PackagingProcedure(
-        crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
-    ),
+    PackagingProcedure(crate::PackagingProcedure),
     /// Variant representing the `photograph_procedures` table.
-    PhotographProcedure(
-        crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
-    ),
+    PhotographProcedure(crate::PhotographProcedure),
     /// Variant representing the `pouring_procedures` table.
-    PouringProcedure(crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure),
+    PouringProcedure(crate::PouringProcedure),
     /// Variant representing the `procedures` table.
-    Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
+    Procedure(crate::Procedure),
     /// Variant representing the `storage_procedures` table.
-    StorageProcedure(crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure),
+    StorageProcedure(crate::StorageProcedure),
     /// Variant representing the `supernatant_procedures` table.
-    SupernatantProcedure(
-        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
-    ),
+    SupernatantProcedure(crate::SupernatantProcedure),
     /// Variant representing the `weighing_procedures` table.
-    WeighingProcedure(
-        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
-    ),
+    WeighingProcedure(crate::WeighingProcedure),
 }
-impl From<crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
-    ) -> Self {
+impl From<crate::AliquotingProcedure> for ProcedureDAG {
+    fn from(value: crate::AliquotingProcedure) -> Self {
         ProcedureDAG::AliquotingProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
-    ) -> Self {
+impl From<crate::BallMillProcedure> for ProcedureDAG {
+    fn from(value: crate::BallMillProcedure) -> Self {
         ProcedureDAG::BallMillProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
-    ) -> Self {
+impl From<crate::CappingProcedure> for ProcedureDAG {
+    fn from(value: crate::CappingProcedure) -> Self {
         ProcedureDAG::CappingProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
-    ) -> Self {
+impl From<crate::CentrifugeProcedure> for ProcedureDAG {
+    fn from(value: crate::CentrifugeProcedure) -> Self {
         ProcedureDAG::CentrifugeProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
-    ) -> Self {
+impl From<crate::DisposalProcedure> for ProcedureDAG {
+    fn from(value: crate::DisposalProcedure) -> Self {
         ProcedureDAG::DisposalProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
-    ) -> Self {
+impl From<crate::FractioningProcedure> for ProcedureDAG {
+    fn from(value: crate::FractioningProcedure) -> Self {
         ProcedureDAG::FractioningProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
-    ) -> Self {
+impl From<crate::FreezeDryingProcedure> for ProcedureDAG {
+    fn from(value: crate::FreezeDryingProcedure) -> Self {
         ProcedureDAG::FreezeDryingProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
-    ) -> Self {
+impl From<crate::FreezingProcedure> for ProcedureDAG {
+    fn from(value: crate::FreezingProcedure) -> Self {
         ProcedureDAG::FreezingProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
-    ) -> Self {
+impl From<crate::GeolocationProcedure> for ProcedureDAG {
+    fn from(value: crate::GeolocationProcedure) -> Self {
         ProcedureDAG::GeolocationProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
-    ) -> Self {
+impl From<crate::PackagingProcedure> for ProcedureDAG {
+    fn from(value: crate::PackagingProcedure) -> Self {
         ProcedureDAG::PackagingProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
-    ) -> Self {
+impl From<crate::PhotographProcedure> for ProcedureDAG {
+    fn from(value: crate::PhotographProcedure) -> Self {
         ProcedureDAG::PhotographProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
-    ) -> Self {
+impl From<crate::PouringProcedure> for ProcedureDAG {
+    fn from(value: crate::PouringProcedure) -> Self {
         ProcedureDAG::PouringProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::procedures::Procedure> for ProcedureDAG {
-    fn from(value: crate::codegen::structs_codegen::tables::procedures::Procedure) -> Self {
+impl From<crate::Procedure> for ProcedureDAG {
+    fn from(value: crate::Procedure) -> Self {
         ProcedureDAG::Procedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
-    ) -> Self {
+impl From<crate::StorageProcedure> for ProcedureDAG {
+    fn from(value: crate::StorageProcedure) -> Self {
         ProcedureDAG::StorageProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
-    ) -> Self {
+impl From<crate::SupernatantProcedure> for ProcedureDAG {
+    fn from(value: crate::SupernatantProcedure) -> Self {
         ProcedureDAG::SupernatantProcedure(value)
     }
 }
-impl From<crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
-    ) -> Self {
+impl From<crate::WeighingProcedure> for ProcedureDAG {
+    fn from(value: crate::WeighingProcedure) -> Self {
         ProcedureDAG::WeighingProcedure(value)
     }
 }
-impl<C> web_common_traits::database::MostConcreteVariant<C>
-    for crate::codegen::structs_codegen::tables::procedures::Procedure
+impl<C> web_common_traits::database::MostConcreteVariant<C> for crate::Procedure
 where
-    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure:
-        web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure:
-        web_common_traits::database::Read<C>,
+    crate::AliquotingProcedure: web_common_traits::database::Read<C>,
+    crate::BallMillProcedure: web_common_traits::database::Read<C>,
+    crate::CappingProcedure: web_common_traits::database::Read<C>,
+    crate::CentrifugeProcedure: web_common_traits::database::Read<C>,
+    crate::DisposalProcedure: web_common_traits::database::Read<C>,
+    crate::FractioningProcedure: web_common_traits::database::Read<C>,
+    crate::FreezeDryingProcedure: web_common_traits::database::Read<C>,
+    crate::FreezingProcedure: web_common_traits::database::Read<C>,
+    crate::GeolocationProcedure: web_common_traits::database::Read<C>,
+    crate::PackagingProcedure: web_common_traits::database::Read<C>,
+    crate::PhotographProcedure: web_common_traits::database::Read<C>,
+    crate::PouringProcedure: web_common_traits::database::Read<C>,
+    crate::StorageProcedure: web_common_traits::database::Read<C>,
+    crate::SupernatantProcedure: web_common_traits::database::Read<C>,
+    crate::WeighingProcedure: web_common_traits::database::Read<C>,
 {
     type Variant = ProcedureDAG;
     fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
         use diesel::Identifiable;
-        Ok(
-            match self.most_concrete_table.as_str() {
-                "aliquoting_procedures" => {
-                    <crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "ball_mill_procedures" => {
-                    <crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "capping_procedures" => {
-                    <crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "centrifuge_procedures" => {
-                    <crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "disposal_procedures" => {
-                    <crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "fractioning_procedures" => {
-                    <crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "freeze_drying_procedures" => {
-                    <crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "freezing_procedures" => {
-                    <crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "geolocation_procedures" => {
-                    <crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "packaging_procedures" => {
-                    <crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "photograph_procedures" => {
-                    <crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "pouring_procedures" => {
-                    <crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "procedures" => self.clone().into(),
-                "storage_procedures" => {
-                    <crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "supernatant_procedures" => {
-                    <crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                "weighing_procedures" => {
-                    <crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
-                _ => unreachable!("Database and codegen are out of sync."),
-            },
-        )
+        Ok(match self.most_concrete_table.as_str() {
+            "aliquoting_procedures" => {
+                <crate::AliquotingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "ball_mill_procedures" => {
+                <crate::BallMillProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "capping_procedures" => {
+                <crate::CappingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "centrifuge_procedures" => {
+                <crate::CentrifugeProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "disposal_procedures" => {
+                <crate::DisposalProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "fractioning_procedures" => {
+                <crate::FractioningProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "freeze_drying_procedures" => {
+                <crate::FreezeDryingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "freezing_procedures" => {
+                <crate::FreezingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "geolocation_procedures" => {
+                <crate::GeolocationProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "packaging_procedures" => {
+                <crate::PackagingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "photograph_procedures" => {
+                <crate::PhotographProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "pouring_procedures" => {
+                <crate::PouringProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "procedures" => self.clone().into(),
+            "storage_procedures" => {
+                <crate::StorageProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "supernatant_procedures" => {
+                <crate::SupernatantProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            "weighing_procedures" => {
+                <crate::WeighingProcedure as web_common_traits::database::Read<C>>::read(
+                    *self.id(),
+                    conn,
+                )?
+                .into()
+            }
+            _ => unreachable!("Database and codegen are out of sync."),
+        })
     }
 }

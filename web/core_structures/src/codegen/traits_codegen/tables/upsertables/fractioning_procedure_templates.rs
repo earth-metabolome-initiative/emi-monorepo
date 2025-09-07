@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate {
+    for crate::FractioningProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -21,31 +22,23 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::Fr
                     .ne(excluded(kilograms))
                     .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with_model.ne(excluded(weighed_with_model)))
-                    .or(
-                        procedure_template_weighed_with_model
-                            .ne(excluded(procedure_template_weighed_with_model)),
-                    )
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
                     .or(fragment_container_model.ne(excluded(fragment_container_model)))
-                    .or(
-                        procedure_template_fragment_container_model
-                            .ne(excluded(procedure_template_fragment_container_model)),
-                    )
-                    .or(
-                        fragment_placed_into_model
-                            .ne(excluded(fragment_placed_into_model)),
-                    )
-                    .or(
-                        procedure_template_fragment_placed_into_model
-                            .ne(excluded(procedure_template_fragment_placed_into_model)),
-                    ),
+                    .or(procedure_template_fragment_container_model
+                        .ne(excluded(procedure_template_fragment_container_model)))
+                    .or(fragment_placed_into_model.ne(excluded(fragment_placed_into_model)))
+                    .or(procedure_template_fragment_placed_into_model
+                        .ne(excluded(procedure_template_fragment_placed_into_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate {
+    for crate::FractioningProcedureTemplate
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -66,25 +59,16 @@ for crate::codegen::structs_codegen::tables::fractioning_procedure_templates::Fr
                     .ne(excluded(kilograms))
                     .or(tolerance_percentage.ne(excluded(tolerance_percentage)))
                     .or(weighed_with_model.ne(excluded(weighed_with_model)))
-                    .or(
-                        procedure_template_weighed_with_model
-                            .ne(excluded(procedure_template_weighed_with_model)),
-                    )
+                    .or(procedure_template_weighed_with_model
+                        .ne(excluded(procedure_template_weighed_with_model)))
                     .or(fragment_container_model.ne(excluded(fragment_container_model)))
-                    .or(
-                        procedure_template_fragment_container_model
-                            .ne(excluded(procedure_template_fragment_container_model)),
-                    )
-                    .or(
-                        fragment_placed_into_model
-                            .ne(excluded(fragment_placed_into_model)),
-                    )
-                    .or(
-                        procedure_template_fragment_placed_into_model
-                            .ne(excluded(procedure_template_fragment_placed_into_model)),
-                    ),
+                    .or(procedure_template_fragment_container_model
+                        .ne(excluded(procedure_template_fragment_container_model)))
+                    .or(fragment_placed_into_model.ne(excluded(fragment_placed_into_model)))
+                    .or(procedure_template_fragment_placed_into_model
+                        .ne(excluded(procedure_template_fragment_placed_into_model))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

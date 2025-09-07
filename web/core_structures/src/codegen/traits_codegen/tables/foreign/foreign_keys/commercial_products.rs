@@ -1,12 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialProductForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
-    pub brand: Option<crate::codegen::structs_codegen::tables::brands::Brand>,
+    pub id: Option<crate::AssetModel>,
+    pub brand: Option<crate::Brand>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::CommercialProduct {
     type ForeignKeys = CommercialProductForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

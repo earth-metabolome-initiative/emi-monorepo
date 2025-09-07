@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure
-{
+impl web_common_traits::database::Insertable for crate::FreezingProcedure {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureBuilder;
     type InsertableVariant =

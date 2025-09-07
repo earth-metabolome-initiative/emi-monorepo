@@ -1,6 +1,4 @@
-impl web_common_traits::database::Insertable
-    for crate::codegen::structs_codegen::tables::addresses::Address
-{
+impl web_common_traits::database::Insertable for crate::Address {
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder;
     type InsertableVariant =

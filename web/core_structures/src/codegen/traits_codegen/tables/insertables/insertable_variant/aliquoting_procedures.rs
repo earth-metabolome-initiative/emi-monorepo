@@ -8,15 +8,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingPr
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure as diesel::associations::HasTable>::Table,
+        <crate::AliquotingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedure as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure as diesel::associations::HasTable>::Table,
+            <crate::AliquotingProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::AliquotingProcedure>,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -25,44 +21,34 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
     >,
-    crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
-        C,
+    crate::AliquotingProcedureTemplate: web_common_traits::database::Read<C>,
+    crate::Procedure: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
     >,
+    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
+        C,
+        crate::Procedure,
+    >,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure;
+    type Row = crate::AliquotingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
@@ -100,7 +86,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let aliquoting_procedure_templates = crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::read(
+            let aliquoting_procedure_templates = crate::AliquotingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -124,7 +110,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_with) = self
             .procedure_aliquoted_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_aliquoted_with,
                 conn,
             )?;
@@ -144,7 +130,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_pipette_tip) = self
             .procedure_pipette_tip
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_pipette_tip,
                 conn,
             )?;
@@ -160,7 +146,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_from) = self
             .procedure_aliquoted_from
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_aliquoted_from,
                 conn,
             )?;
@@ -178,7 +164,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_into) = self
             .procedure_aliquoted_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_aliquoted_into,
                 conn,
             )?;

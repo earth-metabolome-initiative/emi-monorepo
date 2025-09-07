@@ -1,45 +1,28 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialPipetteTipModelForeignKeys {
-    pub pipette_tip_model:
-        Option<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
-    pub commercial_pipette_tip_models_id_fkey:
-        Option<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
-    pub commercial_pipette_tip_models_id_fkey1:
-        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub pipette_tip_model: Option<crate::PipetteTipModel>,
+    pub commercial_pipette_tip_models_id_fkey: Option<crate::PipetteTipModel>,
+    pub commercial_pipette_tip_models_id_fkey1: Option<crate::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel {
+impl web_common_traits::prelude::HasForeignKeys for crate::CommercialPipetteTipModel {
     type ForeignKeys = CommercialPipetteTipModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
-                        self.pipette_tip_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
-                        self.id,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
-                        self.id,
-                    ),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
+                self.pipette_tip_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(self.id),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.pipette_tip_model.is_some()
@@ -61,9 +44,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::Comm
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == commercial_products.id {
-                    foreign_keys.commercial_pipette_tip_models_id_fkey1 = Some(
-                        commercial_products,
-                    );
+                    foreign_keys.commercial_pipette_tip_models_id_fkey1 = Some(commercial_products);
                     updated = true;
                 }
             }
@@ -87,9 +68,7 @@ for crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::Comm
                     updated = true;
                 }
                 if self.id == pipette_tip_models.id {
-                    foreign_keys.commercial_pipette_tip_models_id_fkey = Some(
-                        pipette_tip_models,
-                    );
+                    foreign_keys.commercial_pipette_tip_models_id_fkey = Some(pipette_tip_models);
                     updated = true;
                 }
             }

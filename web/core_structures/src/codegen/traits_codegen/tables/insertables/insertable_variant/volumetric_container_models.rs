@@ -8,20 +8,20 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricCo
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table,
+        <crate::VolumetricContainerModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel as diesel::associations::HasTable>::Table,
+            <crate::VolumetricContainerModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::VolumetricContainerModel,
     >,
     C: diesel::connection::LoadConnection,
     ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel;
+    type Row = crate::VolumetricContainerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,

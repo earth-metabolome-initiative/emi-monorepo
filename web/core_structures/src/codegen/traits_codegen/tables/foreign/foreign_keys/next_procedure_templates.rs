@@ -1,26 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NextProcedureTemplateForeignKeys {
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub parent: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub next_procedure_templates_parent_predecessor_fkey: Option<
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-    >,
-    pub next_procedure_templates_parent_successor_fkey: Option<
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-    >,
-    pub predecessor: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub successor: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
+    pub created_by: Option<crate::User>,
+    pub parent: Option<crate::ProcedureTemplate>,
+    pub next_procedure_templates_parent_predecessor_fkey: Option<crate::ParentProcedureTemplate>,
+    pub next_procedure_templates_parent_successor_fkey: Option<crate::ParentProcedureTemplate>,
+    pub predecessor: Option<crate::ProcedureTemplate>,
+    pub successor: Option<crate::ProcedureTemplate>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::NextProcedureTemplate {
     type ForeignKeys = NextProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

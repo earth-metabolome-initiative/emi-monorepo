@@ -8,15 +8,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDrying
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure as diesel::associations::HasTable>::Table,
+        <crate::FreezeDryingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedure as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure as diesel::associations::HasTable>::Table,
+            <crate::FreezeDryingProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::FreezeDryingProcedure>,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -25,41 +21,33 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute,
     >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
+    crate::Asset: web_common_traits::database::Read<C>,
+    crate::FreezeDryingProcedureTemplate: web_common_traits::database::Read<C>,
+    crate::Procedure: diesel::Identifiable
+        + web_common_traits::database::Updatable<C, UserId = i32>,
+    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
     >,
-    crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: web_common_traits::database::Read<
+    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Procedure as diesel::Identifiable>::Id,
+    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+        'a,
         C,
+        crate::Procedure,
     >,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::ProcedureAsset: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure;
+    type Row = crate::FreezeDryingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute,
@@ -97,7 +85,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let freeze_drying_procedure_templates = crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::read(
+            let freeze_drying_procedure_templates = crate::FreezeDryingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -116,7 +104,7 @@ where
             procedure_freeze_dried_container,
         ) = self.procedure_freeze_dried_container
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_freeze_dried_container,
                 conn,
             )?;
@@ -136,10 +124,7 @@ where
             }
         }
         if let Some(freeze_dried_with) = self.freeze_dried_with {
-            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
-                freeze_dried_with,
-                conn,
-            )?;
+            let assets = crate::Asset::read(freeze_dried_with, conn)?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureSettable>::freeze_dried_with_model(
                 self,
                 assets.model,
@@ -149,7 +134,7 @@ where
             procedure_freeze_dried_with,
         ) = self.procedure_freeze_dried_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::ProcedureAsset::read(
                 procedure_freeze_dried_with,
                 conn,
             )?;

@@ -1,31 +1,14 @@
-impl
-    From<crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule>
-    for super::Rows
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    ) -> Self {
+impl From<crate::AssetCompatibilityRule> for super::Rows {
+    fn from(value: crate::AssetCompatibilityRule) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<
-    Vec<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
-> for super::Rows {
-    fn from(
-        value: Vec<
-            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        >,
-    ) -> Self {
+impl From<Vec<crate::AssetCompatibilityRule>> for super::Rows {
+    fn from(value: Vec<crate::AssetCompatibilityRule>) -> Self {
         super::Rows::AssetCompatibilityRule(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >
-{
+impl TryFrom<super::Rows> for Vec<crate::AssetCompatibilityRule> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

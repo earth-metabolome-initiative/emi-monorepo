@@ -1,15 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProjectForeignKeys {
-    pub color: Option<crate::codegen::structs_codegen::tables::colors::Color>,
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub parent_project: Option<crate::codegen::structs_codegen::tables::projects::Project>,
-    pub state: Option<crate::codegen::structs_codegen::tables::project_states::ProjectState>,
-    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub color: Option<crate::Color>,
+    pub created_by: Option<crate::User>,
+    pub parent_project: Option<crate::Project>,
+    pub state: Option<crate::ProjectState>,
+    pub updated_by: Option<crate::User>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::projects::Project
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::Project {
     type ForeignKeys = ProjectForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

@@ -1,58 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-    >,
-    pub aliquoted_with: Option<
-        crate::codegen::structs_codegen::tables::pipettes::Pipette,
-    >,
-    pub aliquoted_with_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-    >,
-    pub procedure_template_aliquoted_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_aliquoted_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub pipette_tip_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-    >,
-    pub procedure_template_pipette_tip_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_pipette_tip: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub aliquoted_from: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub procedure_template_aliquoted_from_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_aliquoted_from: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub aliquoted_into: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub procedure_template_aliquoted_into_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_aliquoted_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub aliquoting_procedures_aliquoted_with_model_pipette_tip_mod_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_template: Option<crate::AliquotingProcedureTemplate>,
+    pub aliquoted_with: Option<crate::Pipette>,
+    pub aliquoted_with_model: Option<crate::PipetteModel>,
+    pub procedure_template_aliquoted_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_aliquoted_with: Option<crate::ProcedureAsset>,
+    pub pipette_tip_model: Option<crate::PipetteTipModel>,
+    pub procedure_template_pipette_tip_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_pipette_tip: Option<crate::ProcedureAsset>,
+    pub aliquoted_from: Option<crate::VolumetricContainer>,
+    pub procedure_template_aliquoted_from_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_aliquoted_from: Option<crate::ProcedureAsset>,
+    pub aliquoted_into: Option<crate::VolumetricContainer>,
+    pub procedure_template_aliquoted_into_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_aliquoted_into: Option<crate::ProcedureAsset>,
+    pub aliquoting_procedures_aliquoted_with_model_pipette_tip_mod_fkey:
+        Option<crate::AssetCompatibilityRule>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::AliquotingProcedure {
     type ForeignKeys = AliquotingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

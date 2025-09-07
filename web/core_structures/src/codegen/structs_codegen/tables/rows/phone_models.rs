@@ -1,16 +1,14 @@
-impl From<crate::codegen::structs_codegen::tables::phone_models::PhoneModel> for super::Rows {
-    fn from(value: crate::codegen::structs_codegen::tables::phone_models::PhoneModel) -> Self {
+impl From<crate::PhoneModel> for super::Rows {
+    fn from(value: crate::PhoneModel) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>> for super::Rows {
-    fn from(value: Vec<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>) -> Self {
+impl From<Vec<crate::PhoneModel>> for super::Rows {
+    fn from(value: Vec<crate::PhoneModel>) -> Self {
         super::Rows::PhoneModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>
-{
+impl TryFrom<super::Rows> for Vec<crate::PhoneModel> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

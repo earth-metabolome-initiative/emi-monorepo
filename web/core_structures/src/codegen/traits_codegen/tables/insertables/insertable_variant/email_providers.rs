@@ -5,18 +5,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableEmailProvide
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::email_providers::EmailProvider as diesel::associations::HasTable>::Table,
+        <crate::EmailProvider as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableEmailProvider as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::email_providers::EmailProvider as diesel::associations::HasTable>::Table,
+            <crate::EmailProvider as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::EmailProvider>,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider;
+    type Row = crate::EmailProvider;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableEmailProvider;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::EmailProviderAttribute,

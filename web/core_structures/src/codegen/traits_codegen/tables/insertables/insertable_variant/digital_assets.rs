@@ -8,53 +8,49 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table,
+        <crate::DigitalAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table,
+            <crate::DigitalAsset as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::DigitalAsset>,
     Asset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::assets::Asset: diesel::Identifiable
+    crate::Asset: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    <crate::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Asset as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    <<crate::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Asset as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::Identifiable>::Id,
+    <<<crate::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Asset as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::assets::Asset,
+        crate::Asset,
     >,
-    crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel: diesel::Identifiable
+    crate::DigitalAssetModel: diesel::Identifiable
         + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::Identifiable>::Id,
+    <crate::DigitalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAssetModel as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::Identifiable>::Id,
+    <<crate::DigitalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAssetModel as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::Identifiable>::Id,
+    <<<crate::DigitalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::DigitalAssetModel as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
+        crate::DigitalAssetModel,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset;
+    type Row = crate::DigitalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,

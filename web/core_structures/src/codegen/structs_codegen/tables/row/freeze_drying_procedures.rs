@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
-    ) -> Self {
+impl From<crate::FreezeDryingProcedure> for super::Row {
+    fn from(value: crate::FreezeDryingProcedure) -> Self {
         super::Row::FreezeDryingProcedure(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure
-{
+impl TryFrom<super::Row> for crate::FreezeDryingProcedure {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

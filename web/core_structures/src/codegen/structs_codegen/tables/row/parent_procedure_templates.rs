@@ -1,15 +1,9 @@
-impl From<
-    crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-> for super::Row {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-    ) -> Self {
+impl From<crate::ParentProcedureTemplate> for super::Row {
+    fn from(value: crate::ParentProcedureTemplate) -> Self {
         super::Row::ParentProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate
-{
+impl TryFrom<super::Row> for crate::ParentProcedureTemplate {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

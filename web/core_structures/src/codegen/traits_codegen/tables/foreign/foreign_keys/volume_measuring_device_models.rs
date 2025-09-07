@@ -1,25 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VolumeMeasuringDeviceModelForeignKeys {
-    pub id:
-        Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+    pub id: Option<crate::PhysicalAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-for crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel {
+impl web_common_traits::prelude::HasForeignKeys for crate::VolumeMeasuringDeviceModel {
     type ForeignKeys = VolumeMeasuringDeviceModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.id,
-                    ),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.id,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()
@@ -33,9 +28,7 @@ for crate::codegen::structs_codegen::tables::volume_measuring_device_models::Vol
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -46,9 +39,7 @@ for crate::codegen::structs_codegen::tables::volume_measuring_device_models::Vol
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.id == physical_asset_models.id {

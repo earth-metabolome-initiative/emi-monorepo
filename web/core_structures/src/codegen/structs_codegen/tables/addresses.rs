@@ -9,12 +9,7 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::cities::City,
-        foreign_key = city_id
-    )
-)]
+#[diesel(belongs_to(crate::City, foreign_key = city_id))]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::addresses::addresses)]
 pub struct Address {
@@ -28,12 +23,8 @@ pub struct Address {
 impl web_common_traits::prelude::TableName for Address {
     const TABLE_NAME: &'static str = "addresses";
 }
-impl
-    web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::addresses::Address,
-    > for Address
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+impl web_common_traits::prelude::ExtensionTable<crate::Address> for Address where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {
 }
 impl diesel::Identifiable for Address {
@@ -46,34 +37,12 @@ impl Address {
     pub fn city<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::cities::City,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::City, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::cities::City: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::cities::City as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::cities::City as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::cities::City,
-        >,
+        crate::City: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::cities::City::table(),
-                self.city_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::City::read(self.city_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_city_id_and_street_name_and_street_number(

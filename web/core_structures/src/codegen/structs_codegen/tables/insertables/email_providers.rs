@@ -40,66 +40,22 @@ impl InsertableEmailProvider {
     pub fn email<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::user_emails::UserEmail,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::UserEmail, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::user_emails::UserEmail: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::user_emails::UserEmail as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::user_emails::UserEmail,
-        >,
+        crate::UserEmail: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::user_emails::UserEmail::table(),
-                self.email_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::UserEmail::read(self.email_id, conn)
     }
     pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::LoginProvider, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-        >,
+        crate::LoginProvider: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
-                self.login_provider_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::LoginProvider::read(self.login_provider_id, conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -188,7 +144,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
+            Row = crate::EmailProvider,
             Error = web_common_traits::database::InsertError<EmailProviderAttribute>,
         >,
 {
@@ -203,8 +159,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::email_providers::EmailProvider =
-            self.insert(user_id, conn)?;
+        let insertable: crate::EmailProvider = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -5,30 +5,20 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAss
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+        <crate::ProcedureAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+            <crate::ProcedureAsset as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::ProcedureAsset>,
     C: diesel::connection::LoadConnection,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
     >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
+    crate::Asset: web_common_traits::database::Read<C>,
+    crate::Procedure: web_common_traits::database::Read<C>,
+    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
 {
-    type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
+    type Row = crate::ProcedureAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
@@ -56,20 +46,14 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(procedure) = self.procedure {
-            let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
-                procedure,
-                conn,
-            )?;
+            let procedures = crate::Procedure::read(procedure, conn)?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
                 self,
                 procedures.procedure_template,
             )?;
         }
         if let Some(asset) = self.asset {
-            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
-                asset,
-                conn,
-            )?;
+            let assets = crate::Asset::read(asset, conn)?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                 self,
                 assets.model,
@@ -77,7 +61,7 @@ where
         }
         if let Some(procedure_template_asset_model) = self.procedure_template_asset_model
         {
-            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
                 procedure_template_asset_model,
                 conn,
             )?;

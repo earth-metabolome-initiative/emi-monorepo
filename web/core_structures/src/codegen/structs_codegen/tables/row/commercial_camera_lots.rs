@@ -1,15 +1,9 @@
-impl From<crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot>
-    for super::Row
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
-    ) -> Self {
+impl From<crate::CommercialCameraLot> for super::Row {
+    fn from(value: crate::CommercialCameraLot) -> Self {
         super::Row::CommercialCameraLot(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot
-{
+impl TryFrom<super::Row> for crate::CommercialCameraLot {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

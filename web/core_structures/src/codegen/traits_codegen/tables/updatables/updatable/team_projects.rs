@@ -1,42 +1,36 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::codegen::structs_codegen::tables::team_projects::TeamProject
+for crate::TeamProject
 where
-    crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    crate::Project: diesel::Identifiable,
+    <crate::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Project as diesel::Identifiable>::Id,
     >,
-    <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    <<crate::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Project as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
+    <<<crate::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Project as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::projects::Project,
+        crate::Project,
     >,
-    crate::codegen::structs_codegen::tables::projects::Project: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
+    crate::Project: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::Team: diesel::Identifiable,
+    <crate::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >,
-    crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
-    <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    <<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
+    <<<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+        <crate::Team as diesel::Identifiable>::Id,
     >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
         'a,
         C,
-        crate::codegen::structs_codegen::tables::teams::Team,
+        crate::Team,
     >,
-    crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
+    crate::Team: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

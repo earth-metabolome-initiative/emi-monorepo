@@ -1,41 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezingProcedureForeignKeys {
-    pub frozen_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub frozen_container_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
-    pub frozen_with: Option<crate::codegen::structs_codegen::tables::freezers::Freezer>,
-    pub frozen_with_model: Option<
-        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
-    >,
-    pub freezing_procedures_frozen_with_model_frozen_container_mod_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_frozen_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_frozen_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-    >,
-    pub procedure_template_frozen_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_frozen_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
+    pub frozen_container: Option<crate::VolumetricContainer>,
+    pub frozen_container_model: Option<crate::VolumetricContainerModel>,
+    pub frozen_with: Option<crate::Freezer>,
+    pub frozen_with_model: Option<crate::FreezerModel>,
+    pub freezing_procedures_frozen_with_model_frozen_container_mod_fkey:
+        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_frozen_container: Option<crate::ProcedureAsset>,
+    pub procedure_frozen_with: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::FreezingProcedureTemplate>,
+    pub procedure_template_frozen_container_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_frozen_with_model: Option<crate::ProcedureTemplateAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::FreezingProcedure {
     type ForeignKeys = FreezingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

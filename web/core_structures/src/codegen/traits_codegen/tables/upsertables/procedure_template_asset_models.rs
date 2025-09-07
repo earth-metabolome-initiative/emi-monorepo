@@ -1,6 +1,7 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
+    for crate::ProcedureTemplateAssetModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -17,8 +18,7 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
             .do_update()
             .set(self)
             .filter(
-                name
-                    .ne(excluded(name))
+                name.ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
                     .or(asset_model.ne(excluded(asset_model)))
@@ -26,12 +26,13 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
+    for crate::ProcedureTemplateAssetModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -48,8 +49,7 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
             .do_update()
             .set(self)
             .filter(
-                name
-                    .ne(excluded(name))
+                name.ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
                     .or(asset_model.ne(excluded(asset_model)))
@@ -57,6 +57,6 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| { result.pop() })
+            .map(|mut result| result.pop())
     }
 }

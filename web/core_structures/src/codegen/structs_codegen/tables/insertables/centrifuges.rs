@@ -59,83 +59,39 @@ impl InsertableCentrifuge {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        >,
+        crate::PhysicalAsset: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::table(),
-                self.id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::PhysicalAsset::read(self.id, conn)
     }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::CommercialCentrifugeLot, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
-        >,
+        crate::CommercialCentrifugeLot: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot::table(),
-                self.model,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::CommercialCentrifugeLot::read(self.model, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuges_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+    ) -> Result<crate::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
+        crate::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .first::<crate::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, Default)]
@@ -214,9 +170,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
     ///```
@@ -463,11 +419,11 @@ where
     ///    v0@{shape: rounded, label: "model"}
     /// class v0 column-of-interest
     /// end
-    /// v0 --->|"`ancestral same as`"| v2
     /// v1 --->|"`ancestral same as`"| v2
     /// v1 -.->|"`inferred ancestral same as`"| v0
-    /// v5 --->|"`extends`"| v3
+    /// v0 --->|"`ancestral same as`"| v2
     /// v4 --->|"`extends`"| v5
+    /// v5 --->|"`extends`"| v3
     /// ```
     fn model(
         self,
@@ -502,7 +458,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::centrifuges::Centrifuge,
+            Row = crate::Centrifuge,
             Error = web_common_traits::database::InsertError<CentrifugeAttribute>,
         >,
     PhysicalAsset:
@@ -519,8 +475,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::centrifuges::Centrifuge =
-            self.insert(user_id, conn)?;
+        let insertable: crate::Centrifuge = self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

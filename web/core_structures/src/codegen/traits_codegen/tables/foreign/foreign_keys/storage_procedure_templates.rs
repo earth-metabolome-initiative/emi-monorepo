@@ -1,41 +1,26 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StorageProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub procedure_template_stored_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_stored_into_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub stored_asset_model: Option<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    >,
-    pub stored_into_model: Option<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-    >,
-    pub storage_procedure_templates_stored_into_model_stored_asset_fkey: Option<
-        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
-    >,
+    pub procedure_template: Option<crate::ProcedureTemplate>,
+    pub procedure_template_stored_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_stored_into_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub stored_asset_model: Option<crate::PhysicalAssetModel>,
+    pub stored_into_model: Option<crate::ContainerModel>,
+    pub storage_procedure_templates_stored_into_model_stored_asset_fkey:
+        Option<crate::ContainerCompatibilityRule>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-for crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys for crate::StorageProcedureTemplate {
     type ForeignKeys = StorageProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.procedure_template,
+            ),
+        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -52,31 +37,21 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                     ),
                 ),
             );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.stored_asset_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
-                        self.stored_into_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule((
-                        self.stored_into_model,
-                        self.stored_asset_model,
-                    )),
-                ),
-            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.stored_asset_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+                self.stored_into_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule(
+                (self.stored_into_model, self.stored_asset_model),
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_template.is_some()
@@ -104,15 +79,12 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.stored_into_model
-                    == container_compatibility_rules.container_model
+                if self.stored_into_model == container_compatibility_rules.container_model
                     && self.stored_asset_model
                         == container_compatibility_rules.contained_asset_model
                 {
-                    foreign_keys
-                        .storage_procedure_templates_stored_into_model_stored_asset_fkey = Some(
-                        container_compatibility_rules,
-                    );
+                    foreign_keys.storage_procedure_templates_stored_into_model_stored_asset_fkey =
+                        Some(container_compatibility_rules);
                     updated = true;
                 }
             }
@@ -122,13 +94,12 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.stored_into_model
-                    == container_compatibility_rules.container_model
+                if self.stored_into_model == container_compatibility_rules.container_model
                     && self.stored_asset_model
                         == container_compatibility_rules.contained_asset_model
                 {
-                    foreign_keys
-                        .storage_procedure_templates_stored_into_model_stored_asset_fkey = None;
+                    foreign_keys.storage_procedure_templates_stored_into_model_stored_asset_fkey =
+                        None;
                     updated = true;
                 }
             }
@@ -153,9 +124,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -166,9 +135,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(
-                    physical_asset_models,
-                ),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.stored_asset_model == physical_asset_models.id {
@@ -184,20 +151,15 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_stored_asset_model
-                    == procedure_template_asset_models.id
+                if self.procedure_template_stored_asset_model == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_stored_asset_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
+                    foreign_keys.procedure_template_stored_asset_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
-                if self.procedure_template_stored_into_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_stored_into_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
+                if self.procedure_template_stored_into_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_stored_into_model =
+                        Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
             }
@@ -207,15 +169,12 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_stored_asset_model
-                    == procedure_template_asset_models.id
+                if self.procedure_template_stored_asset_model == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_stored_asset_model = None;
                     updated = true;
                 }
-                if self.procedure_template_stored_into_model
-                    == procedure_template_asset_models.id
-                {
+                if self.procedure_template_stored_into_model == procedure_template_asset_models.id {
                     foreign_keys.procedure_template_stored_into_model = None;
                     updated = true;
                 }

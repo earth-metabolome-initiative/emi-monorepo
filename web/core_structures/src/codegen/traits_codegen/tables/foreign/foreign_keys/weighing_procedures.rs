@@ -1,34 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WeighingProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
-    >,
-    pub procedure_template_weighed_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_weighed_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_weighed_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_weighed_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub weighed_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
-    pub weighed_with: Option<
-        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
-    >,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_template: Option<crate::WeighingProcedureTemplate>,
+    pub procedure_template_weighed_container_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_weighed_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_weighed_container: Option<crate::ProcedureAsset>,
+    pub procedure_weighed_with: Option<crate::ProcedureAsset>,
+    pub weighed_container: Option<crate::VolumetricContainer>,
+    pub weighed_with: Option<crate::WeighingDevice>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::WeighingProcedure {
     type ForeignKeys = WeighingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

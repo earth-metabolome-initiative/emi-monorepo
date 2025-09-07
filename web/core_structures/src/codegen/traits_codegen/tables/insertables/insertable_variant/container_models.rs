@@ -8,15 +8,11 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableContainerMod
 where
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+        <crate::ContainerModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+            <crate::ContainerModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<
-        'query,
-        C,
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-    >,
+    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::ContainerModel>,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
@@ -24,7 +20,7 @@ where
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel;
+    type Row = crate::ContainerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,

@@ -1,16 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialFreezerModelForeignKeys {
-    pub freezer_model:
-        Option<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
-    pub commercial_freezer_models_id_fkey:
-        Option<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
-    pub commercial_freezer_models_id_fkey1:
-        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
+    pub freezer_model: Option<crate::FreezerModel>,
+    pub commercial_freezer_models_id_fkey: Option<crate::FreezerModel>,
+    pub commercial_freezer_models_id_fkey1: Option<crate::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::CommercialFreezerModel {
     type ForeignKeys = CommercialFreezerModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

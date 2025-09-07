@@ -1,43 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StorageProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_stored_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_stored_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
-    >,
-    pub procedure_template_stored_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_template_stored_into_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub stored_asset: Option<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-    >,
-    pub stored_asset_model: Option<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    >,
-    pub stored_into: Option<
-        crate::codegen::structs_codegen::tables::containers::Container,
-    >,
-    pub stored_into_model: Option<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-    >,
-    pub storage_procedures_stored_into_model_stored_asset_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
-    >,
+    pub procedure: Option<crate::Procedure>,
+    pub procedure_stored_asset: Option<crate::ProcedureAsset>,
+    pub procedure_stored_into: Option<crate::ProcedureAsset>,
+    pub procedure_template: Option<crate::StorageProcedureTemplate>,
+    pub procedure_template_stored_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template_stored_into_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub stored_asset: Option<crate::PhysicalAsset>,
+    pub stored_asset_model: Option<crate::PhysicalAssetModel>,
+    pub stored_into: Option<crate::Container>,
+    pub stored_into_model: Option<crate::ContainerModel>,
+    pub storage_procedures_stored_into_model_stored_asset_model_fkey:
+        Option<crate::ContainerCompatibilityRule>,
 }
-impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure
-{
+impl web_common_traits::prelude::HasForeignKeys for crate::StorageProcedure {
     type ForeignKeys = StorageProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
