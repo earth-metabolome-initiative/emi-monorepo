@@ -256,10 +256,10 @@ pub trait CommercialVolumeMeasuringDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     VolumeMeasuringDeviceModel,
@@ -278,7 +278,7 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -298,18 +298,15 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v7
-    ///v5 -.->|"`descendant of`"| v4
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v5
-    ///v6 -.->|"`descendant of`"| v4
-    ///v6 -.->|"`descendant of`"| v7
+    ///v5 --->|"`extends`"| v7
     ///```
     fn product_model(
         mut self,
@@ -407,7 +404,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
@@ -563,7 +560,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -584,7 +581,6 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v5
     ///v4 --->|"`extends`"| v3
-    ///v4 -.->|"`descendant of`"| v5
     ///```
     fn product_model(
         self,
@@ -620,7 +616,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -641,16 +637,13 @@ where
     ///class v0 column-of-interest
     ///end
     ///v0 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v5
-    ///v6 -.->|"`descendant of`"| v4
-    ///v6 -.->|"`descendant of`"| v7
     ///v5 --->|"`extends`"| v7
-    ///v5 -.->|"`descendant of`"| v4
+    ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(

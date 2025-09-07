@@ -1,6 +1,4 @@
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
-
-use crate::errors::WebCodeGenError;
+use diesel::{Queryable, QueryableByName};
 
 /// Represents a row in the `constraint_column_usage` table in `PostgreSQL`
 ///

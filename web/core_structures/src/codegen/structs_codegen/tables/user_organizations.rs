@@ -1,7 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+        foreign_key = organization_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = user_id
+    )
+)]
 #[diesel(primary_key(user_id, organization_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::user_organizations::user_organizations
@@ -91,38 +109,6 @@ impl UserOrganization {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_user_id(
-        user_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations;
-        Self::table()
-            .filter(user_organizations::user_id.eq(user_id))
-            .order_by((
-                user_organizations::user_id.asc(),
-                user_organizations::organization_id.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_organization_id(
-        organization_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_organizations::user_organizations;
-        Self::table()
-            .filter(user_organizations::organization_id.eq(organization_id))
-            .order_by((
-                user_organizations::user_id.asc(),
-                user_organizations::organization_id.asc(),
-            ))
-            .load::<Self>(conn)
     }
 }
 impl AsRef<UserOrganization> for UserOrganization {

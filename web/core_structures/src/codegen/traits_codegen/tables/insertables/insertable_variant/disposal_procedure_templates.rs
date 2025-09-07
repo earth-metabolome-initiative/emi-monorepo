@@ -88,18 +88,17 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_template_disposed_asset_model),
+            procedure_template_disposed_asset_model,
         ) = self.procedure_template_disposed_asset_model
         {
-            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_disposed_asset_model,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateSettable>::disposed_asset_model(
-                    self,
-                    procedure_template_asset_models.asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateSettable>::disposed_asset_model(
+                self,
+                procedure_template_asset_models.asset_model,
+            )?;
         }
         let disposed_asset_model = self
             .disposed_asset_model
@@ -121,16 +120,7 @@ where
         let procedure_template_disposed_asset_model = match self
             .procedure_template_disposed_asset_model
         {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateAttribute::ProcedureTemplateDisposedAssetModel(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_template_disposed_asset_model,
             ) => {

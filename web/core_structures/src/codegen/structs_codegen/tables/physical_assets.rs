@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::physical_assets::physical_assets
@@ -124,15 +131,15 @@ impl PhysicalAsset {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::physical_assets::physical_assets;
         Self::table()
-            .filter(physical_assets::model.eq(model))
+            .filter(physical_assets::id.eq(id))
             .order_by(physical_assets::id.asc())
             .load::<Self>(conn)
     }
@@ -250,6 +257,26 @@ impl PhysicalAsset {
         Self::table()
             .inner_join(assets::table.on(physical_assets::id.eq(assets::id)))
             .filter(assets::description.eq(description))
+            .order_by(physical_assets::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            assets::assets, physical_assets::physical_assets,
+        };
+        Self::table()
+            .inner_join(assets::table.on(physical_assets::id.eq(assets::id)))
+            .filter(assets::model.eq(model))
             .order_by(physical_assets::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

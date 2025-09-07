@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::user_emails::user_emails)]
 pub struct UserEmail {
@@ -68,45 +75,6 @@ impl UserEmail {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(user_emails::created_by.eq(created_by))
-            .order_by(user_emails::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(user_emails::created_at.eq(created_at))
-            .order_by(user_emails::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_primary_email(
-        primary_email: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
-        Self::table()
-            .filter(user_emails::primary_email.eq(primary_email))
-            .order_by(user_emails::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_email(
         email: &str,
         conn: &mut diesel::PgConnection,
@@ -154,6 +122,32 @@ impl UserEmail {
             )
             .order_by(user_emails::id.asc())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_at(
+        created_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::created_at.eq(created_at))
+            .order_by(user_emails::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_primary_email(
+        primary_email: &bool,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
+        Self::table()
+            .filter(user_emails::primary_email.eq(primary_email))
+            .order_by(user_emails::id.asc())
+            .load::<Self>(conn)
     }
 }
 impl AsRef<UserEmail> for UserEmail {

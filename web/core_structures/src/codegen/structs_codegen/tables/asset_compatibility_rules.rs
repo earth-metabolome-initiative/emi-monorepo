@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
 #[diesel(primary_key(left_asset_model, right_asset_model))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules
@@ -158,22 +165,6 @@ impl AssetCompatibilityRule {
         use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules;
         Self::table()
             .filter(asset_compatibility_rules::right_asset_model.eq(right_asset_model))
-            .order_by((
-                asset_compatibility_rules::left_asset_model.asc(),
-                asset_compatibility_rules::right_asset_model.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules;
-        Self::table()
-            .filter(asset_compatibility_rules::created_by.eq(created_by))
             .order_by((
                 asset_compatibility_rules::left_asset_model.asc(),
                 asset_compatibility_rules::right_asset_model.asc(),

@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers
@@ -132,15 +139,15 @@ impl FreezeDryer {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers;
         Self::table()
-            .filter(freeze_dryers::model.eq(model))
+            .filter(freeze_dryers::id.eq(id))
             .order_by(freeze_dryers::id.asc())
             .load::<Self>(conn)
     }
@@ -158,6 +165,26 @@ impl FreezeDryer {
         Self::table()
             .filter(freeze_dryers::id.eq(id).and(freeze_dryers::model.eq(model)))
             .order_by(freeze_dryers::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            freeze_dryers::freeze_dryers, physical_assets::physical_assets,
+        };
+        Self::table()
+            .inner_join(physical_assets::table.on(freeze_dryers::id.eq(physical_assets::id)))
+            .filter(physical_assets::model.eq(model))
+            .order_by(freeze_dryers::id.asc())
+            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

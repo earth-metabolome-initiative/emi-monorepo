@@ -40,6 +40,19 @@ impl diesel::Identifiable for LoginProvider {
 }
 impl LoginProvider {
     #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
+        Self::table()
+            .filter(login_providers::name.eq(name))
+            .order_by(login_providers::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_icon(
         icon: &str,
         conn: &mut diesel::PgConnection,
@@ -103,19 +116,6 @@ impl LoginProvider {
             .filter(login_providers::scope.eq(scope))
             .order_by(login_providers::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::login_providers::login_providers;
-        Self::table()
-            .filter(login_providers::name.eq(name))
-            .order_by(login_providers::id.asc())
-            .first::<Self>(conn)
     }
 }
 impl AsRef<LoginProvider> for LoginProvider {

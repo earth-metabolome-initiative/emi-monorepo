@@ -6,8 +6,27 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organisms::Organism,
+        foreign_key = organism_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::taxa::Taxon,
+        foreign_key = taxon_id
+    )
+)]
 #[diesel(primary_key(organism_id, taxon_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa
@@ -133,19 +152,6 @@ impl OrganismTaxon {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::created_by.eq(created_by))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -155,32 +161,6 @@ impl OrganismTaxon {
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
         Self::table()
             .filter(organism_taxa::created_at.eq(created_at))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_organism_id(
-        organism_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::organism_id.eq(organism_id))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_taxon_id(
-        taxon_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::taxon_id.eq(taxon_id))
             .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
             .load::<Self>(conn)
     }

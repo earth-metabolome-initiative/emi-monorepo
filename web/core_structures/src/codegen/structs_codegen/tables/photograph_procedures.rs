@@ -6,8 +6,21 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        foreign_key = photographed_asset
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::cameras::Camera,
+        foreign_key = photographed_with
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures
@@ -483,44 +496,15 @@ impl PhotographProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
         Self::table()
-            .filter(photograph_procedures::procedure_template.eq(procedure_template))
-            .order_by(photograph_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photographed_asset(
-        photographed_asset: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
-        Self::table()
-            .filter(photograph_procedures::photographed_asset.eq(photographed_asset))
-            .order_by(photograph_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_photographed_asset_model(
-        procedure_template_photographed_asset_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
-        Self::table()
-            .filter(
-                photograph_procedures::procedure_template_photographed_asset_model
-                    .eq(procedure_template_photographed_asset_model),
-            )
+            .filter(photograph_procedures::procedure.eq(procedure))
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -536,50 +520,6 @@ impl PhotographProcedure {
             .filter(
                 photograph_procedures::procedure_photographed_asset
                     .eq(procedure_photographed_asset),
-            )
-            .order_by(photograph_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photographed_with(
-        photographed_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
-        Self::table()
-            .filter(photograph_procedures::photographed_with.eq(photographed_with))
-            .order_by(photograph_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_photographed_with_model(
-        procedure_template_photographed_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
-        Self::table()
-            .filter(
-                photograph_procedures::procedure_template_photographed_with_model
-                    .eq(procedure_template_photographed_with_model),
-            )
-            .order_by(photograph_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_photographed_with(
-        procedure_photographed_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
-        Self::table()
-            .filter(
-                photograph_procedures::procedure_photographed_with.eq(procedure_photographed_with),
             )
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -623,6 +563,21 @@ impl PhotographProcedure {
                         photograph_procedures::procedure_template_photographed_asset_model
                             .eq(procedure_template_photographed_asset_model),
                     ),
+            )
+            .order_by(photograph_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_photographed_with(
+        procedure_photographed_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
+        Self::table()
+            .filter(
+                photograph_procedures::procedure_photographed_with.eq(procedure_photographed_with),
             )
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -686,6 +641,51 @@ impl PhotographProcedure {
                 photograph_procedures::procedure
                     .eq(procedure)
                     .and(photograph_procedures::procedure_template.eq(procedure_template)),
+            )
+            .order_by(photograph_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
+        Self::table()
+            .filter(photograph_procedures::procedure_template.eq(procedure_template))
+            .order_by(photograph_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_photographed_asset_model(
+        procedure_template_photographed_asset_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
+        Self::table()
+            .filter(
+                photograph_procedures::procedure_template_photographed_asset_model
+                    .eq(procedure_template_photographed_asset_model),
+            )
+            .order_by(photograph_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_photographed_with_model(
+        procedure_template_photographed_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
+        Self::table()
+            .filter(
+                photograph_procedures::procedure_template_photographed_with_model
+                    .eq(procedure_template_photographed_with_model),
             )
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)

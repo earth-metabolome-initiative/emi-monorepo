@@ -1,10 +1,7 @@
 //! Submodule defining the sample collection procedures in the
 //! database.
 
-use core_structures::{
-    ProcedureTemplate,
-    traits::{ChildOptions, ParentProcedureTemplate},
-};
+use core_structures::{ProcedureTemplate, traits::ParentProcedureTemplate};
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 mod weather_retrieval_procedure;
@@ -43,12 +40,7 @@ pub(crate) fn init_data_enrichment_procedure(
     let weather_retrieval_procedure =
         weather_retrieval_procedure::init_weather_retrieval_procedure(user, conn)?;
 
-    data_enrichment_procedure.child(
-        &weather_retrieval_procedure,
-        ChildOptions::default(),
-        user,
-        conn,
-    )?;
+    data_enrichment_procedure.child(&weather_retrieval_procedure, user, conn)?;
 
     Ok(data_enrichment_procedure)
 }

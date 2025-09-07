@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::freezers::freezers)]
 pub struct Freezer {
@@ -130,17 +137,14 @@ impl Freezer {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freezers::freezers;
-        Self::table()
-            .filter(freezers::model.eq(model))
-            .order_by(freezers::id.asc())
-            .load::<Self>(conn)
+        Self::table().filter(freezers::id.eq(id)).order_by(freezers::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id_and_model(
@@ -156,6 +160,26 @@ impl Freezer {
         Self::table()
             .filter(freezers::id.eq(id).and(freezers::model.eq(model)))
             .order_by(freezers::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            freezers::freezers, physical_assets::physical_assets,
+        };
+        Self::table()
+            .inner_join(physical_assets::table.on(freezers::id.eq(physical_assets::id)))
+            .filter(physical_assets::model.eq(model))
+            .order_by(freezers::id.asc())
+            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

@@ -53,15 +53,14 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(parent_procedure) = self.parent_procedure {
-            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+            let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
                 parent_procedure,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
-                    self,
-                    Some(procedures.procedure_template),
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                self,
+                Some(procedures.procedure_template),
+            )?;
         }
         let procedure = self
             .procedure

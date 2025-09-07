@@ -200,6 +200,19 @@ impl CommercialCapModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_cap_models::commercial_cap_models;
+        Self::table()
+            .filter(commercial_cap_models::id.eq(id))
+            .order_by(commercial_cap_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_id_and_cap_model(
         id: &i32,
         cap_model: &i32,

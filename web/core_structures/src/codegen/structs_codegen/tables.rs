@@ -269,6 +269,7 @@ pub use weighing_procedure_templates::WeighingProcedureTemplate;
 pub mod weighing_procedures;
 pub use weighing_procedures::WeighingProcedure;
 pub mod insertables;
+pub mod most_concrete_variants;
 pub mod row;
 pub mod rows;
 pub mod table_names;

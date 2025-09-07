@@ -94,60 +94,56 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(packaging_procedure_templates) = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
+            let packaging_procedure_templates = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
-                    self,
-                    packaging_procedure_templates.procedure_template_sample_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_packaged_with_model(
-                    self,
-                    packaging_procedure_templates.procedure_template_packaged_with_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
+                self,
+                packaging_procedure_templates.procedure_template_sample_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_packaged_with_model(
+                self,
+                packaging_procedure_templates.procedure_template_packaged_with_model,
+            )?;
         }
-        if let web_common_traits::database::IdOrBuilder::Id(Some(procedure_sample)) = self
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_sample) = self
             .procedure_sample
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_sample,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample(
                     self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample(
-                        self,
-                        asset,
-                    )?;
-                }
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample_model(
-                    self,
-                    procedure_assets.asset_model,
+                    asset,
                 )?;
             }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
         }
-        if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_packaged_with),
-        ) = self.procedure_packaged_with
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_packaged_with) = self
+            .procedure_packaged_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_packaged_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::packaged_with_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_packaged_with_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::packaged_with_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_packaged_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -202,16 +198,7 @@ where
                 ))
             })?;
         let procedure_sample = match self.procedure_sample {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedureSample(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(mut procedure_sample) => {
                 procedure_sample = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure(
                         procedure_sample,
@@ -232,16 +219,7 @@ where
             }
         };
         let procedure_packaged_with = match self.procedure_packaged_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedurePackagedWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_packaged_with,
             ) => {

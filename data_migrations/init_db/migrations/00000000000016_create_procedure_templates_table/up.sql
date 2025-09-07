@@ -24,6 +24,17 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- We enforce that the name and description are distinct to avoid lazy duplicates
 	CHECK (must_be_distinct(name, description))
 );
+CREATE TABLE IF NOT EXISTS parent_procedure_templates (
+	PRIMARY KEY (parent, child),
+	-- The parent procedure template
+	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	-- The child procedure template
+	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(parent, child)),
+	-- The user who created this relationship
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	-- The timestamp when this relationship was created
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),
 	-- The parent procedure template
@@ -37,10 +48,36 @@ CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	-- The timestamp when this relationship was created
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- We enforce that the parent procedure is indeed a parent of the predecessor procedure
-	FOREIGN KEY (parent, predecessor) REFERENCES parent_procedure_templates(parent, child) ON DELETE CASCADE,
+	FOREIGN KEY (parent, predecessor) REFERENCES parent_procedure_templates(parent, child),
 	-- We enforce that the parent procedure is indeed a parent of the successor procedure
-	FOREIGN KEY (parent, successor) REFERENCES parent_procedure_templates(parent, child) ON DELETE CASCADE
+	FOREIGN KEY (parent, successor) REFERENCES parent_procedure_templates(parent, child)
 );
+-- Trigger function
+CREATE OR REPLACE FUNCTION ensure_parent_procedure_templates()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Insert predecessor parent relationship if missing
+    INSERT INTO parent_procedure_templates (parent, child, created_by)
+    VALUES (NEW.parent, NEW.predecessor, NEW.created_by)
+    ON CONFLICT (parent, child) DO NOTHING;
+
+    -- Insert successor parent relationship if missing
+    INSERT INTO parent_procedure_templates (parent, child, created_by)
+    VALUES (NEW.parent, NEW.successor, NEW.created_by)
+    ON CONFLICT (parent, child) DO NOTHING;
+
+    RETURN NEW;
+END;
+$$;
+
+-- Trigger
+CREATE TRIGGER before_insert_next_procedure_templates
+BEFORE INSERT ON next_procedure_templates
+FOR EACH ROW
+EXECUTE FUNCTION ensure_parent_procedure_templates();
+
 CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- Identifier of the procedure template asset model
 	id SERIAL PRIMARY KEY,
@@ -70,18 +107,8 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- keys from the concrete procedures to check that the asset model is correctly aligned.
 	UNIQUE (id, asset_model)
 );
-CREATE TABLE IF NOT EXISTS parent_procedure_templates (
-	PRIMARY KEY (parent, child),
-	-- The parent procedure template
-	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
-	-- The child procedure template
-	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(parent, child)),
-	-- The user who created this relationship
-	created_by INTEGER NOT NULL REFERENCES users(id),
-	-- The timestamp when this relationship was created
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE OR REPLACE FUNCTION inherit_asset_models() RETURNS TRIGGER AS $$ BEGIN
+
+CREATE OR REPLACE FUNCTION inherit_procedure_template_asset_models() RETURNS TRIGGER AS $$ BEGIN
 INSERT INTO procedure_template_asset_models (
 		name,
 		procedure_template,
@@ -101,6 +128,6 @@ WHERE pam.procedure_template = NEW.child;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE OR REPLACE TRIGGER trg_inherit_asset_models
+CREATE OR REPLACE TRIGGER trg_inherit_procedure_template_asset_models
 AFTER
-INSERT ON parent_procedure_templates FOR EACH ROW EXECUTE FUNCTION inherit_asset_models();
+INSERT ON parent_procedure_templates FOR EACH ROW EXECUTE FUNCTION inherit_procedure_template_asset_models();

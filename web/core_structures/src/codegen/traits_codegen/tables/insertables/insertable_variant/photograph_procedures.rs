@@ -94,59 +94,55 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(photograph_procedure_templates) = crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
+            let photograph_procedure_templates = crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_asset_model(
-                    self,
-                    photograph_procedure_templates
-                        .procedure_template_photographed_asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_with_model(
-                    self,
-                    photograph_procedure_templates
-                        .procedure_template_photographed_with_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_asset_model(
+                self,
+                photograph_procedure_templates
+                    .procedure_template_photographed_asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_with_model(
+                self,
+                photograph_procedure_templates.procedure_template_photographed_with_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_photographed_asset),
+            procedure_photographed_asset,
         ) = self.procedure_photographed_asset
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_photographed_asset,
                 conn,
-            )? {
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::photographed_asset(
-                        self,
-                        asset,
-                    )?;
-                }
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_asset_model(
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::photographed_asset(
                     self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
             }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_asset_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_photographed_with),
+            procedure_photographed_with,
         ) = self.procedure_photographed_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_photographed_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::photographed_with(
-                    self,
-                    procedure_assets.asset,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_with_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::photographed_with(
+                self,
+                procedure_assets.asset,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable>::procedure_template_photographed_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -187,16 +183,7 @@ where
                 ))
             })?;
         let procedure_photographed_asset = match self.procedure_photographed_asset {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedAsset(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_photographed_asset,
             ) => {
@@ -219,16 +206,7 @@ where
             }
         };
         let procedure_photographed_with = match self.procedure_photographed_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_photographed_with,
             ) => {

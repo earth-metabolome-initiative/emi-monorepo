@@ -38,6 +38,9 @@ pub const CODEGEN_UPSERTABLES_PATH: &str = "upsertables";
 /// Constant defining the submodule for the Insertable-related trait
 /// implementation.
 pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
+/// Constant defining the submodule for the MostConcreteVariant-related trait
+/// implementation.
+pub const CODEGEN_MOST_CONCRETE_VARIANTS_PATH: &str = "most_concrete_variants";
 /// Constant defining the submodule for the Insertable trait implementations.
 pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
 /// Constant defining the submodule for the foreign-keys-related trait
@@ -108,6 +111,10 @@ pub struct Codegen<'a> {
     /// implementations.
     pub(super) enable_insertable_trait: bool,
     /// Whether to enable the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// implementations.
+    pub(super) enable_most_concrete_variant_trait: bool,
+    /// Whether to enable the
     /// [`Updatable`](web_common_traits::database::Updatable) traits
     /// implementations.
     pub(super) enable_updatable_trait: bool,
@@ -138,6 +145,7 @@ impl<'a> Codegen<'a> {
             || self.enable_attribute_trait
             || self.enable_foreign_trait
             || self.enable_insertable_trait
+            || self.enable_most_concrete_variant_trait
             || self.enable_updatable_trait
             || self.enable_upsertable_trait
             || self.enable_read_trait
@@ -362,6 +370,22 @@ impl<'a> Codegen<'a> {
     pub fn enable_insertable_trait(mut self) -> Self {
         self = self.enable_updatable_trait();
         self.enable_insertable_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits.
+    ///
+    /// # Note
+    ///
+    /// Since the [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// require the tables structs, enabling the generation of the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// automatically enables the generation of the tables structs.
+    pub fn enable_most_concrete_variant_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_most_concrete_variant_trait = true;
         self
     }
 

@@ -1,7 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail,
+        foreign_key = email_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        foreign_key = login_provider_id
+    )
+)]
 #[diesel(primary_key(email_id, login_provider_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::email_providers::email_providers
@@ -91,32 +109,6 @@ impl EmailProvider {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_email_id(
-        email_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::email_providers::email_providers;
-        Self::table()
-            .filter(email_providers::email_id.eq(email_id))
-            .order_by((email_providers::email_id.asc(), email_providers::login_provider_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_login_provider_id(
-        login_provider_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::email_providers::email_providers;
-        Self::table()
-            .filter(email_providers::login_provider_id.eq(login_provider_id))
-            .order_by((email_providers::email_id.asc(), email_providers::login_provider_id.asc()))
-            .load::<Self>(conn)
     }
 }
 impl AsRef<EmailProvider> for EmailProvider {

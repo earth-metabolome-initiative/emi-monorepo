@@ -100,116 +100,109 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(supernatant_procedure_templates) = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
+            let supernatant_procedure_templates = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_supernatant_destination_model(
-                    self,
-                    supernatant_procedure_templates
-                        .procedure_template_supernatant_destination_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_transferred_with_model(
-                    self,
-                    supernatant_procedure_templates
-                        .procedure_template_transferred_with_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_pipette_tip_model(
-                    self,
-                    supernatant_procedure_templates.procedure_template_pipette_tip_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_stratified_source_model(
-                    self,
-                    supernatant_procedure_templates
-                        .procedure_template_stratified_source_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_supernatant_destination_model(
+                self,
+                supernatant_procedure_templates
+                    .procedure_template_supernatant_destination_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_transferred_with_model(
+                self,
+                supernatant_procedure_templates.procedure_template_transferred_with_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_pipette_tip_model(
+                self,
+                supernatant_procedure_templates.procedure_template_pipette_tip_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_stratified_source_model(
+                self,
+                supernatant_procedure_templates
+                    .procedure_template_stratified_source_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_stratified_source),
+            procedure_stratified_source,
         ) = self.procedure_stratified_source
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_stratified_source,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_stratified_source_model(
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_stratified_source_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::stratified_source(
                     self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::stratified_source(
-                        self,
-                        asset,
-                    )?;
-                }
             }
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_supernatant_destination),
+            procedure_supernatant_destination,
         ) = self.procedure_supernatant_destination
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_supernatant_destination,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_supernatant_destination_model(
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_supernatant_destination_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::supernatant_destination(
                     self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::supernatant_destination(
-                        self,
-                        asset,
-                    )?;
-                }
             }
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_transferred_with),
+            procedure_transferred_with,
         ) = self.procedure_transferred_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_transferred_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_transferred_with_model(
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_transferred_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with(
                     self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with(
-                        self,
-                        asset,
-                    )?;
-                }
             }
         }
-        if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_pipette_tip),
-        ) = self.procedure_pipette_tip
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_pipette_tip) = self
+            .procedure_pipette_tip
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_pipette_tip,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_pipette_tip_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_pipette_tip_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -292,16 +285,7 @@ where
                 ))
             })?;
         let procedure_stratified_source = match self.procedure_stratified_source {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureStratifiedSource(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_stratified_source,
             ) => {
@@ -326,16 +310,7 @@ where
         let procedure_supernatant_destination = match self
             .procedure_supernatant_destination
         {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureSupernatantDestination(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_supernatant_destination,
             ) => {
@@ -358,16 +333,7 @@ where
             }
         };
         let procedure_transferred_with = match self.procedure_transferred_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureTransferredWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_transferred_with,
             ) => {
@@ -390,16 +356,7 @@ where
             }
         };
         let procedure_pipette_tip = match self.procedure_pipette_tip {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedurePipetteTip(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_pipette_tip,
             ) => {

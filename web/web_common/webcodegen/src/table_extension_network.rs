@@ -605,4 +605,35 @@ impl TableExtensionNetwork {
 
         Ok(sorted_extension_foreign_keys)
     }
+
+    /// Returns all the descendant tables of the provided table in the
+    /// extension network.
+    ///
+    /// # Arguments
+    ///
+    /// * `table`: A reference to the table to find the descendants for.
+    ///
+    /// # Panics
+    ///
+    /// * If the provided table is not part of the extension network.
+    pub fn descendants(&self, table: &Table) -> Vec<&Table> {
+        let table_id = self
+            .extension_graph
+            .nodes_vocabulary()
+            .binary_search(table)
+            .expect("Failed to get node ID for the table");
+
+        let mut descendants = Vec::new();
+
+        for successor_id in self.transposed_extension_graph.successors_set(table_id) {
+            descendants.push(
+                self.extension_graph
+                    .nodes_vocabulary()
+                    .get(successor_id)
+                    .expect("Failed to get descendant table"),
+            );
+        }
+
+        descendants
+    }
 }

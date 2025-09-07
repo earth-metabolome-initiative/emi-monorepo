@@ -70,21 +70,6 @@ impl Table {
                 ));
             }
 
-            for column in extension_table.columns(conn)?.as_ref() {
-                // If the column is a UNIQUE index or a foreign key, skip it, as
-                // the method generation is already taken care of elsewhere.
-                if column.is_unique(conn)? || !column.supports_eq(conn)? {
-                    continue;
-                }
-
-                ancestral_from_attributes.push((
-                    vec![root_table.clone(), extension_table.clone()],
-                    Arc::new(vec![column.clone()]),
-                    false,
-                    Some(join_clause.clone()),
-                ));
-            }
-
             for foreign_key_constraint in extension_table.foreign_keys(conn)?.as_ref() {
                 let columns = foreign_key_constraint.columns(conn)?;
 
@@ -99,6 +84,21 @@ impl Table {
                 ancestral_from_attributes.push((
                     vec![root_table.clone(), extension_table.clone()],
                     columns,
+                    false,
+                    Some(join_clause.clone()),
+                ));
+            }
+
+            for column in extension_table.columns(conn)?.as_ref() {
+                // If the column is a UNIQUE index or a foreign key, skip it, as
+                // the method generation is already taken care of elsewhere.
+                if column.is_unique(conn)? || !column.supports_eq(conn)? {
+                    continue;
+                }
+
+                ancestral_from_attributes.push((
+                    vec![root_table.clone(), extension_table.clone()],
+                    Arc::new(vec![column.clone()]),
                     false,
                     Some(join_clause.clone()),
                 ));
@@ -155,21 +155,6 @@ impl Table {
             }
         };
 
-        for column in self.columns(conn)?.as_ref() {
-            // If the column is a UNIQUE index skip it, as
-            // the method generation is already taken care of elsewhere.
-            if column.is_unique(conn)? || !column.supports_eq(conn)? {
-                continue;
-            }
-
-            from_methods.push((
-                vec![arc_table.clone()],
-                Arc::new(vec![column.clone()]),
-                false,
-                None,
-            ));
-        }
-
         for index in self.unique_indices(conn)? {
             if index.is_primary_key() {
                 continue;
@@ -185,15 +170,33 @@ impl Table {
         }
 
         for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
-            let columns = foreign_key_constraint.columns(conn)?;
-
             // The foreign keys which are either a single column or part
             // of a unique constraints are already covered by other methods.
-            if columns.len() == 1 {
+            if foreign_key_constraint.is_singleton(conn)? {
                 continue;
             }
 
+            let columns = foreign_key_constraint.columns(conn)?;
+
             from_methods.push((vec![arc_table.clone()], columns, false, None));
+        }
+
+        for column in self.columns(conn)?.as_ref() {
+            // If the column is a UNIQUE index skip it, as
+            // the method generation is already taken care of elsewhere.
+            if column.is_unique(conn)?
+                || !column.supports_eq(conn)?
+                || column.has_singleton_foreign_key(conn)?
+            {
+                continue;
+            }
+
+            from_methods.push((
+                vec![arc_table.clone()],
+                Arc::new(vec![column.clone()]),
+                false,
+                None,
+            ));
         }
 
         let extension_tables = self.ancestral_extension_tables(conn)?;

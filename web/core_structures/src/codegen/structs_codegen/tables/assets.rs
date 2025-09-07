@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::assets::assets)]
 pub struct Asset {
@@ -136,6 +143,64 @@ impl Asset {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_model_and_id(
+        model: &i32,
+        id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::model.eq(model).and(assets::id.eq(id)))
+            .order_by(assets::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name_and_model(
+        name: &str,
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::name.eq(name).and(assets::model.eq(model)))
+            .order_by(assets::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::created_by.eq(created_by))
+            .order_by(assets::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_by(
+        updated_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::assets::assets;
+        Self::table()
+            .filter(assets::updated_by.eq(updated_by))
+            .order_by(assets::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -172,29 +237,6 @@ impl Asset {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table().filter(assets::model.eq(model)).order_by(assets::id.asc()).load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table()
-            .filter(assets::created_by.eq(created_by))
-            .order_by(assets::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -204,19 +246,6 @@ impl Asset {
         use crate::codegen::diesel_codegen::tables::assets::assets;
         Self::table()
             .filter(assets::created_at.eq(created_at))
-            .order_by(assets::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_by(
-        updated_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table()
-            .filter(assets::updated_by.eq(updated_by))
             .order_by(assets::id.asc())
             .load::<Self>(conn)
     }
@@ -232,38 +261,6 @@ impl Asset {
             .filter(assets::updated_at.eq(updated_at))
             .order_by(assets::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_model_and_id(
-        model: &i32,
-        id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table()
-            .filter(assets::model.eq(model).and(assets::id.eq(id)))
-            .order_by(assets::id.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name_and_model(
-        name: &str,
-        model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::assets::assets;
-        Self::table()
-            .filter(assets::name.eq(name).and(assets::model.eq(model)))
-            .order_by(assets::id.asc())
-            .first::<Self>(conn)
     }
 }
 impl AsRef<Asset> for Asset {

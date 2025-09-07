@@ -112,33 +112,30 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(disposal_procedure_templates) = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
+            let disposal_procedure_templates = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
-                    self,
-                    disposal_procedure_templates.procedure_template_disposed_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
+                self,
+                disposal_procedure_templates.procedure_template_disposed_asset_model,
+            )?;
         }
-        if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_disposed_asset),
-        ) = self.procedure_disposed_asset
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_disposed_asset) = self
+            .procedure_disposed_asset
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_disposed_asset,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::disposed_asset(
-                    self,
-                    procedure_assets.asset,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::disposed_asset(
+                self,
+                procedure_assets.asset,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -165,16 +162,7 @@ where
                 ))
             })?;
         let procedure_disposed_asset = match self.procedure_disposed_asset {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute::ProcedureDisposedAsset(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_disposed_asset,
             ) => {

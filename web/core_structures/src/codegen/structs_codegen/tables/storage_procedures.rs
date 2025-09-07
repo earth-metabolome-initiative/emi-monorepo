@@ -6,8 +6,33 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        foreign_key = stored_asset
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = stored_asset_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::containers::Container,
+        foreign_key = stored_into
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        foreign_key = stored_into_model
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures
@@ -619,125 +644,15 @@ impl StorageProcedure {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
         Self::table()
-            .filter(storage_procedures::procedure_template.eq(procedure_template))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_stored_asset(
-        stored_asset: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::stored_asset.eq(stored_asset))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_stored_asset_model(
-        stored_asset_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::stored_asset_model.eq(stored_asset_model))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stored_asset_model(
-        procedure_template_stored_asset_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(
-                storage_procedures::procedure_template_stored_asset_model
-                    .eq(procedure_template_stored_asset_model),
-            )
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_stored_asset(
-        procedure_stored_asset: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::procedure_stored_asset.eq(procedure_stored_asset))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_stored_into(
-        stored_into: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::stored_into.eq(stored_into))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_stored_into_model(
-        stored_into_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::stored_into_model.eq(stored_into_model))
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stored_into_model(
-        procedure_template_stored_into_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(
-                storage_procedures::procedure_template_stored_into_model
-                    .eq(procedure_template_stored_into_model),
-            )
-            .order_by(storage_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_stored_into(
-        procedure_stored_into: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
-        Self::table()
-            .filter(storage_procedures::procedure_stored_into.eq(procedure_stored_into))
+            .filter(storage_procedures::procedure.eq(procedure))
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -758,6 +673,19 @@ impl StorageProcedure {
                     .eq(procedure)
                     .and(storage_procedures::procedure_template.eq(procedure_template)),
             )
+            .order_by(storage_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_stored_asset(
+        procedure_stored_asset: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
+        Self::table()
+            .filter(storage_procedures::procedure_stored_asset.eq(procedure_stored_asset))
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -823,6 +751,19 @@ impl StorageProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_stored_into(
+        procedure_stored_into: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
+        Self::table()
+            .filter(storage_procedures::procedure_stored_into.eq(procedure_stored_into))
+            .order_by(storage_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_into_and_procedure_template_stored_into_model(
         procedure_stored_into: &::rosetta_uuid::Uuid,
         procedure_template_stored_into_model: &i32,
@@ -884,6 +825,19 @@ impl StorageProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
+        Self::table()
+            .filter(storage_procedures::procedure_template.eq(procedure_template))
+            .order_by(storage_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_stored_into_model(
         procedure_template: &i32,
         procedure_template_stored_into_model: &i32,
@@ -921,6 +875,38 @@ impl StorageProcedure {
                     storage_procedures::procedure_template_stored_asset_model
                         .eq(procedure_template_stored_asset_model),
                 ),
+            )
+            .order_by(storage_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_stored_asset_model(
+        procedure_template_stored_asset_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
+        Self::table()
+            .filter(
+                storage_procedures::procedure_template_stored_asset_model
+                    .eq(procedure_template_stored_asset_model),
+            )
+            .order_by(storage_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_stored_into_model(
+        procedure_template_stored_into_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
+        Self::table()
+            .filter(
+                storage_procedures::procedure_template_stored_into_model
+                    .eq(procedure_template_stored_into_model),
             )
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)

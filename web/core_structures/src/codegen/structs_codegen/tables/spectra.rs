@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        foreign_key = spectra_collection_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::spectra::spectra)]
 pub struct Spectrum {
@@ -113,17 +120,14 @@ impl Spectrum {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_spectra_collection_id(
-        spectra_collection_id: &::rosetta_uuid::Uuid,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::spectra::spectra;
-        Self::table()
-            .filter(spectra::spectra_collection_id.eq(spectra_collection_id))
-            .order_by(spectra::id.asc())
-            .load::<Self>(conn)
+        Self::table().filter(spectra::id.eq(id)).order_by(spectra::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_model(

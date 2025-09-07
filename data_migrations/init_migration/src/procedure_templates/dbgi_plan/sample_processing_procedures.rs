@@ -13,7 +13,7 @@ use core_structures::{
         ProcedureTemplateSettable, StorageProcedureTemplateSettable,
         SupernatantProcedureTemplateSettable,
     },
-    traits::{AppendProcedureTemplate, ParentProcedureTemplate},
+    traits::AppendProcedureTemplate,
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -104,14 +104,16 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .procedure_template_milled_container_model(safelock)?
         .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
         .insert(user.id, conn)?;
+    let beads_model = first_ball_mill_procedure.procedure_template_bead_model;
+    let safelock_ball_mill = first_ball_mill_procedure.procedure_template_milled_with_model;
 
     let second_ball_mill_procedure = BallMillProcedureTemplate::new()
         .name("Ball Mill 2")?
         .description("Second Ball Mill to extract sample procedure template")?
         .created_by(user.id)?
-        .procedure_template_bead_model(bead_3mm_builder(user, conn)?)?
+        .procedure_template_bead_model(beads_model)?
         .procedure_template_milled_container_model(safelock)?
-        .procedure_template_milled_with_model(safelock_ball_mill_builder(user, conn)?)?
+        .procedure_template_milled_with_model(safelock_ball_mill)?
         .insert(user.id, conn)?;
 
     let centrifuge_procedure = CentrifugeProcedureTemplate::new()
@@ -187,15 +189,6 @@ pub(super) fn init_dbgi_sample_processing_procedures(
     ];
 
     let subprocedures_ref = subprocedures.iter().collect::<Vec<_>>();
-
-    for subprocedure in &subprocedures {
-        dbgi_sample_processing_procedure.child(
-            subprocedure,
-            core_structures::traits::ChildOptions::default(),
-            user,
-            conn,
-        )?;
-    }
 
     dbgi_sample_processing_procedure.extend(&subprocedures_ref, user, conn)?;
 

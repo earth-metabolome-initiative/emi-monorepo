@@ -107,6 +107,45 @@ impl ProcedureTemplate {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+        Self::table()
+            .filter(procedure_templates::name.eq(name))
+            .order_by(procedure_templates::procedure_template.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+        Self::table()
+            .filter(procedure_templates::created_by.eq(created_by))
+            .order_by(procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_by(
+        updated_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+        Self::table()
+            .filter(procedure_templates::updated_by.eq(updated_by))
+            .order_by(procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -146,19 +185,6 @@ impl ProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
-        Self::table()
-            .filter(procedure_templates::created_by.eq(created_by))
-            .order_by(procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -168,19 +194,6 @@ impl ProcedureTemplate {
         use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
         Self::table()
             .filter(procedure_templates::created_at.eq(created_at))
-            .order_by(procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_by(
-        updated_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
-        Self::table()
-            .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
@@ -209,19 +222,6 @@ impl ProcedureTemplate {
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
-        Self::table()
-            .filter(procedure_templates::name.eq(name))
-            .order_by(procedure_templates::procedure_template.asc())
-            .first::<Self>(conn)
     }
 }
 impl AsRef<ProcedureTemplate> for ProcedureTemplate {

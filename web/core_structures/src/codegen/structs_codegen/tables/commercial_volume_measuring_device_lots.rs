@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        foreign_key = product_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_lots::commercial_volume_measuring_device_lots
@@ -187,15 +194,15 @@ impl CommercialVolumeMeasuringDeviceLot {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_product_model(
-        product_model: &i32,
+    pub fn from_id(
+        id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_lots::commercial_volume_measuring_device_lots;
         Self::table()
-            .filter(commercial_volume_measuring_device_lots::product_model.eq(product_model))
+            .filter(commercial_volume_measuring_device_lots::id.eq(id))
             .order_by(commercial_volume_measuring_device_lots::id.asc())
             .load::<Self>(conn)
     }
@@ -274,6 +281,33 @@ impl CommercialVolumeMeasuringDeviceLot {
                     ),
             )
             .filter(commercial_product_lots::lot.eq(lot))
+            .order_by(commercial_volume_measuring_device_lots::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_product_model(
+        product_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            commercial_product_lots::commercial_product_lots,
+            commercial_volume_measuring_device_lots::commercial_volume_measuring_device_lots,
+        };
+        Self::table()
+            .inner_join(
+                commercial_product_lots::table
+                    .on(
+                        commercial_volume_measuring_device_lots::id
+                            .eq(commercial_product_lots::id),
+                    ),
+            )
+            .filter(commercial_product_lots::product_model.eq(product_model))
             .order_by(commercial_volume_measuring_device_lots::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

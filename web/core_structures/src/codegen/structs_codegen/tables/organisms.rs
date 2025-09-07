@@ -74,6 +74,16 @@ impl Organism {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
+        Self::table().filter(organisms::id.eq(id)).order_by(organisms::id.asc()).load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_model(
         model: &i32,
         conn: &mut diesel::PgConnection,

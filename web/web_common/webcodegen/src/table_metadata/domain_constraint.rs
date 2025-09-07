@@ -1,6 +1,4 @@
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
-
-use crate::errors::WebCodeGenError;
+use diesel::{Queryable, QueryableByName};
 
 /// Represents a domain constraint in the database.
 ///

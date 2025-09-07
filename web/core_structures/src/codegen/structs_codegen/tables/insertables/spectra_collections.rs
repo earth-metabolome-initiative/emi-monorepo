@@ -25,15 +25,6 @@ pub enum SpectraCollectionAttribute {
     Extension(SpectraCollectionExtensionAttribute),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute>
-    for SpectraCollectionAttribute
-{
-    fn from(
-        digital_assets: crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
-    ) -> Self {
-        Self::Extension(SpectraCollectionExtensionAttribute::DigitalAsset(digital_assets))
-    }
-}
 impl core::str::FromStr for SpectraCollectionAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -209,7 +200,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]

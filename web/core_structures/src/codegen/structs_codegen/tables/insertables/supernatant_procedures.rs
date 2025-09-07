@@ -1481,7 +1481,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -1494,25 +1494,25 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v4 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    /// class v1 column-of-interest
+    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v5 directly-involved-column
     /// end
+    /// v3 --->|"`associated same as`"| v6
     /// v2 --->|"`associated same as`"| v6
-    /// v4 --->|"`associated same as`"| v6
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v4
     /// v1 -.->|"`foreign defines`"| v5
     /// v1 -.->|"`foreign defines`"| v2
     /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v6
+    /// v4 --->|"`associated same as`"| v6
     /// v5 --->|"`associated same as`"| v6
     /// v9 --->|"`extends`"| v8
     /// v9 ---o|"`associated with`"| v7
@@ -1543,27 +1543,27 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stratified_source"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stratified_source"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stratified_source(
@@ -1598,27 +1598,27 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stratified_source"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_stratified_source_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stratified_source_model(
@@ -1653,33 +1653,33 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
+    ///    v4@{shape: rounded, label: "stratified_source"}
+    /// class v4 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_stratified_source"}
     /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
-    ///    v4@{shape: rounded, label: "stratified_source"}
-    /// class v4 directly-involved-column
     /// end
+    /// v4 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v4
     /// v3 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_stratified_source<PSS>(
@@ -1781,27 +1781,27 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "supernatant_destination"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn supernatant_destination(
@@ -1837,15 +1837,15 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
@@ -1894,7 +1894,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -1907,19 +1907,19 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
     /// class v3 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_supernatant_destination"}
+    /// class v2 column-of-interest
     ///    v4@{shape: rounded, label: "supernatant_destination"}
     /// class v4 directly-involved-column
     /// end
+    /// v3 --->|"`associated same as`"| v1
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v4
-    /// v3 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
@@ -2026,15 +2026,15 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "transferred_with"}
@@ -2081,7 +2081,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -2092,23 +2092,23 @@ impl<
     /// class v4 undirectly-involved-column
     /// end
     /// subgraph v6 ["`supernatant_procedures`"]
-    ///    v3@{shape: rounded, label: "transferred_with_model"}
-    /// class v3 column-of-interest
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_transferred_with"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "transferred_with_model"}
+    /// class v3 column-of-interest
     /// end
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 -.->|"`foreign defines`"| v3
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v3
+    /// v1 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v0
+    /// v1 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v0
+    /// v3 -.->|"`foreign defines`"| v1
     /// v6 ---o|"`associated with`"| v5
     /// ```
     fn transferred_with_model(
@@ -2143,7 +2143,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -2199,31 +2199,31 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v3 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v4 column-of-interest
-    ///    v5@{shape: rounded, label: "transferred_with"}
-    /// class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "transferred_with_model"}
     /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
+    /// class v4 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_transferred_with_model"}
+    /// class v3 directly-involved-column
+    ///    v5@{shape: rounded, label: "transferred_with"}
+    /// class v5 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v2
+    /// v6 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v7
     /// v4 --->|"`associated same as`"| v7
     /// v4 --->|"`associated same as`"| v7
@@ -2231,9 +2231,9 @@ impl<
     /// v4 -.->|"`foreign defines`"| v3
     /// v4 -.->|"`foreign defines`"| v6
     /// v4 -.->|"`foreign defines`"| v5
-    /// v5 --->|"`associated same as`"| v0
+    /// v3 --->|"`associated same as`"| v2
     /// v0 -.->|"`foreign defines`"| v1
-    /// v6 --->|"`associated same as`"| v1
+    /// v5 --->|"`associated same as`"| v0
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_transferred_with<PTW>(
@@ -2367,23 +2367,23 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v4@{shape: rounded, label: "id"}
     /// class v4 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v6 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 column-of-interest
     ///    v3@{shape: rounded, label: "transferred_with_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 column-of-interest
     /// end
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
@@ -2391,11 +2391,11 @@ impl<
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v1
+    /// v3 --->|"`associated same as`"| v0
+    /// v3 -.->|"`foreign defines`"| v1
     /// v1 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v0
     /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v1
     /// v6 ---o|"`associated with`"| v5
     /// ```
     fn pipette_tip_model(
@@ -2444,15 +2444,15 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
@@ -2499,27 +2499,28 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
-    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v4 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v3 column-of-interest
     ///    v2@{shape: rounded, label: "pipette_tip_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_pipette_tip"}
+    /// class v3 column-of-interest
+    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v4 directly-involved-column
     /// end
-    /// v4 --->|"`associated same as`"| v1
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
@@ -2527,8 +2528,7 @@ impl<
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v0
+    /// v4 --->|"`associated same as`"| v1
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_pipette_tip<PPT>(
@@ -2685,7 +2685,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`procedures`"]

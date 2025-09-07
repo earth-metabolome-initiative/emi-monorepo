@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -87,6 +87,19 @@ impl VolumetricContainerModel {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::volumetric_container_models::volumetric_container_models;
+        Self::table()
+            .filter(volumetric_container_models::id.eq(id))
+            .order_by(volumetric_container_models::id.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model(

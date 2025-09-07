@@ -93,15 +93,14 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(based_on) = self.based_on {
-            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 based_on,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    self,
-                    procedure_template_asset_models.asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                self,
+                procedure_template_asset_models.asset_model,
+            )?;
         }
         let name = self
             .name

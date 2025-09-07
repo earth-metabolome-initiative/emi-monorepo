@@ -28,15 +28,6 @@ pub enum ReagentModelAttribute {
     CasCode,
     MolecularFormula,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
-    for ReagentModelAttribute
-{
-    fn from(
-        asset_models: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-    ) -> Self {
-        Self::Extension(ReagentModelExtensionAttribute::AssetModel(asset_models))
-    }
-}
 impl core::str::FromStr for ReagentModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

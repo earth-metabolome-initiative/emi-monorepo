@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::countries::Country,
+        foreign_key = iso
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cities::cities)]
 pub struct City {
@@ -74,16 +81,6 @@ impl City {
 
         use crate::codegen::diesel_codegen::tables::cities::cities;
         Self::table().filter(cities::name.eq(name)).order_by(cities::id.asc()).load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_iso(
-        iso: &::iso_codes::CountryCode,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::cities::cities;
-        Self::table().filter(cities::iso.eq(iso)).order_by(cities::id.asc()).load::<Self>(conn)
     }
 }
 impl AsRef<City> for City {

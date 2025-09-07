@@ -1,9 +1,8 @@
 //! Submodule defining the DBGI plan procedure template.
 
 use core_structures::{
-    ProcedureTemplate, User,
-    tables::insertables::ProcedureTemplateSettable,
-    traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
+    ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable,
+    traits::AppendProcedureTemplate,
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -48,18 +47,6 @@ pub fn init_dbgi_plan(
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn)?;
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn)?;
     let data_enrichment = init_data_enrichment_procedure(user, conn)?;
-
-    for procedure in [
-        &collection_preparation,
-        &observation_procedure,
-        &part_of_organism_collection,
-        &sample_processing_procedure,
-        &positive_lcms_procedure,
-        &negative_lcms_procedure,
-        &data_enrichment,
-    ] {
-        dbgi_plan.child(procedure, ChildOptions::default(), user, conn)?;
-    }
 
     dbgi_plan.extend(
         &[

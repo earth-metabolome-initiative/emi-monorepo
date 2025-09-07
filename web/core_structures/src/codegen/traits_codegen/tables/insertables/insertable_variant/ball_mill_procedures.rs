@@ -97,87 +97,81 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(ball_mill_procedure_templates) = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
+            let ball_mill_procedure_templates = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
-                    self,
-                    ball_mill_procedure_templates.procedure_template_milled_with_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
-                    self,
-                    ball_mill_procedure_templates
-                        .procedure_template_milled_container_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
-                    self,
-                    ball_mill_procedure_templates.procedure_template_bead_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
+                self,
+                ball_mill_procedure_templates.procedure_template_milled_with_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
+                self,
+                ball_mill_procedure_templates.procedure_template_milled_container_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
+                self,
+                ball_mill_procedure_templates.procedure_template_bead_model,
+            )?;
         }
-        if let web_common_traits::database::IdOrBuilder::Id(Some(procedure_bead)) = self
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_bead) = self
             .procedure_bead
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_bead,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::bead_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::bead_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
-        if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_milled_with),
-        ) = self.procedure_milled_with
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_milled_with) = self
+            .procedure_milled_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_milled_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with(
-                    self,
-                    procedure_assets.asset,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with(
+                self,
+                procedure_assets.asset,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_milled_container),
+            procedure_milled_container,
         ) = self.procedure_milled_container
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_milled_container,
                 conn,
-            )? {
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container(
-                        self,
-                        asset,
-                    )?;
-                }
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container_model(
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container(
                     self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
             }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -246,16 +240,7 @@ where
                 ))
             })?;
         let procedure_bead = match self.procedure_bead {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureBead(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(mut procedure_bead) => {
                 procedure_bead = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure(
                         procedure_bead,
@@ -276,16 +261,7 @@ where
             }
         };
         let procedure_milled_with = match self.procedure_milled_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_milled_with,
             ) => {
@@ -308,16 +284,7 @@ where
             }
         };
         let procedure_milled_container = match self.procedure_milled_container {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledContainer(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_milled_container,
             ) => {

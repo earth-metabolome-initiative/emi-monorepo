@@ -74,6 +74,19 @@ impl VolumeMeasuringDeviceModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::volume_measuring_device_models::volume_measuring_device_models;
+        Self::table()
+            .filter(volume_measuring_device_models::id.eq(id))
+            .order_by(volume_measuring_device_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_parent_model(
         parent_model: &i32,
         conn: &mut diesel::PgConnection,

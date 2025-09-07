@@ -101,19 +101,6 @@ impl Document {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_mime_type(
-        mime_type: &::media_types::MediaType,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::documents::documents;
-        Self::table()
-            .filter(documents::mime_type.eq(mime_type))
-            .order_by(documents::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,
@@ -127,19 +114,6 @@ impl Document {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::documents::documents;
-        Self::table()
-            .filter(documents::created_at.eq(created_at))
-            .order_by(documents::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_updated_by(
         updated_by: &i32,
         conn: &mut diesel::PgConnection,
@@ -149,6 +123,32 @@ impl Document {
         use crate::codegen::diesel_codegen::tables::documents::documents;
         Self::table()
             .filter(documents::updated_by.eq(updated_by))
+            .order_by(documents::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_mime_type(
+        mime_type: &::media_types::MediaType,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::documents::documents;
+        Self::table()
+            .filter(documents::mime_type.eq(mime_type))
+            .order_by(documents::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_at(
+        created_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::documents::documents;
+        Self::table()
+            .filter(documents::created_at.eq(created_at))
             .order_by(documents::id.asc())
             .load::<Self>(conn)
     }

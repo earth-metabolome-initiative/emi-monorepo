@@ -304,9 +304,6 @@ impl Codegen<'_> {
 
             let local_column_ident = partial_builder_column.snake_case_ident()?;
             let camel_cased_column_ident = partial_builder_column.camel_case_ident()?;
-            let partial_builder_attributes_enum = partial_builder_table.insertable_enum_ty()?;
-            let partial_builder_primary_key_camel_cased =
-                partial_builder_table.primary_key_columns(conn)?[0].camel_case_ident()?;
             let builder_ident = match partial_builder_kind {
                 PartialBuilderKind::Mandatory => quote! {self.#local_column_ident},
                 PartialBuilderKind::Discretional => quote! {#local_column_ident},
@@ -396,14 +393,6 @@ impl Codegen<'_> {
                         let #local_column_ident = match self.#local_column_ident {
                             web_common_traits::database::IdOrBuilder::Id(id) => {
                                 id
-                                    .mint_primary_key(user_id, conn)
-                                    .map_err(|_| {
-                                        common_traits::prelude::BuilderError::IncompleteBuild(
-                                            #insertable_enum::#camel_cased_column_ident(
-                                                #partial_builder_attributes_enum::#partial_builder_primary_key_camel_cased
-                                            )
-                                        )
-                                    })?
                             },
                             web_common_traits::database::IdOrBuilder::Builder(#maybe_mut_builder #local_column_ident) => {
                                 #(#missing_same_as_assignments)*

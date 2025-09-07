@@ -7,7 +7,7 @@ use core_structures::{
         PackagingProcedureTemplateSettable, ProcedureTemplateSettable,
         StorageProcedureTemplateSettable,
     },
-    traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
+    traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -112,17 +112,6 @@ pub(crate) fn init_part_of_organism_collection(
         .procedure_template_stored_asset_model(cct.id)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
-
-    for procedure in [
-        &gloves_reminder,
-        &sterilization_reminder,
-        &cut_part,
-        &coffee_filter_wrapping.procedure_template(conn)?,
-        &place_in_tube.procedure_template(conn)?,
-        &place_in_storage_box.procedure_template(conn)?,
-    ] {
-        collection.child(procedure, ChildOptions::default(), user, conn)?;
-    }
 
     collection.extend(
         &[

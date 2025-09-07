@@ -204,6 +204,19 @@ impl CommercialWeighingDeviceModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models;
+        Self::table()
+            .filter(commercial_weighing_device_models::id.eq(id))
+            .order_by(commercial_weighing_device_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_id_and_weighing_device_model(
         id: &i32,
         weighing_device_model: &i32,

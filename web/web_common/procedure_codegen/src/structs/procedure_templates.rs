@@ -35,6 +35,24 @@ impl AsRef<Table> for ProcedureTemplate {
 }
 
 impl ProcedureTemplate {
+    /// Returns the root procedure template table.
+    ///
+    /// # Arguments
+    ///
+    /// * `table_catalog` - The name of the database catalog (database name).
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn root(
+        table_catalog: &str,
+        conn: &mut PgConnection,
+    ) -> Result<Self, crate::errors::Error> {
+        let table = Table::load(conn, PROCEDURE_TEMPLATES_TABLE_NAME, "public", table_catalog)?;
+        Ok(Self { table: table.as_ref().clone() })
+    }
+
     /// Returns whether the current procedure template is the abstract template.
     pub(crate) fn is_abstract(&self) -> bool {
         self.table.table_name == PROCEDURE_TEMPLATES_TABLE_NAME

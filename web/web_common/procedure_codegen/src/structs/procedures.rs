@@ -75,6 +75,29 @@ fn procedure_template_foreign_key(
 }
 
 impl Procedure {
+    /// Returns the root procedure table.
+    ///
+    /// # Arguments
+    ///
+    /// * `table_catalog` - The name of the database catalog (database name).
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn root(
+        table_catalog: &str,
+        conn: &mut PgConnection,
+    ) -> Result<Self, crate::errors::Error> {
+        let table = Table::load(conn, PROCEDURES_TABLE_NAME, "public", table_catalog)?;
+        Ok(Self { table: table.as_ref().clone() })
+    }
+
+    /// Returns whether the current procedure is the abstract.
+    pub(crate) fn is_abstract(&self) -> bool {
+        self.table.table_name == PROCEDURES_TABLE_NAME
+    }
+
     /// Returns whether the given table is a procedure table.
     ///
     /// # Arguments

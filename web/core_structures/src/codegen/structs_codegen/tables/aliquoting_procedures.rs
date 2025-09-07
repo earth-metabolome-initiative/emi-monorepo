@@ -6,8 +6,27 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::pipettes::Pipette,
+        foreign_key = aliquoted_with
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        foreign_key = aliquoted_with_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        foreign_key = pipette_tip_model
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures
@@ -919,6 +938,19 @@ impl AliquotingProcedure {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
+        Self::table()
+            .filter(aliquoting_procedures::procedure.eq(procedure))
+            .order_by(aliquoting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_template(
         procedure_template: &i32,
         conn: &mut diesel::PgConnection,
@@ -928,32 +960,6 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(aliquoting_procedures::procedure_template.eq(procedure_template))
-            .order_by(aliquoting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_aliquoted_with(
-        aliquoted_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
-        Self::table()
-            .filter(aliquoting_procedures::aliquoted_with.eq(aliquoted_with))
-            .order_by(aliquoting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_aliquoted_with_model(
-        aliquoted_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
-        Self::table()
-            .filter(aliquoting_procedures::aliquoted_with_model.eq(aliquoted_with_model))
             .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -983,19 +989,6 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(aliquoting_procedures::procedure_aliquoted_with.eq(procedure_aliquoted_with))
-            .order_by(aliquoting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_pipette_tip_model(
-        pipette_tip_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
-        Self::table()
-            .filter(aliquoting_procedures::pipette_tip_model.eq(pipette_tip_model))
             .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }

@@ -6,8 +6,21 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        foreign_key = capped_container_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
+        foreign_key = capped_with_model
+    )
+)]
 #[diesel(primary_key(procedure_template))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates
@@ -288,64 +301,6 @@ impl CappingProcedureTemplate {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_capped_container_model(
-        capped_container_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
-        Self::table()
-            .filter(capping_procedure_templates::capped_container_model.eq(capped_container_model))
-            .order_by(capping_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_capped_container_model(
-        procedure_template_capped_container_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
-        Self::table()
-            .filter(
-                capping_procedure_templates::procedure_template_capped_container_model
-                    .eq(procedure_template_capped_container_model),
-            )
-            .order_by(capping_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_capped_with_model(
-        capped_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
-        Self::table()
-            .filter(capping_procedure_templates::capped_with_model.eq(capped_with_model))
-            .order_by(capping_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_capped_with_model(
-        procedure_template_capped_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
-        Self::table()
-            .filter(
-                capping_procedure_templates::procedure_template_capped_with_model
-                    .eq(procedure_template_capped_with_model),
-            )
-            .order_by(capping_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_capped_container_model(
         procedure_template: &i32,
         procedure_template_capped_container_model: &i32,
@@ -386,6 +341,51 @@ impl CappingProcedureTemplate {
             )
             .order_by(capping_procedure_templates::procedure_template.asc())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
+        Self::table()
+            .filter(capping_procedure_templates::procedure_template.eq(procedure_template))
+            .order_by(capping_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_capped_container_model(
+        procedure_template_capped_container_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
+        Self::table()
+            .filter(
+                capping_procedure_templates::procedure_template_capped_container_model
+                    .eq(procedure_template_capped_container_model),
+            )
+            .order_by(capping_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_capped_with_model(
+        procedure_template_capped_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates;
+        Self::table()
+            .filter(
+                capping_procedure_templates::procedure_template_capped_with_model
+                    .eq(procedure_template_capped_with_model),
+            )
+            .order_by(capping_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_capped_container_model_and_capped_container_model(

@@ -21,8 +21,8 @@ pub mod prelude {
         database::{
             Ancestor, AncestorExists, BoundedRead, BoundedReadDispatch, Deletable, Descendant,
             ExtensionTable, ForeignKeys, HasForeignKeys, Insertable, InsertableVariant,
-            MostConcreteTable, ReadDispatch, Row, Rows, SetPrimaryKey, StaticTabular, TableName,
-            Tabular, UpsertVec, Upsertable,
+            MostConcreteTable, MostConcreteVariant, ReadDispatch, Row, Rows, SetPrimaryKey,
+            StaticTabular, TableName, Tabular, UpsertVec, Upsertable,
         },
         filtrable::*,
         operation::Operation,

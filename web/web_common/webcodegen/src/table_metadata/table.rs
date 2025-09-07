@@ -571,6 +571,43 @@ impl Table {
         })
     }
 
+    /// Returns whether the table has singleton foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
+    pub fn has_singleton_foreign_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self.foreign_keys(conn)?.iter().any(|fk| fk.is_singleton(conn).unwrap_or(false)))
+    }
+
+    /// Returns the table singleton foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the foreign keys cannot be loaded from the database.
+    pub fn singleton_foreign_keys(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
+        Ok(self
+            .foreign_keys(conn)?
+            .iter()
+            .filter(|fk| fk.is_singleton(conn).unwrap_or(false))
+            .cloned()
+            .collect())
+    }
+
     /// Returns the diesel derives supported by the table.
     ///
     /// # Arguments
@@ -597,6 +634,10 @@ impl Table {
         if self.has_primary_keys(conn)? {
             derives.push(parse_str("diesel::Queryable")?);
             derives.push(parse_str("diesel::Identifiable")?);
+        }
+
+        if self.has_singleton_foreign_keys(conn)? {
+            derives.push(parse_str("diesel::Associations")?);
         }
 
         Ok(derives)
@@ -1028,6 +1069,24 @@ impl Table {
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         for column in self.columns(conn)?.as_ref() {
             if !column.supports_eq(conn)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
+    /// Returns whether the table supports the `PartialOrd` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If database connection fails.
+    pub fn supports_partial_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        for column in self.columns(conn)?.as_ref() {
+            if !column.supports_partial_ord(conn)? {
                 return Ok(false);
             }
         }

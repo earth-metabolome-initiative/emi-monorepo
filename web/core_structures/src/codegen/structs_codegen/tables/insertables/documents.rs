@@ -338,7 +338,7 @@ impl DocumentSettable for InsertableDocumentBuilder {
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// v0@{shape: rounded, label: "created_by"}

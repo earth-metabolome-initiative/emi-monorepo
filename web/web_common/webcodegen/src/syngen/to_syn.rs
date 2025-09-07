@@ -71,8 +71,10 @@ impl Table {
         if self.supports_eq(conn)? {
             default_derives.push(quote!(Eq));
         }
-        if self.supports_ord(conn)? {
+        if self.supports_partial_ord(conn)? {
             default_derives.push(quote!(PartialOrd));
+        }
+        if self.supports_ord(conn)? {
             default_derives.push(quote!(Ord));
         }
         if self.supports_hash(conn)? {
@@ -84,6 +86,15 @@ impl Table {
         if enable_yew {
             diesel_derives_decorator.extend(quote! {
                 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+            });
+        }
+
+        for singleton_foreign_key in self.singleton_foreign_keys(conn)? {
+            let foreign_table = singleton_foreign_key.foreign_table(conn)?;
+            let foreign_struct_path = foreign_table.import_struct_path()?;
+            let column_ident = singleton_foreign_key.columns(conn)?[0].snake_case_ident()?;
+            diesel_derives_decorator.extend(quote! {
+                #[diesel(belongs_to(#foreign_struct_path, foreign_key = #column_ident))]
             });
         }
 

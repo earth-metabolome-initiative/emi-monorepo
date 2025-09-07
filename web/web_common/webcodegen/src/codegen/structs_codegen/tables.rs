@@ -6,10 +6,15 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::{Table, traits::TableLike};
+use crate::{
+    Table,
+    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_MOST_CONCRETE_VARIANTS_PATH},
+    traits::TableLike,
+};
 
 mod crud;
 mod insertables;
+mod most_concrete_variant;
 
 impl Codegen<'_> {
     /// Generate implementations of the structs representing rows of the tables
@@ -66,9 +71,24 @@ impl Codegen<'_> {
         }
 
         if self.enable_insertable_trait {
-            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
+            self.generate_insertable_structs(
+                root.join(CODEGEN_INSERTABLES_PATH).as_path(),
+                tables,
+                conn,
+            )?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
+            });
+        }
+
+        if self.enable_most_concrete_variant_trait {
+            self.generate_most_concrete_variant_structs(
+                root.join(CODEGEN_MOST_CONCRETE_VARIANTS_PATH).as_path(),
+                tables,
+                conn,
+            )?;
+            table_main_module.extend(quote::quote! {
+                pub mod most_concrete_variants;
             });
         }
 

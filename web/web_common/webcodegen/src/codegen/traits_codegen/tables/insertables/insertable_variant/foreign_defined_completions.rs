@@ -75,9 +75,8 @@ impl Codegen<'_> {
                     #foreign_table_struct: web_common_traits::database::Read<C>
                 });
                 foreign_definer_ops.push(quote! {
-                    if let Some(#foreign_table_snake_case) = #foreign_table_struct::read(#foreign_define_column_ident, conn)? {
-	                    #(#assignments)*
-					}
+                    let #foreign_table_snake_case = #foreign_table_struct::read(#foreign_define_column_ident, conn)?;
+                    #(#assignments)*
                 });
             }
 
@@ -88,7 +87,7 @@ impl Codegen<'_> {
             foreign_defined_completions.push(if let Some((build_kind, _, _)) = foreign_define_column.requires_partial_builder(conn)? {
                 assert_eq!(build_kind, PartialBuilderKind::Discretional);
                 quote! {
-                    if let web_common_traits::database::IdOrBuilder::Id(Some(#foreign_define_column_ident)) = self.#foreign_define_column_ident {
+                    if let web_common_traits::database::IdOrBuilder::Id(#foreign_define_column_ident) = self.#foreign_define_column_ident {
                         #(#foreign_definer_ops)*
                     }
                 }

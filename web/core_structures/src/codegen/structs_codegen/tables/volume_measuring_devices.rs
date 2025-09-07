@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::volume_measuring_devices::volume_measuring_devices
@@ -132,15 +139,15 @@ impl VolumeMeasuringDevice {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::volume_measuring_devices::volume_measuring_devices;
         Self::table()
-            .filter(volume_measuring_devices::model.eq(model))
+            .filter(volume_measuring_devices::id.eq(id))
             .order_by(volume_measuring_devices::id.asc())
             .load::<Self>(conn)
     }
@@ -160,6 +167,28 @@ impl VolumeMeasuringDevice {
                 volume_measuring_devices::id.eq(id).and(volume_measuring_devices::model.eq(model)),
             )
             .order_by(volume_measuring_devices::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            physical_assets::physical_assets, volume_measuring_devices::volume_measuring_devices,
+        };
+        Self::table()
+            .inner_join(
+                physical_assets::table.on(volume_measuring_devices::id.eq(physical_assets::id)),
+            )
+            .filter(physical_assets::model.eq(model))
+            .order_by(volume_measuring_devices::id.asc())
+            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

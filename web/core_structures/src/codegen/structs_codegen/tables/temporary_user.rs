@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        foreign_key = login_provider_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::temporary_user::temporary_user
@@ -68,32 +75,6 @@ impl TemporaryUser {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_email(
-        email: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        Self::table()
-            .filter(temporary_user::email.eq(email))
-            .order_by(temporary_user::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_login_provider_id(
-        login_provider_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        Self::table()
-            .filter(temporary_user::login_provider_id.eq(login_provider_id))
-            .order_by(temporary_user::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_email_and_login_provider_id(
         email: &str,
         login_provider_id: &i16,
@@ -112,6 +93,19 @@ impl TemporaryUser {
             )
             .order_by(temporary_user::id.asc())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_email(
+        email: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
+        Self::table()
+            .filter(temporary_user::email.eq(email))
+            .order_by(temporary_user::id.asc())
+            .load::<Self>(conn)
     }
 }
 impl AsRef<TemporaryUser> for TemporaryUser {

@@ -810,7 +810,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -823,18 +823,18 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v2 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v3 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
     /// class v1 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v3 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
-    /// v3 --->|"`associated same as`"| v4
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v2
     /// v1 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
     /// ```
@@ -864,7 +864,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -919,27 +919,27 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_container_model(
@@ -974,7 +974,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -987,19 +987,19 @@ impl<
     /// class v5 undirectly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v3 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v3 column-of-interest
     ///    v4@{shape: rounded, label: "weighed_container"}
     /// class v4 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
-    /// v2 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
@@ -1124,7 +1124,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -1179,7 +1179,7 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -1233,33 +1233,33 @@ impl<
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v2 directly-involved-column
     ///    v4@{shape: rounded, label: "weighed_with"}
     /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_weighed_with"}
     /// class v3 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
+    /// v2 --->|"`associated same as`"| v1
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_weighed_with<PWW>(
@@ -1386,7 +1386,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`procedures`"]

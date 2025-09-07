@@ -6,6 +6,7 @@ mod deletable;
 mod extension;
 mod foreign;
 mod insertable;
+mod most_concrete_variant;
 mod read;
 mod table_name;
 mod tabular;
@@ -21,6 +22,7 @@ pub use foreign::{ForeignKeys, HasForeignKeys};
 pub use insertable::{
     IdOrBuilder, InsertError, Insertable, InsertableVariant, MostConcreteTable, SetPrimaryKey,
 };
+pub use most_concrete_variant::MostConcreteVariant;
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};

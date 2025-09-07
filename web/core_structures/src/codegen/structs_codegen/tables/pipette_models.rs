@@ -76,6 +76,19 @@ impl PipetteModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::pipette_models::pipette_models;
+        Self::table()
+            .filter(pipette_models::id.eq(id))
+            .order_by(pipette_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_parent_model(
         parent_model: &i32,
         conn: &mut diesel::PgConnection,

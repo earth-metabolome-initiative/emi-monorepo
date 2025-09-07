@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::colors::Color,
+        foreign_key = color_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects
@@ -68,19 +75,6 @@ impl ObservationSubject {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::observation_subjects::observation_subjects;
-        Self::table()
-            .filter(observation_subjects::color_id.eq(color_id))
-            .order_by(observation_subjects::id.asc())
-            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -6,8 +6,27 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::colors::Color,
+        foreign_key = color_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::projects::Project,
+        foreign_key = parent_project_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        foreign_key = state_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::projects::projects)]
 pub struct Project {
@@ -234,6 +253,45 @@ impl Project {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::projects::projects;
+        Self::table()
+            .filter(projects::name.eq(name))
+            .order_by(projects::id.asc())
+            .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::projects::projects;
+        Self::table()
+            .filter(projects::created_by.eq(created_by))
+            .order_by(projects::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_by(
+        updated_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::projects::projects;
+        Self::table()
+            .filter(projects::updated_by.eq(updated_by))
+            .order_by(projects::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,
@@ -243,19 +301,6 @@ impl Project {
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::description.eq(description))
-            .order_by(projects::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_state_id(
-        state_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::state_id.eq(state_id))
             .order_by(projects::id.asc())
             .load::<Self>(conn)
     }
@@ -273,45 +318,6 @@ impl Project {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::color_id.eq(color_id))
-            .order_by(projects::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_project_id(
-        parent_project_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::parent_project_id.eq(parent_project_id))
-            .order_by(projects::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::created_by.eq(created_by))
-            .order_by(projects::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -321,19 +327,6 @@ impl Project {
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::created_at.eq(created_at))
-            .order_by(projects::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_by(
-        updated_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::updated_by.eq(updated_by))
             .order_by(projects::id.asc())
             .load::<Self>(conn)
     }
@@ -375,19 +368,6 @@ impl Project {
             .filter(projects::end_date.eq(end_date))
             .order_by(projects::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::projects::projects;
-        Self::table()
-            .filter(projects::name.eq(name))
-            .order_by(projects::id.asc())
-            .first::<Self>(conn)
     }
 }
 impl AsRef<Project> for Project {

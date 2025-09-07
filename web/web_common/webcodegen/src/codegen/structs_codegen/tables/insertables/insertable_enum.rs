@@ -324,7 +324,7 @@ impl Table {
         let mut singleton_foreign_keys = Vec::new();
 
         for foreign_key in self.foreign_keys(conn)?.iter() {
-            if foreign_key.is_singleton_foreign_key(conn)?
+            if foreign_key.is_singleton(conn)?
                 && (foreign_key.is_partial_builder_constraint(conn)?.is_some()
                     || foreign_key.is_extension(conn)?)
             {
@@ -430,7 +430,7 @@ impl Codegen<'_> {
         let first_ancestor =
             foreign_key_path.first().expect("The foreign key path must have at least one ancestor");
 
-        Ok(if first_ancestor.is_singleton_foreign_key(conn)? {
+        Ok(if first_ancestor.is_singleton(conn)? {
             // If the first ancestor is a singleton foreign key, it means
             // that the enum implements the `From` trait for the conversion
             // from the enum associated with the foreign key to the current enum.

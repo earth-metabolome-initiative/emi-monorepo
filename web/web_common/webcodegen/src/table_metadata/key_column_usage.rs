@@ -384,14 +384,17 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub(crate) fn is_singleton_foreign_key(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, WebCodeGenError> {
+    pub(crate) fn is_singleton(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_local_primary_key(conn)? {
+            return Ok(false);
+        }
+        if self.columns(conn)?.len() != 1 {
+            return Ok(false);
+        }
         let foreign_table = self.foreign_table(conn)?;
         let table = self.table(conn)?;
         Ok(table.foreign_keys(conn)?.iter().all(|fk| {
-            fk == self || fk.foreign_table(conn).map(|t| t == foreign_table).unwrap_or(true)
+            fk == self || fk.foreign_table(conn).map(|t| t != foreign_table).unwrap_or(true)
         }))
     }
 

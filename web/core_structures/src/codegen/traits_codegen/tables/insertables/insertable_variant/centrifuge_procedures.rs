@@ -97,78 +97,73 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(centrifuge_procedure_templates) = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
+            let centrifuge_procedure_templates = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_with_model(
-                    self,
-                    centrifuge_procedure_templates
-                        .procedure_template_centrifuged_with_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_container_model(
-                    self,
-                    centrifuge_procedure_templates
-                        .procedure_template_centrifuged_container_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_with_model(
+                self,
+                centrifuge_procedure_templates.procedure_template_centrifuged_with_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_container_model(
+                self,
+                centrifuge_procedure_templates
+                    .procedure_template_centrifuged_container_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_centrifuged_container),
+            procedure_centrifuged_container,
         ) = self.procedure_centrifuged_container
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_centrifuged_container,
                 conn,
-            )? {
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_container(
-                        self,
-                        asset,
-                    )?;
-                }
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_container_model(
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_container(
                     self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_container_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
             }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_container_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_container_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         if let Some(centrifuged_with) = self.centrifuged_with {
-            if let Some(assets) = crate::codegen::structs_codegen::tables::assets::Asset::read(
+            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
                 centrifuged_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with_model(
-                    self,
-                    assets.model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with_model(
+                self,
+                assets.model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_centrifuged_with),
+            procedure_centrifuged_with,
         ) = self.procedure_centrifuged_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_centrifuged_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with(
-                    self,
-                    procedure_assets.asset,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with_model(
-                    self,
-                    procedure_assets.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_with_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with(
+                self,
+                procedure_assets.asset,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with_model(
+                self,
+                procedure_assets.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::procedure_template_centrifuged_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -224,16 +219,7 @@ where
             })?;
         let procedure_centrifuged_container = match self.procedure_centrifuged_container
         {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedContainer(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_centrifuged_container,
             ) => {
@@ -256,16 +242,7 @@ where
             }
         };
         let procedure_centrifuged_with = match self.procedure_centrifuged_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_centrifuged_with,
             ) => {

@@ -4,7 +4,7 @@ use core_structures::{
         GeolocationProcedureTemplateSettable, PhotographProcedureTemplateSettable,
         ProcedureTemplateSettable,
     },
-    traits::{AppendProcedureTemplate, ChildOptions, ParentProcedureTemplate},
+    traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -58,12 +58,13 @@ pub(crate) fn init_organism_observation_procedure(
         .created_by(user.id)?
         .insert(user.id, conn)?;
     let organism = organism_in_ecosystem_picture.procedure_template_photographed_asset_model;
+    let phone = organism_in_ecosystem_picture.procedure_template_photographed_with_model;
 
     // Take a picture of the full organism
     let organism_picture = PhotographProcedureTemplate::new()
         .name("Organism Picture")?
         .description("Photograph of the full organism for identification.")?
-        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone)?
         .procedure_template_photographed_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
@@ -73,7 +74,7 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_details_picture = PhotographProcedureTemplate::new()
         .name("Organism Details Picture")?
         .description("Photograph of details of the organism to facilitate identification.")?
-        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone)?
         .procedure_template_photographed_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
@@ -82,26 +83,10 @@ pub(crate) fn init_organism_observation_procedure(
     let organism_geolocation = GeolocationProcedureTemplate::new()
         .name("Organism Geolocation")?
         .description("Geolocation of the organism observation.")?
-        .procedure_template_geolocated_with_model(phone_builder(user, conn)?)?
+        .procedure_template_geolocated_with_model(phone)?
         .procedure_template_geolocated_asset_model(organism)?
         .created_by(user.id)?
         .insert(user.id, conn)?;
-
-    observation_procedure.child(
-        &arrow_reminder,
-        ChildOptions::default().skippable(),
-        user,
-        conn,
-    )?;
-
-    for procedure in [
-        &organism_in_ecosystem_picture.procedure_template(conn)?,
-        &organism_picture.procedure_template(conn)?,
-        &organism_details_picture.procedure_template(conn)?,
-        &organism_geolocation.procedure_template(conn)?,
-    ] {
-        observation_procedure.child(procedure, ChildOptions::default(), user, conn)?;
-    }
 
     observation_procedure.extend(
         &[

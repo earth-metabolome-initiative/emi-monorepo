@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        foreign_key = volumetric_container_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers
@@ -140,17 +147,15 @@ impl VolumetricContainer {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_volumetric_container_model(
-        volumetric_container_model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers;
         Self::table()
-            .filter(
-                volumetric_containers::volumetric_container_model.eq(volumetric_container_model),
-            )
+            .filter(volumetric_containers::id.eq(id))
             .order_by(volumetric_containers::id.asc())
             .load::<Self>(conn)
     }

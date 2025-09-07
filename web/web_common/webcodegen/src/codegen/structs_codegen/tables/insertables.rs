@@ -21,6 +21,7 @@ mod insertable_builder_definition;
 mod insertable_builder_set_primary_key;
 mod insertable_builder_trait;
 mod insertable_builder_trait_impls;
+pub(crate) use insertable_builder_trait_impls::columns_to_mermaid_illustration;
 mod insertable_builder_try_insert_generic;
 mod insertable_enum;
 mod insertable_variant;

@@ -6,7 +6,7 @@ use std::{collections::HashMap, rc::Rc};
 use core_structures::{
     NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
 };
-use diesel::PgConnection;
+use diesel::{BelongingToDsl, PgConnection, RunQueryDsl};
 use mermaid::{
     FlowchartError,
     prelude::{
@@ -22,7 +22,7 @@ use crate::MermaidDB;
 
 fn to_mermaid_node(
     root_procedure_template: &ProcedureTemplate,
-    trackable_classes: &HashMap<&ProcedureTemplateAssetModel, Rc<StyleClass>>,
+    procedure_template_asset_model_classes: &HashMap<&ProcedureTemplateAssetModel, Rc<StyleClass>>,
     procedure_template_class: &Rc<StyleClass>,
     procedure_template: &ProcedureTemplate,
     builder: &mut FlowchartBuilder,
@@ -41,21 +41,24 @@ fn to_mermaid_node(
         NextProcedureTemplate::from_parent(&procedure_template.procedure_template, conn)?;
 
     if subprocedures.is_empty() {
-        let procedure_trackables = ProcedureTemplateAssetModel::from_procedure_template(
-            &procedure_template.procedure_template,
-            conn,
-        )?;
-        if procedure_trackables.is_empty() {
+        let procedure_template_asset_models: Vec<ProcedureTemplateAssetModel> =
+            ProcedureTemplateAssetModel::belonging_to(&procedure_template).load(conn)?;
+        if procedure_template_asset_models.is_empty() {
             node_builder = node_builder.shape(FlowchartNodeShape::RoundEdges);
         } else {
-            for procedure_template_trackable in procedure_trackables {
-                let style_class = trackable_classes
-                    .get(&procedure_template_trackable)
-                    .expect("Style class not found");
+            for procedure_template_asset_model in procedure_template_asset_models {
+                let style_class = procedure_template_asset_model_classes
+                    .get(&procedure_template_asset_model)
+                    .expect(&format!(
+                        "Style class not found for procedure template asset model \"{}\" found in subprocedure \"{}\" of root procedure template \"{}\"",
+                        procedure_template_asset_model.name,
+                        procedure_template.name,
+                        root_procedure_template.name
+                    ));
                 node_builder = node_builder.subnode(
                     builder.node(
                         FlowchartNodeBuilder::default()
-                            .label(&procedure_template_trackable.name)?
+                            .label(&procedure_template_asset_model.name)?
                             .shape(FlowchartNodeShape::LRParallelogram)
                             .style_class(style_class.clone())
                             .map_err(FlowchartError::from)?,
@@ -72,7 +75,7 @@ fn to_mermaid_node(
         let child_procedure = subprocedure.child(conn)?;
         node_builder = node_builder.subnode(to_mermaid_node(
             root_procedure_template,
-            trackable_classes,
+            procedure_template_asset_model_classes,
             procedure_template_class,
             &child_procedure,
             builder,
@@ -118,11 +121,19 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 .title(&self.name)?,
         )?;
 
-        let procedure_trackables =
-            ProcedureTemplateAssetModel::from_procedure_template(&self.procedure_template, conn)?;
-        let colors = Color::maximally_distinct(procedure_trackables.len() as u16, 70, 80);
-        let mut trackable_classes: HashMap<&ProcedureTemplateAssetModel, Rc<StyleClass>> =
-            HashMap::with_capacity(procedure_trackables.len());
+        let procedure_template_asset_models: Vec<ProcedureTemplateAssetModel> =
+            ProcedureTemplateAssetModel::belonging_to(&self).load(conn)?;
+        println!(
+            "Found {} procedure template asset models associated to procedure template \"{}\"",
+            procedure_template_asset_models.len(),
+            self.name
+        );
+        let colors =
+            Color::maximally_distinct(procedure_template_asset_models.len() as u16, 70, 80);
+        let mut procedure_template_asset_model_classes: HashMap<
+            &ProcedureTemplateAssetModel,
+            Rc<StyleClass>,
+        > = HashMap::with_capacity(procedure_template_asset_models.len());
 
         let procedure_template_class = builder.style_class(
             StyleClassBuilder::default()
@@ -134,19 +145,20 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 .map_err(FlowchartError::from)?,
         )?;
 
-        for (trackable_index, (trackable, color)) in
-            procedure_trackables.iter().zip(colors).enumerate()
+        for (procedure_template_asset_model, color) in
+            procedure_template_asset_models.iter().zip(colors)
         {
             let style_class = builder.style_class(
                 StyleClassBuilder::default()
-                    .name(format!("t{}", trackable_index))
+                    .name(format!("ptam{}", procedure_template_asset_model.id))
                     .map_err(FlowchartError::from)?
                     .property(StyleProperty::Fill(color))
                     .map_err(FlowchartError::from)?
                     .property(StyleProperty::Stroke(color.darken(30)))
                     .map_err(FlowchartError::from)?,
             )?;
-            trackable_classes.insert(trackable, style_class);
+            procedure_template_asset_model_classes
+                .insert(procedure_template_asset_model, style_class);
         }
 
         // We create a class for each trackable of the parent procedure.
@@ -156,7 +168,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
             let child_procedure = subprocedure.child(conn)?;
             let _node = to_mermaid_node(
                 self,
-                &trackable_classes,
+                &procedure_template_asset_model_classes,
                 &procedure_template_class,
                 &child_procedure,
                 &mut builder,

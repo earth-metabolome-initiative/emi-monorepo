@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::ball_mill_machines::ball_mill_machines
@@ -132,15 +139,15 @@ impl BallMillMachine {
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::ball_mill_machines::ball_mill_machines;
         Self::table()
-            .filter(ball_mill_machines::model.eq(model))
+            .filter(ball_mill_machines::id.eq(id))
             .order_by(ball_mill_machines::id.asc())
             .load::<Self>(conn)
     }
@@ -158,6 +165,26 @@ impl BallMillMachine {
         Self::table()
             .filter(ball_mill_machines::id.eq(id).and(ball_mill_machines::model.eq(model)))
             .order_by(ball_mill_machines::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_machines::ball_mill_machines, physical_assets::physical_assets,
+        };
+        Self::table()
+            .inner_join(physical_assets::table.on(ball_mill_machines::id.eq(physical_assets::id)))
+            .filter(physical_assets::model.eq(model))
+            .order_by(ball_mill_machines::id.asc())
+            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

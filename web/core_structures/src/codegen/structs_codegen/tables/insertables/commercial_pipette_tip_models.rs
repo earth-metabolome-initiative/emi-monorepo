@@ -265,7 +265,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -284,8 +284,6 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
-    ///v4 -.->|"`descendant of`"| v3
-    ///v4 -.->|"`descendant of`"| v5
     ///v5 --->|"`extends`"| v3
     ///```
     fn pipette_tip_model(
@@ -372,7 +370,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
@@ -552,7 +550,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -568,11 +566,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v4 -.->|"`descendant of`"| v3
-    ///v4 -.->|"`descendant of`"| v5
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

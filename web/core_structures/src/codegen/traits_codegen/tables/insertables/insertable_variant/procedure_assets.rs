@@ -56,42 +56,39 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(procedure) = self.procedure {
-            if let Some(procedures) = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+            let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
                 procedure,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
-                    self,
-                    procedures.procedure_template,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
+                self,
+                procedures.procedure_template,
+            )?;
         }
         if let Some(asset) = self.asset {
-            if let Some(assets) = crate::codegen::structs_codegen::tables::assets::Asset::read(
+            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
                 asset,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
-                    self,
-                    assets.model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                self,
+                assets.model,
+            )?;
         }
         if let Some(procedure_template_asset_model) = self.procedure_template_asset_model
         {
-            if let Some(procedure_template_asset_models) = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_asset_model,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::ancestor_model(
-                    self,
-                    procedure_template_asset_models.asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
-                    self,
-                    procedure_template_asset_models.procedure_template,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::ancestor_model(
+                self,
+                procedure_template_asset_models.asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
+                self,
+                procedure_template_asset_models.procedure_template,
+            )?;
         }
         let id = self
             .id

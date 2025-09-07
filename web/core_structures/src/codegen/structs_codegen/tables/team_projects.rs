@@ -1,7 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::projects::Project,
+        foreign_key = project_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
+    )
+)]
 #[diesel(primary_key(team_id, project_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_projects::team_projects
@@ -91,32 +109,6 @@ impl TeamProject {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_team_id(
-        team_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
-        Self::table()
-            .filter(team_projects::team_id.eq(team_id))
-            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_project_id(
-        project_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
-        Self::table()
-            .filter(team_projects::project_id.eq(project_id))
-            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
-            .load::<Self>(conn)
     }
 }
 impl AsRef<TeamProject> for TeamProject {

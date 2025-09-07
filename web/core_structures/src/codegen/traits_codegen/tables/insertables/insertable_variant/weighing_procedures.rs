@@ -118,58 +118,53 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            if let Some(weighing_procedure_templates) = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::read(
+            let weighing_procedure_templates = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::read(
                 procedure_template,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_container_model(
-                    self,
-                    weighing_procedure_templates
-                        .procedure_template_weighed_container_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_with_model(
-                    self,
-                    weighing_procedure_templates.procedure_template_weighed_with_model,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_container_model(
+                self,
+                weighing_procedure_templates.procedure_template_weighed_container_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_with_model(
+                self,
+                weighing_procedure_templates.procedure_template_weighed_with_model,
+            )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_weighed_container),
+            procedure_weighed_container,
         ) = self.procedure_weighed_container
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_weighed_container,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_container_model(
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_container_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            if let Some(asset) = procedure_assets.asset {
+                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::weighed_container(
                     self,
-                    procedure_assets.procedure_template_asset_model,
+                    asset,
                 )?;
-                if let Some(asset) = procedure_assets.asset {
-                    self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::weighed_container(
-                        self,
-                        asset,
-                    )?;
-                }
             }
         }
-        if let web_common_traits::database::IdOrBuilder::Id(
-            Some(procedure_weighed_with),
-        ) = self.procedure_weighed_with
+        if let web_common_traits::database::IdOrBuilder::Id(procedure_weighed_with) = self
+            .procedure_weighed_with
         {
-            if let Some(procedure_assets) = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_weighed_with,
                 conn,
-            )? {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_with_model(
-                    self,
-                    procedure_assets.procedure_template_asset_model,
-                )?;
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::weighed_with(
-                    self,
-                    procedure_assets.asset,
-                )?;
-            }
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::procedure_template_weighed_with_model(
+                self,
+                procedure_assets.procedure_template_asset_model,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable>::weighed_with(
+                self,
+                procedure_assets.asset,
+            )?;
         }
         let procedure_template = self
             .procedure_template
@@ -217,16 +212,7 @@ where
                 ))
             })?;
         let procedure_weighed_container = match self.procedure_weighed_container {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute::ProcedureWeighedContainer(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_weighed_container,
             ) => {
@@ -249,16 +235,7 @@ where
             }
         };
         let procedure_weighed_with = match self.procedure_weighed_with {
-            web_common_traits::database::IdOrBuilder::Id(id) => {
-                id.mint_primary_key(user_id, conn)
-                    .map_err(|_| {
-                        common_traits::prelude::BuilderError::IncompleteBuild(
-                            crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute::ProcedureWeighedWith(
-                                crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
-                            ),
-                        )
-                    })?
-            }
+            web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
                 mut procedure_weighed_with,
             ) => {

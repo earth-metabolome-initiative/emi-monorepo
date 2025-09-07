@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
 #[diesel(primary_key(parent, predecessor, successor))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates
@@ -251,74 +258,6 @@ impl NextProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_predecessor(
-        predecessor: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
-        Self::table()
-            .filter(next_procedure_templates::predecessor.eq(predecessor))
-            .order_by((
-                next_procedure_templates::parent.asc(),
-                next_procedure_templates::predecessor.asc(),
-                next_procedure_templates::successor.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_successor(
-        successor: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
-        Self::table()
-            .filter(next_procedure_templates::successor.eq(successor))
-            .order_by((
-                next_procedure_templates::parent.asc(),
-                next_procedure_templates::predecessor.asc(),
-                next_procedure_templates::successor.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
-        Self::table()
-            .filter(next_procedure_templates::created_by.eq(created_by))
-            .order_by((
-                next_procedure_templates::parent.asc(),
-                next_procedure_templates::predecessor.asc(),
-                next_procedure_templates::successor.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
-        Self::table()
-            .filter(next_procedure_templates::created_at.eq(created_at))
-            .order_by((
-                next_procedure_templates::parent.asc(),
-                next_procedure_templates::predecessor.asc(),
-                next_procedure_templates::successor.asc(),
-            ))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_parent_and_predecessor(
         parent: &i32,
         predecessor: &i32,
@@ -359,6 +298,57 @@ impl NextProcedureTemplate {
                     .eq(parent)
                     .and(next_procedure_templates::successor.eq(successor)),
             )
+            .order_by((
+                next_procedure_templates::parent.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_predecessor(
+        predecessor: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
+        Self::table()
+            .filter(next_procedure_templates::predecessor.eq(predecessor))
+            .order_by((
+                next_procedure_templates::parent.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_successor(
+        successor: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
+        Self::table()
+            .filter(next_procedure_templates::successor.eq(successor))
+            .order_by((
+                next_procedure_templates::parent.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
+            ))
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_at(
+        created_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
+        Self::table()
+            .filter(next_procedure_templates::created_at.eq(created_at))
             .order_by((
                 next_procedure_templates::parent.asc(),
                 next_procedure_templates::predecessor.asc(),

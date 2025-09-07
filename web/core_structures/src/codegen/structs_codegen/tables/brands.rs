@@ -101,6 +101,16 @@ impl Brand {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::brands::brands;
+        Self::table().filter(brands::name.eq(name)).order_by(brands::id.asc()).first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_created_by(
         created_by: &i32,
         conn: &mut diesel::PgConnection,
@@ -110,19 +120,6 @@ impl Brand {
         use crate::codegen::diesel_codegen::tables::brands::brands;
         Self::table()
             .filter(brands::created_by.eq(created_by))
-            .order_by(brands::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::brands::brands;
-        Self::table()
-            .filter(brands::created_at.eq(created_at))
             .order_by(brands::id.asc())
             .load::<Self>(conn)
     }
@@ -140,6 +137,19 @@ impl Brand {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_created_at(
+        created_at: &::rosetta_timestamp::TimestampUTC,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::brands::brands;
+        Self::table()
+            .filter(brands::created_at.eq(created_at))
+            .order_by(brands::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_updated_at(
         updated_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -151,16 +161,6 @@ impl Brand {
             .filter(brands::updated_at.eq(updated_at))
             .order_by(brands::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::brands::brands;
-        Self::table().filter(brands::name.eq(name)).order_by(brands::id.asc()).first::<Self>(conn)
     }
 }
 impl AsRef<Brand> for Brand {

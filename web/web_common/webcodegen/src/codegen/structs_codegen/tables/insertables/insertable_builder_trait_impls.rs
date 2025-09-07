@@ -7,7 +7,7 @@ use quote::quote;
 
 mod generate_setter_method;
 mod mermaid_illustration;
-use mermaid_illustration::columns_to_mermaid_illustration;
+pub(crate) use mermaid_illustration::columns_to_mermaid_illustration;
 
 use crate::{
     Column, PgExtension, Table, TableExtensionNetwork, TableLike, errors::WebCodeGenError,
@@ -240,6 +240,7 @@ impl Table {
 
                 if relevant_columns.len() > 1 {
                     let mermaid_illustraion = columns_to_mermaid_illustration(
+                        true,
                         &relevant_columns,
                         &insertable_column,
                         conn,

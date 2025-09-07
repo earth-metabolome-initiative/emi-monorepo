@@ -76,6 +76,19 @@ impl FreezeDryerModel {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::freeze_dryer_models::freeze_dryer_models;
+        Self::table()
+            .filter(freeze_dryer_models::id.eq(id))
+            .order_by(freeze_dryer_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_parent_model(
         parent_model: &i32,
         conn: &mut diesel::PgConnection,

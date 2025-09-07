@@ -198,7 +198,7 @@ impl<
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -218,7 +218,6 @@ impl<
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
-    ///v4 -.->|"`descendant of`"| v3
     ///v5 --->|"`extends`"| v3
     ///```
     fn model(
@@ -322,7 +321,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]
@@ -448,7 +447,7 @@ where
     /// ## Mermaid illustration
     ///
     /// ```mermaid
-    /// flowchart LR
+    /// flowchart BT
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -469,7 +468,6 @@ where
     /// v1 -.->|"`inferred ancestral same as`"| v0
     /// v5 --->|"`extends`"| v3
     /// v4 --->|"`extends`"| v5
-    /// v4 -.->|"`descendant of`"| v3
     /// ```
     fn model(
         self,

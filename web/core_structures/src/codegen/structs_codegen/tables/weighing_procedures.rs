@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -6,8 +6,21 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        foreign_key = weighed_container
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
+        foreign_key = weighed_with
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures
@@ -484,101 +497,15 @@ impl WeighingProcedure {
         .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
         Self::table()
-            .filter(weighing_procedures::procedure_template.eq(procedure_template))
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_weighed_container(
-        weighed_container: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(weighing_procedures::weighed_container.eq(weighed_container))
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_weighed_container_model(
-        procedure_template_weighed_container_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(
-                weighing_procedures::procedure_template_weighed_container_model
-                    .eq(procedure_template_weighed_container_model),
-            )
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_weighed_container(
-        procedure_weighed_container: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(
-                weighing_procedures::procedure_weighed_container.eq(procedure_weighed_container),
-            )
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_weighed_with(
-        weighed_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(weighing_procedures::weighed_with.eq(weighed_with))
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_weighed_with_model(
-        procedure_template_weighed_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(
-                weighing_procedures::procedure_template_weighed_with_model
-                    .eq(procedure_template_weighed_with_model),
-            )
-            .order_by(weighing_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_weighed_with(
-        procedure_weighed_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
-        Self::table()
-            .filter(weighing_procedures::procedure_weighed_with.eq(procedure_weighed_with))
+            .filter(weighing_procedures::procedure.eq(procedure))
             .order_by(weighing_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -599,6 +526,19 @@ impl WeighingProcedure {
                     .eq(procedure)
                     .and(weighing_procedures::procedure_template.eq(procedure_template)),
             )
+            .order_by(weighing_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(weighing_procedures::procedure_template.eq(procedure_template))
             .order_by(weighing_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -645,6 +585,53 @@ impl WeighingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_weighed_container_model(
+        procedure_template_weighed_container_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(
+                weighing_procedures::procedure_template_weighed_container_model
+                    .eq(procedure_template_weighed_container_model),
+            )
+            .order_by(weighing_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_weighed_with_model(
+        procedure_template_weighed_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(
+                weighing_procedures::procedure_template_weighed_with_model
+                    .eq(procedure_template_weighed_with_model),
+            )
+            .order_by(weighing_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_container(
+        procedure_weighed_container: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(
+                weighing_procedures::procedure_weighed_container.eq(procedure_weighed_container),
+            )
+            .order_by(weighing_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_weighed_container_and_procedure_template_weighed_container_model(
         procedure_weighed_container: &::rosetta_uuid::Uuid,
         procedure_template_weighed_container_model: &i32,
@@ -684,6 +671,19 @@ impl WeighingProcedure {
                     .eq(procedure_weighed_container)
                     .and(weighing_procedures::weighed_container.eq(weighed_container)),
             )
+            .order_by(weighing_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_weighed_with(
+        procedure_weighed_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
+        Self::table()
+            .filter(weighing_procedures::procedure_weighed_with.eq(procedure_weighed_with))
             .order_by(weighing_procedures::procedure.asc())
             .load::<Self>(conn)
     }

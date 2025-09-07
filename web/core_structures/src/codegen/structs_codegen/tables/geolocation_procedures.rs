@@ -6,8 +6,21 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        foreign_key = geolocated_asset
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
+        foreign_key = geolocated_with
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures
@@ -485,44 +498,15 @@ impl GeolocationProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
         Self::table()
-            .filter(geolocation_procedures::procedure_template.eq(procedure_template))
-            .order_by(geolocation_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_geolocated_asset(
-        geolocated_asset: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
-        Self::table()
-            .filter(geolocation_procedures::geolocated_asset.eq(geolocated_asset))
-            .order_by(geolocation_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_geolocated_asset_model(
-        procedure_template_geolocated_asset_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
-        Self::table()
-            .filter(
-                geolocation_procedures::procedure_template_geolocated_asset_model
-                    .eq(procedure_template_geolocated_asset_model),
-            )
+            .filter(geolocation_procedures::procedure.eq(procedure))
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -537,48 +521,6 @@ impl GeolocationProcedure {
         Self::table()
             .filter(
                 geolocation_procedures::procedure_geolocated_asset.eq(procedure_geolocated_asset),
-            )
-            .order_by(geolocation_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_geolocated_with(
-        geolocated_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
-        Self::table()
-            .filter(geolocation_procedures::geolocated_with.eq(geolocated_with))
-            .order_by(geolocation_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_geolocated_with(
-        procedure_geolocated_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
-        Self::table()
-            .filter(geolocation_procedures::procedure_geolocated_with.eq(procedure_geolocated_with))
-            .order_by(geolocation_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_geolocated_with_model(
-        procedure_template_geolocated_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
-        Self::table()
-            .filter(
-                geolocation_procedures::procedure_template_geolocated_with_model
-                    .eq(procedure_template_geolocated_with_model),
             )
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -623,6 +565,19 @@ impl GeolocationProcedure {
                             .eq(procedure_template_geolocated_asset_model),
                     ),
             )
+            .order_by(geolocation_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_geolocated_with(
+        procedure_geolocated_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
+        Self::table()
+            .filter(geolocation_procedures::procedure_geolocated_with.eq(procedure_geolocated_with))
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -685,6 +640,51 @@ impl GeolocationProcedure {
                 geolocation_procedures::procedure
                     .eq(procedure)
                     .and(geolocation_procedures::procedure_template.eq(procedure_template)),
+            )
+            .order_by(geolocation_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
+        Self::table()
+            .filter(geolocation_procedures::procedure_template.eq(procedure_template))
+            .order_by(geolocation_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_geolocated_asset_model(
+        procedure_template_geolocated_asset_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
+        Self::table()
+            .filter(
+                geolocation_procedures::procedure_template_geolocated_asset_model
+                    .eq(procedure_template_geolocated_asset_model),
+            )
+            .order_by(geolocation_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_geolocated_with_model(
+        procedure_template_geolocated_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
+        Self::table()
+            .filter(
+                geolocation_procedures::procedure_template_geolocated_with_model
+                    .eq(procedure_template_geolocated_with_model),
             )
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)

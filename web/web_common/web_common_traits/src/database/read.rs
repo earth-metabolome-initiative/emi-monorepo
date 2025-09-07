@@ -2,7 +2,7 @@
 
 pub mod dispatch;
 use diesel::{
-    Identifiable, OptionalExtension, QueryDsl, RunQueryDsl,
+    Identifiable, QueryDsl, RunQueryDsl,
     associations::HasTable,
     query_dsl::methods::{FindDsl, LimitDsl, LoadQuery, OffsetDsl},
 };
@@ -19,7 +19,7 @@ pub trait Read<C>: Sized + Identifiable {
     /// # Errors
     ///
     /// * Returns an error if loading the row fails.
-    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Option<Self>, diesel::result::Error>;
+    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Self, diesel::result::Error>;
 }
 
 /// The `BoundedRead` trait
@@ -50,8 +50,8 @@ where
     <<T::Table as FindDsl<<T as Identifiable>::Id>>::Output as LimitDsl>::Output:
         for<'a> LoadQuery<'a, C, T>,
 {
-    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Option<Self>, diesel::result::Error> {
-        RunQueryDsl::first(QueryDsl::find(T::table(), primary_key), conn).optional()
+    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Self, diesel::result::Error> {
+        RunQueryDsl::first(QueryDsl::find(T::table(), primary_key), conn)
     }
 }
 

@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::addresses::Address,
+        foreign_key = addresses_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::rooms::rooms)]
 pub struct Room {
@@ -136,6 +143,42 @@ impl Room {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_qrcode(
+        qrcode: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::rooms::rooms;
+        Self::table().filter(rooms::qrcode.eq(qrcode)).order_by(rooms::id.asc()).first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_created_by(
+        created_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::rooms::rooms;
+        Self::table()
+            .filter(rooms::created_by.eq(created_by))
+            .order_by(rooms::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_updated_by(
+        updated_by: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::rooms::rooms;
+        Self::table()
+            .filter(rooms::updated_by.eq(updated_by))
+            .order_by(rooms::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
@@ -159,32 +202,6 @@ impl Room {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_addresses_id(
-        addresses_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table()
-            .filter(rooms::addresses_id.eq(addresses_id))
-            .order_by(rooms::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table()
-            .filter(rooms::created_by.eq(created_by))
-            .order_by(rooms::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_created_at(
         created_at: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -194,19 +211,6 @@ impl Room {
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::created_at.eq(created_at))
-            .order_by(rooms::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_by(
-        updated_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table()
-            .filter(rooms::updated_by.eq(updated_by))
             .order_by(rooms::id.asc())
             .load::<Self>(conn)
     }
@@ -222,16 +226,6 @@ impl Room {
             .filter(rooms::updated_at.eq(updated_at))
             .order_by(rooms::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_qrcode(
-        qrcode: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table().filter(rooms::qrcode.eq(qrcode)).order_by(rooms::id.asc()).first::<Self>(conn)
     }
 }
 impl AsRef<Room> for Room {

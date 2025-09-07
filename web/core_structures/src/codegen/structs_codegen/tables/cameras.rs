@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cameras::cameras)]
 pub struct Camera {
@@ -130,17 +137,14 @@ impl Camera {
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model(
-        model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::cameras::cameras;
-        Self::table()
-            .filter(cameras::model.eq(model))
-            .order_by(cameras::id.asc())
-            .load::<Self>(conn)
+        Self::table().filter(cameras::id.eq(id)).order_by(cameras::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_id_and_model(
@@ -156,6 +160,26 @@ impl Camera {
         Self::table()
             .filter(cameras::id.eq(id).and(cameras::model.eq(model)))
             .order_by(cameras::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model(
+        model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            cameras::cameras, physical_assets::physical_assets,
+        };
+        Self::table()
+            .inner_join(physical_assets::table.on(cameras::id.eq(physical_assets::id)))
+            .filter(physical_assets::model.eq(model))
+            .order_by(cameras::id.asc())
+            .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

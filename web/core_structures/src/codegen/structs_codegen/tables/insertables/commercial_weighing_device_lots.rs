@@ -275,7 +275,7 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -295,18 +295,15 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v7 --->|"`extends`"| v4
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v5 --->|"`extends`"| v7
-    ///v5 -.->|"`descendant of`"| v4
     ///v6 --->|"`extends`"| v5
-    ///v6 -.->|"`descendant of`"| v4
-    ///v6 -.->|"`descendant of`"| v7
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -404,7 +401,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]
@@ -560,7 +557,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -580,7 +577,6 @@ where
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v4 --->|"`extends`"| v3
-    ///v4 -.->|"`descendant of`"| v5
     ///v3 --->|"`extends`"| v5
     ///```
     fn product_model(
@@ -614,7 +610,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -635,17 +631,14 @@ where
     ///class v0 column-of-interest
     ///end
     ///v0 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v7
-    ///v5 -.->|"`descendant of`"| v4
-    ///v6 --->|"`extends`"| v5
-    ///v6 -.->|"`descendant of`"| v4
-    ///v6 -.->|"`descendant of`"| v7
     ///v7 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
     ///```
     fn parent_model(
         self,

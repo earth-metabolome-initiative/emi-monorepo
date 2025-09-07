@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = parent_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::physical_asset_models::physical_asset_models
@@ -165,15 +172,15 @@ impl PhysicalAssetModel {
             .map(Some)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: &i32,
+    pub fn from_id(
+        id: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::physical_asset_models::physical_asset_models;
         Self::table()
-            .filter(physical_asset_models::parent_model.eq(parent_model))
+            .filter(physical_asset_models::id.eq(id))
             .order_by(physical_asset_models::id.asc())
             .load::<Self>(conn)
     }
@@ -274,6 +281,26 @@ impl PhysicalAssetModel {
         Self::table()
             .inner_join(asset_models::table.on(physical_asset_models::id.eq(asset_models::id)))
             .filter(asset_models::description.eq(description))
+            .order_by(physical_asset_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            asset_models::asset_models, physical_asset_models::physical_asset_models,
+        };
+        Self::table()
+            .inner_join(asset_models::table.on(physical_asset_models::id.eq(asset_models::id)))
+            .filter(asset_models::parent_model.eq(parent_model))
             .order_by(physical_asset_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

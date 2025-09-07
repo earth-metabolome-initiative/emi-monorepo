@@ -27,17 +27,6 @@ pub enum VolumeMeasuringDeviceModelAttribute {
     Extension(VolumeMeasuringDeviceModelExtensionAttribute),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
-    for VolumeMeasuringDeviceModelAttribute
-{
-    fn from(
-        physical_asset_models: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-    ) -> Self {
-        Self::Extension(VolumeMeasuringDeviceModelExtensionAttribute::PhysicalAssetModel(
-            physical_asset_models,
-        ))
-    }
-}
 impl core::str::FromStr for VolumeMeasuringDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -194,7 +183,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`asset_models`"]

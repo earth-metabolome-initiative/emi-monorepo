@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        foreign_key = container_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::containers::containers)]
 pub struct Container {
@@ -130,15 +137,15 @@ impl Container {
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_model(
-        container_model: &i32,
+    pub fn from_id(
+        id: &::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
-            .filter(containers::container_model.eq(container_model))
+            .filter(containers::id.eq(id))
             .order_by(containers::id.asc())
             .load::<Self>(conn)
     }

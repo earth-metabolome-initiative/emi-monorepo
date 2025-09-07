@@ -6,8 +6,27 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        foreign_key = packaged_with_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        foreign_key = sample
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = sample_model
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures
@@ -562,116 +581,6 @@ impl PackagingProcedure {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::procedure_template.eq(procedure_template))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_sample(
-        sample: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::sample.eq(sample))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_sample_model(
-        sample_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::sample_model.eq(sample_model))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_sample_model(
-        procedure_template_sample_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(
-                packaging_procedures::procedure_template_sample_model
-                    .eq(procedure_template_sample_model),
-            )
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample(
-        procedure_sample: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::procedure_sample.eq(procedure_sample))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_packaged_with_model(
-        packaged_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::packaged_with_model.eq(packaged_with_model))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_packaged_with_model(
-        procedure_template_packaged_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(
-                packaging_procedures::procedure_template_packaged_with_model
-                    .eq(procedure_template_packaged_with_model),
-            )
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_packaged_with(
-        procedure_packaged_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
-        Self::table()
-            .filter(packaging_procedures::procedure_packaged_with.eq(procedure_packaged_with))
-            .order_by(packaging_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_packaged_with_model_and_sample_model(
         packaged_with_model: &i32,
         sample_model: &i32,
@@ -688,6 +597,32 @@ impl PackagingProcedure {
                     .eq(packaged_with_model)
                     .and(packaging_procedures::sample_model.eq(sample_model)),
             )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure(
+        procedure: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure.eq(procedure))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_packaged_with(
+        procedure_packaged_with: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure_packaged_with.eq(procedure_packaged_with))
             .order_by(packaging_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -753,6 +688,19 @@ impl PackagingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample(
+        procedure_sample: &::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure_sample.eq(procedure_sample))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_sample_and_procedure_template_sample_model(
         procedure_sample: &::rosetta_uuid::Uuid,
         procedure_template_sample_model: &i32,
@@ -814,6 +762,35 @@ impl PackagingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_procedure_template(
+        procedure_template: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(packaging_procedures::procedure_template.eq(procedure_template))
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_packaged_with_model(
+        procedure_template_packaged_with_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template_packaged_with_model
+                    .eq(procedure_template_packaged_with_model),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_sample_model(
         procedure_template: &i32,
         procedure_template_sample_model: &i32,
@@ -851,6 +828,22 @@ impl PackagingProcedure {
                     packaging_procedures::procedure_template_packaged_with_model
                         .eq(procedure_template_packaged_with_model),
                 ),
+            )
+            .order_by(packaging_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_sample_model(
+        procedure_template_sample_model: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
+        Self::table()
+            .filter(
+                packaging_procedures::procedure_template_sample_model
+                    .eq(procedure_template_sample_model),
             )
             .order_by(packaging_procedures::procedure.asc())
             .load::<Self>(conn)

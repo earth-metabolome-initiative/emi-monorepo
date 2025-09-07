@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::ranks::Rank,
+        foreign_key = rank_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::taxa::taxa)]
 pub struct Taxon {
@@ -87,16 +94,6 @@ impl Taxon {
             .filter(taxa::parent_id.eq(parent_id))
             .order_by(taxa::id.asc())
             .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_rank_id(
-        rank_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::taxa::taxa;
-        Self::table().filter(taxa::rank_id.eq(rank_id)).order_by(taxa::id.asc()).load::<Self>(conn)
     }
 }
 impl AsRef<Taxon> for Taxon {

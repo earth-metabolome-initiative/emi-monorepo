@@ -410,7 +410,7 @@ where
     fn read(
         primary_key: Self::PrimaryKey,
         conn: &mut C,
-    ) -> Result<Option<Self>, diesel::result::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         use web_common_traits::database::Read;
         Ok(
             match primary_key {
@@ -421,7 +421,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedureTemplate(
                     primary_key,
@@ -430,7 +430,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AliquotingProcedure(
                     primary_key,
@@ -439,7 +439,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule(
                     primary_key,
@@ -448,7 +448,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModelAncestor(
                     primary_key,
@@ -457,7 +457,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
                     primary_key,
@@ -466,7 +466,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Asset(
                     primary_key,
@@ -475,7 +475,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
                     primary_key,
@@ -484,7 +484,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachine(
                     primary_key,
@@ -493,7 +493,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureTemplate(
                     primary_key,
@@ -502,7 +502,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedure(
                     primary_key,
@@ -511,7 +511,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(
                     primary_key,
@@ -520,7 +520,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Brand(
                     primary_key,
@@ -529,7 +529,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CameraModel(
                     primary_key,
@@ -538,7 +538,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Camera(
                     primary_key,
@@ -547,7 +547,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
                     primary_key,
@@ -556,7 +556,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
                     primary_key,
@@ -565,7 +565,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedure(
                     primary_key,
@@ -574,7 +574,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
                     primary_key,
@@ -583,7 +583,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedureTemplate(
                     primary_key,
@@ -592,7 +592,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeProcedure(
                     primary_key,
@@ -601,7 +601,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Centrifuge(
                     primary_key,
@@ -610,7 +610,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::City(
                     primary_key,
@@ -619,7 +619,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Color(
                     primary_key,
@@ -628,7 +628,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBallMillMachineLot(
                     primary_key,
@@ -637,7 +637,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBallMillMachineModel(
                     primary_key,
@@ -646,7 +646,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadLot(
                     primary_key,
@@ -655,7 +655,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialBeadModel(
                     primary_key,
@@ -664,7 +664,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCameraLot(
                     primary_key,
@@ -673,7 +673,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCameraModel(
                     primary_key,
@@ -682,7 +682,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCapLot(
                     primary_key,
@@ -691,7 +691,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCapModel(
                     primary_key,
@@ -700,7 +700,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCentrifugeLot(
                     primary_key,
@@ -709,7 +709,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialCentrifugeModel(
                     primary_key,
@@ -718,7 +718,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialFreezeDryerLot(
                     primary_key,
@@ -727,7 +727,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialFreezeDryerModel(
                     primary_key,
@@ -736,7 +736,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialFreezerLot(
                     primary_key,
@@ -745,7 +745,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialFreezerModel(
                     primary_key,
@@ -754,7 +754,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPackagingLot(
                     primary_key,
@@ -763,7 +763,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPackagingModel(
                     primary_key,
@@ -772,7 +772,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPipetteLot(
                     primary_key,
@@ -781,7 +781,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPipetteModel(
                     primary_key,
@@ -790,7 +790,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPipetteTipLot(
                     primary_key,
@@ -799,7 +799,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPipetteTipModel(
                     primary_key,
@@ -808,7 +808,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPositioningDeviceLot(
                     primary_key,
@@ -817,7 +817,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialPositioningDeviceModel(
                     primary_key,
@@ -826,7 +826,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProductLot(
                     primary_key,
@@ -835,7 +835,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
                     primary_key,
@@ -844,7 +844,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialVolumeMeasuringDeviceLot(
                     primary_key,
@@ -853,7 +853,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialVolumeMeasuringDeviceModel(
                     primary_key,
@@ -862,7 +862,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialWeighingDeviceLot(
                     primary_key,
@@ -871,7 +871,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialWeighingDeviceModel(
                     primary_key,
@@ -880,7 +880,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule(
                     primary_key,
@@ -889,7 +889,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
                     primary_key,
@@ -898,7 +898,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Container(
                     primary_key,
@@ -907,7 +907,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Country(
                     primary_key,
@@ -916,7 +916,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::DigitalAssetModel(
                     primary_key,
@@ -925,7 +925,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::DigitalAsset(
                     primary_key,
@@ -934,7 +934,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureTemplate(
                     primary_key,
@@ -943,7 +943,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedure(
                     primary_key,
@@ -952,7 +952,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Document(
                     primary_key,
@@ -961,7 +961,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::EmailProvider(
                     primary_key,
@@ -970,7 +970,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedureTemplate(
                     primary_key,
@@ -979,7 +979,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FractioningProcedure(
                     primary_key,
@@ -988,7 +988,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryerModel(
                     primary_key,
@@ -997,7 +997,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryer(
                     primary_key,
@@ -1006,7 +1006,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedureTemplate(
                     primary_key,
@@ -1015,7 +1015,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezeDryingProcedure(
                     primary_key,
@@ -1024,7 +1024,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezerModel(
                     primary_key,
@@ -1033,7 +1033,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Freezer(
                     primary_key,
@@ -1042,7 +1042,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
                     primary_key,
@@ -1051,7 +1051,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedure(
                     primary_key,
@@ -1060,7 +1060,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedureTemplate(
                     primary_key,
@@ -1069,7 +1069,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::GeolocationProcedure(
                     primary_key,
@@ -1078,7 +1078,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::InstrumentState(
                     primary_key,
@@ -1087,7 +1087,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::LoginProvider(
                     primary_key,
@@ -1096,7 +1096,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Material(
                     primary_key,
@@ -1105,7 +1105,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::NextProcedureTemplate(
                     primary_key,
@@ -1114,7 +1114,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ObservationSubject(
                     primary_key,
@@ -1123,7 +1123,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::OrganismTaxon(
                     primary_key,
@@ -1132,7 +1132,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Organism(
                     primary_key,
@@ -1141,7 +1141,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Organization(
                     primary_key,
@@ -1150,7 +1150,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
                     primary_key,
@@ -1159,7 +1159,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureTemplate(
                     primary_key,
@@ -1168,7 +1168,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedure(
                     primary_key,
@@ -1177,7 +1177,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ParentProcedureTemplate(
                     primary_key,
@@ -1186,7 +1186,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PermanenceCategory(
                     primary_key,
@@ -1195,7 +1195,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhoneModel(
                     primary_key,
@@ -1204,7 +1204,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedureTemplate(
                     primary_key,
@@ -1213,7 +1213,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhotographProcedure(
                     primary_key,
@@ -1222,7 +1222,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
                     primary_key,
@@ -1231,7 +1231,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
                     primary_key,
@@ -1240,7 +1240,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
                     primary_key,
@@ -1249,7 +1249,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
                     primary_key,
@@ -1258,7 +1258,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Pipette(
                     primary_key,
@@ -1267,7 +1267,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
                     primary_key,
@@ -1276,7 +1276,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDevice(
                     primary_key,
@@ -1285,7 +1285,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedureTemplate(
                     primary_key,
@@ -1294,7 +1294,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PouringProcedure(
                     primary_key,
@@ -1303,7 +1303,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
                     primary_key,
@@ -1312,7 +1312,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                     primary_key,
@@ -1321,7 +1321,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                     primary_key,
@@ -1330,7 +1330,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(
                     primary_key,
@@ -1339,7 +1339,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProjectState(
                     primary_key,
@@ -1348,7 +1348,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Project(
                     primary_key,
@@ -1357,7 +1357,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Rank(
                     primary_key,
@@ -1366,7 +1366,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ReagentModel(
                     primary_key,
@@ -1375,7 +1375,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Role(
                     primary_key,
@@ -1384,7 +1384,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Room(
                     primary_key,
@@ -1393,7 +1393,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleState(
                     primary_key,
@@ -1402,7 +1402,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SpatialRefSy(
                     primary_key,
@@ -1411,7 +1411,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Spectrum(
                     primary_key,
@@ -1420,7 +1420,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SpectraCollection(
                     primary_key,
@@ -1429,7 +1429,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureTemplate(
                     primary_key,
@@ -1438,7 +1438,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedure(
                     primary_key,
@@ -1447,7 +1447,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedureTemplate(
                     primary_key,
@@ -1456,7 +1456,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::SupernatantProcedure(
                     primary_key,
@@ -1465,7 +1465,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Taxon(
                     primary_key,
@@ -1474,7 +1474,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::TeamMember(
                     primary_key,
@@ -1483,7 +1483,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::TeamProject(
                     primary_key,
@@ -1492,7 +1492,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::TeamState(
                     primary_key,
@@ -1501,7 +1501,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Team(
                     primary_key,
@@ -1510,7 +1510,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::TemporaryUser(
                     primary_key,
@@ -1519,7 +1519,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Unit(
                     primary_key,
@@ -1528,7 +1528,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::UserEmail(
                     primary_key,
@@ -1537,7 +1537,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::UserOrganization(
                     primary_key,
@@ -1546,7 +1546,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
                     primary_key,
@@ -1555,7 +1555,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDeviceModel(
                     primary_key,
@@ -1564,7 +1564,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumeMeasuringDevice(
                     primary_key,
@@ -1573,7 +1573,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
                     primary_key,
@@ -1582,7 +1582,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                     primary_key,
@@ -1591,7 +1591,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
                     primary_key,
@@ -1600,7 +1600,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDevice(
                     primary_key,
@@ -1609,7 +1609,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedureTemplate(
                     primary_key,
@@ -1618,7 +1618,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingProcedure(
                     primary_key,
@@ -1627,7 +1627,7 @@ where
                             primary_key,
                             conn,
                         )?
-                        .map(super::Row::from)
+                        .into()
                 }
             },
         )

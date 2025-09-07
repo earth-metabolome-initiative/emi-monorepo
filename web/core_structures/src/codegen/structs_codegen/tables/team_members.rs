@@ -1,7 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = member_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
+    )
+)]
 #[diesel(primary_key(team_id, member_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_members::team_members
@@ -91,32 +109,6 @@ impl TeamMember {
             ),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_team_id(
-        team_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_members::team_members;
-        Self::table()
-            .filter(team_members::team_id.eq(team_id))
-            .order_by((team_members::team_id.asc(), team_members::member_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_member_id(
-        member_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_members::team_members;
-        Self::table()
-            .filter(team_members::member_id.eq(member_id))
-            .order_by((team_members::team_id.asc(), team_members::member_id.asc()))
-            .load::<Self>(conn)
     }
 }
 impl AsRef<TeamMember> for TeamMember {

@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        foreign_key = product_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots
@@ -140,32 +147,6 @@ impl CommercialProductLot {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_lot(
-        lot: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        Self::table()
-            .filter(commercial_product_lots::lot.eq(lot))
-            .order_by(commercial_product_lots::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_product_model(
-        product_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
-        Self::table()
-            .filter(commercial_product_lots::product_model.eq(product_model))
-            .order_by(commercial_product_lots::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_lot_and_product_model(
         lot: &str,
         product_model: &i32,
@@ -186,6 +167,19 @@ impl CommercialProductLot {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
+        Self::table()
+            .filter(commercial_product_lots::id.eq(id))
+            .order_by(commercial_product_lots::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_id_and_product_model(
         id: &i32,
         product_model: &i32,
@@ -202,6 +196,19 @@ impl CommercialProductLot {
                     .eq(id)
                     .and(commercial_product_lots::product_model.eq(product_model)),
             )
+            .order_by(commercial_product_lots::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_lot(
+        lot: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_product_lots::commercial_product_lots;
+        Self::table()
+            .filter(commercial_product_lots::lot.eq(lot))
             .order_by(commercial_product_lots::id.asc())
             .load::<Self>(conn)
     }

@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::brands::Brand,
+        foreign_key = brand_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_products::commercial_products
@@ -108,6 +115,19 @@ impl CommercialProduct {
         )
     }
     #[cfg(feature = "postgres")]
+    pub fn from_id(
+        id: &i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
+        Self::table()
+            .filter(commercial_products::id.eq(id))
+            .order_by(commercial_products::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_deprecation_date(
         deprecation_date: &::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
@@ -117,19 +137,6 @@ impl CommercialProduct {
         use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
         Self::table()
             .filter(commercial_products::deprecation_date.eq(deprecation_date))
-            .order_by(commercial_products::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_brand_id(
-        brand_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_products::commercial_products;
-        Self::table()
-            .filter(commercial_products::brand_id.eq(brand_id))
             .order_by(commercial_products::id.asc())
             .load::<Self>(conn)
     }

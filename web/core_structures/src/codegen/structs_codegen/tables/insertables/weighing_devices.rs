@@ -204,7 +204,7 @@ impl<
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -220,12 +220,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
-    ///v5 -.->|"`descendant of`"| v3
     ///```
     fn model(
         mut self,
@@ -328,7 +327,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`assets`"]
@@ -456,7 +455,7 @@ where
     ///## Mermaid illustration
     ///
     ///```mermaid
-    ///flowchart LR
+    ///flowchart BT
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
@@ -477,7 +476,6 @@ where
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
-    ///v5 -.->|"`descendant of`"| v3
     ///```
     fn model(
         self,

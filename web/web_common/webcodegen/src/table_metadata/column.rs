@@ -25,7 +25,10 @@ use super::{
 use crate::{
     KeyColumnUsage, Table,
     errors::WebCodeGenError,
-    table_metadata::{key_column_usage::PartialBuilderKind, pg_type::postgres_type_to_diesel},
+    table_metadata::{
+        key_column_usage::PartialBuilderKind,
+        pg_type::{PARTIAL_ORD_TYPES, postgres_type_to_diesel},
+    },
     utils::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS},
 };
 
@@ -935,6 +938,38 @@ impl Column {
             Err(error) => {
                 if self.has_custom_type() {
                     Ok(PgType::from_name(self.data_type_str(conn)?, conn)?.supports_eq(conn)?)
+                } else {
+                    Err(error)
+                }
+            }
+        }
+    }
+
+    /// Returns whether the column type supports the `PartialOrd` trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn supports_partial_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.supports_ord(conn)? {
+            return Ok(true);
+        }
+
+        if self.geometry(conn).ok().flatten().is_some()
+            || self.geography(conn).ok().flatten().is_some()
+        {
+            return Ok(true);
+        }
+        match rust_type_str(self.data_type_str(conn)?, conn) {
+            Ok(s) => Ok(PARTIAL_ORD_TYPES.contains(&s)),
+            Err(error) => {
+                if self.has_custom_type() {
+                    Ok(PgType::from_name(self.data_type_str(conn)?, conn)?
+                        .supports_partial_ord(conn)?)
                 } else {
                     Err(error)
                 }
@@ -1904,5 +1939,22 @@ impl Column {
         let mut all_distinct_check_constraints = self.distinct_check_constraints(conn)?;
         all_distinct_check_constraints.extend(self.inherited_distinct_check_constraints(conn)?);
         Ok(all_distinct_check_constraints)
+    }
+
+    /// Returns whether the column has exactly one foreign key constraint
+    /// that references exactly one column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn has_singleton_foreign_key(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self.foreign_keys(conn)?.iter().any(|key| key.is_singleton(conn).unwrap_or(false)))
     }
 }
