@@ -3,13 +3,18 @@
 
 use sqlparser::ast::OrderByExpr;
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for OrderByExpr {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
 
-    fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         if self.with_fill.is_some() {
             return Err(crate::errors::Error::UnknownPostgresFeature(
                 "WITH FILL in ORDER BY".to_string(),
@@ -17,7 +22,7 @@ impl Translator for OrderByExpr {
         }
 
         Ok(OrderByExpr {
-            expr: self.expr.translate(schema)?,
+            expr: self.expr.translate(schema, options)?,
             options: self.options.clone(),
             with_fill: None,
         })

@@ -81,3 +81,26 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	-- The timestamp when this relationship was created
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE OR REPLACE FUNCTION inherit_asset_models() RETURNS TRIGGER AS $$ BEGIN
+INSERT INTO procedure_template_asset_models (
+		name,
+		procedure_template,
+		based_on,
+		asset_model,
+		created_by,
+		created_at
+	)
+SELECT pam.name,
+	NEW.parent,
+	pam.id,
+	pam.asset_model,
+	NEW.created_by,
+	NEW.created_at
+FROM procedure_template_asset_models pam
+WHERE pam.procedure_template = NEW.child;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER trg_inherit_asset_models
+AFTER
+INSERT ON parent_procedure_templates FOR EACH ROW EXECUTE FUNCTION inherit_asset_models();

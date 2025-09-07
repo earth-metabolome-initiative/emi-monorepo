@@ -3,13 +3,18 @@
 
 use sqlparser::ast::{ColumnOption, ColumnOptionDef, Expr};
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for ColumnOptionDef {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = Option<ColumnOptionDef>;
 
-    fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match &self.option {
             ColumnOption::Unique { is_primary, characteristics } => {
                 Ok(Some(ColumnOptionDef {
@@ -69,13 +74,13 @@ impl Translator for ColumnOptionDef {
                         foreign_table: foreign_table.clone(),
                         referred_columns: referred_columns.clone(),
                         on_delete: on_delete
-                            .map(|on_delete| on_delete.translate(schema))
+                            .map(|on_delete| on_delete.translate(schema, options))
                             .transpose()?,
                         on_update: on_update
-                            .map(|on_update| on_update.translate(schema))
+                            .map(|on_update| on_update.translate(schema, options))
                             .transpose()?,
                         characteristics: characteristics
-                            .map(|c| c.translate(schema))
+                            .map(|c| c.translate(schema, options))
                             .transpose()?,
                     },
                 }))

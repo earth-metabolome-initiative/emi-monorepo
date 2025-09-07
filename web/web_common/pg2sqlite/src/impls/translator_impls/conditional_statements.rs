@@ -1,11 +1,11 @@
 //! Implementation of the [`Translator`] trait for the
-//! [`Expr`](sqlparser::ast::Expr) type.
+//! [`ConditionalStatements`](sqlparser::ast::ConditionalStatements) type.
 
-use sqlparser::ast::Expr;
+use sqlparser::ast::ConditionalStatements;
 
 use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
-impl Translator for Expr {
+impl Translator for ConditionalStatements {
     type Schema = PgSchema;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
@@ -16,9 +16,11 @@ impl Translator for Expr {
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
-            Expr::Function(func) => Expr::Function(func.translate(schema, options)?),
             _ => {
-                unimplemented!("Expr translation for definition `{}` is not yet implemented.", self)
+                unimplemented!(
+                    "ConditionalStatements translation for definition `{}` is not yet implemented.",
+                    self
+                )
             }
         })
     }

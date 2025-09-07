@@ -3,20 +3,25 @@
 
 use sqlparser::ast::ColumnDef;
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for ColumnDef {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = ColumnDef;
 
-    fn translate(&self, schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(ColumnDef {
             name: self.name.clone(),
-            data_type: self.data_type.translate(schema)?,
+            data_type: self.data_type.translate(schema, options)?,
             options: self
                 .options
                 .iter()
-                .map(|o| o.translate(schema))
+                .map(|o| o.translate(schema, options))
                 .collect::<Result<Vec<_>, _>>()?
                 .into_iter()
                 .flatten()

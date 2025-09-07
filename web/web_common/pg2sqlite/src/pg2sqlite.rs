@@ -1,41 +1,27 @@
 //! Submodule defining the main translator struct.
 
-use indicatif::ProgressIterator;
 use sqlparser::ast::Statement;
 
-use crate::prelude::Translator;
+use crate::{
+    options::Pg2SqliteOptions,
+    prelude::{PgSchema, Translator},
+};
 
 #[derive(Debug, Clone, Default)]
 /// Struct to translate between a `PostgreSQL` entry and a `SQLite` entry.
 pub struct Pg2Sqlite {
     /// The set of `PostgreSQL` statements to be translated.
     pub pg_statements: Vec<Statement>,
-    /// Whether to show a loading bar of the translation progress.
-    pub verbose: bool,
-    /// Whether to drop check constraints containing unsupported functions.
-    pub remove_unsupported_check_constraints: bool,
+    /// Inner schema.
+    inner_schema: PgSchema,
 }
 
 impl Pg2Sqlite {
-    #[must_use]
-    /// Sets to show a loading bar of the translation progress.
-    pub fn verbose(mut self) -> Self {
-        self.verbose = true;
-        self
-    }
-
     #[must_use]
     /// Adds a new SQL statement to the set of `PostgreSQL` statements to be
     /// translated.
     pub fn statement(mut self, statement: Statement) -> Self {
         self.pg_statements.push(statement);
-        self
-    }
-
-    #[must_use]
-    /// Sets to drop check constraints containing unsupported functions.
-    pub fn remove_unsupported_check_constraints(mut self) -> Self {
-        self.remove_unsupported_check_constraints = true;
         self
     }
 
@@ -141,23 +127,13 @@ impl Pg2Sqlite {
     /// # Panics
     ///
     /// * If the progress bar could not be created.
-    pub fn translate(self) -> Result<Vec<Statement>, crate::errors::Error> {
-        let bar = indicatif::ProgressBar::new(self.pg_statements.len() as u64);
-        bar.set_style(
-            indicatif::ProgressStyle::default_bar()
-                .template(
-                    "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}",
-                )
-                .expect("Failed to set progress bar style")
-                .progress_chars("#>-"),
-        );
-        if !self.verbose {
-            bar.set_draw_target(indicatif::ProgressDrawTarget::hidden());
-        }
+    pub fn translate(
+        mut self,
+        options: &Pg2SqliteOptions,
+    ) -> Result<Vec<Statement>, crate::errors::Error> {
         self.pg_statements
             .iter()
-            .progress_with(bar)
-            .map(|statement| statement.translate(&self))
+            .map(|statement| statement.translate(&mut self.inner_schema, options))
             .collect::<Result<Vec<Vec<Statement>>, crate::errors::Error>>()
             .map(|statements| statements.into_iter().flatten().collect())
     }

@@ -3,7 +3,7 @@
 
 use sqlparser::ast::{Function, Ident, ObjectName};
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 fn translate_function_name(name: ObjectName) -> Result<ObjectName, crate::errors::Error> {
     let original_name = name.to_string();
@@ -16,10 +16,15 @@ fn translate_function_name(name: ObjectName) -> Result<ObjectName, crate::errors
 }
 
 impl Translator for Function {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
 
-    fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        _schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(Function {
             name: translate_function_name(self.name.clone())?,
             uses_odbc_syntax: self.uses_odbc_syntax,

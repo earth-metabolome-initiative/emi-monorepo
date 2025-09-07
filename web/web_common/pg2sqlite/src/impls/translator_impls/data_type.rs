@@ -3,13 +3,18 @@
 
 use sqlparser::ast::DataType;
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for DataType {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = DataType;
 
-    fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        _schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
             DataType::Text | DataType::Integer(None) | DataType::Real => Ok(self.clone()),
             DataType::SmallInt(None) | DataType::Int(None) | DataType::Boolean | DataType::Bool => {

@@ -35,10 +35,8 @@ fn to_mermaid_node(
         .map_err(FlowchartError::from)?;
 
     let current_direction = parent_direction.flip();
-    let subprocedures = ParentProcedureTemplate::from_parent_procedure_template(
-        &procedure_template.procedure_template,
-        conn,
-    )?;
+    let subprocedures =
+        ParentProcedureTemplate::from_parent(&procedure_template.procedure_template, conn)?;
     let next_procedures =
         NextProcedureTemplate::from_parent(&procedure_template.procedure_template, conn)?;
 
@@ -71,7 +69,7 @@ fn to_mermaid_node(
     }
 
     for subprocedure in subprocedures {
-        let child_procedure = subprocedure.child_procedure_template(conn)?;
+        let child_procedure = subprocedure.child(conn)?;
         node_builder = node_builder.subnode(to_mermaid_node(
             root_procedure_template,
             trackable_classes,
@@ -86,7 +84,7 @@ fn to_mermaid_node(
     // Next, we chain add the edges representing which procedures are followed by
     // which.
     for subprocedure in next_procedures {
-        let current_procedure = subprocedure.current(conn)?;
+        let current_procedure = subprocedure.predecessor(conn)?;
         let next_procedure = subprocedure.successor(conn)?;
         builder.edge(
             FlowchartEdgeBuilder::default()
@@ -154,10 +152,8 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
         // We create a class for each trackable of the parent procedure.
 
         // We start creating the nodes for the procedure template.
-        for subprocedure in
-            ParentProcedureTemplate::from_parent_procedure_template(&self.procedure_template, conn)?
-        {
-            let child_procedure = subprocedure.child_procedure_template(conn)?;
+        for subprocedure in ParentProcedureTemplate::from_parent(&self.procedure_template, conn)? {
+            let child_procedure = subprocedure.child(conn)?;
             let _node = to_mermaid_node(
                 self,
                 &trackable_classes,
@@ -172,7 +168,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
         // Next, we chain add the edges representing which procedures are followed by
         // which.
         for subprocedure in NextProcedureTemplate::from_parent(&self.procedure_template, conn)? {
-            let current_procedure = subprocedure.current(conn)?;
+            let current_procedure = subprocedure.predecessor(conn)?;
             let next_procedure = subprocedure.successor(conn)?;
             builder.edge(
                 FlowchartEdgeBuilder::default()

@@ -3,7 +3,7 @@
 //! Submodule defining the `ParentProcedureTemplate` trait.
 
 use web_common_traits::{
-    database::{InsertError, Insertable, InsertableVariant, Read},
+    database::{InsertError, Insertable, InsertableVariant},
     prelude::ExtensionTable,
 };
 
@@ -12,40 +12,6 @@ use crate::{
     codegen::structs_codegen::tables::insertables::ParentProcedureTemplateSettable,
     tables::insertables::ParentProcedureTemplateAttribute,
 };
-
-#[derive(Default, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ChildOptions {
-    snoozable: bool,
-    copiable: bool,
-    repeatable: bool,
-    skippable: bool,
-}
-
-impl ChildOptions {
-    /// Sets the snoozable option.
-    pub fn snoozable(mut self) -> Self {
-        self.snoozable = true;
-        self
-    }
-
-    /// Sets the copiable option.
-    pub fn copiable(mut self) -> Self {
-        self.copiable = true;
-        self
-    }
-
-    /// Sets the repeatable option.
-    pub fn repeatable(mut self) -> Self {
-        self.repeatable = true;
-        self
-    }
-
-    /// Sets the skippable option.
-    pub fn skippable(mut self) -> Self {
-        self.skippable = true;
-        self
-    }
-}
 
 /// Trait defining the methods for managing parent-child relationships in
 /// procedure templates.
@@ -67,7 +33,6 @@ where
     fn child<C>(
         &self,
         child_procedure: &C,
-        options: ChildOptions,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
     ) -> Result<crate::ParentProcedureTemplate, InsertError<ParentProcedureTemplateAttribute>>
@@ -76,15 +41,9 @@ where
         for<'a> &'a C: diesel::Identifiable<Id = &'a i32>,
     {
         use diesel::Identifiable;
-        let child_procedure = ProcedureTemplate::read(*child_procedure.id(), conn)?
-            .expect("Child procedure template not found");
         let parent_procedure_template = crate::ParentProcedureTemplate::new()
-            .parent_procedure_template(*self.id())?
-            .child_procedure_template(child_procedure.procedure_template)?
-            .snoozable(options.snoozable)?
-            .copiable(options.copiable)?
-            .repeatable(options.repeatable)?
-            .skippable(options.skippable)?
+            .parent(*self.id())?
+            .child(*child_procedure.id())?
             .created_by(user.id)?
             .insert(user.id, conn)?;
 

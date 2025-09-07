@@ -5,11 +5,13 @@ use std::path::Path;
 
 use csqlv::{CSVSchemaBuilder, SQLGenerationOptions};
 use macro_utils::{cached_file_path, file_last_modified_time, most_recent_file};
-use pg2sqlite::prelude::Pg2Sqlite;
+use pg2sqlite::{
+    prelude::{Pg2Sqlite, Pg2SqliteOptions},
+    traits::TranslationOptions,
+};
 use proc_macro::TokenStream;
 use quote::quote;
 use sqlparser::ast::Statement;
-
 #[proc_macro]
 /// Generates a function to load a `SQLite` database from CSV files.
 ///
@@ -66,11 +68,9 @@ pub fn load_sqlite_from_csvs(csv_directory: TokenStream) -> TokenStream {
     let sql = schema.to_sql(&sql_generation_options).expect("Failed to generate SQL");
 
     let translated_sql: Vec<Statement> = Pg2Sqlite::default()
-        .remove_unsupported_check_constraints()
-        .verbose()
         .sql(&sql)
         .expect("Failed to parse SQL")
-        .translate()
+        .translate(&Pg2SqliteOptions::default().remove_unsupported_check_constraints())
         .expect("Failed to translate SQL");
 
     let translated_sql: String = translated_sql
@@ -140,11 +140,9 @@ pub fn load_sqlite_from_migrations(migrations_directory: TokenStream) -> TokenSt
         migrations_directory.to_str().expect("Failed to convert path to string");
 
     let translated_sql: Vec<Statement> = Pg2Sqlite::default()
-        .remove_unsupported_check_constraints()
-        .verbose()
         .ups(migrations_directory)
         .expect("Failed to parse SQL")
-        .translate()
+        .translate(&Pg2SqliteOptions::default().remove_unsupported_check_constraints())
         .expect("Failed to translate SQL");
 
     let translated_sql: String = translated_sql

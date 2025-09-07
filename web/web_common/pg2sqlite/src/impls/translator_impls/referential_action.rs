@@ -3,13 +3,18 @@
 
 use sqlparser::ast::ReferentialAction;
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for ReferentialAction {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = ReferentialAction;
 
-    fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        _schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
             ReferentialAction::NoAction => Ok(ReferentialAction::NoAction),
             ReferentialAction::Restrict => Ok(ReferentialAction::Restrict),

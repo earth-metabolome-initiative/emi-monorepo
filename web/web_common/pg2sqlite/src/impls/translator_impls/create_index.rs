@@ -3,13 +3,18 @@
 
 use sqlparser::ast::{CreateIndex, IndexType};
 
-use crate::prelude::{Pg2Sqlite, Translator};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
 impl Translator for CreateIndex {
-    type Schema = Pg2Sqlite;
+    type Schema = PgSchema;
+    type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
 
-    fn translate(&self, _schema: &Self::Schema) -> Result<Self::SQLiteEntry, crate::errors::Error> {
+    fn translate(
+        &self,
+        schema: &mut Self::Schema,
+        options: &Self::Options,
+    ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         // If the index is a GIN or GiST index, we need to translate it into a table
         // with a FTS5 virtual table. This is because SQLite does not support
         // GIN or GiST indexes.
@@ -18,18 +23,16 @@ impl Translator for CreateIndex {
             // let _fts5_table = create_fts5_from_index(self);
         }
 
-        println!("Translating CreateIndex: {self:?}");
-
         Ok(CreateIndex {
             columns: self
                 .columns
                 .iter()
-                .map(|col| col.translate(_schema))
+                .map(|col| col.translate(schema, options))
                 .collect::<Result<_, _>>()?,
             predicate: self
                 .predicate
                 .as_ref()
-                .map(|predicate| predicate.translate(_schema))
+                .map(|predicate| predicate.translate(schema, options))
                 .transpose()?,
             ..self.clone()
         })

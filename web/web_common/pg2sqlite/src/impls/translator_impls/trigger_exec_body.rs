@@ -1,11 +1,11 @@
 //! Implementation of the [`Translator`] trait for the
-//! [`IndexColumn`](sqlparser::ast::IndexColumn) type.
+//! [`TriggerExecBody`](sqlparser::ast::TriggerExecBody) type.
 
-use sqlparser::ast::IndexColumn;
+use sqlparser::ast::TriggerExecBody;
 
 use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
 
-impl Translator for IndexColumn {
+impl Translator for TriggerExecBody {
     type Schema = PgSchema;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
@@ -15,6 +15,13 @@ impl Translator for IndexColumn {
         schema: &mut Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
-        Ok(IndexColumn { column: self.column.translate(schema, options)?, ..self.clone() })
+        Ok(match self {
+            _ => {
+                unimplemented!(
+                    "TriggerExecBody translation for definition `{}` is not yet implemented.",
+                    self
+                )
+            }
+        })
     }
 }
