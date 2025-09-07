@@ -284,18 +284,18 @@ for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -627,12 +627,12 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v7
-    ///v6 -.->|"`descendant of`"| v4
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v5 -.->|"`descendant of`"| v4
     ///v5 -.->|"`descendant of`"| v7
+    ///v6 --->|"`extends`"| v7
+    ///v6 -.->|"`descendant of`"| v4
+    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,

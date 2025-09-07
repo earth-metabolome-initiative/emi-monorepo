@@ -47,22 +47,22 @@ where
         if user_id == self.created_by {
             return Ok(true);
         }
-        if !self.current(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
-        if !self
-            .next_procedure_templates_parent_current_fkey(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Ok(false);
-        }
         if !self.parent(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         if !self
-            .next_procedure_templates_parent_successor_id_fkey(conn)?
+            .next_procedure_templates_parent_predecessor_fkey(conn)?
             .can_update(user_id, conn)?
         {
+            return Ok(false);
+        }
+        if !self
+            .next_procedure_templates_parent_successor_fkey(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Ok(false);
+        }
+        if !self.predecessor(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         if !self.successor(conn)?.can_update(user_id, conn)? {

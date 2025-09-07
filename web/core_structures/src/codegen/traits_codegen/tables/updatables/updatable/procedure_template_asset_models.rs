@@ -47,9 +47,6 @@ where
         if user_id == self.created_by {
             return Ok(true);
         }
-        if user_id == self.updated_by {
-            return Ok(true);
-        }
         if !self.asset_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }

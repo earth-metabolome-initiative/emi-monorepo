@@ -2,8 +2,8 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum NextProcedureTemplateAttribute {
     Parent,
-    Current,
-    SuccessorId,
+    Predecessor,
+    Successor,
     CreatedBy,
     CreatedAt,
 }
@@ -12,13 +12,13 @@ impl core::str::FromStr for NextProcedureTemplateAttribute {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Parent" => Ok(Self::Parent),
-            "Current" => Ok(Self::Current),
-            "SuccessorId" => Ok(Self::SuccessorId),
+            "Predecessor" => Ok(Self::Predecessor),
+            "Successor" => Ok(Self::Successor),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
             "parent" => Ok(Self::Parent),
-            "current" => Ok(Self::Current),
-            "successor_id" => Ok(Self::SuccessorId),
+            "predecessor" => Ok(Self::Predecessor),
+            "successor" => Ok(Self::Successor),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
@@ -29,8 +29,8 @@ impl core::fmt::Display for NextProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Parent => write!(f, "parent"),
-            Self::Current => write!(f, "current"),
-            Self::SuccessorId => write!(f, "successor_id"),
+            Self::Predecessor => write!(f, "predecessor"),
+            Self::Successor => write!(f, "successor"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
         }
@@ -46,8 +46,8 @@ impl core::fmt::Display for NextProcedureTemplateAttribute {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableNextProcedureTemplate {
     pub(crate) parent: i32,
-    pub(crate) current: i32,
-    pub(crate) successor_id: i32,
+    pub(crate) predecessor: i32,
+    pub(crate) successor: i32,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
@@ -84,72 +84,6 @@ impl InsertableNextProcedureTemplate {
             conn,
         )
     }
-    pub fn current<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.current,
-            ),
-            conn,
-        )
-    }
-    pub fn next_procedure_templates_parent_current_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
-                (self.parent, self.current),
-            ),
-            conn,
-        )
-    }
     pub fn parent<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -182,7 +116,7 @@ impl InsertableNextProcedureTemplate {
             conn,
         )
     }
-    pub fn next_procedure_templates_parent_successor_id_fkey<
+    pub fn next_procedure_templates_parent_predecessor_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
@@ -211,7 +145,73 @@ impl InsertableNextProcedureTemplate {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
-                (self.parent, self.successor_id),
+                (self.parent, self.predecessor),
+            ),
+            conn,
+        )
+    }
+    pub fn next_procedure_templates_parent_successor_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
+                (self.parent, self.successor),
+            ),
+            conn,
+        )
+    }
+    pub fn predecessor<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.predecessor,
             ),
             conn,
         )
@@ -243,7 +243,7 @@ impl InsertableNextProcedureTemplate {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.successor_id,
+                self.successor,
             ),
             conn,
         )
@@ -253,8 +253,8 @@ impl InsertableNextProcedureTemplate {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableNextProcedureTemplateBuilder {
     pub(crate) parent: Option<i32>,
-    pub(crate) current: Option<i32>,
-    pub(crate) successor_id: Option<i32>,
+    pub(crate) predecessor: Option<i32>,
+    pub(crate) successor: Option<i32>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
@@ -262,8 +262,8 @@ impl Default for InsertableNextProcedureTemplateBuilder {
     fn default() -> Self {
         Self {
             parent: Default::default(),
-            current: Default::default(),
-            successor_id: Default::default(),
+            predecessor: Default::default(),
+            successor: Default::default(),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
@@ -296,11 +296,12 @@ pub trait NextProcedureTemplateSettable: Sized {
         self,
         parent: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `public.next_procedure_templates.current` column.
+    /// Sets the value of the `public.next_procedure_templates.predecessor`
+    /// column.
     ///
     /// # Arguments
-    /// * `current`: The value to set for the
-    ///   `public.next_procedure_templates.current` column.
+    /// * `predecessor`: The value to set for the
+    ///   `public.next_procedure_templates.predecessor` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -314,16 +315,16 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn current(
+    fn predecessor(
         self,
-        current: i32,
+        predecessor: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the `public.next_procedure_templates.successor_id`
+    /// Sets the value of the `public.next_procedure_templates.successor`
     /// column.
     ///
     /// # Arguments
-    /// * `successor_id`: The value to set for the
-    ///   `public.next_procedure_templates.successor_id` column.
+    /// * `successor`: The value to set for the
+    ///   `public.next_procedure_templates.successor` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -339,7 +340,7 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn successor(
         self,
-        successor_id: i32,
+        successor: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the `public.next_procedure_templates.created_by`
     /// column.
@@ -404,41 +405,42 @@ impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder {
         self.parent = Some(parent);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.current` column.
-    fn current(
+    /// Sets the value of the `public.next_procedure_templates.predecessor`
+    /// column.
+    fn predecessor(
         mut self,
-        current: i32,
+        predecessor: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(successor_id) = self.successor_id {
-            pgrx_validation::must_be_distinct_i32(current, successor_id)
+        if let Some(successor) = self.successor {
+            pgrx_validation::must_be_distinct_i32(predecessor, successor)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Current,
-                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::SuccessorId,
+                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Predecessor,
+                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Successor,
                         )
                 })?;
         }
-        self.current = Some(current);
+        self.predecessor = Some(predecessor);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.successor_id`
+    /// Sets the value of the `public.next_procedure_templates.successor`
     /// column.
     fn successor(
         mut self,
-        successor_id: i32,
+        successor: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(current) = self.current {
-            pgrx_validation::must_be_distinct_i32(current, successor_id)
+        if let Some(predecessor) = self.predecessor {
+            pgrx_validation::must_be_distinct_i32(predecessor, successor)
                 .map_err(|e| {
                     e
                         .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Current,
-                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::SuccessorId,
+                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Predecessor,
+                            crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute::Successor,
                         )
                 })?;
         }
-        self.successor_id = Some(successor_id);
+        self.successor = Some(successor);
         Ok(self)
     }
     /// Sets the value of the `public.next_procedure_templates.created_by`
@@ -487,7 +489,7 @@ where
 {
     type Attributes = NextProcedureTemplateAttribute;
     fn is_complete(&self) -> bool {
-        self.parent.is_some() && self.current.is_some() && self.successor_id.is_some()
+        self.parent.is_some() && self.predecessor.is_some() && self.successor.is_some()
             && self.created_by.is_some() && self.created_at.is_some()
     }
     fn mint_primary_key(

@@ -8,14 +8,14 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(parent, current, successor_id))]
+#[diesel(primary_key(parent, predecessor, successor))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates
 )]
 pub struct NextProcedureTemplate {
     pub parent: i32,
-    pub current: i32,
-    pub successor_id: i32,
+    pub predecessor: i32,
+    pub successor: i32,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
 }
@@ -33,7 +33,7 @@ where
 impl diesel::Identifiable for NextProcedureTemplate {
     type Id = (i32, i32, i32);
     fn id(self) -> Self::Id {
-        (self.parent, self.current, self.successor_id)
+        (self.parent, self.predecessor, self.successor)
     }
 }
 impl NextProcedureTemplate {
@@ -65,72 +65,6 @@ impl NextProcedureTemplate {
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::users::User::table(),
                 self.created_by,
-            ),
-            conn,
-        )
-    }
-    pub fn current<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.current,
-            ),
-            conn,
-        )
-    }
-    pub fn next_procedure_templates_parent_current_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
-                (self.parent, self.current),
             ),
             conn,
         )
@@ -167,7 +101,7 @@ impl NextProcedureTemplate {
             conn,
         )
     }
-    pub fn next_procedure_templates_parent_successor_id_fkey<
+    pub fn next_procedure_templates_parent_predecessor_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
@@ -196,7 +130,73 @@ impl NextProcedureTemplate {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
-                (self.parent, self.successor_id),
+                (self.parent, self.predecessor),
+            ),
+            conn,
+        )
+    }
+    pub fn next_procedure_templates_parent_successor_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::table(),
+                (self.parent, self.successor),
+            ),
+            conn,
+        )
+    }
+    pub fn predecessor<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
+                self.predecessor,
             ),
             conn,
         )
@@ -228,7 +228,7 @@ impl NextProcedureTemplate {
         RunQueryDsl::first(
             QueryDsl::find(
                 crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::table(),
-                self.successor_id,
+                self.successor,
             ),
             conn,
         )
@@ -245,42 +245,42 @@ impl NextProcedureTemplate {
             .filter(next_procedure_templates::parent.eq(parent))
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_current(
-        current: &i32,
+    pub fn from_predecessor(
+        predecessor: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
         Self::table()
-            .filter(next_procedure_templates::current.eq(current))
+            .filter(next_procedure_templates::predecessor.eq(predecessor))
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_successor_id(
-        successor_id: &i32,
+    pub fn from_successor(
+        successor: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
         Self::table()
-            .filter(next_procedure_templates::successor_id.eq(successor_id))
+            .filter(next_procedure_templates::successor.eq(successor))
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
@@ -296,8 +296,8 @@ impl NextProcedureTemplate {
             .filter(next_procedure_templates::created_by.eq(created_by))
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
@@ -313,15 +313,15 @@ impl NextProcedureTemplate {
             .filter(next_procedure_templates::created_at.eq(created_at))
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_and_current(
+    pub fn from_parent_and_predecessor(
         parent: &i32,
-        current: &i32,
+        predecessor: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -333,19 +333,19 @@ impl NextProcedureTemplate {
             .filter(
                 next_procedure_templates::parent
                     .eq(parent)
-                    .and(next_procedure_templates::current.eq(current)),
+                    .and(next_procedure_templates::predecessor.eq(predecessor)),
             )
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_and_successor_id(
+    pub fn from_parent_and_successor(
         parent: &i32,
-        successor_id: &i32,
+        successor: &i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -357,12 +357,12 @@ impl NextProcedureTemplate {
             .filter(
                 next_procedure_templates::parent
                     .eq(parent)
-                    .and(next_procedure_templates::successor_id.eq(successor_id)),
+                    .and(next_procedure_templates::successor.eq(successor)),
             )
             .order_by((
                 next_procedure_templates::parent.asc(),
-                next_procedure_templates::current.asc(),
-                next_procedure_templates::successor_id.asc(),
+                next_procedure_templates::predecessor.asc(),
+                next_procedure_templates::successor.asc(),
             ))
             .load::<Self>(conn)
     }

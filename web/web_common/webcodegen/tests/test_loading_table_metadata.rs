@@ -37,15 +37,9 @@ async fn test_user_table() {
     let all_tables = Table::load_all(&mut conn, &database_name, "public").unwrap();
     assert!(!all_tables.is_empty());
 
-    let _all_columns = Column::load_all(&mut conn);
-
     let _all_table_constraints = TableConstraint::load_all(&mut conn);
     let _all_referential_constraints =
         ReferentialConstraint::load_all_referential_constraints(&mut conn);
-    let _all_constraint_column_usage =
-        ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
-    let _all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
-    let _all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", "public", &database_name).unwrap();
 

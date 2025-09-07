@@ -5,12 +5,12 @@ pub enum ProcedureTemplateAttribute {
     MostConcreteTable,
     Name,
     Description,
-    Deprecated,
     Icon,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
     UpdatedAt,
+    Deprecated,
 }
 impl core::str::FromStr for ProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -19,21 +19,21 @@ impl core::str::FromStr for ProcedureTemplateAttribute {
             "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "Name" => Ok(Self::Name),
             "Description" => Ok(Self::Description),
-            "Deprecated" => Ok(Self::Deprecated),
             "Icon" => Ok(Self::Icon),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
+            "Deprecated" => Ok(Self::Deprecated),
             "most_concrete_table" => Ok(Self::MostConcreteTable),
             "name" => Ok(Self::Name),
             "description" => Ok(Self::Description),
-            "deprecated" => Ok(Self::Deprecated),
             "icon" => Ok(Self::Icon),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
             "updated_by" => Ok(Self::UpdatedBy),
             "updated_at" => Ok(Self::UpdatedAt),
+            "deprecated" => Ok(Self::Deprecated),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -45,12 +45,12 @@ impl core::fmt::Display for ProcedureTemplateAttribute {
             Self::MostConcreteTable => write!(f, "most_concrete_table"),
             Self::Name => write!(f, "name"),
             Self::Description => write!(f, "description"),
-            Self::Deprecated => write!(f, "deprecated"),
             Self::Icon => write!(f, "icon"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
             Self::UpdatedBy => write!(f, "updated_by"),
             Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Deprecated => write!(f, "deprecated"),
         }
     }
 }
@@ -66,12 +66,12 @@ pub struct InsertableProcedureTemplate {
     pub(crate) most_concrete_table: String,
     pub(crate) name: String,
     pub(crate) description: String,
-    pub(crate) deprecated: bool,
     pub(crate) icon: String,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) deprecated: bool,
 }
 impl InsertableProcedureTemplate {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -145,12 +145,12 @@ pub struct InsertableProcedureTemplateBuilder {
     pub(crate) most_concrete_table: Option<String>,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
-    pub(crate) deprecated: Option<bool>,
     pub(crate) icon: Option<String>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+    pub(crate) deprecated: Option<bool>,
 }
 impl From<InsertableProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProcedureTemplateBuilder>
@@ -165,12 +165,12 @@ impl Default for InsertableProcedureTemplateBuilder {
             most_concrete_table: Default::default(),
             name: Default::default(),
             description: Default::default(),
-            deprecated: Some(false),
             icon: Some("book".to_owned()),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            deprecated: Some(false),
         }
     }
 }
@@ -231,31 +231,6 @@ pub trait ProcedureTemplateSettable: Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-    /// Sets the value of the `public.procedure_templates.deprecated` column.
-    ///
-    /// # Arguments
-    /// * `deprecated`: The value to set for the
-    ///   `public.procedure_templates.deprecated` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `bool`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn deprecated<D>(
-        self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>;
     /// Sets the value of the `public.procedure_templates.icon` column.
     ///
     /// # Arguments
@@ -380,6 +355,31 @@ pub trait ProcedureTemplateSettable: Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+    /// Sets the value of the `public.procedure_templates.deprecated` column.
+    ///
+    /// # Arguments
+    /// * `deprecated`: The value to set for the
+    ///   `public.procedure_templates.deprecated` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `bool`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn deprecated<D>(
+        self,
+        deprecated: D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>;
 }
 impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
     type Attributes =
@@ -397,16 +397,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAttribute::Name)
         })?;
-        if let Some(description) = self.description.as_ref() {
-            pgrx_validation::must_be_distinct(name.as_ref(), description)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                        )
-                })?;
-        }
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
                 e
@@ -414,6 +404,25 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                         crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
                     )
             })?;
+        if let Some(description) = self.description.as_ref() {
+            pgrx_validation::must_be_paragraph(description)
+                .map_err(|e| {
+                    e
+                        .rename_field(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                        )
+                })
+                .and_then(|_| {
+                    pgrx_validation::must_be_distinct(name.as_ref(), description)
+                        .map_err(|e| {
+                            e
+                                .rename_fields(
+                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
+                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                                )
+                        })
+                })?;
+        }
         self.name = Some(name);
         Ok(self)
     }
@@ -431,39 +440,25 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                 .rename_field(ProcedureTemplateAttribute::Description)
         })?;
         if let Some(name) = self.name.as_ref() {
-            pgrx_validation::must_be_distinct(name, description.as_ref())
+            pgrx_validation::must_be_paragraph(description.as_ref())
                 .map_err(|e| {
                     e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
+                        .rename_field(
                             crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
                         )
+                })
+                .and_then(|_| {
+                    pgrx_validation::must_be_distinct(name, description.as_ref())
+                        .map_err(|e| {
+                            e
+                                .rename_fields(
+                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
+                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                                )
+                        })
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                    )
-            })?;
         self.description = Some(description);
-        Ok(self)
-    }
-    /// Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
-    {
-        let deprecated = deprecated.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::Deprecated)
-        })?;
-        self.deprecated = Some(deprecated);
         Ok(self)
     }
     /// Sets the value of the `public.procedure_templates.icon` column.
@@ -576,6 +571,22 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         self.updated_at = Some(updated_at);
         Ok(self)
     }
+    /// Sets the value of the `public.procedure_templates.deprecated` column.
+    fn deprecated<D>(
+        mut self,
+        deprecated: D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
+    {
+        let deprecated = deprecated.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(ProcedureTemplateAttribute::Deprecated)
+        })?;
+        self.deprecated = Some(deprecated);
+        Ok(self)
+    }
 }
 impl web_common_traits::database::MostConcreteTable for InsertableProcedureTemplateBuilder {
     fn set_most_concrete_table(&mut self, table_name: &str) {
@@ -604,12 +615,12 @@ where
         self.most_concrete_table.is_some()
             && self.name.is_some()
             && self.description.is_some()
-            && self.deprecated.is_some()
             && self.icon.is_some()
             && self.created_by.is_some()
             && self.created_at.is_some()
             && self.updated_by.is_some()
             && self.updated_at.is_some()
+            && self.deprecated.is_some()
     }
     fn mint_primary_key(
         self,

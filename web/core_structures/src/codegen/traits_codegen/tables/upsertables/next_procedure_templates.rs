@@ -14,7 +14,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((parent, current, successor_id))
+            .on_conflict((parent, predecessor, successor))
             .do_update()
             .set(self)
             .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))
@@ -38,7 +38,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((parent, current, successor_id))
+            .on_conflict((parent, predecessor, successor))
             .do_update()
             .set(self)
             .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))

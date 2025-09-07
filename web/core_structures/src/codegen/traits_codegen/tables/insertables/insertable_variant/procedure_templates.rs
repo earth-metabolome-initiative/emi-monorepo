@@ -66,13 +66,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
                 ),
             )?;
-        let deprecated = self
-            .deprecated
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Deprecated,
-                ),
-            )?;
         let icon = self
             .icon
             .ok_or(
@@ -108,16 +101,23 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::UpdatedAt,
                 ),
             )?;
+        let deprecated = self
+            .deprecated
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Deprecated,
+                ),
+            )?;
         Ok(Self::InsertableVariant {
             most_concrete_table,
             name,
             description,
-            deprecated,
             icon,
             created_by,
             created_at,
             updated_by,
             updated_at,
+            deprecated,
         })
     }
 }

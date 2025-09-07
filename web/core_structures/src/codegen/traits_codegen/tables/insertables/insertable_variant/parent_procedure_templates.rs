@@ -47,15 +47,13 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.child_procedure_template(conn)?.can_update(user_id, conn)?
-        {
+        if !insertable_struct.child(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.parent_procedure_template(conn)?.can_update(user_id, conn)?
-        {
+        if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -72,46 +70,18 @@ where
         _user_id: i32,
         _conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let parent_procedure_template = self
-            .parent_procedure_template
+        let parent = self
+            .parent
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ParentProcedureTemplate,
+                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Parent,
                 ),
             )?;
-        let child_procedure_template = self
-            .child_procedure_template
+        let child = self
+            .child
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::ChildProcedureTemplate,
-                ),
-            )?;
-        let snoozable = self
-            .snoozable
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Snoozable,
-                ),
-            )?;
-        let copiable = self
-            .copiable
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Copiable,
-                ),
-            )?;
-        let repeatable = self
-            .repeatable
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Repeatable,
-                ),
-            )?;
-        let skippable = self
-            .skippable
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Skippable,
+                    crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute::Child,
                 ),
             )?;
         let created_by = self
@@ -129,12 +99,8 @@ where
                 ),
             )?;
         Ok(Self::InsertableVariant {
-            parent_procedure_template,
-            child_procedure_template,
-            snoozable,
-            copiable,
-            repeatable,
-            skippable,
+            parent,
+            child,
             created_by,
             created_at,
         })

@@ -17,12 +17,12 @@ pub struct ProcedureTemplate {
     pub most_concrete_table: String,
     pub name: String,
     pub description: String,
-    pub deprecated: bool,
     pub icon: String,
     pub created_by: i32,
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
     pub updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub deprecated: bool,
 }
 impl web_common_traits::prelude::TableName for ProcedureTemplate {
     const TABLE_NAME: &'static str = "procedure_templates";
@@ -133,19 +133,6 @@ impl ProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_deprecated(
-        deprecated: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
-        Self::table()
-            .filter(procedure_templates::deprecated.eq(deprecated))
-            .order_by(procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_icon(
         icon: &str,
         conn: &mut diesel::PgConnection,
@@ -207,6 +194,19 @@ impl ProcedureTemplate {
         use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
         Self::table()
             .filter(procedure_templates::updated_at.eq(updated_at))
+            .order_by(procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_deprecated(
+        deprecated: &bool,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates;
+        Self::table()
+            .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }

@@ -1068,12 +1068,12 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// subgraph v6 ["`ball_mill_procedure_templates`"]
     ///    v3@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "milled_container_model"}
+    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "milled_with_model"}
     /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "bead_model"}
     /// class v0 column-of-interest
-    ///    v1@{shape: rounded, label: "milled_container_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_template_asset_models`"]
     ///    v4@{shape: rounded, label: "asset_model"}
@@ -1084,15 +1084,15 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v0
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn bead_model(
@@ -1132,21 +1132,21 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_bead_model<PTBM>(
@@ -1240,10 +1240,10 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "milled_with_model"}
-    /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v3 directly-involved-column
+    ///    v2@{shape: rounded, label: "milled_with_model"}
+    /// class v2 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_template_asset_models`"]
     ///    v4@{shape: rounded, label: "asset_model"}
@@ -1257,12 +1257,12 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// v1 --->|"`associated same as`"| v4
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v2 -.->|"`foreign defines`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn milled_with_model(
@@ -1309,10 +1309,10 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -1386,27 +1386,27 @@ impl<ProcedureTemplate> BallMillProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "milled_with_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "bead_model"}
     /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "milled_with_model"}
+    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_milled_container_model"}
     /// class v3 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "asset_model"}
-    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "asset_model"}
+    /// class v4 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v2 -.->|"`foreign defines`"| v1
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
     /// v1 --->|"`associated same as`"| v4
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
@@ -1579,28 +1579,6 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
-                self.procedure_template,
-                deprecated,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
     ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
@@ -1697,6 +1675,28 @@ for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate> {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
+    fn deprecated<D>(
+        mut self,
+        deprecated: D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
+                self.procedure_template,
+                deprecated,
             )
             .map_err(|e| {
                 e

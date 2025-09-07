@@ -786,10 +786,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
@@ -835,21 +835,21 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "weighed_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_weighed_with_model<PTWWM>(
@@ -1073,10 +1073,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1130,10 +1130,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1249,28 +1249,6 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
-                self.procedure_template,
-                deprecated,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
     ///Sets the value of the `public.procedure_templates.icon` column.
     fn icon<I>(
         mut self,
@@ -1367,6 +1345,28 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                 self.procedure_template,
                 updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
+    fn deprecated<D>(
+        mut self,
+        deprecated: D,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        D: TryInto<bool>,
+        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
+                self.procedure_template,
+                deprecated,
             )
             .map_err(|e| {
                 e

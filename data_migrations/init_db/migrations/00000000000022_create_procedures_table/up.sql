@@ -31,10 +31,7 @@ CREATE TABLE IF NOT EXISTS procedures (
 	FOREIGN KEY (parent_procedure, parent_procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that if a parent procedure template is specified, then the parent procedure template
 	-- must indeed be a valid parent procedure template for the specified procedure template.
-	FOREIGN KEY (parent_procedure_template, procedure_template) REFERENCES parent_procedure_templates(
-		parent_procedure_template,
-		child_procedure_template
-	),
+	FOREIGN KEY (parent_procedure_template, procedure_template) REFERENCES parent_procedure_templates(parent, child),
 	-- We check that either both parent_procedure and parent_procedure_template are NULL,
 	-- or neither is NULL.
 	CHECK (

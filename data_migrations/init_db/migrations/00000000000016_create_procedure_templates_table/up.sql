@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	-- The user who created this relationship
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this relationship was created
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),

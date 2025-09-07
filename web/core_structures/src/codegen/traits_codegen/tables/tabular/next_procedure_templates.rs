@@ -20,8 +20,8 @@ impl web_common_traits::prelude::Row
     fn primary_key(&self) -> Self::PrimaryKey {
         crate::codegen::tables::table_primary_keys::TablePrimaryKey::NextProcedureTemplate((
             self.parent,
-            self.current,
-            self.successor_id,
+            self.predecessor,
+            self.successor,
         ))
     }
 }

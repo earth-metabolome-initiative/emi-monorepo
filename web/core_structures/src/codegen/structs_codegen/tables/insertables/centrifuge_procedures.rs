@@ -122,6 +122,60 @@ pub struct InsertableCentrifugeProcedure {
     pub(crate) procedure_centrifuged_with: ::rosetta_uuid::Uuid,
 }
 impl InsertableCentrifugeProcedure {
+    pub fn procedure_centrifuged_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        RunQueryDsl::first(
+            QueryDsl::find(
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
+                self.procedure_centrifuged_with,
+            ),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuge_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -418,60 +472,6 @@ impl InsertableCentrifugeProcedure {
             ),
             conn,
         )
-    }
-    pub fn procedure_centrifuged_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table(),
-                self.procedure_centrifuged_with,
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn centrifuge_procedures_procedure_procedure_template_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_centrifuged_with_centrifuged_with_mo_fkey(
@@ -1018,12 +1018,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`centrifuge_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
-    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v6 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1033,11 +1033,11 @@ impl<
     ///    v3@{shape: rounded, label: "procedure_template"}
     /// class v3 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v1
-    /// v2 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
     /// v5 --->|"`extends`"| v7
     /// v5 ---o|"`associated with`"| v6
     /// ```
@@ -1078,10 +1078,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1127,28 +1127,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`centrifuge_procedures`"]
-    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
-    /// class v0 column-of-interest
-    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_centrifuged_container"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "id"}
     /// class v4 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
     /// v5 ---o|"`associated with`"| v6
     /// ```
     fn centrifuged_container_model(
@@ -1188,23 +1188,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_centrifuged_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_centrifuged_container_model(
@@ -1246,27 +1246,24 @@ impl<
     /// subgraph v8 ["`centrifuge_procedures`"]
     ///    v1@{shape: rounded, label: "centrifuged_container_model"}
     /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v3 directly-involved-column
-    ///    v0@{shape: rounded, label: "centrifuged_container"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_centrifuged_container"}
     /// class v2 column-of-interest
+    ///    v0@{shape: rounded, label: "centrifuged_container"}
+    /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v5
-    /// v4 -.->|"`foreign defines`"| v5
-    /// v3 --->|"`associated same as`"| v6
-    /// v0 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1274,6 +1271,9 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
+    /// v0 --->|"`associated same as`"| v4
+    /// v4 -.->|"`foreign defines`"| v5
+    /// v3 --->|"`associated same as`"| v6
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_centrifuged_container<PCC>(
@@ -1416,10 +1416,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`centrifuge_procedures`"]
-    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "centrifuged_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
+    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
     /// class v2 directly-involved-column
     /// end
@@ -1429,10 +1429,10 @@ impl<
     ///    v4@{shape: rounded, label: "id"}
     /// class v4 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
@@ -1476,31 +1476,31 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
-    /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_with"}
     /// class v0 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
+    /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset_model"}
     /// class v4 undirectly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v4
     /// v3 -.->|"`foreign defines`"| v4
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn centrifuged_with(
@@ -1596,26 +1596,25 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`centrifuge_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
     /// class v2 column-of-interest
-    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_with"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v6
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1623,10 +1622,11 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
-    /// v4 -.->|"`foreign defines`"| v5
-    /// v1 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v5
+    /// v3 --->|"`associated same as`"| v6
+    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_centrifuged_with<PCW>(

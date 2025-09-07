@@ -644,30 +644,6 @@ impl FractioningProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_deprecated(
-        deprecated: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            fractioning_procedure_templates::fractioning_procedure_templates,
-            procedure_templates::procedure_templates,
-        };
-        Self::table()
-            .inner_join(
-                procedure_templates::table.on(fractioning_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
-            )
-            .filter(procedure_templates::deprecated.eq(deprecated))
-            .order_by(fractioning_procedure_templates::procedure_template.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_icon(
         icon: &str,
         conn: &mut diesel::PgConnection,
@@ -783,6 +759,30 @@ impl FractioningProcedureTemplate {
                     .eq(procedure_templates::procedure_template)),
             )
             .filter(procedure_templates::updated_at.eq(updated_at))
+            .order_by(fractioning_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_deprecated(
+        deprecated: &bool,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            fractioning_procedure_templates::fractioning_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(fractioning_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(fractioning_procedure_templates::procedure_template.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

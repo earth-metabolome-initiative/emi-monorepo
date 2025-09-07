@@ -89,10 +89,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.parent_procedure_template.is_some_and(|parent_procedure_template| {
-                    parent_procedure_template
-                        == parent_procedure_templates.parent_procedure_template
-                }) && self.procedure_template
-                    == parent_procedure_templates.child_procedure_template
+                    parent_procedure_template == parent_procedure_templates.parent
+                }) && self.procedure_template == parent_procedure_templates.child
                 {
                     foreign_keys.procedures_parent_procedure_template_procedure_template_fkey =
                         Some(parent_procedure_templates);
@@ -106,10 +104,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.parent_procedure_template.is_some_and(|parent_procedure_template| {
-                    parent_procedure_template
-                        == parent_procedure_templates.parent_procedure_template
-                }) && self.procedure_template
-                    == parent_procedure_templates.child_procedure_template
+                    parent_procedure_template == parent_procedure_templates.parent
+                }) && self.procedure_template == parent_procedure_templates.child
                 {
                     foreign_keys.procedures_parent_procedure_template_procedure_template_fkey =
                         None;

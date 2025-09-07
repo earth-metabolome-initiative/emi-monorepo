@@ -1191,25 +1191,6 @@ impl Column {
         self.column_name == "created_at" && self.data_type == "timestamp with time zone"
     }
 
-    /// Load all columns from the database
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a `Vec` of `Column` if the operation was
-    /// successful,
-    ///
-    /// # Errors
-    ///
-    /// If an error occurs while querying the database
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
-        use crate::schema::columns;
-        columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
-    }
-
     /// Load a column with a given name fom a given table
     ///
     /// # Arguments

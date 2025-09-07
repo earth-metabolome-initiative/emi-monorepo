@@ -1,13 +1,13 @@
 # Time Report for Building Core Structures
 
-The total time spent on all tasks was 19 seconds.
-The slowest task was `Setting up Docker and Database Connection` which took now (42.11% of all time).
+The total time spent on all tasks was 20 seconds.
+The slowest task was `Setting up Docker and Database Connection` which took now (45.00% of all time).
 
 | name                                      | time | percentage | comment |
 |-------------------------------------------|------|------------|---------|
-| Setting up Docker and Database Connection | now  | 42.11%     |         |
-| Init DB                                   | now  | 21.05%     |         |
-| Code Generation                           | now  | 31.58%     |         |
+| Setting up Docker and Database Connection | now  | 45.00%     |         |
+| Init DB                                   | now  | 20.00%     |         |
+| Code Generation                           | now  | 30.00%     |         |
 
 ## Time Report for Init DB
 
@@ -22,11 +22,11 @@ The slowest task was `Init DB Transaction` which took now (100.00% of all time).
 ### Time Report for Init DB Transaction
 
 The total time spent on all tasks was now.
-The slowest task was `Initialize CSVs` which took now (75.00% of all time).
+The slowest task was `Initialize CSVs` which took now (100.00% of all time).
 
 | name                  | time | percentage | comment |
 |-----------------------|------|------------|---------|
-| Initialize CSVs       | now  | 75.00%     |         |
+| Initialize CSVs       | now  | 100.00%    |         |
 | Initialize Migrations | now  | 0.00%      |         |
 
 ## Time Report for Code Generation

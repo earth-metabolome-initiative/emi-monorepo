@@ -4,11 +4,10 @@ pub enum ProcedureTemplateAssetModelAttribute {
     Id,
     Name,
     ProcedureTemplate,
+    BasedOn,
     AssetModel,
     CreatedBy,
     CreatedAt,
-    UpdatedBy,
-    UpdatedAt,
 }
 impl core::str::FromStr for ProcedureTemplateAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -16,18 +15,16 @@ impl core::str::FromStr for ProcedureTemplateAssetModelAttribute {
         match s {
             "Name" => Ok(Self::Name),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
+            "BasedOn" => Ok(Self::BasedOn),
             "AssetModel" => Ok(Self::AssetModel),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
-            "UpdatedBy" => Ok(Self::UpdatedBy),
-            "UpdatedAt" => Ok(Self::UpdatedAt),
             "name" => Ok(Self::Name),
             "procedure_template" => Ok(Self::ProcedureTemplate),
+            "based_on" => Ok(Self::BasedOn),
             "asset_model" => Ok(Self::AssetModel),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
-            "updated_by" => Ok(Self::UpdatedBy),
-            "updated_at" => Ok(Self::UpdatedAt),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -38,11 +35,10 @@ impl core::fmt::Display for ProcedureTemplateAssetModelAttribute {
             Self::Id => write!(f, "id"),
             Self::Name => write!(f, "name"),
             Self::ProcedureTemplate => write!(f, "procedure_template"),
+            Self::BasedOn => write!(f, "based_on"),
             Self::AssetModel => write!(f, "asset_model"),
             Self::CreatedBy => write!(f, "created_by"),
             Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
         }
     }
 }
@@ -57,11 +53,10 @@ impl core::fmt::Display for ProcedureTemplateAssetModelAttribute {
 pub struct InsertableProcedureTemplateAssetModel {
     pub(crate) name: String,
     pub(crate) procedure_template: i32,
+    pub(crate) based_on: Option<i32>,
     pub(crate) asset_model: i32,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
-    pub(crate) updated_by: i32,
-    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureTemplateAssetModel {
     pub fn asset_model<C: diesel::connection::LoadConnection>(
@@ -95,6 +90,74 @@ impl InsertableProcedureTemplateAssetModel {
             ),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn procedure_template_asset_models_based_on_asset_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        let Some(based_on) = self.based_on else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(based_on)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+            .map(Some)
+    }
+    pub fn based_on<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: diesel::Identifiable,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >,
+        <<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
+        <<<crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::Identifiable>::Id,
+        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
+            'a,
+            C,
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    {
+        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        let Some(based_on) = self.based_on else {
+            return Ok(None);
+        };
+        RunQueryDsl::first(
+                QueryDsl::find(
+                    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table(),
+                    based_on,
+                ),
+                conn,
+            )
+            .map(Some)
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
@@ -160,49 +223,16 @@ impl InsertableProcedureTemplateAssetModel {
             conn,
         )
     }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
-    }
 }
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplateAssetModelBuilder {
     pub(crate) name: Option<String>,
     pub(crate) procedure_template: Option<i32>,
+    pub(crate) based_on: Option<i32>,
     pub(crate) asset_model: Option<i32>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    pub(crate) updated_by: Option<i32>,
-    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
 impl From<InsertableProcedureTemplateAssetModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProcedureTemplateAssetModelBuilder>
@@ -216,11 +246,10 @@ impl Default for InsertableProcedureTemplateAssetModelBuilder {
         Self {
             name: Default::default(),
             procedure_template: Default::default(),
+            based_on: Default::default(),
             asset_model: Default::default(),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
         }
     }
 }
@@ -278,6 +307,29 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     fn procedure_template(
         self,
         procedure_template: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.procedure_template_asset_models.based_on`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `based_on`: The value to set for the
+    ///   `public.procedure_template_asset_models.based_on` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn based_on(
+        self,
+        based_on: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
     /// Sets the value of the
     /// `public.procedure_template_asset_models.asset_model` column.
@@ -353,57 +405,6 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.updated_by` column.
-    ///
-    /// # Arguments
-    /// * `updated_by`: The value to set for the
-    ///   `public.procedure_template_asset_models.updated_by` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
-        self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.updated_at` column.
-    ///
-    /// # Arguments
-    /// * `updated_at`: The value to set for the
-    ///   `public.procedure_template_asset_models.updated_at` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `::rosetta_timestamp::TimestampUTC`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetModelBuilder {
     type Attributes =
@@ -441,17 +442,8 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.asset_model` column.
-    fn asset_model(
-        mut self,
-        asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.asset_model = Some(asset_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.created_by` column.
+    /// Sets the value of the `public.procedure_template_asset_models.based_on`
+    /// column.
     ///
     /// # Implementation notes
     /// This method also set the values of other columns, due to
@@ -463,16 +455,34 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
     /// flowchart LR
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "created_by"}
-    /// class v0 column-of-interest
-    /// v1@{shape: rounded, label: "updated_by"}
-    /// class v1 directly-involved-column
+    /// v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
+    /// v1@{shape: rounded, label: "based_on"}
+    /// class v1 column-of-interest
+    /// v1 -.->|"`foreign defines`"| v0
     /// ```
+    fn based_on(
+        mut self,
+        based_on: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.based_on = based_on;
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.procedure_template_asset_models.asset_model` column.
+    fn asset_model(
+        mut self,
+        asset_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.asset_model = Some(asset_model);
+        Ok(self)
+    }
+    /// Sets the value of the
+    /// `public.procedure_template_asset_models.created_by` column.
     fn created_by(
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -491,54 +501,7 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAssetModelAttribute::CreatedAt)
         })?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::UpdatedAt,
-                        )
-                })?;
-        }
         self.created_at = Some(created_at);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.updated_by` column.
-    fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.updated_by = Some(updated_by);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAssetModelAttribute::UpdatedAt)
-        })?;
-        if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::UpdatedAt,
-                        )
-                })?;
-        }
-        self.updated_at = Some(updated_at);
         Ok(self)
     }
 }
@@ -564,8 +527,7 @@ where
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.procedure_template.is_some()
             && self.asset_model.is_some() && self.created_by.is_some()
-            && self.created_at.is_some() && self.updated_by.is_some()
-            && self.updated_at.is_some()
+            && self.created_at.is_some()
     }
     fn mint_primary_key(
         self,
