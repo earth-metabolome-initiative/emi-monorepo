@@ -8,10 +8,7 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- Human-readable name of the procedure template
 	name TEXT UNIQUE NOT NULL CHECK (must_be_paragraph(name)),
 	-- Human-readable description of the procedure template
-	description TEXT NOT NULL CHECK (
-		must_be_paragraph(description)
-		AND must_be_distinct(name, description)
-	),
+	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
 	-- photograph_id UUID REFERENCES documents(id),
 	icon TEXT NOT NULL DEFAULT 'book' CHECK (must_be_font_awesome_class(icon)),
 	-- The user who created this procedure template
@@ -23,18 +20,9 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- The timestamp when this procedure template was last updated
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (must_be_smaller_than_utc(created_at, updated_at)),
 	-- Whether this procedure template is deprecated and should not be used for new procedures
-	deprecated BOOLEAN NOT NULL DEFAULT FALSE
-);
-CREATE TABLE IF NOT EXISTS parent_procedure_templates (
-	PRIMARY KEY (parent, child),
-	-- The parent procedure template
-	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
-	-- The child procedure template
-	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(parent, child)),
-	-- The user who created this relationship
-	created_by INTEGER NOT NULL REFERENCES users(id),
-	-- The timestamp when this relationship was created
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
+	-- We enforce that the name and description are distinct to avoid lazy duplicates
+	CHECK (must_be_distinct(name, description))
 );
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),
@@ -62,7 +50,7 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- Optional reference to a procedure template asset model from another procedure template
 	-- which this procedure template asset model is based on
-	based_on INTEGER REFERENCES procedure_template_asset_models(id) ON DELETE SET NULL,
+	based_on INTEGER REFERENCES procedure_template_asset_models(id),
 	-- The asset model this procedure template asset model is associated with
 	asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
 	-- The user who created this procedure template asset model
@@ -81,4 +69,15 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- We create an index on (procedure_template, asset_model) to allow for foreign
 	-- keys from the concrete procedures to check that the asset model is correctly aligned.
 	UNIQUE (id, asset_model)
+);
+CREATE TABLE IF NOT EXISTS parent_procedure_templates (
+	PRIMARY KEY (parent, child),
+	-- The parent procedure template
+	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	-- The child procedure template
+	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(parent, child)),
+	-- The user who created this relationship
+	created_by INTEGER NOT NULL REFERENCES users(id),
+	-- The timestamp when this relationship was created
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

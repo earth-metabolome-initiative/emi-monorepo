@@ -920,10 +920,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_from_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -931,10 +931,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_from_model(
@@ -975,10 +975,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "aliquoted_from_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -986,10 +986,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_aliquoted_from_model<PTAFM>(
@@ -1061,10 +1061,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_into_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -1072,10 +1072,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_into_model(
@@ -1116,10 +1116,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "aliquoted_into_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "aliquoted_into_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -1127,10 +1127,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_aliquoted_into_model<PTAIM>(
@@ -1202,23 +1202,23 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`aliquoting_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
+    /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
     /// class v2 directly-involved-column
     /// end
     /// subgraph v6 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset_model"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v3
+    /// v0 -.->|"`foreign defines`"| v1
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v0
@@ -1262,10 +1262,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "aliquoted_with_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1273,10 +1273,10 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_aliquoted_with_model<PTAWM>(
@@ -1348,12 +1348,12 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`aliquoting_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "aliquoted_with_model"}
     /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 column-of-interest
     /// end
     /// subgraph v6 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "asset_model"}
@@ -1361,13 +1361,13 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     ///    v4@{shape: rounded, label: "id"}
     /// class v4 undirectly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v0
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
     /// v2 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
     /// v5 ---o|"`associated with`"| v6
     /// ```
     fn pipette_tip_model(
@@ -1408,21 +1408,21 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "pipette_tip_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_pipette_tip_model<PTPTM>(

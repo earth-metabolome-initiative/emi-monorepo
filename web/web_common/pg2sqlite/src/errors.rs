@@ -13,6 +13,10 @@ pub enum Error {
     IoError(std::io::Error),
     /// Error when a function is not available in the schema.
     UndefinedFunction(String),
+    /// Error when a feature is not supported in `PostgreSQL`.
+    UnknownPostgresFeature(String),
+    /// Error when a feature is not supported in `SQLite`.
+    UnsupportedSQLiteFeature(String),
 }
 
 impl From<std::io::Error> for Error {

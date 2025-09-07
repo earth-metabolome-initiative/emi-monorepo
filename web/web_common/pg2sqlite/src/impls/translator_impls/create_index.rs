@@ -1,7 +1,7 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`CreateIndex`](sqlparser::ast::CreateIndex) type.
 
-use sqlparser::ast::{CreateIndex, IndexType, Statement};
+use sqlparser::ast::{CreateIndex, IndexType};
 
 use crate::prelude::{Pg2Sqlite, Translator};
 
@@ -18,9 +18,20 @@ impl Translator for CreateIndex {
             // let _fts5_table = create_fts5_from_index(self);
         }
 
-        // CREATE UNIQUE INDEX unique_asset_compatibility_pair ON
-        // asset_compatibility_rules(LEAST(left_asset_model, right_asset_model),
-        // GREATEST(left_asset_model, right_asset_model))
-        Ok(self.clone())
+        println!("Translating CreateIndex: {self:?}");
+
+        Ok(CreateIndex {
+            columns: self
+                .columns
+                .iter()
+                .map(|col| col.translate(_schema))
+                .collect::<Result<_, _>>()?,
+            predicate: self
+                .predicate
+                .as_ref()
+                .map(|predicate| predicate.translate(_schema))
+                .transpose()?,
+            ..self.clone()
+        })
     }
 }

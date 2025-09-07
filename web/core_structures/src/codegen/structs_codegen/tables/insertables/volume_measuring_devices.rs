@@ -221,12 +221,12 @@ for InsertableVolumeMeasuringDeviceBuilder<PhysicalAsset> {
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///v5 -.->|"`descendant of`"| v3
+    ///v4 --->|"`extends`"| v3
     ///```
     fn model(
         mut self,
@@ -476,9 +476,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
+    ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///v5 -.->|"`descendant of`"| v3
-    ///v4 --->|"`extends`"| v3
     ///```
     fn model(
         self,

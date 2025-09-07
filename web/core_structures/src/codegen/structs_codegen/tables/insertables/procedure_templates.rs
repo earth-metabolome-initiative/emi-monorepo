@@ -397,6 +397,16 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAttribute::Name)
         })?;
+        if let Some(description) = self.description.as_ref() {
+            pgrx_validation::must_be_distinct(name.as_ref(), description)
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                        )
+                })?;
+        }
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
                 e
@@ -404,25 +414,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                         crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
                     )
             })?;
-        if let Some(description) = self.description.as_ref() {
-            pgrx_validation::must_be_paragraph(description)
-                .map_err(|e| {
-                    e
-                        .rename_field(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                        )
-                })
-                .and_then(|_| {
-                    pgrx_validation::must_be_distinct(name.as_ref(), description)
-                        .map_err(|e| {
-                            e
-                                .rename_fields(
-                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
-                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                                )
-                        })
-                })?;
-        }
         self.name = Some(name);
         Ok(self)
     }
@@ -439,23 +430,21 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAttribute::Description)
         })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                    )
+            })?;
         if let Some(name) = self.name.as_ref() {
-            pgrx_validation::must_be_paragraph(description.as_ref())
+            pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
                     e
-                        .rename_field(
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
                             crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
                         )
-                })
-                .and_then(|_| {
-                    pgrx_validation::must_be_distinct(name, description.as_ref())
-                        .map_err(|e| {
-                            e
-                                .rename_fields(
-                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Name,
-                                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                                )
-                        })
                 })?;
         }
         self.description = Some(description);

@@ -14,7 +14,7 @@ fn test_translator() {
         .translate()
         .expect("Failed to translate the migrations");
 
-    assert_eq!(translated_migrations.len(), 66);
+    assert_eq!(translated_migrations.len(), 121);
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.
@@ -32,9 +32,13 @@ fn test_translator() {
     let mut connection = SqliteConnection::establish(":memory:")
         .expect("Failed to establish a connection to the SQLite database");
 
-    for (i, translated_migration) in translated_migrations.iter().enumerate() {
-        connection.batch_execute(&translated_migration.to_string()).unwrap_or_else(|_| {
-            panic!("Failed to run the migration {i}/{}", translated_migrations.len())
-        });
+    let number_of_migrations = translated_migrations.len();
+    for (i, translated_migration) in
+        translated_migrations.iter().enumerate().map(|(v, s)| (v + 1, s))
+    {
+        let sql = translated_migration.to_string();
+        if let Err(err) = connection.batch_execute(&sql) {
+            panic!("Failed to run the translated statement {i}/{number_of_migrations} {sql}: {err}")
+        }
     }
 }
