@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPo
     PositioningDeviceModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialPositioningDeviceLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLot as diesel::Insertable<
@@ -28,20 +27,10 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::PositioningDeviceModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::PositioningDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::PositioningDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PositioningDeviceModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
+    crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
+    crate::PositioningDeviceModel: web_common_traits::database::Updatable<
         C,
-        crate::PositioningDeviceModel,
+        UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {

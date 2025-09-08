@@ -3,7 +3,6 @@ impl<
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateBuilder
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::NextProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate as diesel::Insertable<
@@ -11,21 +10,8 @@ where
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::NextProcedureTemplate>,
     C: diesel::connection::LoadConnection,
-    crate::ProcedureTemplate: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >,
-    <<crate::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::ProcedureTemplate,
-    >,
+    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type Row = crate::NextProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate;

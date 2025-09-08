@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCa
     CapModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialCapLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapLot as diesel::Insertable<

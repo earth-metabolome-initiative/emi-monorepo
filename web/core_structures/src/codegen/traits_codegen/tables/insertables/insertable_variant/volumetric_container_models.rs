@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricCo
     ContainerModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::VolumetricContainerModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel as diesel::Insertable<

@@ -34,6 +34,7 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
     let mut time_tracker = TimeTracker::new("Code Generation");
 
     let mut codegen = Codegen::default()
+        .beautify()
         .users(&users)
         .projects(&projects)
         .teams(&teams)
@@ -48,8 +49,7 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
         .enable_updatable_trait()
         .enable_upsertable_trait()
         .enable_crud_operations()
-        .enable_yew()
-        .beautify();
+        .enable_yew();
     time_tracker.extend(codegen.generate(conn, DATABASE_NAME)?);
 
     let table_extension_network = codegen.table_extension_network().unwrap();

@@ -3,7 +3,6 @@ impl<
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::TeamProject as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject as diesel::Insertable<
@@ -11,36 +10,10 @@ where
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::TeamProject>,
     C: diesel::connection::LoadConnection,
-    crate::Project: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Project as diesel::Identifiable>::Id,
-    >,
-    <<crate::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Project as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Project as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Project,
-    >,
-    crate::Team: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Team as diesel::Identifiable>::Id,
-    >,
-    <<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Team as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Team as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Team,
-    >,
+    crate::Project: web_common_traits::database::Read<C>,
+    crate::Project: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::Team: web_common_traits::database::Read<C>,
+    crate::Team: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type Row = crate::TeamProject;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamProject;

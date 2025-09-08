@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBe
     BeadModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialBeadLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadLot as diesel::Insertable<

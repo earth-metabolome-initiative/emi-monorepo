@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePackagingMod
     PhysicalAssetModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::PackagingModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel as diesel::Insertable<

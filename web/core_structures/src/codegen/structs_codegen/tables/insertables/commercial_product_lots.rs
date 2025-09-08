@@ -232,8 +232,8 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn product_model(
         mut self,
@@ -462,9 +462,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
     ///```

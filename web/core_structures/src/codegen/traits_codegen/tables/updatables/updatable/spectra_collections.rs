@@ -1,20 +1,7 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::SpectraCollection
+    for crate::SpectraCollection
 where
-    crate::DigitalAsset: diesel::Identifiable,
-    <crate::DigitalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >,
-    <<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::DigitalAsset,
-    >,
+    crate::DigitalAsset: web_common_traits::database::Read<C>,
     crate::DigitalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;

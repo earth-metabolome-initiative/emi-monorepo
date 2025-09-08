@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVo
     VolumeMeasuringDeviceModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialVolumeMeasuringDeviceLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceLot as diesel::Insertable<
@@ -28,20 +27,10 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::VolumeMeasuringDeviceModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::VolumeMeasuringDeviceModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::VolumeMeasuringDeviceModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::VolumeMeasuringDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::VolumeMeasuringDeviceModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::VolumeMeasuringDeviceModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::VolumeMeasuringDeviceModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
+    crate::VolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
+    crate::VolumeMeasuringDeviceModel: web_common_traits::database::Updatable<
         C,
-        crate::VolumeMeasuringDeviceModel,
+        UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {

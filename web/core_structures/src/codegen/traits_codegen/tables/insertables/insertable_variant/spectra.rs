@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuil
     DigitalAsset,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::Spectrum as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum as diesel::Insertable<
@@ -18,36 +17,10 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::DigitalAsset: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::DigitalAsset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >,
-    <<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::DigitalAsset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::DigitalAsset as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::DigitalAsset,
-    >,
-    crate::SpectraCollection: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::SpectraCollection as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::SpectraCollection as diesel::Identifiable>::Id,
-    >,
-    <<crate::SpectraCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::SpectraCollection as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::SpectraCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::SpectraCollection as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::SpectraCollection,
-    >,
+    crate::DigitalAsset: web_common_traits::database::Read<C>,
+    crate::DigitalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::SpectraCollection: web_common_traits::database::Read<C>,
+    crate::SpectraCollection: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::Spectrum;

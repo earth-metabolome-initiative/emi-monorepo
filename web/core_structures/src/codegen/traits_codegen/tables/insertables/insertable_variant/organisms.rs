@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuil
     PhysicalAsset,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::Organism as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableOrganism as diesel::Insertable<

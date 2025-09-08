@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFr
     FreezerModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialFreezerLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot as diesel::Insertable<
@@ -21,21 +20,8 @@ where
         PrimaryKey = i32,
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::FreezerModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::FreezerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::FreezerModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::FreezerModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::FreezerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::FreezerModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::FreezerModel,
-    >,
+    crate::FreezerModel: web_common_traits::database::Read<C>,
+    crate::FreezerModel: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::CommercialFreezerLot;

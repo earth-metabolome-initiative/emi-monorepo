@@ -3,7 +3,6 @@ impl<
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel as diesel::Insertable<
@@ -18,36 +17,10 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     >,
-    crate::AssetModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::AssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::AssetModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::AssetModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::AssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::AssetModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::AssetModel,
-    >,
-    crate::ProcedureTemplate: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::ProcedureTemplate as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >,
-    <<crate::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::ProcedureTemplate as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::ProcedureTemplate as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::ProcedureTemplate,
-    >,
+    crate::AssetModel: web_common_traits::database::Read<C>,
+    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
 {
     type Row = crate::ProcedureTemplateAssetModel;

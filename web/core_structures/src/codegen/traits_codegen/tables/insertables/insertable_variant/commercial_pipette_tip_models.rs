@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPi
     CommercialProduct,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialPipetteTipModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel as diesel::Insertable<
@@ -25,21 +24,8 @@ where
         PrimaryKey = i32,
     >,
     PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::PipetteTipModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::PipetteTipModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::PipetteTipModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PipetteTipModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::PipetteTipModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PipetteTipModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::PipetteTipModel,
-    >,
+    crate::PipetteTipModel: web_common_traits::database::Read<C>,
+    crate::PipetteTipModel: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::CommercialPipetteTipModel;

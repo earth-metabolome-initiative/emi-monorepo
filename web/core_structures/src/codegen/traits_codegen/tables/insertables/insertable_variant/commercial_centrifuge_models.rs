@@ -8,7 +8,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCe
     CommercialProduct,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModel as diesel::Insertable<
@@ -25,21 +24,8 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::CentrifugeModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::CentrifugeModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::CentrifugeModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::CentrifugeModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::CentrifugeModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::CentrifugeModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::CentrifugeModel,
-    >,
+    crate::CentrifugeModel: web_common_traits::database::Read<C>,
+    crate::CentrifugeModel: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::CommercialCentrifugeModel;

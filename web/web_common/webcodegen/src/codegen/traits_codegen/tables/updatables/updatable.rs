@@ -2,7 +2,7 @@
 //! [`Updatable`](web_common_traits::database::Updatable) trait for all required
 //! tables.
 
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -94,6 +94,7 @@ impl Codegen<'_> {
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_path = table.import_struct_path()?;
             let table_ident = table.snake_case_ident()?;
+            let mut where_constraints = Vec::new();
 
             // let team_check = if table == projects {
             //     // In order to check whether the user is a member of the project's team,
@@ -120,7 +121,6 @@ impl Codegen<'_> {
             // };
 
             let mut parent_check = TokenStream::new();
-            let mut parent_check_trait_requirements = HashMap::new();
 
             for parent_key in table.parent_keys(conn)? {
                 let parent_table = parent_key.foreign_table(conn)?;
@@ -141,34 +141,14 @@ impl Codegen<'_> {
                     }
                 };
 
-                let current_constraints = parent_check_trait_requirements
-                    .entry(parent_table_ident.clone())
-                    .or_insert_with(TokenStream::new);
+                where_constraints.push(quote::quote! {
+                    #parent_table_path: web_common_traits::database::Read<C>
+                });
 
-                if current_constraints.is_empty() {
-                    current_constraints.extend(
-                    quote::quote! {
-                        #parent_table_path: diesel::Identifiable,
-                        <#parent_table_path as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >,
-                        <<#parent_table_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-                        <<<#parent_table_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-                            'a,
-                            C,
-                            #parent_table_path,
-                        >,
+                if parent_table.as_ref() != table {
+                    where_constraints.push(quote::quote! {
+                        #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
                     });
-
-                    if parent_table.as_ref() != table {
-                        current_constraints.extend(quote::quote! {
-                            #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
-                        });
-                    }
                 }
 
                 parent_check.extend(if parent_key.is_nullable(conn)? {
@@ -237,22 +217,19 @@ impl Codegen<'_> {
                 TokenStream::new()
             };
 
-            let where_clause = if parent_check_trait_requirements.is_empty() {
+            let maybe_where_clause = if where_constraints.is_empty() {
                 TokenStream::new()
             } else {
-                let mut constraints =
-                    parent_check_trait_requirements.into_iter().collect::<Vec<_>>();
-                constraints.sort_unstable_by_key(|(ident, _)| ident.to_string());
-                let constraints =
-                    constraints.into_iter().map(|(_, constraint)| constraint).collect::<Vec<_>>();
+                where_constraints.sort_unstable_by_key(|constraint| constraint.to_string());
+                where_constraints.dedup_by_key(|constraint| constraint.to_string());
 
-                quote::quote! { where #(#constraints),* }
+                quote::quote! { where #(#where_constraints),* }
             };
 
             std::fs::write(
                 &table_file,
                 self.beautify_code(&quote::quote! {
-                    impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C> for #table_path #where_clause{
+                    impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C> for #table_path #maybe_where_clause{
                         type UserId = #user_id_type;
 
                         fn can_update(

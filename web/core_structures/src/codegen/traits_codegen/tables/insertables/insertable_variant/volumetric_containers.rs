@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricCo
     Container,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::VolumetricContainer as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainer as diesel::Insertable<
@@ -18,21 +17,8 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::Container: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::Container as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >,
-    <<crate::Container as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Container as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Container,
-    >,
+    crate::Container: web_common_traits::database::Read<C>,
+    crate::Container: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::VolumetricContainer;

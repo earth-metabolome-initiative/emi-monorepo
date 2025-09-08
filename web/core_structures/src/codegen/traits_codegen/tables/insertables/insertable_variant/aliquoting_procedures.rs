@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingPr
     Procedure,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::AliquotingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedure as diesel::Insertable<
@@ -22,24 +21,8 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
     >,
     crate::AliquotingProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::Procedure: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Procedure,
-    >,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::Procedure: web_common_traits::database::Read<C>,
+    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
     crate::ProcedureAsset: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,

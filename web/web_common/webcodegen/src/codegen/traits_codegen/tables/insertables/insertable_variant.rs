@@ -1,11 +1,7 @@
 //! Submodule providing the code to generate the implementation of the
 //! [`InsertableVariant`] trait for all required tables.
 
-use std::{
-    collections::{HashMap, HashSet},
-    path::Path,
-    sync::Arc,
-};
+use std::{collections::HashSet, path::Path, sync::Arc};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -507,7 +503,7 @@ impl Codegen<'_> {
             // the parent tables.
 
             let mut parent_check = TokenStream::new();
-            let mut parent_check_trait_requirements = HashMap::new();
+            let mut additional_where_clause = Vec::new();
 
             for parent_key in table.parent_keys(conn)? {
                 let parent_key_method = parent_key.constraint_ident(conn)?;
@@ -516,6 +512,7 @@ impl Codegen<'_> {
                 if !parent_table.allows_updatable(conn)? {
                     continue;
                 }
+
                 let parent_table_path = parent_table.import_struct_path()?;
 
                 parent_check.extend(if parent_key.is_nullable(conn)? {
@@ -534,29 +531,13 @@ impl Codegen<'_> {
                     }
                 });
 
-                let current_constraints = parent_check_trait_requirements
-                    .entry(parent_table.clone())
-                    .or_insert_with(TokenStream::new);
+                additional_where_clause.push(quote::quote! {
+                    #parent_table_path: web_common_traits::database::Read<C>
+                });
 
-                if current_constraints.is_empty() {
-                    current_constraints.extend(
-                    quote::quote! {
-                        #parent_table_path: diesel::Identifiable + web_common_traits::database::Updatable<C, UserId = #user_id_type>,
-                        <#parent_table_path as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >,
-                        <<#parent_table_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-                        <<<#parent_table_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-                            <#parent_table_path as diesel::Identifiable>::Id,
-                        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-                            'a,
-                            C,
-                            #parent_table_path,
-                        >
-                    });
-                }
+                additional_where_clause.push(quote::quote! {
+                    #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
+                });
             }
 
             let mut additional_imports = Vec::new();
@@ -567,12 +548,6 @@ impl Codegen<'_> {
                 });
             }
 
-            let mut additional_where_clause = if parent_check_trait_requirements.is_empty() {
-                Vec::new()
-            } else {
-                parent_check_trait_requirements.values().cloned().collect::<Vec<_>>()
-            };
-
             let attributes_enum = table.insertable_enum_ty()?;
 
             let (try_insert, try_insert_additional_where_clause) =
@@ -580,6 +555,7 @@ impl Codegen<'_> {
 
             additional_where_clause.extend(try_insert_additional_where_clause);
             additional_where_clause.sort_unstable_by(|a, b| a.to_string().cmp(&b.to_string()));
+            additional_where_clause.dedup_by_key(|x| x.to_string());
 
             let extension_tables = table.extension_tables(conn)?;
             let generics = extension_tables
@@ -610,7 +586,6 @@ impl Codegen<'_> {
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
 				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_right_generics
                 where
-                    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
                     diesel::query_builder::InsertStatement<
                         <#table_path as diesel::associations::HasTable>::Table,
                         <#insertable_struct as diesel::Insertable<<#table_path as diesel::associations::HasTable>::Table>>::Values,

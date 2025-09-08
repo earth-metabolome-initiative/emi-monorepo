@@ -1,20 +1,7 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::VolumetricContainer
+    for crate::VolumetricContainer
 where
-    crate::Container: diesel::Identifiable,
-    <crate::Container as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >,
-    <<crate::Container as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Container as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Container as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Container,
-    >,
+    crate::Container: web_common_traits::database::Read<C>,
     crate::Container: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;

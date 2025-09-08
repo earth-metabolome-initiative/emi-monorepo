@@ -517,8 +517,8 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     /// class v0 column-of-interest
     /// v1@{shape: rounded, label: "procedure_template"}
     /// class v1 directly-involved-column
-    /// v0 -.->|"`foreign defines`"| v1
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 -.->|"`foreign defines`"| v1
     /// ```
     fn parent_procedure_template(
         mut self,

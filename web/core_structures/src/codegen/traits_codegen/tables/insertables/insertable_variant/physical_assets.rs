@@ -6,7 +6,6 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsse
     Asset,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::PhysicalAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset as diesel::Insertable<
@@ -18,36 +17,10 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     C: diesel::connection::LoadConnection,
-    crate::Asset: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::Asset as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Asset as diesel::Identifiable>::Id,
-    >,
-    <<crate::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Asset as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Asset as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Asset as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Asset,
-    >,
-    crate::PhysicalAssetModel: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::PhysicalAssetModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::PhysicalAssetModel as diesel::Identifiable>::Id,
-    >,
-    <<crate::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PhysicalAssetModel as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::PhysicalAssetModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::PhysicalAssetModel as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::PhysicalAssetModel,
-    >,
+    crate::Asset: web_common_traits::database::Read<C>,
+    crate::Asset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
+    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::PhysicalAsset;

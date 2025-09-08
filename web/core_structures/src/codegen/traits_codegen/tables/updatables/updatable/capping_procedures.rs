@@ -1,20 +1,7 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-for crate::CappingProcedure
+    for crate::CappingProcedure
 where
-    crate::Procedure: diesel::Identifiable,
-    <crate::Procedure as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >,
-    <<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::Procedure as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::Procedure as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
-        C,
-        crate::Procedure,
-    >,
+    crate::Procedure: web_common_traits::database::Read<C>,
     crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
