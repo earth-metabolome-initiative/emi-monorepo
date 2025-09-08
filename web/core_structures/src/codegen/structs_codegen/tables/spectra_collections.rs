@@ -12,6 +12,16 @@ pub struct SpectraCollection {
 impl web_common_traits::prelude::TableName for SpectraCollection {
     const TABLE_NAME: &'static str = "spectra_collections";
 }
+impl<'a> From<&'a SpectraCollection>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder,
+    >
+{
+    fn from(value: &'a SpectraCollection) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for SpectraCollection where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

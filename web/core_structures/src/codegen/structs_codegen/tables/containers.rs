@@ -19,6 +19,16 @@ pub struct Container {
 impl web_common_traits::prelude::TableName for Container {
     const TABLE_NAME: &'static str = "containers";
 }
+impl<'a> From<&'a Container>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder,
+    >
+{
+    fn from(value: &'a Container) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Container where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

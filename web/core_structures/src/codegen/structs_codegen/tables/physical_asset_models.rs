@@ -21,6 +21,16 @@ pub struct PhysicalAssetModel {
 impl web_common_traits::prelude::TableName for PhysicalAssetModel {
     const TABLE_NAME: &'static str = "physical_asset_models";
 }
+impl<'a> From<&'a PhysicalAssetModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder,
+    >
+{
+    fn from(value: &'a PhysicalAssetModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for PhysicalAssetModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -24,6 +24,19 @@ pub struct NextProcedureTemplate {
 impl web_common_traits::prelude::TableName for NextProcedureTemplate {
     const TABLE_NAME: &'static str = "next_procedure_templates";
 }
+impl<'a> From<&'a NextProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    (i32, i32, i32),
+    crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateBuilder,
+> {
+    fn from(value: &'a NextProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((
+            value.parent,
+            value.predecessor,
+            value.successor,
+        ))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::NextProcedureTemplate>
     for NextProcedureTemplate
 where

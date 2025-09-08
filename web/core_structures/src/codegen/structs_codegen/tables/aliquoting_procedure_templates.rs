@@ -30,6 +30,15 @@ pub struct AliquotingProcedureTemplate {
 impl web_common_traits::prelude::TableName for AliquotingProcedureTemplate {
     const TABLE_NAME: &'static str = "aliquoting_procedure_templates";
 }
+impl<'a> From<&'a AliquotingProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateBuilder,
+> {
+    fn from(value: &'a AliquotingProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for AliquotingProcedureTemplate
 where

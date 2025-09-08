@@ -21,6 +21,16 @@ pub struct PositioningDevice {
 impl web_common_traits::prelude::TableName for PositioningDevice {
     const TABLE_NAME: &'static str = "positioning_devices";
 }
+impl<'a> From<&'a PositioningDevice>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceBuilder,
+    >
+{
+    fn from(value: &'a PositioningDevice) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for PositioningDevice where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

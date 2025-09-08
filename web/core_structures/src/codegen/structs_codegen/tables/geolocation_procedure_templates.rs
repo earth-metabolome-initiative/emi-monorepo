@@ -25,6 +25,15 @@ pub struct GeolocationProcedureTemplate {
 impl web_common_traits::prelude::TableName for GeolocationProcedureTemplate {
     const TABLE_NAME: &'static str = "geolocation_procedure_templates";
 }
+impl<'a> From<&'a GeolocationProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateBuilder,
+> {
+    fn from(value: &'a GeolocationProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for GeolocationProcedureTemplate
 where

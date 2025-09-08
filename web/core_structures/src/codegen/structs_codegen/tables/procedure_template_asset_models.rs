@@ -28,6 +28,15 @@ pub struct ProcedureTemplateAssetModel {
 impl web_common_traits::prelude::TableName for ProcedureTemplateAssetModel {
     const TABLE_NAME: &'static str = "procedure_template_asset_models";
 }
+impl<'a> From<&'a ProcedureTemplateAssetModel>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder,
+> {
+    fn from(value: &'a ProcedureTemplateAssetModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplateAssetModel>
     for ProcedureTemplateAssetModel
 where

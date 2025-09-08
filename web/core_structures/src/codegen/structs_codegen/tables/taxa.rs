@@ -21,6 +21,16 @@ pub struct Taxon {
 impl web_common_traits::prelude::TableName for Taxon {
     const TABLE_NAME: &'static str = "taxa";
 }
+impl<'a> From<&'a Taxon>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder,
+    >
+{
+    fn from(value: &'a Taxon) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Taxon> for Taxon where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -24,6 +24,16 @@ pub struct ObservationSubject {
 impl web_common_traits::prelude::TableName for ObservationSubject {
     const TABLE_NAME: &'static str = "observation_subjects";
 }
+impl<'a> From<&'a ObservationSubject>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectBuilder,
+    >
+{
+    fn from(value: &'a ObservationSubject) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ObservationSubject> for ObservationSubject where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

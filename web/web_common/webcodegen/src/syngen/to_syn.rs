@@ -101,6 +101,14 @@ impl Table {
         let extensions_impls = self.extension_traits_impls(conn)?;
         let ancestor_impl = self.ancestor_traits_impl(conn)?;
         let table_name = self.table_name.clone();
+        let primary_key_type = self.primary_key_type(conn)?;
+        let builder_type = self.insertable_builder_ty()?;
+        let primary_key_idents = self.primary_key_idents(conn)?;
+        let formatted_primary_key_idents = if primary_key_idents.len() == 1 {
+            quote! { value.#(#primary_key_idents)* }
+        } else {
+            quote! { (#(value.#primary_key_idents),*) }
+        };
 
         Ok(quote! {
             #[derive(#(#default_derives),*)]
@@ -114,6 +122,12 @@ impl Table {
 
             impl web_common_traits::prelude::TableName for #struct_name {
                 const TABLE_NAME: &'static str = #table_name;
+            }
+
+            impl<'a> From<&'a #struct_name> for web_common_traits::database::IdOrBuilder<#primary_key_type, #builder_type> {
+                fn from(value: &'a #struct_name) -> Self {
+                    web_common_traits::database::IdOrBuilder::Id(#formatted_primary_key_idents)
+                }
             }
 
             #(#extensions_impls)*

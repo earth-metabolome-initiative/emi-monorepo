@@ -27,6 +27,15 @@ pub struct WeighingProcedureTemplate {
 impl web_common_traits::prelude::TableName for WeighingProcedureTemplate {
     const TABLE_NAME: &'static str = "weighing_procedure_templates";
 }
+impl<'a> From<&'a WeighingProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateBuilder,
+> {
+    fn from(value: &'a WeighingProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for WeighingProcedureTemplate
 where

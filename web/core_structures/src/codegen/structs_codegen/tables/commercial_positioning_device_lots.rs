@@ -23,6 +23,15 @@ pub struct CommercialPositioningDeviceLot {
 impl web_common_traits::prelude::TableName for CommercialPositioningDeviceLot {
     const TABLE_NAME: &'static str = "commercial_positioning_device_lots";
 }
+impl<'a> From<&'a CommercialPositioningDeviceLot>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceLotBuilder,
+> {
+    fn from(value: &'a CommercialPositioningDeviceLot) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel>
     for CommercialPositioningDeviceLot
 where

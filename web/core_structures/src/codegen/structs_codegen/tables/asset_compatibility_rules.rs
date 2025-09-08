@@ -23,6 +23,18 @@ pub struct AssetCompatibilityRule {
 impl web_common_traits::prelude::TableName for AssetCompatibilityRule {
     const TABLE_NAME: &'static str = "asset_compatibility_rules";
 }
+impl<'a> From<&'a AssetCompatibilityRule>
+for web_common_traits::database::IdOrBuilder<
+    (i32, i32),
+    crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleBuilder,
+> {
+    fn from(value: &'a AssetCompatibilityRule) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((
+            value.left_asset_model,
+            value.right_asset_model,
+        ))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetCompatibilityRule>
     for AssetCompatibilityRule
 where

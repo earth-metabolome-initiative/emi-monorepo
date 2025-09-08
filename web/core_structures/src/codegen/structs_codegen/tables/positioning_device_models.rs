@@ -12,6 +12,15 @@ pub struct PositioningDeviceModel {
 impl web_common_traits::prelude::TableName for PositioningDeviceModel {
     const TABLE_NAME: &'static str = "positioning_device_models";
 }
+impl<'a> From<&'a PositioningDeviceModel>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModelBuilder,
+> {
+    fn from(value: &'a PositioningDeviceModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for PositioningDeviceModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

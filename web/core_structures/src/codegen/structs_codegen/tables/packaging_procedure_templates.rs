@@ -25,6 +25,15 @@ pub struct PackagingProcedureTemplate {
 impl web_common_traits::prelude::TableName for PackagingProcedureTemplate {
     const TABLE_NAME: &'static str = "packaging_procedure_templates";
 }
+impl<'a> From<&'a PackagingProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateBuilder,
+> {
+    fn from(value: &'a PackagingProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for PackagingProcedureTemplate
 where

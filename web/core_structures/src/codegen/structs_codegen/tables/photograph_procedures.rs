@@ -28,6 +28,16 @@ pub struct PhotographProcedure {
 impl web_common_traits::prelude::TableName for PhotographProcedure {
     const TABLE_NAME: &'static str = "photograph_procedures";
 }
+impl<'a> From<&'a PhotographProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder,
+    >
+{
+    fn from(value: &'a PhotographProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for PhotographProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

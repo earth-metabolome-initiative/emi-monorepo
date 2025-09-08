@@ -22,6 +22,16 @@ pub struct Role {
 impl web_common_traits::prelude::TableName for Role {
     const TABLE_NAME: &'static str = "roles";
 }
+impl<'a> From<&'a Role>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRoleBuilder,
+    >
+{
+    fn from(value: &'a Role) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Role> for Role where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

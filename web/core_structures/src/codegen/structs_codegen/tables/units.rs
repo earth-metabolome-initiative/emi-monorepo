@@ -22,6 +22,16 @@ pub struct Unit {
 impl web_common_traits::prelude::TableName for Unit {
     const TABLE_NAME: &'static str = "units";
 }
+impl<'a> From<&'a Unit>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder,
+    >
+{
+    fn from(value: &'a Unit) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Unit> for Unit where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

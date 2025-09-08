@@ -36,6 +36,16 @@ pub struct AliquotingProcedure {
 impl web_common_traits::prelude::TableName for AliquotingProcedure {
     const TABLE_NAME: &'static str = "aliquoting_procedures";
 }
+impl<'a> From<&'a AliquotingProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureBuilder,
+    >
+{
+    fn from(value: &'a AliquotingProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for AliquotingProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

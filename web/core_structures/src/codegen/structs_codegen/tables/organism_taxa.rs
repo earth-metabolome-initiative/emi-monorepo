@@ -25,6 +25,16 @@ pub struct OrganismTaxon {
 impl web_common_traits::prelude::TableName for OrganismTaxon {
     const TABLE_NAME: &'static str = "organism_taxa";
 }
+impl<'a> From<&'a OrganismTaxon>
+    for web_common_traits::database::IdOrBuilder<
+        (::rosetta_uuid::Uuid, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder,
+    >
+{
+    fn from(value: &'a OrganismTaxon) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.organism_id, value.taxon_id))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::OrganismTaxon> for OrganismTaxon where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>
 {

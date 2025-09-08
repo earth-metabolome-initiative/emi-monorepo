@@ -23,6 +23,15 @@ pub struct CommercialVolumeMeasuringDeviceLot {
 impl web_common_traits::prelude::TableName for CommercialVolumeMeasuringDeviceLot {
     const TABLE_NAME: &'static str = "commercial_volume_measuring_device_lots";
 }
+impl<'a> From<&'a CommercialVolumeMeasuringDeviceLot>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceLotBuilder,
+> {
+    fn from(value: &'a CommercialVolumeMeasuringDeviceLot) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel>
     for CommercialVolumeMeasuringDeviceLot
 where

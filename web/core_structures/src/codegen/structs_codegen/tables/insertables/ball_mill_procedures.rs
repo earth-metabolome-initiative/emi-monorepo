@@ -920,12 +920,12 @@ impl<
     /// subgraph v6 ["`ball_mill_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_milled_container_model"}
-    /// class v2 directly-involved-column
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v3 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    /// class v0 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_milled_container_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "procedure_template_asset_model"}
@@ -936,12 +936,12 @@ impl<
     /// class v4 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
+    /// v3 --->|"`associated same as`"| v5
     /// v0 --->|"`ancestral same as`"| v4
     /// v0 -.->|"`foreign defines`"| v3
     /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v1
-    /// v3 --->|"`associated same as`"| v5
+    /// v2 --->|"`associated same as`"| v5
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -975,14 +975,14 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedures`"]
-    ///    v2@{shape: rounded, label: "milled_with_model"}
-    /// class v2 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_bead"}
-    /// class v3 directly-involved-column
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "milled_with_model"}
+    /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_bead"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "asset_model"}
@@ -990,19 +990,19 @@ impl<
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v4
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
+    /// v0 --->|"`associated same as`"| v4
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v0 -.->|"`foreign defines`"| v2
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v4
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v0 -.->|"`foreign defines`"| v2
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn bead_model(
@@ -1041,10 +1041,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_bead"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1052,11 +1052,11 @@ impl<
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_bead_model(
@@ -1095,23 +1095,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_bead"}
     /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
@@ -1215,35 +1215,35 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_milled_with"}
-    /// class v3 directly-involved-column
-    ///    v2@{shape: rounded, label: "milled_with_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "milled_with_model"}
+    /// class v2 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_milled_with"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset_model"}
     /// class v4 directly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn milled_with_model(
@@ -1283,10 +1283,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_milled_with"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_milled_with"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1294,12 +1294,12 @@ impl<
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_milled_with_model(
@@ -1338,26 +1338,29 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`ball_mill_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
-    /// class v3 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_milled_with"}
-    /// class v2 column-of-interest
-    ///    v1@{shape: rounded, label: "milled_with_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "milled_with"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
+    /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "milled_with_model"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_milled_with"}
+    /// class v2 column-of-interest
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v4
     /// v3 --->|"`associated same as`"| v6
+    /// v4 -.->|"`foreign defines`"| v5
+    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1365,9 +1368,6 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v0 --->|"`associated same as`"| v4
-    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_milled_with<PMW>(
@@ -1497,10 +1497,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "milled_with"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_milled_with"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "milled_with"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1508,12 +1508,12 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_with(
@@ -1552,10 +1552,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_milled_container"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "milled_container"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_milled_container"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1563,12 +1563,12 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_container(
@@ -1607,35 +1607,35 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_milled_container"}
-    /// class v3 directly-involved-column
-    ///    v2@{shape: rounded, label: "milled_with_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "bead_model"}
     /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "milled_with_model"}
+    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_milled_container"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "asset_model"}
-    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "asset_model"}
+    /// class v4 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v4
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
+    /// v2 -.->|"`foreign defines`"| v0
+    /// v2 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v4
+    /// v1 -.->|"`foreign defines`"| v0
+    /// v1 -.->|"`foreign defines`"| v2
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v1
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v0 --->|"`associated same as`"| v4
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v0 -.->|"`foreign defines`"| v2
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn milled_container_model(
@@ -1741,18 +1741,18 @@ impl<
     /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v5
-    /// v4 -.->|"`foreign defines`"| v5
     /// v0 --->|"`associated same as`"| v4
+    /// v4 -.->|"`foreign defines`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7

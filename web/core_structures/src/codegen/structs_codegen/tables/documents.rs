@@ -21,6 +21,16 @@ pub struct Document {
 impl web_common_traits::prelude::TableName for Document {
     const TABLE_NAME: &'static str = "documents";
 }
+impl<'a> From<&'a Document>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder,
+    >
+{
+    fn from(value: &'a Document) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Document> for Document where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

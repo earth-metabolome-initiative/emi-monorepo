@@ -630,8 +630,8 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
     /// class v0 column-of-interest
     /// v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
-    /// v1 -.->|"`foreign defines`"| v0
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 -.->|"`foreign defines`"| v0
     /// ```
     fn ancestor_model(
         mut self,

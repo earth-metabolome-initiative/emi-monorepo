@@ -21,6 +21,15 @@ pub struct CommercialCentrifugeLot {
 impl web_common_traits::prelude::TableName for CommercialCentrifugeLot {
     const TABLE_NAME: &'static str = "commercial_centrifuge_lots";
 }
+impl<'a> From<&'a CommercialCentrifugeLot>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotBuilder,
+> {
+    fn from(value: &'a CommercialCentrifugeLot) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialCentrifugeLot where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -19,6 +19,16 @@ pub struct Pipette {
 impl web_common_traits::prelude::TableName for Pipette {
     const TABLE_NAME: &'static str = "pipettes";
 }
+impl<'a> From<&'a Pipette>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteBuilder,
+    >
+{
+    fn from(value: &'a Pipette) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Pipette where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

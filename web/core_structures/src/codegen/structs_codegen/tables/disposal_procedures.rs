@@ -30,6 +30,16 @@ pub struct DisposalProcedure {
 impl web_common_traits::prelude::TableName for DisposalProcedure {
     const TABLE_NAME: &'static str = "disposal_procedures";
 }
+impl<'a> From<&'a DisposalProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder,
+    >
+{
+    fn from(value: &'a DisposalProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for DisposalProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

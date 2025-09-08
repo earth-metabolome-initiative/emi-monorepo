@@ -175,8 +175,8 @@ impl<
     ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         mut self,

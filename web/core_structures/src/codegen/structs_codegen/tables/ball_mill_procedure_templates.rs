@@ -35,6 +35,15 @@ pub struct BallMillProcedureTemplate {
 impl web_common_traits::prelude::TableName for BallMillProcedureTemplate {
     const TABLE_NAME: &'static str = "ball_mill_procedure_templates";
 }
+impl<'a> From<&'a BallMillProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateBuilder,
+> {
+    fn from(value: &'a BallMillProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for BallMillProcedureTemplate
 where

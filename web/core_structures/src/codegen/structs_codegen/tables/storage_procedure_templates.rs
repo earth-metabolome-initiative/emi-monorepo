@@ -27,6 +27,15 @@ pub struct StorageProcedureTemplate {
 impl web_common_traits::prelude::TableName for StorageProcedureTemplate {
     const TABLE_NAME: &'static str = "storage_procedure_templates";
 }
+impl<'a> From<&'a StorageProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateBuilder,
+> {
+    fn from(value: &'a StorageProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for StorageProcedureTemplate
 where

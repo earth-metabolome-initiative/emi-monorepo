@@ -208,9 +208,9 @@ for InsertableCommercialPackagingModelBuilder<CommercialProduct, PackagingModel>
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn packaging_model(
@@ -500,9 +500,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

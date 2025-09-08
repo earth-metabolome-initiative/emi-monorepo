@@ -36,6 +36,16 @@ pub struct SupernatantProcedure {
 impl web_common_traits::prelude::TableName for SupernatantProcedure {
     const TABLE_NAME: &'static str = "supernatant_procedures";
 }
+impl<'a> From<&'a SupernatantProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder,
+    >
+{
+    fn from(value: &'a SupernatantProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for SupernatantProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

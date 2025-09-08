@@ -23,6 +23,16 @@ pub struct Address {
 impl web_common_traits::prelude::TableName for Address {
     const TABLE_NAME: &'static str = "addresses";
 }
+impl<'a> From<&'a Address>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder,
+    >
+{
+    fn from(value: &'a Address) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Address> for Address where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -7,4 +7,5 @@ pub mod freezer;
 pub mod phone;
 pub mod pipette_tips;
 pub mod pipettes;
+pub mod volume_measuring_device;
 pub mod weighing_scale;

@@ -3,15 +3,15 @@
 use core_structures::{
     BallMillProcedureTemplate, CappingProcedureTemplate, CentrifugeProcedureTemplate,
     DisposalProcedureTemplate, FractioningProcedureTemplate, FreezeDryingProcedureTemplate,
-    FreezingProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
-    StorageProcedureTemplate, SupernatantProcedureTemplate,
+    FreezingProcedureTemplate, PouringProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel, StorageProcedureTemplate, SupernatantProcedureTemplate,
     tables::insertables::{
         BallMillProcedureTemplateSettable, CappingProcedureTemplateSettable,
         CentrifugeProcedureTemplateSettable, DisposalProcedureTemplateSettable,
         FractioningProcedureTemplateSettable, FreezeDryingProcedureTemplateSettable,
-        FreezingProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
-        ProcedureTemplateSettable, StorageProcedureTemplateSettable,
-        SupernatantProcedureTemplateSettable,
+        FreezingProcedureTemplateSettable, PouringProcedureTemplateSettable,
+        ProcedureTemplateAssetModelSettable, ProcedureTemplateSettable,
+        StorageProcedureTemplateSettable, SupernatantProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
 };
@@ -28,8 +28,10 @@ use crate::{
         freeze_dryer::freeze_dryer_builder, freezer::freezer_builder,
         pipette_tips::pipette_tips_1000ul_builder, pipettes::pipette_1000ul_builder,
         safelock::safelock_builder, vial_caps::sealed_cap_vial_1_5ml_builder,
+        volume_measuring_device::volume_measuring_device_builder,
         weighing_device::weighing_device_builder,
     },
+    procedure_templates::sample_extraction_solvent_procedure,
 };
 
 pub(super) fn init_dbgi_sample_processing_procedures(
@@ -107,6 +109,18 @@ pub(super) fn init_dbgi_sample_processing_procedures(
     let beads_model = first_ball_mill_procedure.procedure_template_bead_model;
     let safelock_ball_mill = first_ball_mill_procedure.procedure_template_milled_with_model;
 
+    let (_solvant_procedure, solvent_ptam) = sample_extraction_solvent_procedure(user, conn)?;
+
+    let pouring_solvent_procedure = PouringProcedureTemplate::new()
+        .name("Pouring Solvent")?
+        .description("Pouring Solvent procedure template to add solvent to the milled sample")?
+        .created_by(user.id)?
+        .liters(1e-3)?
+        .procedure_template_poured_into_model(safelock)?
+        .procedure_template_poured_from_model(&solvent_ptam)?
+        .procedure_template_measured_with_model(volume_measuring_device_builder(user, conn)?)?
+        .insert(user.id, conn)?;
+
     let second_ball_mill_procedure = BallMillProcedureTemplate::new()
         .name("Ball Mill 2")?
         .description("Second Ball Mill to extract sample procedure template")?
@@ -175,7 +189,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         falcon_storage_procedure.procedure_template(conn)?,
         fractioning_procedure.procedure_template(conn)?,
         first_ball_mill_procedure.procedure_template(conn)?,
-        // TODO!: Add the solvant step
+        pouring_solvent_procedure.procedure_template(conn)?,
         second_ball_mill_procedure.procedure_template(conn)?,
         centrifuge_procedure.procedure_template(conn)?,
         prelevate_supernatant_procedure.procedure_template(conn)?,

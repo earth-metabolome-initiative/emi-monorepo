@@ -21,6 +21,16 @@ pub struct EmailProvider {
 impl web_common_traits::prelude::TableName for EmailProvider {
     const TABLE_NAME: &'static str = "email_providers";
 }
+impl<'a> From<&'a EmailProvider>
+    for web_common_traits::database::IdOrBuilder<
+        (i32, i16),
+        crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder,
+    >
+{
+    fn from(value: &'a EmailProvider) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.email_id, value.login_provider_id))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::EmailProvider> for EmailProvider where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i16)>
 {

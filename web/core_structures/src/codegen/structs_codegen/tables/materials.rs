@@ -22,6 +22,16 @@ pub struct Material {
 impl web_common_traits::prelude::TableName for Material {
     const TABLE_NAME: &'static str = "materials";
 }
+impl<'a> From<&'a Material>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder,
+    >
+{
+    fn from(value: &'a Material) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Material> for Material where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

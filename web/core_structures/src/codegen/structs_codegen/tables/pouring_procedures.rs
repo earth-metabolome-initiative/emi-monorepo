@@ -30,6 +30,16 @@ pub struct PouringProcedure {
 impl web_common_traits::prelude::TableName for PouringProcedure {
     const TABLE_NAME: &'static str = "pouring_procedures";
 }
+impl<'a> From<&'a PouringProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder,
+    >
+{
+    fn from(value: &'a PouringProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for PouringProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

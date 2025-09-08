@@ -19,6 +19,16 @@ pub struct Camera {
 impl web_common_traits::prelude::TableName for Camera {
     const TABLE_NAME: &'static str = "cameras";
 }
+impl<'a> From<&'a Camera>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraBuilder,
+    >
+{
+    fn from(value: &'a Camera) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Camera where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

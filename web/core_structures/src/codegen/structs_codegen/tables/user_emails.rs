@@ -22,6 +22,16 @@ pub struct UserEmail {
 impl web_common_traits::prelude::TableName for UserEmail {
     const TABLE_NAME: &'static str = "user_emails";
 }
+impl<'a> From<&'a UserEmail>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder,
+    >
+{
+    fn from(value: &'a UserEmail) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::UserEmail> for UserEmail where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

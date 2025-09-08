@@ -26,6 +26,18 @@ pub struct ContainerCompatibilityRule {
 impl web_common_traits::prelude::TableName for ContainerCompatibilityRule {
     const TABLE_NAME: &'static str = "container_compatibility_rules";
 }
+impl<'a> From<&'a ContainerCompatibilityRule>
+for web_common_traits::database::IdOrBuilder<
+    (i32, i32),
+    crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder,
+> {
+    fn from(value: &'a ContainerCompatibilityRule) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((
+            value.container_model,
+            value.contained_asset_model,
+        ))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ContainerCompatibilityRule>
     for ContainerCompatibilityRule
 where

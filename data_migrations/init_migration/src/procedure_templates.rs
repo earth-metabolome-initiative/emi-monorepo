@@ -16,7 +16,7 @@ pub(crate) use analysis_procedures::{
     init_negative_ionization_lcms_procedure, init_positive_ionization_lcms_procedure,
 };
 pub(crate) use collection_preparation_procedures::{
-    init_ethanol_70_percent, init_sample_extraction_solvent_procedure,
+    init_ethanol_70_percent, sample_extraction_solvent_procedure,
 };
 pub(crate) use sample_collection_procedures::init_part_of_organism_collection;
 

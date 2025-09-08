@@ -28,6 +28,15 @@ pub struct FractioningProcedureTemplate {
 impl web_common_traits::prelude::TableName for FractioningProcedureTemplate {
     const TABLE_NAME: &'static str = "fractioning_procedure_templates";
 }
+impl<'a> From<&'a FractioningProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateBuilder,
+> {
+    fn from(value: &'a FractioningProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for FractioningProcedureTemplate
 where

@@ -16,4 +16,5 @@ pub mod pipette_tips;
 pub mod pipettes;
 pub mod safelock;
 pub mod vial_caps;
+pub mod volume_measuring_device;
 pub mod weighing_device;

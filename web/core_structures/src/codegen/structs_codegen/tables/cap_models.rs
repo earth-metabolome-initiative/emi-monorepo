@@ -10,6 +10,16 @@ pub struct CapModel {
 impl web_common_traits::prelude::TableName for CapModel {
     const TABLE_NAME: &'static str = "cap_models";
 }
+impl<'a> From<&'a CapModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCapModelBuilder,
+    >
+{
+    fn from(value: &'a CapModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CapModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

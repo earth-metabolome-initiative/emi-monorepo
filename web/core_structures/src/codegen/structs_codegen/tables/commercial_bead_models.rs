@@ -19,6 +19,16 @@ pub struct CommercialBeadModel {
 impl web_common_traits::prelude::TableName for CommercialBeadModel {
     const TABLE_NAME: &'static str = "commercial_bead_models";
 }
+impl<'a> From<&'a CommercialBeadModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelBuilder,
+    >
+{
+    fn from(value: &'a CommercialBeadModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialBeadModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -1,5 +1,6 @@
 //! Submodule to initialize the `reagents` in the database.
 
+pub mod bottles;
 pub mod boxes;
 pub mod conical_centrifugal_tubes;
 pub mod racks;

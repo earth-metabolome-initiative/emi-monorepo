@@ -18,7 +18,7 @@ pub use flowchart_node::{
 
 use crate::{
     shared::generic_diagram::GenericDiagram,
-    traits::{Configuration, Diagram, Node},
+    traits::{Configuration, Diagram, Node, edge::Edge},
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -67,7 +67,9 @@ impl Display for Flowchart {
         write!(f, "{}", self.configuration())?;
         writeln!(f, "flowchart {}", self.configuration().direction())?;
         for style_class in self.style_classes() {
-            if !self.nodes().any(|n| n.classes().any(|sc| sc == style_class)) {
+            if !self.nodes().any(|n| n.classes().any(|sc| sc == style_class))
+                && !self.edges().any(|e| e.classes().any(|sc| sc == style_class))
+            {
                 continue;
             }
 

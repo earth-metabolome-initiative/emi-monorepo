@@ -32,6 +32,16 @@ pub struct CappingProcedure {
 impl web_common_traits::prelude::TableName for CappingProcedure {
     const TABLE_NAME: &'static str = "capping_procedures";
 }
+impl<'a> From<&'a CappingProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureBuilder,
+    >
+{
+    fn from(value: &'a CappingProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for CappingProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

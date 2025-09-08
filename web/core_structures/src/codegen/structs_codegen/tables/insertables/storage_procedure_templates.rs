@@ -516,26 +516,26 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
     /// end
     /// subgraph v6 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "stored_into_model"}
     /// class v3 column-of-interest
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v4
     /// v1 -.->|"`foreign defines`"| v3
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
     /// v3 --->|"`associated same as`"| v0
     /// v3 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 -.->|"`foreign defines`"| v3
     /// v6 ---o|"`associated with`"| v5
     /// ```
     fn stored_into_model(
@@ -576,10 +576,10 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
     ///    v2@{shape: rounded, label: "stored_into_model"}
@@ -659,26 +659,26 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v4@{shape: rounded, label: "id"}
     /// class v4 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v6 ["`storage_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "stored_into_model"}
     /// class v3 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
     /// v3 --->|"`associated same as`"| v0
     /// v3 -.->|"`foreign defines`"| v2
     /// v1 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v4
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 -.->|"`foreign defines`"| v3
     /// v6 ---o|"`associated with`"| v5
     /// ```
     fn stored_asset_model(
@@ -719,10 +719,10 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}

@@ -31,6 +31,16 @@ pub struct FractioningProcedure {
 impl web_common_traits::prelude::TableName for FractioningProcedure {
     const TABLE_NAME: &'static str = "fractioning_procedures";
 }
+impl<'a> From<&'a FractioningProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder,
+    >
+{
+    fn from(value: &'a FractioningProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for FractioningProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

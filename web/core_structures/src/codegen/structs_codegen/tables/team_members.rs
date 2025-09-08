@@ -21,6 +21,16 @@ pub struct TeamMember {
 impl web_common_traits::prelude::TableName for TeamMember {
     const TABLE_NAME: &'static str = "team_members";
 }
+impl<'a> From<&'a TeamMember>
+    for web_common_traits::database::IdOrBuilder<
+        (i32, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder,
+    >
+{
+    fn from(value: &'a TeamMember) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.team_id, value.member_id))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::TeamMember> for TeamMember where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
 {

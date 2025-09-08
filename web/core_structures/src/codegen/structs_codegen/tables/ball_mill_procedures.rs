@@ -38,6 +38,16 @@ pub struct BallMillProcedure {
 impl web_common_traits::prelude::TableName for BallMillProcedure {
     const TABLE_NAME: &'static str = "ball_mill_procedures";
 }
+impl<'a> From<&'a BallMillProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureBuilder,
+    >
+{
+    fn from(value: &'a BallMillProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for BallMillProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

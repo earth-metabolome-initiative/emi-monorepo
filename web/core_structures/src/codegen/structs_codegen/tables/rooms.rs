@@ -27,6 +27,16 @@ pub struct Room {
 impl web_common_traits::prelude::TableName for Room {
     const TABLE_NAME: &'static str = "rooms";
 }
+impl<'a> From<&'a Room>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder,
+    >
+{
+    fn from(value: &'a Room) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Room> for Room where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

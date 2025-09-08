@@ -26,6 +26,16 @@ pub struct Asset {
 impl web_common_traits::prelude::TableName for Asset {
     const TABLE_NAME: &'static str = "assets";
 }
+impl<'a> From<&'a Asset>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
+    >
+{
+    fn from(value: &'a Asset) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Asset where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

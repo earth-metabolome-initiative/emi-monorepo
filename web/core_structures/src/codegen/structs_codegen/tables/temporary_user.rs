@@ -22,6 +22,16 @@ pub struct TemporaryUser {
 impl web_common_traits::prelude::TableName for TemporaryUser {
     const TABLE_NAME: &'static str = "temporary_user";
 }
+impl<'a> From<&'a TemporaryUser>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder,
+    >
+{
+    fn from(value: &'a TemporaryUser) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::TemporaryUser> for TemporaryUser where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

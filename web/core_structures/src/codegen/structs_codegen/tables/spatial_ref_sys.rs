@@ -22,6 +22,16 @@ pub struct SpatialRefSy {
 impl web_common_traits::prelude::TableName for SpatialRefSy {
     const TABLE_NAME: &'static str = "spatial_ref_sys";
 }
+impl<'a> From<&'a SpatialRefSy>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder,
+    >
+{
+    fn from(value: &'a SpatialRefSy) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.srid)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::SpatialRefSy> for SpatialRefSy where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

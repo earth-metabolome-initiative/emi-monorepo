@@ -26,6 +26,9 @@ pub trait Edge {
     /// Returns the line style of the edge.
     fn line_style(&self) -> LineStyle;
 
+    /// Returns an iterator over the style classes associated with the edge.
+    fn classes(&self) -> impl Iterator<Item = &crate::shared::StyleClass>;
+
     /// Returns the left arrow shape of the edge, if any.
     fn left_arrow_shape(&self) -> Option<ArrowShape>;
 

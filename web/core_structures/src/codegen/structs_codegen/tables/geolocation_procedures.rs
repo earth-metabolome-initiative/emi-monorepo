@@ -28,6 +28,16 @@ pub struct GeolocationProcedure {
 impl web_common_traits::prelude::TableName for GeolocationProcedure {
     const TABLE_NAME: &'static str = "geolocation_procedures";
 }
+impl<'a> From<&'a GeolocationProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureBuilder,
+    >
+{
+    fn from(value: &'a GeolocationProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for GeolocationProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

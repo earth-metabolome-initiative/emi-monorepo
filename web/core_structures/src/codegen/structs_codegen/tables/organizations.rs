@@ -24,6 +24,16 @@ pub struct Organization {
 impl web_common_traits::prelude::TableName for Organization {
     const TABLE_NAME: &'static str = "organizations";
 }
+impl<'a> From<&'a Organization>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder,
+    >
+{
+    fn from(value: &'a Organization) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Organization> for Organization where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

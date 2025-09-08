@@ -24,6 +24,16 @@ pub struct PermanenceCategory {
 impl web_common_traits::prelude::TableName for PermanenceCategory {
     const TABLE_NAME: &'static str = "permanence_categories";
 }
+impl<'a> From<&'a PermanenceCategory>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder,
+    >
+{
+    fn from(value: &'a PermanenceCategory) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::PermanenceCategory> for PermanenceCategory where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

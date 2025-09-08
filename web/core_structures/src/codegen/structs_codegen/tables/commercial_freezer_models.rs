@@ -19,6 +19,15 @@ pub struct CommercialFreezerModel {
 impl web_common_traits::prelude::TableName for CommercialFreezerModel {
     const TABLE_NAME: &'static str = "commercial_freezer_models";
 }
+impl<'a> From<&'a CommercialFreezerModel>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelBuilder,
+> {
+    fn from(value: &'a CommercialFreezerModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialFreezerModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

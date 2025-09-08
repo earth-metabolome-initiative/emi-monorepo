@@ -30,6 +30,15 @@ pub struct SupernatantProcedureTemplate {
 impl web_common_traits::prelude::TableName for SupernatantProcedureTemplate {
     const TABLE_NAME: &'static str = "supernatant_procedure_templates";
 }
+impl<'a> From<&'a SupernatantProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateBuilder,
+> {
+    fn from(value: &'a SupernatantProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for SupernatantProcedureTemplate
 where

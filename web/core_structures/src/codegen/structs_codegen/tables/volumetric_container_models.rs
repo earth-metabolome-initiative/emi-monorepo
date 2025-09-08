@@ -19,6 +19,15 @@ pub struct VolumetricContainerModel {
 impl web_common_traits::prelude::TableName for VolumetricContainerModel {
     const TABLE_NAME: &'static str = "volumetric_container_models";
 }
+impl<'a> From<&'a VolumetricContainerModel>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder,
+> {
+    fn from(value: &'a VolumetricContainerModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for VolumetricContainerModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

@@ -19,6 +19,16 @@ pub struct CommercialCapModel {
 impl web_common_traits::prelude::TableName for CommercialCapModel {
     const TABLE_NAME: &'static str = "commercial_cap_models";
 }
+impl<'a> From<&'a CommercialCapModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelBuilder,
+    >
+{
+    fn from(value: &'a CommercialCapModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialCapModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

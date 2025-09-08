@@ -24,6 +24,16 @@ pub struct InstrumentState {
 impl web_common_traits::prelude::TableName for InstrumentState {
     const TABLE_NAME: &'static str = "instrument_states";
 }
+impl<'a> From<&'a InstrumentState>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateBuilder,
+    >
+{
+    fn from(value: &'a InstrumentState) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::InstrumentState> for InstrumentState where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
 {

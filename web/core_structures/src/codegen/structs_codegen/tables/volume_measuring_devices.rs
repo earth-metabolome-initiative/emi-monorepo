@@ -21,6 +21,15 @@ pub struct VolumeMeasuringDevice {
 impl web_common_traits::prelude::TableName for VolumeMeasuringDevice {
     const TABLE_NAME: &'static str = "volume_measuring_devices";
 }
+impl<'a> From<&'a VolumeMeasuringDevice>
+for web_common_traits::database::IdOrBuilder<
+    ::rosetta_uuid::Uuid,
+    crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceBuilder,
+> {
+    fn from(value: &'a VolumeMeasuringDevice) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for VolumeMeasuringDevice where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

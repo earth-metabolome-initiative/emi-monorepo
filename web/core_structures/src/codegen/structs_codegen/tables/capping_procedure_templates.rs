@@ -27,6 +27,15 @@ pub struct CappingProcedureTemplate {
 impl web_common_traits::prelude::TableName for CappingProcedureTemplate {
     const TABLE_NAME: &'static str = "capping_procedure_templates";
 }
+impl<'a> From<&'a CappingProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateBuilder,
+> {
+    fn from(value: &'a CappingProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
     for CappingProcedureTemplate
 where

@@ -11,7 +11,6 @@ use crate::procedure_templates::{
     init_organism_observation_procedure, init_part_of_organism_collection,
     init_positive_ionization_lcms_procedure,
 };
-mod dbgi_collection_preparation;
 mod sample_processing_procedures;
 
 /// The name of the DBGI plan procedure template.
@@ -38,8 +37,6 @@ pub fn init_dbgi_plan(
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    let collection_preparation =
-        dbgi_collection_preparation::init_dbgi_collection_preparation(user, conn)?;
     let observation_procedure = init_organism_observation_procedure(user, conn)?;
     let (part_of_organism_collection, cct) = init_part_of_organism_collection(user, conn)?;
     let sample_processing_procedure =
@@ -50,7 +47,6 @@ pub fn init_dbgi_plan(
 
     dbgi_plan.extend(
         &[
-            &collection_preparation,
             &observation_procedure,
             &part_of_organism_collection,
             &sample_processing_procedure,

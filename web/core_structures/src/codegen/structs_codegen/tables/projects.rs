@@ -34,6 +34,16 @@ pub struct Project {
 impl web_common_traits::prelude::TableName for Project {
     const TABLE_NAME: &'static str = "projects";
 }
+impl<'a> From<&'a Project>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder,
+    >
+{
+    fn from(value: &'a Project) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Project> for Project where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

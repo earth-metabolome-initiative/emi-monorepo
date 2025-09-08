@@ -19,6 +19,15 @@ pub struct CommercialBallMillMachineModel {
 impl web_common_traits::prelude::TableName for CommercialBallMillMachineModel {
     const TABLE_NAME: &'static str = "commercial_ball_mill_machine_models";
 }
+impl<'a> From<&'a CommercialBallMillMachineModel>
+for web_common_traits::database::IdOrBuilder<
+    i32,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelBuilder,
+> {
+    fn from(value: &'a CommercialBallMillMachineModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel>
     for CommercialBallMillMachineModel
 where

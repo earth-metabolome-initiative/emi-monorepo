@@ -49,6 +49,10 @@ impl Edge for FlowchartEdge {
         self.edge.destination()
     }
 
+    fn classes(&self) -> impl Iterator<Item = &StyleClass> {
+        self.style_classes.iter().map(AsRef::as_ref)
+    }
+
     fn line_style(&self) -> LineStyle {
         self.edge.line_style()
     }
@@ -95,7 +99,7 @@ impl Display for FlowchartEdge {
         }
 
         for class in &self.style_classes {
-            writeln!(f, "class {EDGE_LETTER}{} {class}", self.id)?;
+            writeln!(f, "class {EDGE_LETTER}{} {}", self.id, class.name())?;
         }
 
         if !self.style_properties.is_empty() {

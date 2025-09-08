@@ -19,6 +19,16 @@ pub struct Spectrum {
 impl web_common_traits::prelude::TableName for Spectrum {
     const TABLE_NAME: &'static str = "spectra";
 }
+impl<'a> From<&'a Spectrum>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder,
+    >
+{
+    fn from(value: &'a Spectrum) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Spectrum where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

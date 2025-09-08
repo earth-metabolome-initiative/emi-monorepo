@@ -28,6 +28,26 @@ where
 {
     type Procedure = crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureDAG;
     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+    fn procedure_template_id(&self) -> i32 {
+        match self {
+            Self::AliquotingProcedureTemplate(value) => value.procedure_template,
+            Self::BallMillProcedureTemplate(value) => value.procedure_template,
+            Self::CappingProcedureTemplate(value) => value.procedure_template,
+            Self::CentrifugeProcedureTemplate(value) => value.procedure_template,
+            Self::DisposalProcedureTemplate(value) => value.procedure_template,
+            Self::FractioningProcedureTemplate(value) => value.procedure_template,
+            Self::FreezeDryingProcedureTemplate(value) => value.procedure_template,
+            Self::FreezingProcedureTemplate(value) => value.procedure_template,
+            Self::GeolocationProcedureTemplate(value) => value.procedure_template,
+            Self::PackagingProcedureTemplate(value) => value.procedure_template,
+            Self::PhotographProcedureTemplate(value) => value.procedure_template,
+            Self::PouringProcedureTemplate(value) => value.procedure_template,
+            Self::StorageProcedureTemplate(value) => value.procedure_template,
+            Self::SupernatantProcedureTemplate(value) => value.procedure_template,
+            Self::WeighingProcedureTemplate(value) => value.procedure_template,
+            Self::ProcedureTemplate(value) => value.procedure_template,
+        }
+    }
     fn procedure_template_asset_models(
         &self,
         conn: &mut C,

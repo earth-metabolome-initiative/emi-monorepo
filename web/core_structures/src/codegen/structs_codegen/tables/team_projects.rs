@@ -21,6 +21,16 @@ pub struct TeamProject {
 impl web_common_traits::prelude::TableName for TeamProject {
     const TABLE_NAME: &'static str = "team_projects";
 }
+impl<'a> From<&'a TeamProject>
+    for web_common_traits::database::IdOrBuilder<
+        (i32, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder,
+    >
+{
+    fn from(value: &'a TeamProject) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.team_id, value.project_id))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::TeamProject> for TeamProject where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
 {

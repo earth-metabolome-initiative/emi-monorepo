@@ -12,6 +12,16 @@ pub struct CameraModel {
 impl web_common_traits::prelude::TableName for CameraModel {
     const TABLE_NAME: &'static str = "camera_models";
 }
+impl<'a> From<&'a CameraModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder,
+    >
+{
+    fn from(value: &'a CameraModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CameraModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

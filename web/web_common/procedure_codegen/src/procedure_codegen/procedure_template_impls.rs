@@ -98,6 +98,10 @@ impl<'a> ProcedureCodegen<'a> {
                         type Procedure = #procedure_type;
                         type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
 
+                        fn procedure_template_id(&self) -> i32 {
+                            self.procedure_template
+                        }
+
                         fn procedure_template_asset_models(
                             &self,
                             conn: &mut C,
@@ -135,6 +139,13 @@ impl<'a> ProcedureCodegen<'a> {
                 {
                     type Procedure = #procedure_dag_ty;
                     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+
+                    fn procedure_template_id(&self) -> i32 {
+                        match self {
+                            #(Self::#procedure_template_idents(value) => value.procedure_template,)*
+                            Self::#procedure_template_ident(value) => value.procedure_template,
+                        }
+                    }
 
                     fn procedure_template_asset_models(&self, conn: &mut C) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
                         Ok(match self {

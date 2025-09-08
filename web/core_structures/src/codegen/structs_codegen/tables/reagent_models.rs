@@ -21,6 +21,16 @@ pub struct ReagentModel {
 impl web_common_traits::prelude::TableName for ReagentModel {
     const TABLE_NAME: &'static str = "reagent_models";
 }
+impl<'a> From<&'a ReagentModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder,
+    >
+{
+    fn from(value: &'a ReagentModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for ReagentModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

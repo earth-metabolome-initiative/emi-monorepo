@@ -17,6 +17,16 @@ pub struct Country {
 impl web_common_traits::prelude::TableName for Country {
     const TABLE_NAME: &'static str = "countries";
 }
+impl<'a> From<&'a Country>
+    for web_common_traits::database::IdOrBuilder<
+        ::iso_codes::CountryCode,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder,
+    >
+{
+    fn from(value: &'a Country) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.iso)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Country> for Country where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::iso_codes::CountryCode>
 {

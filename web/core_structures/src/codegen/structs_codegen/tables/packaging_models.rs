@@ -12,6 +12,16 @@ pub struct PackagingModel {
 impl web_common_traits::prelude::TableName for PackagingModel {
     const TABLE_NAME: &'static str = "packaging_models";
 }
+impl<'a> From<&'a PackagingModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder,
+    >
+{
+    fn from(value: &'a PackagingModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for PackagingModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

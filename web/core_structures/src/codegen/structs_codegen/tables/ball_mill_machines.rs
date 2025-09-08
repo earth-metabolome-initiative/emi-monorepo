@@ -21,6 +21,16 @@ pub struct BallMillMachine {
 impl web_common_traits::prelude::TableName for BallMillMachine {
     const TABLE_NAME: &'static str = "ball_mill_machines";
 }
+impl<'a> From<&'a BallMillMachine>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineBuilder,
+    >
+{
+    fn from(value: &'a BallMillMachine) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for BallMillMachine where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

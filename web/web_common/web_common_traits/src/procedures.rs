@@ -10,6 +10,9 @@ pub trait ProcedureTemplate<C> {
     /// Procedure template asset model type.
     type ProcedureTemplateAssetModel: Read<C>;
 
+    /// Returns the unique identifier of the procedure template.
+    fn procedure_template_id(&self) -> i32;
+
     /// Returns all procedure template asset models associated with the current
     /// procedure template.
     fn procedure_template_asset_models(

@@ -22,6 +22,16 @@ pub struct CommercialProductLot {
 impl web_common_traits::prelude::TableName for CommercialProductLot {
     const TABLE_NAME: &'static str = "commercial_product_lots";
 }
+impl<'a> From<&'a CommercialProductLot>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder,
+    >
+{
+    fn from(value: &'a CommercialProductLot) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialProductLot where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

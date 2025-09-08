@@ -23,6 +23,15 @@ pub struct ParentProcedureTemplate {
 impl web_common_traits::prelude::TableName for ParentProcedureTemplate {
     const TABLE_NAME: &'static str = "parent_procedure_templates";
 }
+impl<'a> From<&'a ParentProcedureTemplate>
+for web_common_traits::database::IdOrBuilder<
+    (i32, i32),
+    crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateBuilder,
+> {
+    fn from(value: &'a ParentProcedureTemplate) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.parent, value.child))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ParentProcedureTemplate>
     for ParentProcedureTemplate
 where

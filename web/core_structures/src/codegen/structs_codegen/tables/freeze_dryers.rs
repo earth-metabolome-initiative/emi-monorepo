@@ -21,6 +21,16 @@ pub struct FreezeDryer {
 impl web_common_traits::prelude::TableName for FreezeDryer {
     const TABLE_NAME: &'static str = "freeze_dryers";
 }
+impl<'a> From<&'a FreezeDryer>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerBuilder,
+    >
+{
+    fn from(value: &'a FreezeDryer) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Asset> for FreezeDryer where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

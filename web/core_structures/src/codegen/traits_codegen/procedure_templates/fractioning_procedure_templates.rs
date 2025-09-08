@@ -5,6 +5,9 @@ where
 {
     type Procedure = crate::FractioningProcedure;
     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+    fn procedure_template_id(&self) -> i32 {
+        self.procedure_template
+    }
     fn procedure_template_asset_models(
         &self,
         conn: &mut C,

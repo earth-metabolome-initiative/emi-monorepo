@@ -29,6 +29,16 @@ pub struct ProcedureAsset {
 impl web_common_traits::prelude::TableName for ProcedureAsset {
     const TABLE_NAME: &'static str = "procedure_assets";
 }
+impl<'a> From<&'a ProcedureAsset>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder,
+    >
+{
+    fn from(value: &'a ProcedureAsset) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::ProcedureAsset> for ProcedureAsset where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {

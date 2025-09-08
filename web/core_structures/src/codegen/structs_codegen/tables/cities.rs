@@ -20,6 +20,16 @@ pub struct City {
 impl web_common_traits::prelude::TableName for City {
     const TABLE_NAME: &'static str = "cities";
 }
+impl<'a> From<&'a City>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder,
+    >
+{
+    fn from(value: &'a City) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::City> for City where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

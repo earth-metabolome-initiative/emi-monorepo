@@ -13,6 +13,16 @@ pub struct AssetModelAncestor {
 impl web_common_traits::prelude::TableName for AssetModelAncestor {
     const TABLE_NAME: &'static str = "asset_model_ancestors";
 }
+impl<'a> From<&'a AssetModelAncestor>
+    for web_common_traits::database::IdOrBuilder<
+        (i32, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorBuilder,
+    >
+{
+    fn from(value: &'a AssetModelAncestor) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.descendant_model, value.ancestor_model))
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModelAncestor> for AssetModelAncestor where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
 {

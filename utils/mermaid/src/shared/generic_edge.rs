@@ -1,13 +1,13 @@
 //! Submodule providing a generic node struct which may be reused across
 //! different diagrams.
 
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, iter::empty, rc::Rc};
 
 use common_traits::prelude::{Builder, BuilderError};
 
 use crate::{
     errors::EdgeError,
-    shared::{ArrowShape, LineStyle},
+    shared::{ArrowShape, LineStyle, StyleClass},
     traits::{Edge, EdgeBuilder, Node},
 };
 
@@ -47,6 +47,10 @@ impl<N: Node> Edge for GenericEdge<N> {
 
     fn line_style(&self) -> LineStyle {
         self.line_style
+    }
+
+    fn classes(&self) -> impl Iterator<Item = &StyleClass> {
+        empty()
     }
 
     fn left_arrow_shape(&self) -> Option<ArrowShape> {

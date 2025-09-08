@@ -12,6 +12,16 @@ pub struct WeighingDeviceModel {
 impl web_common_traits::prelude::TableName for WeighingDeviceModel {
     const TABLE_NAME: &'static str = "weighing_device_models";
 }
+impl<'a> From<&'a WeighingDeviceModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelBuilder,
+    >
+{
+    fn from(value: &'a WeighingDeviceModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for WeighingDeviceModel where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
 {

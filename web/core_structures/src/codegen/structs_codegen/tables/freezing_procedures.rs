@@ -34,6 +34,16 @@ pub struct FreezingProcedure {
 impl web_common_traits::prelude::TableName for FreezingProcedure {
     const TABLE_NAME: &'static str = "freezing_procedures";
 }
+impl<'a> From<&'a FreezingProcedure>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureBuilder,
+    >
+{
+    fn from(value: &'a FreezingProcedure) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.procedure)
+    }
+}
 impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for FreezingProcedure where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
 {
