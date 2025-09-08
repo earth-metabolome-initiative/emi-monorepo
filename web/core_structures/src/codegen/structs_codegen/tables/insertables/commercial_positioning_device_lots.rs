@@ -181,10 +181,10 @@ pub trait CommercialPositioningDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PositioningDeviceModel,
@@ -223,15 +223,15 @@ for InsertableCommercialPositioningDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
+    ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
-    ///v5 --->|"`extends`"| v6
     ///```
     fn product_model(
         mut self,
@@ -501,11 +501,11 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v3 --->|"`extends`"| v4
+    ///v4 --->|"`extends`"| v5
     ///```
     fn product_model(
         self,

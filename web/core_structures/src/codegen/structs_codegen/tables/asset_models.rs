@@ -111,8 +111,8 @@ impl AssetModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model_and_id(
-        parent_model: &i32,
-        id: &i32,
+        parent_model: i32,
+        id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -125,11 +125,37 @@ impl AssetModel {
             .order_by(asset_models::id.asc())
             .first::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_by<C>(
+        created_by: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
@@ -138,11 +164,37 @@ impl AssetModel {
             .order_by(asset_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_by(
-        updated_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_updated_by<C>(
+        updated_by: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_by as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
@@ -177,11 +229,37 @@ impl AssetModel {
             .order_by(asset_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_at<C>(
+        created_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;
@@ -190,11 +268,37 @@ impl AssetModel {
             .order_by(asset_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_updated_at<C>(
+        updated_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_models::asset_models::updated_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_models::asset_models;

@@ -193,9 +193,9 @@ impl<
     /// v2 --->|"`ancestral same as`"| v3
     /// v2 -.->|"`inferred ancestral same as`"| v0
     /// v2 -.->|"`inferred ancestral same as`"| v1
+    /// v6 --->|"`extends`"| v4
     /// v5 --->|"`extends`"| v6
     /// v7 --->|"`extends`"| v5
-    /// v6 --->|"`extends`"| v4
     /// ```
     fn volumetric_container_model(
         mut self,
@@ -505,12 +505,12 @@ where
     ///    v1@{shape: rounded, label: "volumetric_container_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v6 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v5

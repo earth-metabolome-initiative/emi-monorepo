@@ -41,11 +41,34 @@ impl FreezerModel {
         use web_common_traits::database::Read;
         crate::PhysicalAssetModel::read(self.id, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_id(
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezer_models::freezer_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezer_models::freezer_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezer_models::freezer_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezer_models::freezer_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezer_models::freezer_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freezer_models::freezer_models;
@@ -56,7 +79,7 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model(
-        parent_model: &i32,
+        parent_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -98,8 +121,8 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model_and_id(
-        parent_model: &i32,
-        id: &i32,
+        parent_model: i32,
+        id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -159,7 +182,7 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -179,7 +202,7 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -199,7 +222,7 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -219,7 +242,7 @@ impl FreezerModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

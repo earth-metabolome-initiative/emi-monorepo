@@ -146,8 +146,8 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_packaged_with_model(
-        procedure_template: &i32,
-        procedure_template_packaged_with_model: &i32,
+        procedure_template: i32,
+        procedure_template_packaged_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -167,8 +167,8 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_sample_model(
-        procedure_template: &i32,
-        procedure_template_sample_model: &i32,
+        procedure_template: i32,
+        procedure_template_sample_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -188,8 +188,8 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_packaged_with_model_and_packaged_with_model(
-        procedure_template_packaged_with_model: &i32,
-        packaged_with_model: &i32,
+        procedure_template_packaged_with_model: i32,
+        packaged_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -210,8 +210,8 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_sample_model_and_sample_model(
-        procedure_template_sample_model: &i32,
-        sample_model: &i32,
+        procedure_template_sample_model: i32,
+        sample_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -230,8 +230,8 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_packaged_with_model_and_sample_model(
-        packaged_with_model: &i32,
-        sample_model: &i32,
+        packaged_with_model: i32,
+        sample_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -248,11 +248,37 @@ impl PackagingProcedureTemplate {
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
@@ -261,11 +287,37 @@ impl PackagingProcedureTemplate {
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_packaged_with_model(
-        procedure_template_packaged_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_packaged_with_model<C>(
+        procedure_template_packaged_with_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_packaged_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_packaged_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_packaged_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
@@ -277,11 +329,37 @@ impl PackagingProcedureTemplate {
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_sample_model(
-        procedure_template_sample_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_sample_model<C>(
+        procedure_template_sample_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_sample_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_sample_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template_sample_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
@@ -391,7 +469,7 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -415,7 +493,7 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -439,7 +517,7 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -463,7 +541,7 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -487,7 +565,7 @@ impl PackagingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_deprecated(
-        deprecated: &bool,
+        deprecated: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

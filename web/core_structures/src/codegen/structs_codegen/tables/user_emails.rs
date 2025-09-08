@@ -59,7 +59,7 @@ impl UserEmail {
     #[cfg(feature = "postgres")]
     pub fn from_email_and_created_by(
         email: &str,
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -74,8 +74,8 @@ impl UserEmail {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by_and_primary_email(
-        created_by: &i32,
-        primary_email: &bool,
+        created_by: i32,
+        primary_email: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -92,11 +92,37 @@ impl UserEmail {
             .order_by(user_emails::id.asc())
             .first::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_at<C>(
+        created_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;
@@ -105,11 +131,37 @@ impl UserEmail {
             .order_by(user_emails::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_primary_email(
-        primary_email: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_primary_email<C>(
+        primary_email: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::primary_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::primary_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::user_emails::user_emails::primary_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::user_emails::user_emails::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::user_emails::user_emails;

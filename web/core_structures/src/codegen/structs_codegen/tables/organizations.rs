@@ -87,11 +87,37 @@ impl Organization {
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_alpha_two_code(
-        alpha_two_code: &::iso_codes::CountryCode,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_alpha_two_code<C>(
+        alpha_two_code: ::iso_codes::CountryCode,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;

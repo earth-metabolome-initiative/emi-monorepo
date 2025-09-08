@@ -83,11 +83,37 @@ impl VolumetricContainer {
         use web_common_traits::database::Read;
         crate::VolumetricContainerModel::read(self.volumetric_container_model, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_id(
-        id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_id<C>(
+        id: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::id as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::id as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::id as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers;
@@ -98,8 +124,8 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_id_and_volumetric_container_model(
-        id: &::rosetta_uuid::Uuid,
-        volumetric_container_model: &i32,
+        id: ::rosetta_uuid::Uuid,
+        volumetric_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -116,7 +142,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_container_model(
-        container_model: &i32,
+        container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -136,7 +162,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_model(
-        model: &i32,
+        model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -158,8 +184,8 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_model_and_id(
-        model: &i32,
-        id: &::rosetta_uuid::Uuid,
+        model: i32,
+        id: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -180,7 +206,7 @@ impl VolumetricContainer {
     #[cfg(feature = "postgres")]
     pub fn from_name_and_model(
         name: &str,
-        model: &i32,
+        model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -260,7 +286,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -280,7 +306,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -300,7 +326,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -320,7 +346,7 @@ impl VolumetricContainer {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

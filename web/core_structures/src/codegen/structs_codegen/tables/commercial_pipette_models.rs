@@ -99,11 +99,37 @@ impl CommercialPipetteModel {
             )
             .first::<crate::AssetModel>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_pipette_model(
-        pipette_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_pipette_model<C>(
+        pipette_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models;
@@ -112,11 +138,34 @@ impl CommercialPipetteModel {
             .order_by(commercial_pipette_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_id(
-        id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models;
@@ -127,8 +176,8 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_id_and_pipette_model(
-        id: &i32,
-        pipette_model: &i32,
+        id: i32,
+        pipette_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -147,7 +196,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_deprecation_date(
-        deprecation_date: &::rosetta_timestamp::TimestampUTC,
+        deprecation_date: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -171,7 +220,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_brand_id(
-        brand_id: &i32,
+        brand_id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -195,7 +244,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model(
-        parent_model: &i32,
+        parent_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -239,8 +288,8 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model_and_id(
-        parent_model: &i32,
-        id: &i32,
+        parent_model: i32,
+        id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -300,7 +349,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -320,7 +369,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -340,7 +389,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -360,7 +409,7 @@ impl CommercialPipetteModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

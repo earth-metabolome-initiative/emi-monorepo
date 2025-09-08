@@ -136,7 +136,7 @@ impl ProcedureTemplateAssetModel {
     #[cfg(feature = "postgres")]
     pub fn from_name_and_procedure_template(
         name: &str,
-        procedure_template: &i32,
+        procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -155,8 +155,8 @@ impl ProcedureTemplateAssetModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_id(
-        procedure_template: &i32,
-        id: &i32,
+        procedure_template: i32,
+        id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -175,8 +175,8 @@ impl ProcedureTemplateAssetModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_asset_model_and_id(
-        asset_model: &i32,
-        id: &i32,
+        asset_model: i32,
+        id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -195,8 +195,8 @@ impl ProcedureTemplateAssetModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_based_on_and_asset_model(
-        based_on: &i32,
-        asset_model: &i32,
+        based_on: i32,
+        asset_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -215,7 +215,7 @@ impl ProcedureTemplateAssetModel {
     }
     #[cfg(feature = "postgres")]
     pub fn from_based_on(
-        based_on: &i32,
+        based_on: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -239,11 +239,37 @@ impl ProcedureTemplateAssetModel {
             .order_by(procedure_template_asset_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_at<C>(
+        created_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;

@@ -84,7 +84,7 @@ impl TeamState {
     }
     #[cfg(feature = "postgres")]
     pub fn from_color_id(
-        color_id: &i16,
+        color_id: i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};

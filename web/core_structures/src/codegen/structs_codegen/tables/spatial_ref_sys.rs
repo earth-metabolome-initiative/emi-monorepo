@@ -48,7 +48,7 @@ impl SpatialRefSy {
     }
     #[cfg(feature = "postgres")]
     pub fn from_auth_srid(
-        auth_srid: &i32,
+        auth_srid: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};

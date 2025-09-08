@@ -44,11 +44,47 @@ impl AssetModelAncestor {
         use web_common_traits::database::Read;
         crate::AssetModel::read(self.ancestor_model, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_descendant_model(
-        descendant_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_descendant_model<C>(
+        descendant_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors;
@@ -60,11 +96,47 @@ impl AssetModelAncestor {
             ))
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_ancestor_model(
-        ancestor_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_ancestor_model<C>(
+        ancestor_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::descendant_model,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::ancestor_model,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors;

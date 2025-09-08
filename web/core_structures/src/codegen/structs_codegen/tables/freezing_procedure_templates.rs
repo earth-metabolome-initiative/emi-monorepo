@@ -157,8 +157,8 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_frozen_with_model(
-        procedure_template: &i32,
-        procedure_template_frozen_with_model: &i32,
+        procedure_template: i32,
+        procedure_template_frozen_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -178,8 +178,8 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_frozen_container_model(
-        procedure_template: &i32,
-        procedure_template_frozen_container_model: &i32,
+        procedure_template: i32,
+        procedure_template_frozen_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -199,8 +199,8 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_frozen_with_model_and_frozen_container_model(
-        frozen_with_model: &i32,
-        frozen_container_model: &i32,
+        frozen_with_model: i32,
+        frozen_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -215,11 +215,37 @@ impl FreezingProcedureTemplate {
             .order_by(freezing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates;
@@ -230,8 +256,8 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_frozen_container_model_and_frozen_container_model(
-        procedure_template_frozen_container_model: &i32,
-        frozen_container_model: &i32,
+        procedure_template_frozen_container_model: i32,
+        frozen_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -251,11 +277,37 @@ impl FreezingProcedureTemplate {
             .order_by(freezing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_frozen_container_model(
-        procedure_template_frozen_container_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_frozen_container_model<C>(
+        procedure_template_frozen_container_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates;
@@ -269,8 +321,8 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_frozen_with_model_and_frozen_with_model(
-        procedure_template_frozen_with_model: &i32,
-        frozen_with_model: &i32,
+        procedure_template_frozen_with_model: i32,
+        frozen_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -287,11 +339,37 @@ impl FreezingProcedureTemplate {
             .order_by(freezing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_frozen_with_model(
-        procedure_template_frozen_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_frozen_with_model<C>(
+        procedure_template_frozen_with_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template_frozen_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates;
@@ -401,7 +479,7 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -425,7 +503,7 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -449,7 +527,7 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -473,7 +551,7 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -497,7 +575,7 @@ impl FreezingProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_deprecated(
-        deprecated: &bool,
+        deprecated: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

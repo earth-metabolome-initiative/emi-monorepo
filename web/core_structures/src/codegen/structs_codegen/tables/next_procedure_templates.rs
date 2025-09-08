@@ -97,11 +97,53 @@ impl NextProcedureTemplate {
         use web_common_traits::database::Read;
         crate::ProcedureTemplate::read(self.successor, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent(
-        parent: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_parent<C>(
+        parent: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
@@ -116,8 +158,8 @@ impl NextProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_and_predecessor(
-        parent: &i32,
-        predecessor: &i32,
+        parent: i32,
+        predecessor: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -140,8 +182,8 @@ impl NextProcedureTemplate {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_and_successor(
-        parent: &i32,
-        successor: &i32,
+        parent: i32,
+        successor: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -162,11 +204,53 @@ impl NextProcedureTemplate {
             ))
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_predecessor(
-        predecessor: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_predecessor<C>(
+        predecessor: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
@@ -179,11 +263,53 @@ impl NextProcedureTemplate {
             ))
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_successor(
-        successor: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_successor<C>(
+        successor: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;
@@ -196,11 +322,53 @@ impl NextProcedureTemplate {
             ))
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_at<C>(
+        created_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::parent,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::predecessor,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::successor,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates;

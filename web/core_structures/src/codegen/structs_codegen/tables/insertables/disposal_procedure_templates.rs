@@ -242,10 +242,10 @@ impl<ProcedureTemplate> DisposalProcedureTemplateSettable
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -297,10 +297,10 @@ impl<ProcedureTemplate> DisposalProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3

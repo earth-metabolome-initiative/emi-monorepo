@@ -333,11 +333,37 @@ impl StorageProcedure {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure(
-        procedure: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure<C>(
+        procedure: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -348,8 +374,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_and_procedure_template(
-        procedure: &::rosetta_uuid::Uuid,
-        procedure_template: &i32,
+        procedure: ::rosetta_uuid::Uuid,
+        procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -366,11 +392,37 @@ impl StorageProcedure {
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_stored_asset(
-        procedure_stored_asset: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_stored_asset<C>(
+        procedure_stored_asset: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_asset as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_asset as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_asset as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -381,8 +433,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_asset_and_procedure_template_stored_asset_model(
-        procedure_stored_asset: &::rosetta_uuid::Uuid,
-        procedure_template_stored_asset_model: &i32,
+        procedure_stored_asset: ::rosetta_uuid::Uuid,
+        procedure_template_stored_asset_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -402,8 +454,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_asset_and_stored_asset(
-        procedure_stored_asset: &::rosetta_uuid::Uuid,
-        stored_asset: &::rosetta_uuid::Uuid,
+        procedure_stored_asset: ::rosetta_uuid::Uuid,
+        stored_asset: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -422,8 +474,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_asset_and_stored_asset_model(
-        procedure_stored_asset: &::rosetta_uuid::Uuid,
-        stored_asset_model: &i32,
+        procedure_stored_asset: ::rosetta_uuid::Uuid,
+        stored_asset_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -440,11 +492,37 @@ impl StorageProcedure {
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_stored_into(
-        procedure_stored_into: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_stored_into<C>(
+        procedure_stored_into: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_stored_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -455,8 +533,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_into_and_procedure_template_stored_into_model(
-        procedure_stored_into: &::rosetta_uuid::Uuid,
-        procedure_template_stored_into_model: &i32,
+        procedure_stored_into: ::rosetta_uuid::Uuid,
+        procedure_template_stored_into_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -476,8 +554,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_into_and_stored_into(
-        procedure_stored_into: &::rosetta_uuid::Uuid,
-        stored_into: &::rosetta_uuid::Uuid,
+        procedure_stored_into: ::rosetta_uuid::Uuid,
+        stored_into: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -496,8 +574,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stored_into_and_stored_into_model(
-        procedure_stored_into: &::rosetta_uuid::Uuid,
-        stored_into_model: &i32,
+        procedure_stored_into: ::rosetta_uuid::Uuid,
+        stored_into_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -514,11 +592,37 @@ impl StorageProcedure {
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -529,8 +633,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_stored_into_model(
-        procedure_template: &i32,
-        procedure_template_stored_into_model: &i32,
+        procedure_template: i32,
+        procedure_template_stored_into_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -550,8 +654,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_stored_asset_model(
-        procedure_template: &i32,
-        procedure_template_stored_asset_model: &i32,
+        procedure_template: i32,
+        procedure_template_stored_asset_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -569,11 +673,37 @@ impl StorageProcedure {
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stored_asset_model(
-        procedure_template_stored_asset_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_stored_asset_model<C>(
+        procedure_template_stored_asset_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -585,11 +715,37 @@ impl StorageProcedure {
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stored_into_model(
-        procedure_template_stored_into_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_stored_into_model<C>(
+        procedure_template_stored_into_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
@@ -603,8 +759,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_stored_into_model_and_stored_asset_model(
-        stored_into_model: &i32,
-        stored_asset_model: &i32,
+        stored_into_model: i32,
+        stored_asset_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -623,8 +779,8 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure(
-        procedure_template: &i32,
-        procedure: &::rosetta_uuid::Uuid,
+        procedure_template: i32,
+        procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -650,7 +806,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure(
-        parent_procedure: &::rosetta_uuid::Uuid,
+        parent_procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -672,7 +828,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure_template(
-        parent_procedure_template: &i32,
+        parent_procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -716,7 +872,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -738,7 +894,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -760,7 +916,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -782,7 +938,7 @@ impl StorageProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

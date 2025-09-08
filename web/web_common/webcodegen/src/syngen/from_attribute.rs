@@ -131,6 +131,7 @@ impl Table {
     /// * If querying the database for the unique indices fails.
     pub fn from_attributes(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let struct_name = self.struct_ident()?;
+        let table_diesel_path = self.import_diesel_path()?;
         let table_ident = self.snake_case_ident()?;
         let mut from_attributes = TokenStream::new();
         let mut from_methods: FromMethods = Vec::new();
@@ -144,6 +145,24 @@ impl Table {
                 }
             })
             .collect::<Vec<_>>();
+        let primary_key_order_by_type = self
+            .primary_key_idents(conn)?
+            .into_iter()
+            .map(|column_ident| {
+                quote! {
+                    diesel::helper_types::Asc<#table_diesel_path::#column_ident>
+                }
+            })
+            .collect::<Vec<_>>();
+        let formatted_primary_key_order_by_type = if primary_key_order_by_type.len() > 1 {
+            quote! {
+                (#(#primary_key_order_by_type),*)
+            }
+        } else {
+            quote! {
+                #(#primary_key_order_by_type)*
+            }
+        };
 
         let primary_key_order_by = if primary_key_order_by.len() > 1 {
             quote! {
@@ -272,7 +291,11 @@ impl Table {
                 .map(|column| {
                     let column = column.to_non_nullable();
                     let column_name = column.snake_case_ident()?;
-                    let column_type = column.rust_ref_data_type(conn)?;
+                    let column_type = if column.supports_copy(conn)? {
+                        column.rust_data_type(conn)?
+                    } else {
+                        column.rust_ref_data_type(conn)?
+                    };
                     Ok(quote! { #column_name: #column_type })
                 })
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -293,6 +316,47 @@ impl Table {
                             .filter(#where_statement)
                             .order_by(#primary_key_order_by)
                             .select(Self::as_select())
+                            #load_statement
+                    }
+                }
+            } else if !is_unique && arguments.len() == 1 && columns[0].supports_copy(conn)? && !columns[0].is_nullable() {
+                let argument_types = columns
+                    .iter()
+                    .map(|column| {
+                        let column = column.to_non_nullable();
+                        column.rust_data_type(conn)
+                    })
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                let formatted_argument_types = if argument_types.len() > 1 {
+                    quote! { (#(#argument_types),*) }
+                } else {
+                    quote! { #(#argument_types)* }
+                };
+                let column_ident = columns[0].snake_case_ident()?;
+                quote! {
+                    pub fn #method_ident<C>(
+                        #(#arguments,)*
+                        conn: &mut C,
+                    ) -> Result<#ok_return_type, diesel::result::Error>
+                    where
+                        C: diesel::connection::LoadConnection,
+                        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+                            <#table_diesel_path::#column_ident as diesel::expression_methods::EqAll<#formatted_argument_types>>::Output,
+                        >,
+                        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+                            <#table_diesel_path::#column_ident as diesel::expression_methods::EqAll<#formatted_argument_types>>::Output,
+                        >>::Output: diesel::query_dsl::methods::OrderDsl<#formatted_primary_key_order_by_type>,
+                        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+                            <#table_diesel_path::#column_ident as diesel::expression_methods::EqAll<#formatted_argument_types>>::Output,
+                        >>::Output as diesel::query_dsl::methods::OrderDsl<#formatted_primary_key_order_by_type>>::Output: diesel::RunQueryDsl<C> + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+                    {
+                        use diesel::RunQueryDsl;
+                        use diesel::associations::HasTable;
+                        use diesel::{QueryDsl, ExpressionMethods};
+                        #(use #additional_imports;)*
+                        Self::table()
+                            .filter(#where_statement)
+                            .order_by(#primary_key_order_by)
                             #load_statement
                     }
                 }

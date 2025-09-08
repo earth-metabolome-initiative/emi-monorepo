@@ -46,7 +46,7 @@ impl Address {
     }
     #[cfg(feature = "postgres")]
     pub fn from_city_id_and_street_name_and_street_number(
-        city_id: &i32,
+        city_id: i32,
         street_name: &str,
         street_number: &str,
         conn: &mut diesel::PgConnection,

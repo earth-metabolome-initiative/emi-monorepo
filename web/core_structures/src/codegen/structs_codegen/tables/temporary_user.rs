@@ -46,7 +46,7 @@ impl TemporaryUser {
     #[cfg(feature = "postgres")]
     pub fn from_email_and_login_provider_id(
         email: &str,
-        login_provider_id: &i16,
+        login_provider_id: i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{

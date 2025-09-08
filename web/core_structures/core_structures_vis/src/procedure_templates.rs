@@ -36,9 +36,9 @@ fn to_mermaid_node(
 
     let current_direction = parent_direction.flip();
     let subprocedures =
-        ParentProcedureTemplate::from_parent(&procedure_template.procedure_template, conn)?;
+        ParentProcedureTemplate::from_parent(procedure_template.procedure_template, conn)?;
     let next_procedures =
-        NextProcedureTemplate::from_parent(&procedure_template.procedure_template, conn)?;
+        NextProcedureTemplate::from_parent(procedure_template.procedure_template, conn)?;
 
     if subprocedures.is_empty() {
         let procedure_template_asset_models: Vec<ProcedureTemplateAssetModel> =
@@ -164,7 +164,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
         // We create a class for each trackable of the parent procedure.
 
         // We start creating the nodes for the procedure template.
-        for subprocedure in ParentProcedureTemplate::from_parent(&self.procedure_template, conn)? {
+        for subprocedure in ParentProcedureTemplate::from_parent(self.procedure_template, conn)? {
             let child_procedure = subprocedure.child(conn)?;
             let _node = to_mermaid_node(
                 self,
@@ -179,7 +179,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
 
         // Next, we chain add the edges representing which procedures are followed by
         // which.
-        for subprocedure in NextProcedureTemplate::from_parent(&self.procedure_template, conn)? {
+        for subprocedure in NextProcedureTemplate::from_parent(self.procedure_template, conn)? {
             let current_procedure = subprocedure.predecessor(conn)?;
             let next_procedure = subprocedure.successor(conn)?;
             builder.edge(

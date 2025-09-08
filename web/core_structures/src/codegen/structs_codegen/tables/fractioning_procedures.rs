@@ -361,11 +361,37 @@ impl FractioningProcedure {
         };
         crate::WeighingDevice::read(weighed_with, conn).map(Some)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_fragment_container(
-        fragment_container: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_fragment_container<C>(
+        fragment_container: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -374,11 +400,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_fragment_placed_into(
-        fragment_placed_into: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_fragment_placed_into<C>(
+        fragment_placed_into: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -387,11 +439,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure(
-        procedure: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure<C>(
+        procedure: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -400,11 +478,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_fragment_container(
-        procedure_fragment_container: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_fragment_container<C>(
+        procedure_fragment_container: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -418,8 +522,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_fragment_container_and_fragment_container(
-        procedure_fragment_container: &::rosetta_uuid::Uuid,
-        fragment_container: &::rosetta_uuid::Uuid,
+        procedure_fragment_container: ::rosetta_uuid::Uuid,
+        fragment_container: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -438,8 +542,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_fragment_container_and_procedure_template_fragment_container_model(
-        procedure_fragment_container: &::rosetta_uuid::Uuid,
-        procedure_template_fragment_container_model: &i32,
+        procedure_fragment_container: ::rosetta_uuid::Uuid,
+        procedure_template_fragment_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -459,11 +563,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_fragment_placed_into(
-        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_fragment_placed_into<C>(
+        procedure_fragment_placed_into: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_fragment_placed_into as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -477,8 +607,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_fragment_placed_into_and_fragment_placed_into(
-        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
-        fragment_placed_into: &::rosetta_uuid::Uuid,
+        procedure_fragment_placed_into: ::rosetta_uuid::Uuid,
+        fragment_placed_into: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -497,8 +627,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_fragment_placed_into_and_procedure_template_fragment_placed_into_model(
-        procedure_fragment_placed_into: &::rosetta_uuid::Uuid,
-        procedure_template_fragment_placed_into_model: &i32,
+        procedure_fragment_placed_into: ::rosetta_uuid::Uuid,
+        procedure_template_fragment_placed_into_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -520,8 +650,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_and_procedure_template(
-        procedure: &::rosetta_uuid::Uuid,
-        procedure_template: &i32,
+        procedure: ::rosetta_uuid::Uuid,
+        procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -538,11 +668,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -551,11 +707,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_fragment_container_model(
-        procedure_template_fragment_container_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_fragment_container_model<C>(
+        procedure_template_fragment_container_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_container_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -567,11 +749,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_fragment_placed_into_model(
-        procedure_template_fragment_placed_into_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_fragment_placed_into_model<C>(
+        procedure_template_fragment_placed_into_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_placed_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_placed_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_fragment_placed_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -585,8 +793,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_fragment_container_model(
-        procedure_template: &i32,
-        procedure_template_fragment_container_model: &i32,
+        procedure_template: i32,
+        procedure_template_fragment_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -606,8 +814,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_fragment_placed_into_model(
-        procedure_template: &i32,
-        procedure_template_fragment_placed_into_model: &i32,
+        procedure_template: i32,
+        procedure_template_fragment_placed_into_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -627,8 +835,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_weighed_with_model(
-        procedure_template: &i32,
-        procedure_template_weighed_with_model: &i32,
+        procedure_template: i32,
+        procedure_template_weighed_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -646,11 +854,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_weighed_with_model(
-        procedure_template_weighed_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_weighed_with_model<C>(
+        procedure_template_weighed_with_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_weighed_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_weighed_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_template_weighed_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -662,11 +896,37 @@ impl FractioningProcedure {
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_weighed_with(
-        procedure_weighed_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_weighed_with<C>(
+        procedure_weighed_with: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_weighed_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_weighed_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure_weighed_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
@@ -677,8 +937,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_weighed_with_and_procedure_template_weighed_with_model(
-        procedure_weighed_with: &::rosetta_uuid::Uuid,
-        procedure_template_weighed_with_model: &i32,
+        procedure_weighed_with: ::rosetta_uuid::Uuid,
+        procedure_template_weighed_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -698,8 +958,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_weighed_with_and_weighed_with(
-        procedure_weighed_with: &::rosetta_uuid::Uuid,
-        weighed_with: &::rosetta_uuid::Uuid,
+        procedure_weighed_with: ::rosetta_uuid::Uuid,
+        weighed_with: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -718,8 +978,8 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure(
-        procedure_template: &i32,
-        procedure: &::rosetta_uuid::Uuid,
+        procedure_template: i32,
+        procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -745,7 +1005,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure(
-        parent_procedure: &::rosetta_uuid::Uuid,
+        parent_procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -767,7 +1027,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure_template(
-        parent_procedure_template: &i32,
+        parent_procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -811,7 +1071,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -833,7 +1093,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -855,7 +1115,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -877,7 +1137,7 @@ impl FractioningProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

@@ -66,11 +66,47 @@ impl OrganismTaxon {
         use web_common_traits::database::Read;
         crate::Taxon::read(self.taxon_id, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_created_at<C>(
+        created_at: ::rosetta_timestamp::TimestampUTC,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::organism_id,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::taxon_id,
+                >,
+            ),
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::created_at as diesel::expression_methods::EqAll<
+                ::rosetta_timestamp::TimestampUTC,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            (
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::organism_id,
+                >,
+                diesel::helper_types::Asc<
+                    crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa::taxon_id,
+                >,
+            ),
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;

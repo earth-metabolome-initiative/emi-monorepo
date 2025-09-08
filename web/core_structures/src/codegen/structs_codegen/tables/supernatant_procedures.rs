@@ -512,11 +512,37 @@ impl SupernatantProcedure {
             conn,
         )
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure(
-        procedure: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure<C>(
+        procedure: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -525,11 +551,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_pipette_tip(
-        procedure_pipette_tip: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_pipette_tip<C>(
+        procedure_pipette_tip: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_pipette_tip as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_pipette_tip as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_pipette_tip as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -540,8 +592,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_pipette_tip_and_pipette_tip_model(
-        procedure_pipette_tip: &::rosetta_uuid::Uuid,
-        pipette_tip_model: &i32,
+        procedure_pipette_tip: ::rosetta_uuid::Uuid,
+        pipette_tip_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -560,8 +612,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_pipette_tip_and_procedure_template_pipette_tip_model(
-        procedure_pipette_tip: &::rosetta_uuid::Uuid,
-        procedure_template_pipette_tip_model: &i32,
+        procedure_pipette_tip: ::rosetta_uuid::Uuid,
+        procedure_template_pipette_tip_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -581,8 +633,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_and_procedure_template(
-        procedure: &::rosetta_uuid::Uuid,
-        procedure_template: &i32,
+        procedure: ::rosetta_uuid::Uuid,
+        procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -599,11 +651,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_stratified_source(
-        procedure_stratified_source: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_stratified_source<C>(
+        procedure_stratified_source: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -616,8 +694,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stratified_source_and_procedure_template_stratified_source_model(
-        procedure_stratified_source: &::rosetta_uuid::Uuid,
-        procedure_template_stratified_source_model: &i32,
+        procedure_stratified_source: ::rosetta_uuid::Uuid,
+        procedure_template_stratified_source_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -639,8 +717,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_stratified_source_and_stratified_source(
-        procedure_stratified_source: &::rosetta_uuid::Uuid,
-        stratified_source: &::rosetta_uuid::Uuid,
+        procedure_stratified_source: ::rosetta_uuid::Uuid,
+        stratified_source: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -657,11 +735,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_supernatant_destination(
-        procedure_supernatant_destination: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_supernatant_destination<C>(
+        procedure_supernatant_destination: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -675,8 +779,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_supernatant_destination_and_procedure_template_supernatant_destination_model(
-        procedure_supernatant_destination: &::rosetta_uuid::Uuid,
-        procedure_template_supernatant_destination_model: &i32,
+        procedure_supernatant_destination: ::rosetta_uuid::Uuid,
+        procedure_template_supernatant_destination_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -698,8 +802,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_supernatant_destination_and_supernatant_destination(
-        procedure_supernatant_destination: &::rosetta_uuid::Uuid,
-        supernatant_destination: &::rosetta_uuid::Uuid,
+        procedure_supernatant_destination: ::rosetta_uuid::Uuid,
+        supernatant_destination: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -718,11 +822,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template(
-        procedure_template: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -731,11 +861,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_pipette_tip_model(
-        procedure_template_pipette_tip_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_pipette_tip_model<C>(
+        procedure_template_pipette_tip_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_pipette_tip_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_pipette_tip_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_pipette_tip_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -749,8 +905,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_supernatant_destination_model(
-        procedure_template: &i32,
-        procedure_template_supernatant_destination_model: &i32,
+        procedure_template: i32,
+        procedure_template_supernatant_destination_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -770,8 +926,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_transferred_with_model(
-        procedure_template: &i32,
-        procedure_template_transferred_with_model: &i32,
+        procedure_template: i32,
+        procedure_template_transferred_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -791,8 +947,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_pipette_tip_model(
-        procedure_template: &i32,
-        procedure_template_pipette_tip_model: &i32,
+        procedure_template: i32,
+        procedure_template_pipette_tip_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -812,8 +968,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_stratified_source_model(
-        procedure_template: &i32,
-        procedure_template_stratified_source_model: &i32,
+        procedure_template: i32,
+        procedure_template_stratified_source_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -831,11 +987,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stratified_source_model(
-        procedure_template_stratified_source_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_stratified_source_model<C>(
+        procedure_template_stratified_source_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_stratified_source_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_stratified_source_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_stratified_source_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -847,11 +1029,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_supernatant_destination_model(
-        procedure_template_supernatant_destination_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_supernatant_destination_model<C>(
+        procedure_template_supernatant_destination_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_supernatant_destination_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_supernatant_destination_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_supernatant_destination_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -863,11 +1071,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_transferred_with_model(
-        procedure_template_transferred_with_model: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_template_transferred_with_model<C>(
+        procedure_template_transferred_with_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_transferred_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_transferred_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_template_transferred_with_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -879,11 +1113,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_transferred_with(
-        procedure_transferred_with: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_procedure_transferred_with<C>(
+        procedure_transferred_with: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_transferred_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_transferred_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure_transferred_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -896,8 +1156,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_transferred_with_and_procedure_template_transferred_with_model(
-        procedure_transferred_with: &::rosetta_uuid::Uuid,
-        procedure_template_transferred_with_model: &i32,
+        procedure_transferred_with: ::rosetta_uuid::Uuid,
+        procedure_template_transferred_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -919,8 +1179,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_transferred_with_and_transferred_with_model(
-        procedure_transferred_with: &::rosetta_uuid::Uuid,
-        transferred_with_model: &i32,
+        procedure_transferred_with: ::rosetta_uuid::Uuid,
+        transferred_with_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -939,8 +1199,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_transferred_with_and_transferred_with(
-        procedure_transferred_with: &::rosetta_uuid::Uuid,
-        transferred_with: &::rosetta_uuid::Uuid,
+        procedure_transferred_with: ::rosetta_uuid::Uuid,
+        transferred_with: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -957,11 +1217,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_stratified_source(
-        stratified_source: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_stratified_source<C>(
+        stratified_source: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::stratified_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -970,11 +1256,37 @@ impl SupernatantProcedure {
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_supernatant_destination(
-        supernatant_destination: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_supernatant_destination<C>(
+        supernatant_destination: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::supernatant_destination as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
@@ -985,8 +1297,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_transferred_with_model_and_pipette_tip_model(
-        transferred_with_model: &i32,
-        pipette_tip_model: &i32,
+        transferred_with_model: i32,
+        pipette_tip_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1005,8 +1317,8 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure(
-        procedure_template: &i32,
-        procedure: &::rosetta_uuid::Uuid,
+        procedure_template: i32,
+        procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -1032,7 +1344,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure(
-        parent_procedure: &::rosetta_uuid::Uuid,
+        parent_procedure: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1054,7 +1366,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_procedure_template(
-        parent_procedure_template: &i32,
+        parent_procedure_template: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1098,7 +1410,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1120,7 +1432,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
+        created_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1142,7 +1454,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -1164,7 +1476,7 @@ impl SupernatantProcedure {
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
+        updated_at: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{

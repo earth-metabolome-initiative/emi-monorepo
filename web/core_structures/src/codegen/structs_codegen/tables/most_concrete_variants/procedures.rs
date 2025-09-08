@@ -21,21 +21,21 @@
 /// v13@{shape: rect, label: "storage_procedures"}
 /// v14@{shape: rect, label: "supernatant_procedures"}
 /// v15@{shape: rect, label: "weighing_procedures"}
-/// v10 --->|"`extends`"| v12
-/// v0 --->|"`extends`"| v12
-/// v1 --->|"`extends`"| v12
-/// v13 --->|"`extends`"| v12
-/// v5 --->|"`extends`"| v12
 /// v9 --->|"`extends`"| v12
-/// v8 --->|"`extends`"| v12
-/// v3 --->|"`extends`"| v12
-/// v15 --->|"`extends`"| v12
-/// v4 --->|"`extends`"| v12
-/// v6 --->|"`extends`"| v12
-/// v2 --->|"`extends`"| v12
-/// v14 --->|"`extends`"| v12
-/// v11 --->|"`extends`"| v12
 /// v7 --->|"`extends`"| v12
+/// v10 --->|"`extends`"| v12
+/// v3 --->|"`extends`"| v12
+/// v8 --->|"`extends`"| v12
+/// v15 --->|"`extends`"| v12
+/// v0 --->|"`extends`"| v12
+/// v5 --->|"`extends`"| v12
+/// v13 --->|"`extends`"| v12
+/// v4 --->|"`extends`"| v12
+/// v2 --->|"`extends`"| v12
+/// v6 --->|"`extends`"| v12
+/// v11 --->|"`extends`"| v12
+/// v14 --->|"`extends`"| v12
+/// v1 --->|"`extends`"| v12
 /// ```
 pub enum ProcedureDAG {
     /// Variant representing the `aliquoting_procedures` table.

@@ -54,7 +54,7 @@ impl Taxon {
     }
     #[cfg(feature = "postgres")]
     pub fn from_parent_id(
-        parent_id: &i32,
+        parent_id: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
