@@ -3,6 +3,7 @@
 
 use core_structures::Brand as PortalBrand;
 use diesel::PgConnection;
+use diesel::OptionalExtension;
 use web_common_traits::database::{BoundedRead, Insertable, InsertableVariant};
 
 use super::get_user;
@@ -21,17 +22,15 @@ use crate::codegen::Brand as DirectusBrand;
 pub fn insert_missing_brands(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
+) -> anyhow::Result<()> {
     let directus_brands = DirectusBrand::bounded_read(0, u16::MAX, directus_conn)?;
 
     for directus_brand in directus_brands {
-        if PortalBrand::from_name(&directus_brand.brand, portal_conn)?.is_some() {
+        if PortalBrand::from_name(&directus_brand.brand, portal_conn).optional()?.is_some() {
             continue;
         }
 
-        let directus_created_by = directus_brand.user_created(directus_conn)?.ok_or_else(|| {
-            crate::error::Error::BrandWithMissingUser(Box::from(directus_brand.clone()))
-        })?;
+        let directus_created_by = directus_brand.user_created(directus_conn)?.expect("Brand must have a creator");
         let portal_created_by = match get_user(&directus_created_by, directus_conn, portal_conn) {
             Ok(user) => user,
             Err(crate::error::Error::UserNeverLoggedIn(_)) => {
@@ -54,12 +53,7 @@ pub fn insert_missing_brands(
             }
         };
 
-        let created_at = directus_brand.date_created.ok_or_else(|| {
-            crate::error::Error::MissingDate(
-                "directus_brands".to_owned(),
-                "date_created".to_owned(),
-            )
-        })?;
+        let created_at = directus_brand.date_created.expect("Brand must have creation date");
 
         let _portal_brand = PortalBrand::new()
             .created_by(portal_created_by.id)?

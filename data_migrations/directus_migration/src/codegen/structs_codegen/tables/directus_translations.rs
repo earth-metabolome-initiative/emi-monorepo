@@ -20,6 +20,14 @@ pub struct DirectusTranslation {
 impl web_common_traits::prelude::TableName for DirectusTranslation {
     const TABLE_NAME: &'static str = "directus_translations";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_translations::DirectusTranslation,
+    > for DirectusTranslation
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
 impl diesel::Identifiable for DirectusTranslation {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {

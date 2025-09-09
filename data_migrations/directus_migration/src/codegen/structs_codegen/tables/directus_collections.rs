@@ -6,6 +6,13 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
+        foreign_key = group
+    )
 )]
 #[diesel(primary_key(collection))]
 #[diesel(
@@ -35,6 +42,14 @@ pub struct DirectusCollection {
 }
 impl web_common_traits::prelude::TableName for DirectusCollection {
     const TABLE_NAME: &'static str = "directus_collections";
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
+    > for DirectusCollection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a String>,
+{
 }
 impl<C> web_common_traits::prelude::Ancestor<C> for DirectusCollection
 where
@@ -71,39 +86,22 @@ impl DirectusCollection {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection,
-        >,
+        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        let Some(group) = self.group else {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(group) = self.group.clone() else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::table(),
-                    group,
-                ),
-                conn,
-            )
-            .map(Some)
+        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::read(
+            group, conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_icon(
@@ -144,11 +142,37 @@ impl DirectusCollection {
             .order_by(directus_collections::collection.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_hidden(
-        hidden: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_hidden<C>(
+        hidden: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::hidden as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::hidden as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::hidden as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;
@@ -157,11 +181,37 @@ impl DirectusCollection {
             .order_by(directus_collections::collection.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_singleton(
-        singleton: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_singleton<C>(
+        singleton: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::singleton as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::singleton as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::singleton as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;
@@ -183,11 +233,37 @@ impl DirectusCollection {
             .order_by(directus_collections::collection.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_archive_app_filter(
-        archive_app_filter: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_archive_app_filter<C>(
+        archive_app_filter: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::archive_app_filter as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::archive_app_filter as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::archive_app_filter as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;
@@ -263,7 +339,7 @@ impl DirectusCollection {
     }
     #[cfg(feature = "postgres")]
     pub fn from_sort(
-        sort: &i32,
+        sort: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -271,19 +347,6 @@ impl DirectusCollection {
         use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;
         Self::table()
             .filter(directus_collections::sort.eq(sort))
-            .order_by(directus_collections::collection.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_group(
-        group: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;
-        Self::table()
-            .filter(directus_collections::group.eq(group))
             .order_by(directus_collections::collection.asc())
             .load::<Self>(conn)
     }
@@ -313,11 +376,37 @@ impl DirectusCollection {
             .order_by(directus_collections::collection.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_versioning(
-        versioning: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_versioning<C>(
+        versioning: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::versioning as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::versioning as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::versioning as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_collections::directus_collections::collection,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_collections::directus_collections;

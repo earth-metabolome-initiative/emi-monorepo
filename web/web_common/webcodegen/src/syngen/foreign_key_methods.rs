@@ -34,8 +34,11 @@ impl Table {
 
             let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
+            let mut additional_requirements = Vec::new();
+
             let (return_statement, optional) = if columns.iter().any(Column::is_nullable) {
-                (syn::parse_quote! { Option<#foreign_key_struct_path> }, quote! { .map(Some) })
+                additional_requirements.push(quote! { use diesel::OptionalExtension; });
+                (syn::parse_quote! { Option<#foreign_key_struct_path> }, quote! { .optional() })
             } else {
                 (foreign_key_struct_path.clone(), TokenStream::new())
             };
@@ -47,9 +50,12 @@ impl Table {
             for column in columns.as_ref() {
                 let current_column_ident: Ident = column.snake_case_ident()?;
 
+                let maybe_clone =
+                    if !column.supports_copy(conn)? { Some(quote! { .clone() }) } else { None };
+
                 if column.is_nullable() {
                     column_values_retrieval.extend(quote! {
-                        let Some(#current_column_ident) = self.#current_column_ident else {
+                        let Some(#current_column_ident) = self.#current_column_ident #maybe_clone else {
                             return Ok(None);
                         };
                     });
@@ -68,7 +74,11 @@ impl Table {
                         if c.is_nullable() {
                             Ok(quote! { #column_ident })
                         } else {
-                            Ok(quote! { self.#column_ident })
+                            if c.supports_copy(conn)? {
+                                Ok(quote! { self.#column_ident })
+                            } else {
+                                Ok(quote! { self.#column_ident.clone() })
+                            }
                         }
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -87,6 +97,7 @@ impl Table {
                             #foreign_key_struct_path: web_common_traits::database::Read<C>
                     {
                         use web_common_traits::database::Read;
+                        #(#additional_requirements)*
                         #column_values_retrieval
                         #foreign_key_struct_path::read(#formatted_primary_key, conn)#optional
                     }
@@ -101,6 +112,7 @@ impl Table {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;
                         use diesel::{QueryDsl, ExpressionMethods};
+                        #(#additional_requirements)*
                         #bool_expression_methods
                         #column_values_retrieval
                         #foreign_key_struct_path::table()

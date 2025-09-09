@@ -6,6 +6,13 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
+        foreign_key = migrated_flow
+    )
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -27,6 +34,14 @@ pub struct DirectusWebhook {
 impl web_common_traits::prelude::TableName for DirectusWebhook {
     const TABLE_NAME: &'static str = "directus_webhooks";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_webhooks::DirectusWebhook,
+    > for DirectusWebhook
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for DirectusWebhook {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -42,33 +57,19 @@ impl DirectusWebhook {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow,
-        >,
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(migrated_flow) = self.migrated_flow else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::table(),
-                migrated_flow,
-            ),
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::read(
+            migrated_flow,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -122,11 +123,37 @@ impl DirectusWebhook {
             .order_by(directus_webhooks::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_data(
-        data: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_data<C>(
+        data: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::data as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::data as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::data as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
@@ -161,11 +188,37 @@ impl DirectusWebhook {
             .order_by(directus_webhooks::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_was_active_before_deprecation(
-        was_active_before_deprecation: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_was_active_before_deprecation<C>(
+        was_active_before_deprecation: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::was_active_before_deprecation as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::was_active_before_deprecation as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::was_active_before_deprecation as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
@@ -173,19 +226,6 @@ impl DirectusWebhook {
             .filter(
                 directus_webhooks::was_active_before_deprecation.eq(was_active_before_deprecation),
             )
-            .order_by(directus_webhooks::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_migrated_flow(
-        migrated_flow: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
-        Self::table()
-            .filter(directus_webhooks::migrated_flow.eq(migrated_flow))
             .order_by(directus_webhooks::id.asc())
             .load::<Self>(conn)
     }

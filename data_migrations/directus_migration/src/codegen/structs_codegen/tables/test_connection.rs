@@ -11,6 +11,14 @@ pub struct TestConnection {
 impl web_common_traits::prelude::TableName for TestConnection {
     const TABLE_NAME: &'static str = "Test_Connection";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::test_connection::TestConnection,
+    > for TestConnection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for TestConnection {
     type Id = i32;
     fn id(self) -> Self::Id {

@@ -4,7 +4,9 @@ use syn::{Ident, Type};
 
 use crate::{
     Table,
-    codegen::{CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    codegen::{
+        CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
+    },
     errors::WebCodeGenError,
     utils::RESERVED_RUST_WORDS,
 };
@@ -118,7 +120,12 @@ pub trait TableLike: AsRef<Table> {
     ///
     /// * If the snake case name cannot be generated.
     fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
-        Ok(syn::parse_str::<Type>(&format!("crate::{}", self.struct_name()?))?)
+        let table_name = self.snake_case_name()?;
+        Ok(syn::parse_str::<Type>(&format!(
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{}::{}",
+            table_name,
+            self.struct_name()?
+        ))?)
     }
 }
 

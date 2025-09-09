@@ -958,11 +958,10 @@ impl Column {
         if self.supports_ord(conn)? {
             return Ok(true);
         }
-
         if self.geometry(conn).ok().flatten().is_some()
             || self.geography(conn).ok().flatten().is_some()
         {
-            return Ok(true);
+            return Ok(false);
         }
         match rust_type_str(self.data_type_str(conn)?, conn) {
             Ok(s) => Ok(PARTIAL_ORD_TYPES.contains(&s)),

@@ -39,7 +39,8 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
-            let table_content = table.to_syn(self.enable_yew, conn)?;
+            let table_content =
+                table.to_syn(self.enable_yew, self.enable_insertable_trait, conn)?;
             let foreign_key_methods = if self.enable_foreign_trait {
                 table.foreign_key_methods(conn)?
             } else {

@@ -19,6 +19,14 @@ pub struct DirectusMigration {
 impl web_common_traits::prelude::TableName for DirectusMigration {
     const TABLE_NAME: &'static str = "directus_migrations";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_migrations::DirectusMigration,
+    > for DirectusMigration
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a String>,
+{
+}
 impl diesel::Identifiable for DirectusMigration {
     type Id = String;
     fn id(self) -> Self::Id {
@@ -41,7 +49,7 @@ impl DirectusMigration {
     }
     #[cfg(feature = "postgres")]
     pub fn from_timestamp(
-        timestamp: &::rosetta_timestamp::TimestampUTC,
+        timestamp: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};

@@ -26,6 +26,14 @@ pub struct DirectusRelation {
 impl web_common_traits::prelude::TableName for DirectusRelation {
     const TABLE_NAME: &'static str = "directus_relations";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_relations::DirectusRelation,
+    > for DirectusRelation
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for DirectusRelation {
     type Id = i32;
     fn id(self) -> Self::Id {

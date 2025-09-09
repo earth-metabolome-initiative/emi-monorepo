@@ -6,6 +6,25 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
+        foreign_key = activity
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+        foreign_key = parent
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
+        foreign_key = version
+    )
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -23,6 +42,14 @@ pub struct DirectusRevision {
 }
 impl web_common_traits::prelude::TableName for DirectusRevision {
     const TABLE_NAME: &'static str = "directus_revisions";
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+    > for DirectusRevision
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
 }
 impl<C> web_common_traits::prelude::Ancestor<C> for DirectusRevision
 where
@@ -63,28 +90,12 @@ impl DirectusRevision {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
-        >,
+        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::table(
-                ),
-                self.activity,
-            ),
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::read(
+            self.activity,
             conn,
         )
     }
@@ -92,91 +103,43 @@ impl DirectusRevision {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
-        >,
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent) = self.parent else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-                QueryDsl::find(
-                    crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision::table(),
-                    parent,
-                ),
-                conn,
-            )
-            .map(Some)
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision::read(
+            parent, conn,
+        )
+        .optional()
     }
     pub fn version<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
-        >,
+        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(version) = self.version else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion::table(
-                ),
-                version,
-            ),
-            conn,
+        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion::read(
+            version, conn,
         )
-        .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_activity(
-        activity: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
-        Self::table()
-            .filter(directus_revisions::activity.eq(activity))
-            .order_by(directus_revisions::id.asc())
-            .load::<Self>(conn)
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_collection(
@@ -201,32 +164,6 @@ impl DirectusRevision {
         use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
         Self::table()
             .filter(directus_revisions::item.eq(item))
-            .order_by(directus_revisions::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent(
-        parent: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
-        Self::table()
-            .filter(directus_revisions::parent.eq(parent))
-            .order_by(directus_revisions::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_version(
-        version: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
-        Self::table()
-            .filter(directus_revisions::version.eq(version))
             .order_by(directus_revisions::id.asc())
             .load::<Self>(conn)
     }

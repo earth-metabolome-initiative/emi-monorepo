@@ -41,6 +41,7 @@ impl Table {
     pub fn to_syn(
         &self,
         enable_yew: bool,
+        enable_insertables: bool,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         if self.columns(conn)?.len() > 128 {
@@ -110,6 +111,18 @@ impl Table {
             quote! { (#(value.#primary_key_idents),*) }
         };
 
+        let maybe_id_or_builder_from = if enable_insertables {
+            Some(quote! {
+                    impl<'a> From<&'a #struct_name> for web_common_traits::database::IdOrBuilder<#primary_key_type, #builder_type> {
+                    fn from(value: &'a #struct_name) -> Self {
+                        web_common_traits::database::IdOrBuilder::Id(#formatted_primary_key_idents)
+                    }
+                }
+            })
+        } else {
+            None
+        };
+
         Ok(quote! {
             #[derive(#(#default_derives),*)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -124,12 +137,7 @@ impl Table {
                 const TABLE_NAME: &'static str = #table_name;
             }
 
-            impl<'a> From<&'a #struct_name> for web_common_traits::database::IdOrBuilder<#primary_key_type, #builder_type> {
-                fn from(value: &'a #struct_name) -> Self {
-                    web_common_traits::database::IdOrBuilder::Id(#formatted_primary_key_idents)
-                }
-            }
-
+            #maybe_id_or_builder_from
             #(#extensions_impls)*
             #ancestor_impl
             #identifiable_impl

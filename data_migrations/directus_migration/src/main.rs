@@ -1,10 +1,6 @@
 mod codegen;
 mod migrations;
 use diesel::{Connection, PgConnection};
-use migrations::{
-    insert_directus_collection_procedures, insert_missing_brands, insert_missing_instrument_models,
-    insert_missing_users,
-};
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
 const DIRECTUS_DATABASE_PASSWORD: &str = "directus_dbgi";
@@ -29,10 +25,10 @@ fn transact_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), anyhow::Error> {
-    insert_missing_users(directus_conn, portal_conn)?;
-    insert_missing_brands(directus_conn, portal_conn)?;
-    insert_missing_instrument_models(directus_conn, portal_conn)?;
-    insert_directus_collection_procedures(directus_conn, portal_conn)?;
+    // insert_missing_users(directus_conn, portal_conn)?;
+    // insert_missing_brands(directus_conn, portal_conn)?;
+    // insert_missing_instrument_models(directus_conn, portal_conn)?;
+    // insert_directus_collection_procedures(directus_conn, portal_conn)?;
     Ok(())
 }
 

@@ -90,7 +90,7 @@ impl Codegen<'_> {
             };
 
             completeness_statements.push(
-                if let Some((partial_builder_kind, _, partial_builder_constraint)) =
+                if let Some((_partial_builder_kind, _, partial_builder_constraint)) =
                     column.requires_partial_builder(conn)?
                 {
                     let foreign_table = partial_builder_constraint.foreign_table(conn)?;

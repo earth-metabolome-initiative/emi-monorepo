@@ -6,6 +6,19 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
+        foreign_key = storage_default_folder
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+        foreign_key = public_registration_role
+    )
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -50,6 +63,14 @@ pub struct DirectusSetting {
 impl web_common_traits::prelude::TableName for DirectusSetting {
     const TABLE_NAME: &'static str = "directus_settings";
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_settings::DirectusSetting,
+    > for DirectusSetting
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for DirectusSetting {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -65,33 +86,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(project_logo) = self.project_logo else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table(),
-                project_logo,
-            ),
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
+            project_logo,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     pub fn public_background<C: diesel::connection::LoadConnection>(
         &self,
@@ -101,33 +108,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_background) = self.public_background else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table(),
-                public_background,
-            ),
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
+            public_background,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     pub fn public_favicon<C: diesel::connection::LoadConnection>(
         &self,
@@ -137,33 +130,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_favicon) = self.public_favicon else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table(),
-                public_favicon,
-            ),
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
+            public_favicon,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     pub fn public_foreground<C: diesel::connection::LoadConnection>(
         &self,
@@ -173,71 +152,41 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_files::DirectusFile as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_foreground) = self.public_foreground else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_files::DirectusFile::table(),
-                public_foreground,
-            ),
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
+            public_foreground,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     pub fn storage_default_folder<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-        >,
+        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(storage_default_folder) = self.storage_default_folder else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::table(),
-                storage_default_folder,
-            ),
+        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::read(
+            storage_default_folder,
             conn,
         )
-        .map(Some)
+        .optional()
     }
     pub fn public_registration_role<C: diesel::connection::LoadConnection>(
         &self,
@@ -247,33 +196,71 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::directus_roles::DirectusRole as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
-        >,
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_registration_role) = self.public_registration_role else {
             return Ok(None);
         };
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::table(),
-                public_registration_role,
-            ),
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(
+            public_registration_role,
             conn,
         )
-        .map(Some)
+        .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_project_logo(
+        project_logo: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
+        Self::table()
+            .filter(directus_settings::project_logo.eq(project_logo))
+            .order_by(directus_settings::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_public_background(
+        public_background: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
+        Self::table()
+            .filter(directus_settings::public_background.eq(public_background))
+            .order_by(directus_settings::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_public_favicon(
+        public_favicon: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
+        Self::table()
+            .filter(directus_settings::public_favicon.eq(public_favicon))
+            .order_by(directus_settings::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_public_foreground(
+        public_foreground: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
+        Self::table()
+            .filter(directus_settings::public_foreground.eq(public_foreground))
+            .order_by(directus_settings::id.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_project_name(
@@ -315,45 +302,6 @@ impl DirectusSetting {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_project_logo(
-        project_logo: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::project_logo.eq(project_logo))
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_foreground(
-        public_foreground: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::public_foreground.eq(public_foreground))
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_background(
-        public_background: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::public_background.eq(public_background))
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_public_note(
         public_note: &str,
         conn: &mut diesel::PgConnection,
@@ -368,7 +316,7 @@ impl DirectusSetting {
     }
     #[cfg(feature = "postgres")]
     pub fn from_auth_login_attempts(
-        auth_login_attempts: &i32,
+        auth_login_attempts: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
@@ -419,19 +367,6 @@ impl DirectusSetting {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_storage_default_folder(
-        storage_default_folder: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::storage_default_folder.eq(storage_default_folder))
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_mapbox_key(
         mapbox_key: &str,
         conn: &mut diesel::PgConnection,
@@ -467,19 +402,6 @@ impl DirectusSetting {
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::default_language.eq(default_language))
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_favicon(
-        public_favicon: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::public_favicon.eq(public_favicon))
             .order_by(directus_settings::id.asc())
             .load::<Self>(conn)
     }
@@ -561,11 +483,37 @@ impl DirectusSetting {
             .order_by(directus_settings::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_registration(
-        public_registration: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_public_registration<C>(
+        public_registration: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
@@ -574,11 +522,37 @@ impl DirectusSetting {
             .order_by(directus_settings::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_registration_verify_email(
-        public_registration_verify_email: &bool,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_public_registration_verify_email<C>(
+        public_registration_verify_email: bool,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration_verify_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration_verify_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::public_registration_verify_email as diesel::expression_methods::EqAll<
+                bool,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::directus_settings::directus_settings::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
@@ -587,19 +561,6 @@ impl DirectusSetting {
                 directus_settings::public_registration_verify_email
                     .eq(public_registration_verify_email),
             )
-            .order_by(directus_settings::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_public_registration_role(
-        public_registration_role: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
-        Self::table()
-            .filter(directus_settings::public_registration_role.eq(public_registration_role))
             .order_by(directus_settings::id.asc())
             .load::<Self>(conn)
     }
