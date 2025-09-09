@@ -37,7 +37,6 @@ impl Display for FlowchartConfiguration {
         }
         writeln!(f, "---")?;
         writeln!(f, "config:")?;
-        writeln!(f, "  layout: {}", self.renderer())?;
         writeln!(f, "  theme: {}", self.theme())?;
         writeln!(f, "  look: {}", self.look())?;
         writeln!(f, "  flowchart:")?;
