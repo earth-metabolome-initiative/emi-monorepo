@@ -61,13 +61,13 @@ impl Configuration for GenericConfiguration {
 impl Display for GenericConfiguration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "---")?;
-        if let Some(title) = &self.title {
-            writeln!(f, "title: {title}")?;
-        }
         writeln!(f, "config:")?;
         writeln!(f, "  layout: {}", self.renderer)?;
         writeln!(f, "  theme: {}", self.theme)?;
         writeln!(f, "  look: {}", self.look)?;
+        if let Some(title) = &self.title {
+            writeln!(f, "title: {title}")?;
+        }
         writeln!(f, "---")?;
 
         Ok(())

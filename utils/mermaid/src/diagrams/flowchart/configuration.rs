@@ -36,13 +36,14 @@ impl Display for FlowchartConfiguration {
             return Ok(());
         }
         writeln!(f, "---")?;
+        writeln!(f, "config:")?;
+        writeln!(f, "  layout: {}", self.renderer())?;
+        writeln!(f, "  theme: {}", self.theme())?;
+        writeln!(f, "  look: {}", self.look())?;
+        writeln!(f, "  flowchart:")?;
+        writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
         if let Some(title) = &self.generic.title() {
             writeln!(f, "title: {title}")?;
-        }
-        if self.renderer() != Renderer::default() {
-            writeln!(f, "config:")?;
-            writeln!(f, "  flowchart:")?;
-            writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
         }
         writeln!(f, "---")?;
 

@@ -1,7 +1,7 @@
 //! Submodule providing an illustration of a procedure and its subprocedures
 //! using a Flowchart Diagram in Mermaid syntax.
 
-use std::{collections::HashMap, hash::Hash, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use core_structures::{
     NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
@@ -37,10 +37,7 @@ fn to_mermaid_node(
         ProcedureTemplateAssetModel,
         Rc<FlowchartNode>,
     >,
-    procedure_template_asset_model_classes: &HashMap<
-        ProcedureTemplateAssetModel,
-        (Rc<StyleClass>, Rc<StyleClass>),
-    >,
+    ptam_classes: &HashMap<ProcedureTemplateAssetModel, (Rc<StyleClass>, Rc<StyleClass>)>,
     procedure_template_nodes: &mut HashMap<ProcedureTemplate, Rc<FlowchartNode>>,
     procedure_template_class: &Rc<StyleClass>,
     procedure_template: &ProcedureTemplate,
@@ -58,11 +55,9 @@ fn to_mermaid_node(
         for procedure_template_asset_model in
             procedure_template.procedure_template_asset_models(conn)?
         {
-            let reference_procedure_template_asset_model: &ProcedureTemplateAssetModel = metadata
+            let reference_ptam: &ProcedureTemplateAssetModel = metadata
                 .root_reference_procedure_template_asset_model(&procedure_template_asset_model);
-            let (node_style_class, edge_style_class) = procedure_template_asset_model_classes
-                .get(&reference_procedure_template_asset_model)
-                .expect("Procedure template asset model class should exist");
+            let (node_style_class, edge_style_class) = &ptam_classes[reference_ptam];
             let procedure_template_asset_model_node_builder = FlowchartNodeBuilder::default()
                 .label(&procedure_template_asset_model.name)?
                 .shape(FlowchartNodeShape::LRParallelogram)
@@ -107,7 +102,7 @@ fn to_mermaid_node(
         node_builder = node_builder.subnode(to_mermaid_node(
             metadata,
             procedure_template_asset_model_nodes,
-            procedure_template_asset_model_classes,
+            ptam_classes,
             procedure_template_nodes,
             procedure_template_class,
             &subprocedure,
@@ -124,18 +119,12 @@ fn to_mermaid_node(
     {
         let current_procedure = subprocedure.predecessor(conn)?;
         let next_procedure = subprocedure.successor(conn)?;
-        let source_node = procedure_template_nodes
-            .get(&current_procedure)
-            .cloned()
-            .expect(&format!("Current procedure node \"{}\" not found", current_procedure.name));
-        let destination_node = procedure_template_nodes
-            .get(&next_procedure)
-            .cloned()
-            .expect(&format!("Next procedure node \"{}\" not found", next_procedure.name));
+        let source_node = &procedure_template_nodes[&current_procedure];
+        let destination_node = &procedure_template_nodes[&next_procedure];
         builder.edge(
             FlowchartEdgeBuilder::default()
-                .source(source_node)?
-                .destination(destination_node)?
+                .source(source_node.clone())?
+                .destination(destination_node.clone())?
                 .right_arrow_shape(ArrowShape::Normal)?,
         )?;
     }
@@ -427,7 +416,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 .map_err(FlowchartError::from)?,
         )?;
 
-        let mut procedure_template_asset_model_classes = HashMap::new();
+        let mut ptam_classes = HashMap::new();
         for (procedure_template_asset_model, color) in
             metadata.unique_procedure_template_asset_models().zip(colors)
         {
@@ -454,7 +443,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                     .property(StyleProperty::Stroke(stroke_color))
                     .map_err(FlowchartError::from)?,
             )?;
-            procedure_template_asset_model_classes.insert(
+            ptam_classes.insert(
                 procedure_template_asset_model.clone(),
                 (node_style_class, edge_style_class),
             );
@@ -467,29 +456,17 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 .shape(FlowchartNodeShape::RoundEdges)
                 .style_class(foreign_procedure_template_class.clone())
                 .map_err(FlowchartError::from)?;
-            for foreign_procedure_template_asset_model in
-                metadata.foreign_procedure_assets(foreign_procedure_template)
-            {
-                let foreign_procedure_template_asset_model_node_builder =
-                    FlowchartNodeBuilder::default()
-                        .label(&foreign_procedure_template_asset_model.name)?
-                        .shape(FlowchartNodeShape::LRParallelogram)
-                        .style_class(
-                            procedure_template_asset_model_classes
-                                .get(foreign_procedure_template_asset_model)
-                                .expect("Procedure template asset model class should exist")
-                                .clone()
-                                .0,
-                        )
-                        .map_err(FlowchartError::from)?;
-                let foreign_procedure_template_asset_model_node =
-                    builder.node(foreign_procedure_template_asset_model_node_builder)?;
-                procedure_template_asset_model_nodes.insert(
-                    foreign_procedure_template_asset_model.clone(),
-                    foreign_procedure_template_asset_model_node.clone(),
-                );
+            for foreign_ptam in metadata.foreign_procedure_assets(foreign_procedure_template) {
+                let foreign_ptam_node_builder = FlowchartNodeBuilder::default()
+                    .label(&foreign_ptam.name)?
+                    .shape(FlowchartNodeShape::LRParallelogram)
+                    .style_class(ptam_classes[foreign_ptam].clone().0)
+                    .map_err(FlowchartError::from)?;
+                let foreign_ptam_node = builder.node(foreign_ptam_node_builder)?;
+                procedure_template_asset_model_nodes
+                    .insert(foreign_ptam.clone(), foreign_ptam_node.clone());
                 foreign_procedure_template_node_builder = foreign_procedure_template_node_builder
-                    .subnode(foreign_procedure_template_asset_model_node)
+                    .subnode(foreign_ptam_node)
                     .map_err(FlowchartError::from)?;
             }
             let _ = builder.node(foreign_procedure_template_node_builder)?;
@@ -499,7 +476,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
         let _root_node = to_mermaid_node(
             &metadata,
             &mut procedure_template_asset_model_nodes,
-            &procedure_template_asset_model_classes,
+            &ptam_classes,
             &mut procedure_template_nodes,
             &procedure_template_class,
             &metadata.root_procedure_template,
