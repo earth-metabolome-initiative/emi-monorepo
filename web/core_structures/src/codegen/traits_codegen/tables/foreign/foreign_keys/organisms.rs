@@ -1,9 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismForeignKeys {
-    pub id: Option<crate::PhysicalAsset>,
+    pub id: Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::Organism {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::organisms::Organism
+{
     type ForeignKeys = OrganismForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -11,7 +13,7 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Organism {
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(self.id),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
@@ -26,21 +28,21 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Organism {
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
+                crate::codegen::tables::row::Row::SampleSource(sample_sources),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == physical_assets.id {
-                    foreign_keys.id = Some(physical_assets);
+                if self.id == sample_sources.id {
+                    foreign_keys.id = Some(sample_sources);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
+                crate::codegen::tables::row::Row::SampleSource(sample_sources),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == physical_assets.id {
+                if self.id == sample_sources.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

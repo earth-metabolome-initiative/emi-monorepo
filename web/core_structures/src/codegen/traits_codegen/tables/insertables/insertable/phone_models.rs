@@ -1,4 +1,6 @@
-impl web_common_traits::database::Insertable for crate::PhoneModel {
+impl web_common_traits::database::Insertable
+    for crate::codegen::structs_codegen::tables::phone_models::PhoneModel
+{
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder;
     type InsertableVariant =

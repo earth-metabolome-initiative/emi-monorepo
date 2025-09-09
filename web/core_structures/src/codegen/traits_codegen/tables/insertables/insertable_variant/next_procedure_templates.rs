@@ -4,16 +4,25 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::NextProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate as diesel::Insertable<
-            <crate::NextProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::NextProcedureTemplate>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
+    >,
     C: diesel::connection::LoadConnection,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
-    type Row = crate::NextProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute,

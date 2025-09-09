@@ -87,23 +87,23 @@ impl core::fmt::Display for PouringProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::PouredFrom => write!(f, "poured_from"),
+            Self::Procedure => write!(f, "pouring_procedures.procedure"),
+            Self::ProcedureTemplate => write!(f, "pouring_procedures.procedure_template"),
+            Self::PouredFrom => write!(f, "pouring_procedures.poured_from"),
             Self::ProcedureTemplatePouredFromModel => {
-                write!(f, "procedure_template_poured_from_model")
+                write!(f, "pouring_procedures.procedure_template_poured_from_model")
             }
-            Self::ProcedurePouredFrom(e) => write!(f, "{e}"),
-            Self::MeasuredWith => write!(f, "measured_with"),
+            Self::ProcedurePouredFrom(e) => write!(f, "pouring_procedures.{e}"),
+            Self::MeasuredWith => write!(f, "pouring_procedures.measured_with"),
             Self::ProcedureTemplateMeasuredWithModel => {
-                write!(f, "procedure_template_measured_with_model")
+                write!(f, "pouring_procedures.procedure_template_measured_with_model")
             }
-            Self::ProcedureMeasuredWith(e) => write!(f, "{e}"),
-            Self::PouredInto => write!(f, "poured_into"),
+            Self::ProcedureMeasuredWith(e) => write!(f, "pouring_procedures.{e}"),
+            Self::PouredInto => write!(f, "pouring_procedures.poured_into"),
             Self::ProcedureTemplatePouredIntoModel => {
-                write!(f, "procedure_template_poured_into_model")
+                write!(f, "pouring_procedures.procedure_template_poured_into_model")
             }
-            Self::ProcedurePouredInto(e) => write!(f, "{e}"),
+            Self::ProcedurePouredInto(e) => write!(f, "pouring_procedures.{e}"),
         }
     }
 }
@@ -129,206 +129,209 @@ pub struct InsertablePouringProcedure {
     pub(crate) procedure_poured_into: ::rosetta_uuid::Uuid,
 }
 impl InsertablePouringProcedure {
-    pub fn measured_with<C: diesel::connection::LoadConnection>(
+    pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::VolumeMeasuringDevice>, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     where
-        crate::VolumeMeasuringDevice: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        let Some(measured_with) = self.measured_with else {
-            return Ok(None);
-        };
-        crate::VolumeMeasuringDevice::read(measured_with, conn).map(Some)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn poured_from<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.poured_from, conn)
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.poured_from,
+            conn,
+        )
     }
-    pub fn poured_into<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_poured_from_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.poured_into, conn)
-    }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
-    where
-        crate::Procedure: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_measured_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_measured_with, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_measured_with_measured_with_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::ProcedureAsset>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        let Some(measured_with) = self.measured_with else {
-            return Ok(None);
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_measured_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(measured_with),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-            .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_measured_with_procedure_templ_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_measured_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_measured_with_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_poured_from_model,
+            conn,
+        )
     }
     pub fn procedure_poured_from<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_poured_from, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_poured_from,
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_poured_from_poured_from_fkey(
+    pub fn measured_with<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(measured_with) = self.measured_with else {
+            return Ok(None);
         };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_poured_from)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.poured_from),
-                    ),
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice::read(
+                measured_with,
+                conn,
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .optional()
     }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_poured_from_procedure_templat_fkey(
+    pub fn procedure_template_measured_with_model<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_poured_from)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_poured_from_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_measured_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_measured_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_measured_with,
+            conn,
+        )
+    }
+    pub fn poured_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.poured_into,
+            conn,
+        )
+    }
+    pub fn procedure_template_poured_into_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_poured_into_model,
+            conn,
+        )
     }
     pub fn procedure_poured_into<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_poured_into, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_poured_into_poured_into_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_poured_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.poured_into),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_poured_into_procedure_templat_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_poured_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_poured_into_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_poured_into,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn pouring_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -337,76 +340,22 @@ impl InsertablePouringProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PouringProcedureTemplate, diesel::result::Error>
-    where
-        crate::PouringProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PouringProcedureTemplate::read(self.procedure_template, conn)
-    }
-    pub fn procedure_template_measured_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_measured_with_model, conn)
-    }
-    pub fn procedure_template_poured_from_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_poured_from_model, conn)
-    }
-    pub fn procedure_template_poured_into_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_poured_into_model, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn pouring_procedures_procedure_template_procedure_template_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::PouringProcedureTemplate, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::PouringProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_into_model
-                            .eq(&self.procedure_template_poured_into_model),
-                    ),
-            )
-            .first::<crate::PouringProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn pouring_procedures_procedure_template_procedure_template_m_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::PouringProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::PouringProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -415,17 +364,22 @@ impl InsertablePouringProcedure {
                             .eq(&self.procedure_template_measured_with_model),
                     ),
             )
-            .first::<crate::PouringProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn pouring_procedures_procedure_template_procedure_template_p_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::PouringProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::PouringProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -434,7 +388,182 @@ impl InsertablePouringProcedure {
                             .eq(&self.procedure_template_poured_from_model),
                     ),
             )
-            .first::<crate::PouringProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_template_procedure_template_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_into_model
+                            .eq(&self.procedure_template_poured_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_poured_from_poured_from_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_poured_from)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.poured_from),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_poured_into_poured_into_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_poured_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.poured_into),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_poured_from_procedure_templat_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_poured_from)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_poured_from_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_measured_with_procedure_templ_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_measured_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_measured_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_poured_into_procedure_templat_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_poured_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_poured_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn pouring_procedures_procedure_measured_with_measured_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(measured_with) = self.measured_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_measured_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(measured_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -788,14 +917,14 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`pouring_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
+    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_poured_from_model"}
     /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v3 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_measured_with_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "procedure_template_asset_model"}
@@ -805,13 +934,13 @@ impl<
     ///    v4@{shape: rounded, label: "procedure_template"}
     /// class v4 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v5
     /// v0 --->|"`ancestral same as`"| v4
     /// v0 -.->|"`foreign defines`"| v3
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -845,22 +974,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedures`"]
-    ///    v0@{shape: rounded, label: "poured_from"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_poured_from"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "poured_from"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn poured_from(
@@ -953,12 +1082,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`pouring_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_poured_from_model"}
-    /// class v2 directly-involved-column
-    ///    v0@{shape: rounded, label: "poured_from"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_poured_from"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "poured_from"}
+    /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_poured_from_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
@@ -968,13 +1097,13 @@ impl<
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
-    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v0 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_poured_from<PPF>(
@@ -1080,10 +1209,10 @@ impl<
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -1135,10 +1264,10 @@ impl<
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1185,26 +1314,26 @@ impl<
     /// subgraph v6 ["`pouring_procedures`"]
     ///    v0@{shape: rounded, label: "measured_with"}
     /// class v0 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_measured_with_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_measured_with"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_measured_with_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_measured_with<PMW>(
@@ -1220,37 +1349,6 @@ impl<
         >,
     {
         let mut procedure_measured_with = procedure_measured_with.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_measured_with
-        {
-            procedure_measured_with = if let (Some(measured_with), Some(asset)) =
-                (self.measured_with, builder.asset)
-            {
-                if measured_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::MeasuredWith,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.measured_with = Some(asset);
-                builder.into()
-            } else if let Some(measured_with) = self.measured_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(measured_with),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureMeasuredWith(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_measured_with
         {
             procedure_measured_with = if let (
@@ -1290,6 +1388,37 @@ impl<
                 builder.into()
             };
         }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_measured_with
+        {
+            procedure_measured_with = if let (Some(measured_with), Some(asset)) =
+                (self.measured_with, builder.asset)
+            {
+                if measured_with != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::MeasuredWith,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.measured_with = Some(asset);
+                builder.into()
+            } else if let Some(measured_with) = self.measured_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(measured_with),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureMeasuredWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         self.procedure_measured_with = procedure_measured_with;
         Ok(self)
     }
@@ -1313,10 +1442,10 @@ impl<
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -1361,22 +1490,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`pouring_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_poured_into"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_poured_into"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_poured_into_model(
@@ -1415,28 +1544,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`pouring_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_poured_into"}
-    /// class v1 column-of-interest
-    ///    v0@{shape: rounded, label: "poured_into"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_poured_into_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "poured_into"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_poured_into"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_poured_into<PPI>(
@@ -1730,7 +1859,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::PouringProcedure,
+            Row = crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
             Error = web_common_traits::database::InsertError<PouringProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
@@ -1745,7 +1874,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::PouringProcedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -10,9 +10,17 @@
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
-    belongs_to(crate::VolumetricContainerModel, foreign_key = weighed_container_model)
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        foreign_key = weighed_container_model
+    )
 )]
-#[diesel(belongs_to(crate::WeighingDeviceModel, foreign_key = weighed_with_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        foreign_key = weighed_with_model
+    )
+)]
 #[diesel(primary_key(procedure_template))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates
@@ -36,18 +44,20 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
-    for WeighingProcedureTemplate
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    > for WeighingProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::WeighingProcedureTemplate>
-    for WeighingProcedureTemplate
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
+> for WeighingProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl diesel::Identifiable for WeighingProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -58,42 +68,90 @@ impl WeighingProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub fn weighing_procedure_templates_procedure_template_weighed_c_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureTemplateAssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_weighed_container_model)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.weighed_container_model),
-                    ),
-            )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
-    }
-    pub fn procedure_template_weighed_container_model<C: diesel::connection::LoadConnection>(
+    pub fn weighed_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.weighed_container_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_weighed_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_weighed_container_model,
+            conn,
+        )
+    }
+    pub fn weighed_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.weighed_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_weighed_with_model,
             conn,
         )
     }
@@ -101,11 +159,14 @@ impl WeighingProcedureTemplate {
     pub fn weighing_procedure_templates_procedure_template_weighed_w_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_weighed_with_model)
@@ -114,37 +175,33 @@ impl WeighingProcedureTemplate {
                             .eq(&self.weighed_with_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
-    pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn weighing_procedure_templates_procedure_template_weighed_c_fkey1(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_weighed_with_model, conn)
-    }
-    pub fn weighed_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
-    where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.weighed_container_model, conn)
-    }
-    pub fn weighed_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
-    where
-        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::WeighingDeviceModel::read(self.weighed_with_model, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_weighed_container_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.weighed_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_weighed_container_model(
@@ -227,29 +284,6 @@ impl WeighingProcedureTemplate {
             .order_by(weighing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_weighed_container_model_and_weighed_container_model(
-        procedure_template_weighed_container_model: i32,
-        weighed_container_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates;
-        Self::table()
-            .filter(
-                weighing_procedure_templates::procedure_template_weighed_container_model
-                    .eq(procedure_template_weighed_container_model)
-                    .and(
-                        weighing_procedure_templates::weighed_container_model
-                            .eq(weighed_container_model),
-                    ),
-            )
-            .order_by(weighing_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
     pub fn from_procedure_template_weighed_container_model<C>(
         procedure_template_weighed_container_model: i32,
         conn: &mut C,
@@ -292,26 +326,6 @@ impl WeighingProcedureTemplate {
             .order_by(weighing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_weighed_with_model_and_weighed_with_model(
-        procedure_template_weighed_with_model: i32,
-        weighed_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates;
-        Self::table()
-            .filter(
-                weighing_procedure_templates::procedure_template_weighed_with_model
-                    .eq(procedure_template_weighed_with_model)
-                    .and(weighing_procedure_templates::weighed_with_model.eq(weighed_with_model)),
-            )
-            .order_by(weighing_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
     pub fn from_procedure_template_weighed_with_model<C>(
         procedure_template_weighed_with_model: i32,
         conn: &mut C,
@@ -350,6 +364,49 @@ impl WeighingProcedureTemplate {
             .filter(
                 weighing_procedure_templates::procedure_template_weighed_with_model
                     .eq(procedure_template_weighed_with_model),
+            )
+            .order_by(weighing_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_weighed_with_model_and_weighed_with_model(
+        procedure_template_weighed_with_model: i32,
+        weighed_with_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates;
+        Self::table()
+            .filter(
+                weighing_procedure_templates::procedure_template_weighed_with_model
+                    .eq(procedure_template_weighed_with_model)
+                    .and(weighing_procedure_templates::weighed_with_model.eq(weighed_with_model)),
+            )
+            .order_by(weighing_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_weighed_container_model_and_weighed_container_model(
+        procedure_template_weighed_container_model: i32,
+        weighed_container_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates;
+        Self::table()
+            .filter(
+                weighing_procedure_templates::procedure_template_weighed_container_model
+                    .eq(procedure_template_weighed_container_model)
+                    .and(
+                        weighing_procedure_templates::weighed_container_model
+                            .eq(weighed_container_model),
+                    ),
             )
             .order_by(weighing_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)

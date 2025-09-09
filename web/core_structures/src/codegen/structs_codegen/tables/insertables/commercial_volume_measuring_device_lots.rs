@@ -55,8 +55,10 @@ impl core::fmt::Display for CommercialVolumeMeasuringDeviceLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::ProductModel => write!(f, "product_model"),
+            Self::Id => write!(f, "commercial_volume_measuring_device_lots.id"),
+            Self::ProductModel => {
+                write!(f, "commercial_volume_measuring_device_lots.product_model")
+            }
         }
     }
 }
@@ -76,42 +78,69 @@ impl InsertableCommercialVolumeMeasuringDeviceLot {
     pub fn commercial_volume_measuring_device_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProductLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProductLot::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
+            self.id, conn,
+        )
     }
-    pub fn commercial_volume_measuring_device_lots_id_fkey1<C: diesel::connection::LoadConnection>(
+    pub fn commercial_volume_measuring_device_lots_id_fkey1<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumeMeasuringDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumeMeasuringDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel::read(
+            self.id,
+            conn,
+        )
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialVolumeMeasuringDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CommercialVolumeMeasuringDeviceModel::read(self.product_model, conn)
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel::read(
+            self.product_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_volume_measuring_device_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -120,7 +149,9 @@ impl InsertableCommercialVolumeMeasuringDeviceLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -199,10 +230,10 @@ pub trait CommercialVolumeMeasuringDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     VolumeMeasuringDeviceModel,
@@ -241,15 +272,15 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
+    ///v2 --->|"`ancestral same as`"| v3
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
-    ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
     ///```
     fn product_model(
         mut self,
@@ -579,14 +610,14 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
@@ -646,33 +677,46 @@ where
         self
     }
 }
-impl<CommercialProductLot, VolumeMeasuringDeviceModel, C>
-    web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
-        CommercialProductLot,
-        VolumeMeasuringDeviceModel,
-    >
+impl<
+    CommercialProductLot,
+    VolumeMeasuringDeviceModel,
+    C,
+> web_common_traits::database::TryInsertGeneric<C>
+for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
+    CommercialProductLot,
+    VolumeMeasuringDeviceModel,
+>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::CommercialVolumeMeasuringDeviceLot,
-            Error = web_common_traits::database::InsertError<
-                CommercialVolumeMeasuringDeviceLotAttribute,
-            >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+        Error = web_common_traits::database::InsertError<
+            CommercialVolumeMeasuringDeviceLotAttribute,
         >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    VolumeMeasuringDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    >,
+    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    VolumeMeasuringDeviceModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
 {
     type Attributes = CommercialVolumeMeasuringDeviceLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialVolumeMeasuringDeviceLot = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -1,9 +1,15 @@
-impl From<crate::DisposalProcedure> for super::Row {
-    fn from(value: crate::DisposalProcedure) -> Self {
+impl From<crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure>
+    for super::Row
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
+    ) -> Self {
         super::Row::DisposalProcedure(value)
     }
 }
-impl TryFrom<super::Row> for crate::DisposalProcedure {
+impl TryFrom<super::Row>
+    for crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

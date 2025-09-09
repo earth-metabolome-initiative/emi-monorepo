@@ -22,16 +22,28 @@ impl<'a> From<&'a PipetteTipModel>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for PipetteTipModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for PipetteTipModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel> for PipetteTipModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for PipetteTipModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PipetteTipModel> for PipetteTipModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    > for PipetteTipModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for PipetteTipModel {
@@ -44,12 +56,18 @@ impl PipetteTipModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.id, conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

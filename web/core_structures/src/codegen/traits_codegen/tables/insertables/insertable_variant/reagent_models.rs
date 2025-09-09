@@ -7,18 +7,27 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::ReagentModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::reagent_models::ReagentModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel as diesel::Insertable<
-            <crate::ReagentModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::reagent_models::ReagentModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::ReagentModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
+    >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::ReagentModel;
+    type Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,

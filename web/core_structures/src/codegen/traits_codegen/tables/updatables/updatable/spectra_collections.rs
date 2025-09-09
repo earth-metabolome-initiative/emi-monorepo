@@ -1,8 +1,10 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::SpectraCollection
+    for crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection
 where
-    crate::DigitalAsset: web_common_traits::database::Read<C>,
-    crate::DigitalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::SampleState as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::sample_states::SampleState as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSampleState as diesel::Insertable<
-            <crate::SampleState as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::sample_states::SampleState as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::SampleState>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::sample_states::SampleState,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::SampleState;
+    type Row = crate::codegen::structs_codegen::tables::sample_states::SampleState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSampleState;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::SampleStateAttribute,

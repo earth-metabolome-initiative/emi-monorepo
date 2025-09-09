@@ -1,10 +1,20 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::WeighingProcedureTemplate
+for crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate
 where
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
     type UserId = i32;
     fn can_update(
@@ -15,7 +25,8 @@ where
         if !self.procedure_template(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.procedure_template_weighed_with_model(conn)?.can_update(user_id, conn)? {
+        if !self.procedure_template_weighed_with_model(conn)?.can_update(user_id, conn)?
+        {
             return Ok(false);
         }
         Ok(true)

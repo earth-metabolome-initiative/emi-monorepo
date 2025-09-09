@@ -1,9 +1,9 @@
-impl From<crate::Role> for super::Row {
-    fn from(value: crate::Role) -> Self {
+impl From<crate::codegen::structs_codegen::tables::roles::Role> for super::Row {
+    fn from(value: crate::codegen::structs_codegen::tables::roles::Role) -> Self {
         super::Row::Role(value)
     }
 }
-impl TryFrom<super::Row> for crate::Role {
+impl TryFrom<super::Row> for crate::codegen::structs_codegen::tables::roles::Role {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

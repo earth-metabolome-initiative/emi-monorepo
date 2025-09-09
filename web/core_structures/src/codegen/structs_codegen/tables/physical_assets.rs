@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::PhysicalAssetModel, foreign_key = model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::physical_assets::physical_assets
@@ -31,12 +36,20 @@ impl<'a> From<&'a PhysicalAsset>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for PhysicalAsset where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for PhysicalAsset
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAsset> for PhysicalAsset where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for PhysicalAsset
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for PhysicalAsset {
@@ -49,39 +62,46 @@ impl PhysicalAsset {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Asset, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error>
     where
-        crate::Asset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::assets::Asset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Asset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::assets::Asset::read(self.id, conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.model, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn physical_assets_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
-    }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PhysicalAssetModel, diesel::result::Error>
-    where
-        crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PhysicalAssetModel::read(self.model, conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

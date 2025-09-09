@@ -58,21 +58,21 @@ impl core::str::FromStr for ProjectAttribute {
 impl core::fmt::Display for ProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::StateId => write!(f, "state_id"),
-            Self::Icon => write!(f, "icon"),
-            Self::ColorId => write!(f, "color_id"),
-            Self::ParentProjectId => write!(f, "parent_project_id"),
-            Self::Budget => write!(f, "budget"),
-            Self::Expenses => write!(f, "expenses"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
-            Self::ExpectedEndDate => write!(f, "expected_end_date"),
-            Self::EndDate => write!(f, "end_date"),
+            Self::Id => write!(f, "projects.id"),
+            Self::Name => write!(f, "projects.name"),
+            Self::Description => write!(f, "projects.description"),
+            Self::StateId => write!(f, "projects.state_id"),
+            Self::Icon => write!(f, "projects.icon"),
+            Self::ColorId => write!(f, "projects.color_id"),
+            Self::ParentProjectId => write!(f, "projects.parent_project_id"),
+            Self::Budget => write!(f, "projects.budget"),
+            Self::Expenses => write!(f, "projects.expenses"),
+            Self::CreatedBy => write!(f, "projects.created_by"),
+            Self::CreatedAt => write!(f, "projects.created_at"),
+            Self::UpdatedBy => write!(f, "projects.updated_by"),
+            Self::UpdatedAt => write!(f, "projects.updated_at"),
+            Self::ExpectedEndDate => write!(f, "projects.expected_end_date"),
+            Self::EndDate => write!(f, "projects.end_date"),
         }
     }
 }
@@ -100,61 +100,75 @@ pub struct InsertableProject {
     pub(crate) end_date: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProject {
-    pub fn color<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
-    where
-        crate::Color: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
-    }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
-    }
-    pub fn parent_project<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::Project>, diesel::result::Error>
-    where
-        crate::Project: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(parent_project_id) = self.parent_project_id else {
-            return Ok(None);
-        };
-        crate::Project::read(parent_project_id, conn).map(Some)
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProjectState, diesel::result::Error>
-    where
-        crate::ProjectState: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProjectState::read(self.state_id, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
+    }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::project_states::ProjectState:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::project_states::ProjectState::read(
+            self.state_id,
+            conn,
+        )
+    }
+    pub fn color<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn parent_project<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::projects::Project>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::projects::Project:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_project_id) = self.parent_project_id else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::projects::Project::read(parent_project_id, conn)
+            .optional()
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProjectBuilder {
     pub(crate) id: Option<i32>,
@@ -178,6 +192,27 @@ impl From<InsertableProjectBuilder>
 {
     fn from(builder: InsertableProjectBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableProjectBuilder {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            state_id: Some(1i16),
+            icon: Default::default(),
+            color_id: Some(1i16),
+            parent_project_id: Default::default(),
+            budget: Default::default(),
+            expenses: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            expected_end_date: Default::default(),
+            end_date: Default::default(),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -866,7 +901,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Project,
+            Row = crate::codegen::structs_codegen::tables::projects::Project,
             Error = web_common_traits::database::InsertError<ProjectAttribute>,
         >,
 {
@@ -878,7 +913,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Project = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::projects::Project =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

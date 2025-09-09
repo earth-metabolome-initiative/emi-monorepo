@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerB
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::FreezeDryer as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryer as diesel::Insertable<
-            <crate::FreezeDryer as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::FreezeDryer>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::FreezeDryer;
+    type Row = crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryer;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::FreezeDryerAttribute,

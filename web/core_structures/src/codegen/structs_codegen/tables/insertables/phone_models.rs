@@ -50,7 +50,7 @@ impl core::fmt::Display for PhoneModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
+            Self::Id => write!(f, "phone_models.id"),
         }
     }
 }
@@ -69,22 +69,33 @@ impl InsertablePhoneModel {
     pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CameraModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+        diesel::result::Error,
+    >
     where
-        crate::CameraModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CameraModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel::read(self.id, conn)
     }
     pub fn phone_models_positioning<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PositioningDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
+            self.id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -379,7 +390,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::PhoneModel,
+            Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
             Error = web_common_traits::database::InsertError<PhoneModelAttribute>,
         >,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -393,7 +404,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::PhoneModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::phone_models::PhoneModel =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

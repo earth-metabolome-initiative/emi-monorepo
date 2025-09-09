@@ -95,7 +95,7 @@ impl Codegen<'_> {
         ];
 
         Ok(quote! {
-            #[derive(Debug, Clone, PartialEq, PartialOrd)]
+            #[derive(Debug, Clone, PartialEq)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #(#[doc = #documentation])*
             pub enum #dag_ident {

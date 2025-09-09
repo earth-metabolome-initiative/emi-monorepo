@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum representing the `asset_models` table builder DAG.
 pub enum AssetModelBuilderDAG {
@@ -181,6 +181,14 @@ pub enum AssetModelBuilderDAG {
     ///Builder for the `reagent_models` table.
     ReagentModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder,
+    ),
+    ///Builder for the `sample_models` table.
+    SampleModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder,
+    ),
+    ///Builder for the `sample_source_models` table.
+    SampleSourceModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder,
     ),
     ///Builder for the `volume_measuring_device_models` table.
     VolumeMeasuringDeviceModel(
@@ -608,6 +616,24 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableReagen
         value: crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder,
     ) -> Self {
         AssetModelBuilderDAG::ReagentModel(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder>
+    for AssetModelBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder,
+    ) -> Self {
+        AssetModelBuilderDAG::SampleModel(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder>
+    for AssetModelBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder,
+    ) -> Self {
+        AssetModelBuilderDAG::SampleSourceModel(value)
     }
 }
 impl From<

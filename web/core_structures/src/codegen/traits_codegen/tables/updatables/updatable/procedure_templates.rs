@@ -1,5 +1,5 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::ProcedureTemplate
+    for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate
 {
     type UserId = i32;
     fn can_update(

@@ -61,7 +61,6 @@ pub enum TablePrimaryKey {
     DigitalAsset(::rosetta_uuid::Uuid),
     DisposalProcedureTemplate(i32),
     DisposalProcedure(::rosetta_uuid::Uuid),
-    Document(::rosetta_uuid::Uuid),
     EmailProvider((i32, i16)),
     FractioningProcedureTemplate(i32),
     FractioningProcedure(::rosetta_uuid::Uuid),
@@ -91,6 +90,7 @@ pub enum TablePrimaryKey {
     PhoneModel(i32),
     PhotographProcedureTemplate(i32),
     PhotographProcedure(::rosetta_uuid::Uuid),
+    Photograph(::rosetta_uuid::Uuid),
     PhysicalAssetModel(i32),
     PhysicalAsset(::rosetta_uuid::Uuid),
     PipetteModel(i32),
@@ -110,7 +110,11 @@ pub enum TablePrimaryKey {
     ReagentModel(i32),
     Role(i16),
     Room(i32),
+    SampleModel(i32),
+    SampleSourceModel(i32),
+    SampleSource(::rosetta_uuid::Uuid),
     SampleState(i16),
+    Sample(::rosetta_uuid::Uuid),
     SpatialRefSy(i32),
     Spectrum(::rosetta_uuid::Uuid),
     SpectraCollection(::rosetta_uuid::Uuid),
@@ -307,9 +311,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::DisposalProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::DisposalProcedure
             }
-            TablePrimaryKey::Document(_) => {
-                crate::codegen::tables::table_names::TableName::Document
-            }
             TablePrimaryKey::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
             }
@@ -395,6 +396,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PhotographProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedure
             }
+            TablePrimaryKey::Photograph(_) => {
+                crate::codegen::tables::table_names::TableName::Photograph
+            }
             TablePrimaryKey::PhysicalAssetModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhysicalAssetModel
             }
@@ -442,9 +446,19 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             TablePrimaryKey::Room(_) => crate::codegen::tables::table_names::TableName::Room,
+            TablePrimaryKey::SampleModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleModel
+            }
+            TablePrimaryKey::SampleSourceModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSourceModel
+            }
+            TablePrimaryKey::SampleSource(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSource
+            }
             TablePrimaryKey::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
+            TablePrimaryKey::Sample(_) => crate::codegen::tables::table_names::TableName::Sample,
             TablePrimaryKey::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
             }

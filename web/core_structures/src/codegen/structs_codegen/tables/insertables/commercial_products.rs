@@ -43,9 +43,9 @@ impl core::fmt::Display for CommercialProductAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::DeprecationDate => write!(f, "deprecation_date"),
-            Self::BrandId => write!(f, "brand_id"),
+            Self::Id => write!(f, "commercial_products.id"),
+            Self::DeprecationDate => write!(f, "commercial_products.deprecation_date"),
+            Self::BrandId => write!(f, "commercial_products.brand_id"),
         }
     }
 }
@@ -66,22 +66,27 @@ impl InsertableCommercialProduct {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
     pub fn brand<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Brand, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
     where
-        crate::Brand: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::brands::Brand:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Brand::read(self.brand_id, conn)
+        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -377,7 +382,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::CommercialProduct,
+            Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
             Error = web_common_traits::database::InsertError<CommercialProductAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -390,7 +395,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialProduct = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

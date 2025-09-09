@@ -40,8 +40,8 @@ impl core::fmt::Display for BallMillMachineAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Model => write!(f, "model"),
+            Self::Id => write!(f, "ball_mill_machines.id"),
+            Self::Model => write!(f, "ball_mill_machines.model"),
         }
     }
 }
@@ -61,39 +61,51 @@ impl InsertableBallMillMachine {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialBallMillMachineLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialBallMillMachineLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CommercialBallMillMachineLot::read(self.model, conn)
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot::read(
+            self.model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn ball_mill_machines_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -190,8 +202,8 @@ impl<
     ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         mut self,
@@ -441,8 +453,8 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         self,
@@ -477,7 +489,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::BallMillMachine,
+            Row = crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
             Error = web_common_traits::database::InsertError<BallMillMachineAttribute>,
         >,
     PhysicalAsset:
@@ -491,7 +503,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::BallMillMachine = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

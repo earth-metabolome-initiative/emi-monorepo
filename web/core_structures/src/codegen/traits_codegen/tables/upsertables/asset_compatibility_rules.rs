@@ -1,6 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::AssetCompatibilityRule
+    for crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule
 {
     fn upsert(
         &self,
@@ -24,7 +24,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::AssetCompatibilityRule
+    for crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule
 {
     fn upsert(
         &self,

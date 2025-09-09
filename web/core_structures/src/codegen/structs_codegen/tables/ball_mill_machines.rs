@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::CommercialBallMillMachineLot, foreign_key = model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::ball_mill_machines::ball_mill_machines
@@ -31,16 +36,28 @@ impl<'a> From<&'a BallMillMachine>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for BallMillMachine where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for BallMillMachine
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAsset> for BallMillMachine where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for BallMillMachine
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::BallMillMachine> for BallMillMachine where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
+    > for BallMillMachine
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for BallMillMachine {
@@ -53,39 +70,51 @@ impl BallMillMachine {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialBallMillMachineLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialBallMillMachineLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CommercialBallMillMachineLot::read(self.model, conn)
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot::read(
+            self.model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn ball_mill_machines_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

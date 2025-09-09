@@ -28,26 +28,42 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialFreezerModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct> for CommercialFreezerModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::FreezerModel> for CommercialFreezerModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
-    for CommercialFreezerModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for CommercialFreezerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialFreezerModel>
-    for CommercialFreezerModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+    > for CommercialFreezerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+    > for CommercialFreezerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for CommercialFreezerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+    > for CommercialFreezerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
@@ -62,42 +78,62 @@ impl CommercialFreezerModel {
     pub fn freezer_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::FreezerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        diesel::result::Error,
+    >
     where
-        crate::FreezerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::FreezerModel::read(self.freezer_model, conn)
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(
+            self.freezer_model,
+            conn,
+        )
     }
     pub fn commercial_freezer_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::FreezerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        diesel::result::Error,
+    >
     where
-        crate::FreezerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::FreezerModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(self.id, conn)
     }
     pub fn commercial_freezer_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProduct, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProduct: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProduct::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
+            self.id, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_freezer_models_id_freezer_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -106,7 +142,9 @@ impl CommercialFreezerModel {
                             .eq(&self.freezer_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
     pub fn from_freezer_model<C>(
         freezer_model: i32,

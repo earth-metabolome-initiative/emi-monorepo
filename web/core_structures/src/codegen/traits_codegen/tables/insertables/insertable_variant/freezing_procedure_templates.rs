@@ -7,14 +7,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProc
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::FreezingProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureTemplate as diesel::Insertable<
-            <crate::FreezingProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::FreezingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -24,21 +24,28 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::FreezingProcedureTemplateSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::FreezingProcedureTemplateAttribute,
     >,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::FreezingProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::FreezingProcedureTemplateAttribute,
@@ -88,7 +95,7 @@ where
             procedure_template_frozen_with_model,
         ) = self.procedure_template_frozen_with_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_frozen_with_model,
                 conn,
             )?;
@@ -101,7 +108,7 @@ where
             procedure_template_frozen_container_model,
         ) = self.procedure_template_frozen_container_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_frozen_container_model,
                 conn,
             )?;

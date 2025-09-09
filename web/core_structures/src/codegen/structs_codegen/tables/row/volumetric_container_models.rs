@@ -1,9 +1,14 @@
-impl From<crate::VolumetricContainerModel> for super::Row {
-    fn from(value: crate::VolumetricContainerModel) -> Self {
+impl From<
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+> for super::Row {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    ) -> Self {
         super::Row::VolumetricContainerModel(value)
     }
 }
-impl TryFrom<super::Row> for crate::VolumetricContainerModel {
+impl TryFrom<super::Row>
+for crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

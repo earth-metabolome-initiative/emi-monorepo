@@ -82,7 +82,7 @@ pub async fn main() {
     time_tracker.add_completed_task(task);
 
     // We initialize the database into the docker container
-    match init_database(DATABASE_NAME, true, &mut conn).await {
+    match init_database(DATABASE_NAME, false, &mut conn).await {
         Ok(tracker) => time_tracker.extend(tracker),
         Err(err) => {
             docker.stop().await.expect("Failed to stop the docker container");

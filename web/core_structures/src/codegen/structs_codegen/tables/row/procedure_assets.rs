@@ -1,9 +1,15 @@
-impl From<crate::ProcedureAsset> for super::Row {
-    fn from(value: crate::ProcedureAsset) -> Self {
+impl From<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>
+    for super::Row
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    ) -> Self {
         super::Row::ProcedureAsset(value)
     }
 }
-impl TryFrom<super::Row> for crate::ProcedureAsset {
+impl TryFrom<super::Row>
+    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

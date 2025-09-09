@@ -1,7 +1,8 @@
-impl<C> web_common_traits::prelude::Procedure<C> for crate::PhotographProcedure
+impl<C> web_common_traits::prelude::Procedure<C>
+    for crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure
 where
     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     C: diesel::connection::LoadConnection,
 {
-    type Template = crate::PhotographProcedureTemplate;
+    type Template = crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate;
 }

@@ -1,8 +1,10 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::PositioningDevice
+    for crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice
 where
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

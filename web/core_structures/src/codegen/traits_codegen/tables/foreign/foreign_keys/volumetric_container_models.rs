@@ -1,18 +1,24 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VolumetricContainerModelForeignKeys {
-    pub id: Option<crate::ContainerModel>,
+    pub id: Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::VolumetricContainerModel {
+impl web_common_traits::prelude::HasForeignKeys
+for crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel {
     type ForeignKeys = VolumetricContainerModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(self.id),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+                        self.id,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()

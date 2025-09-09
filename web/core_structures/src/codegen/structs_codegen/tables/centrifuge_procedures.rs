@@ -9,15 +9,30 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::VolumetricContainer, foreign_key = centrifuged_container))]
 #[diesel(
     belongs_to(
-        crate::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        foreign_key = centrifuged_container
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         foreign_key = centrifuged_container_model
     )
 )]
-#[diesel(belongs_to(crate::CentrifugeModel, foreign_key = centrifuged_with_model))]
-#[diesel(belongs_to(crate::Centrifuge, foreign_key = centrifuged_with))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+        foreign_key = centrifuged_with_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::centrifuges::Centrifuge,
+        foreign_key = centrifuged_with
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures
@@ -47,12 +62,20 @@ impl<'a> From<&'a CentrifugeProcedure>
         web_common_traits::database::IdOrBuilder::Id(value.procedure)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for CentrifugeProcedure where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    > for CentrifugeProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CentrifugeProcedure> for CentrifugeProcedure where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+    > for CentrifugeProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for CentrifugeProcedure {
@@ -62,25 +85,193 @@ impl diesel::Identifiable for CentrifugeProcedure {
     }
 }
 impl CentrifugeProcedure {
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn centrifuged_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.centrifuged_container,
+            conn,
+        )
+    }
+    pub fn centrifuged_container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.centrifuged_container_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_centrifuged_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_centrifuged_container_model,
+            conn,
+        )
+    }
+    pub fn procedure_centrifuged_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_centrifuged_container,
+            conn,
+        )
+    }
+    pub fn centrifuged_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::read(
+            self.centrifuged_with_model,
+            conn,
+        )
+    }
+    pub fn centrifuged_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::centrifuges::Centrifuge>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::centrifuges::Centrifuge:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(centrifuged_with) = self.centrifuged_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::centrifuges::Centrifuge::read(
+            centrifuged_with,
+            conn,
+        )
+        .optional()
+    }
+    pub fn procedure_template_centrifuged_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_centrifuged_with_model,
+            conn,
+        )
+    }
     pub fn procedure_centrifuged_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_centrifuged_with, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_centrifuged_with,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -89,119 +280,24 @@ impl CentrifugeProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-    }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
-    where
-        crate::Procedure: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::CentrifugeProcedureTemplate, diesel::result::Error>
-    where
-        crate::CentrifugeProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::CentrifugeProcedureTemplate::read(self.procedure_template, conn)
-    }
-    pub fn centrifuged_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
-    where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.centrifuged_container, conn)
-    }
-    pub fn centrifuged_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
-    where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.centrifuged_container_model, conn)
-    }
-    pub fn procedure_template_centrifuged_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_centrifuged_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_centrifuged_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_centrifuged_container, conn)
-    }
-    pub fn centrifuged_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::CentrifugeModel, diesel::result::Error>
-    where
-        crate::CentrifugeModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::CentrifugeModel::read(self.centrifuged_with_model, conn)
-    }
-    pub fn centrifuged_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::Centrifuge>, diesel::result::Error>
-    where
-        crate::Centrifuge: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(centrifuged_with) = self.centrifuged_with else {
-            return Ok(None);
-        };
-        crate::Centrifuge::read(centrifuged_with, conn).map(Some)
-    }
-    pub fn procedure_template_centrifuged_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_centrifuged_with_model,
-            conn,
-        )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_centrifuged_with_centrifuged_with_mo_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::Asset>, diesel::result::Error> {
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(centrifuged_with) = self.centrifuged_with else {
             return Ok(None);
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
                     .eq(centrifuged_with)
@@ -210,18 +306,21 @@ impl CentrifugeProcedure {
                             .eq(&self.centrifuged_with_model),
                     ),
             )
-            .first::<crate::Asset>(conn)
-            .map(Some)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_template_procedure_templat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::CentrifugeProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::CentrifugeProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -230,17 +329,22 @@ impl CentrifugeProcedure {
                             .eq(&self.procedure_template_centrifuged_container_model),
                     ),
             )
-            .first::<crate::CentrifugeProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_template_procedure_templa_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::CentrifugeProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::CentrifugeProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -249,17 +353,22 @@ impl CentrifugeProcedure {
                             .eq(&self.procedure_template_centrifuged_with_model),
                     ),
             )
-            .first::<crate::CentrifugeProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_centrifuged_container_proc_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_container)
@@ -268,17 +377,22 @@ impl CentrifugeProcedure {
                             .eq(&self.procedure_template_centrifuged_container_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_centrifuged_with_procedure_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_with)
@@ -287,19 +401,25 @@ impl CentrifugeProcedure {
                             .eq(&self.procedure_template_centrifuged_with_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
     where
-        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetCompatibilityRule::read(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
             (self.centrifuged_with_model, self.centrifuged_container_model),
             conn,
         )
@@ -308,11 +428,14 @@ impl CentrifugeProcedure {
     pub fn centrifuge_procedures_procedure_centrifuged_container_cent_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_container)
@@ -321,17 +444,22 @@ impl CentrifugeProcedure {
                             .eq(&self.centrifuged_container_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_centrifuged_container_cen_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_container)
@@ -340,17 +468,22 @@ impl CentrifugeProcedure {
                             .eq(&self.centrifuged_container),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_centrifuged_with_centrifug_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_with)
@@ -359,20 +492,26 @@ impl CentrifugeProcedure {
                             .eq(&self.centrifuged_with_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn centrifuge_procedures_procedure_centrifuged_with_centrifu_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::ProcedureAsset>, diesel::result::Error> {
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(centrifuged_with) = self.centrifuged_with else {
             return Ok(None);
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_centrifuged_with)
@@ -381,69 +520,10 @@ impl CentrifugeProcedure {
                             .eq(centrifuged_with),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
-            .map(Some)
-    }
-    pub fn from_procedure_centrifuged_with<C>(
-        procedure_centrifuged_with: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
-        Self::table()
-            .filter(
-                centrifuge_procedures::procedure_centrifuged_with.eq(procedure_centrifuged_with),
-            )
-            .order_by(centrifuge_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_procedure_template(
-        procedure: ::rosetta_uuid::Uuid,
-        procedure_template: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
-        Self::table()
-            .filter(
-                centrifuge_procedures::procedure
-                    .eq(procedure)
-                    .and(centrifuge_procedures::procedure_template.eq(procedure_template)),
-            )
-            .order_by(centrifuge_procedures::procedure.asc())
-            .load::<Self>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
     }
     pub fn from_procedure<C>(
         procedure: ::rosetta_uuid::Uuid,
@@ -645,6 +725,67 @@ impl CentrifugeProcedure {
             .filter(
                 centrifuge_procedures::procedure_template_centrifuged_with_model
                     .eq(procedure_template_centrifuged_with_model),
+            )
+            .order_by(centrifuge_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_procedure_centrifuged_with<C>(
+        procedure_centrifuged_with: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure_centrifuged_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
+        Self::table()
+            .filter(
+                centrifuge_procedures::procedure_centrifuged_with.eq(procedure_centrifuged_with),
+            )
+            .order_by(centrifuge_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_and_procedure_template(
+        procedure: ::rosetta_uuid::Uuid,
+        procedure_template: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
+        Self::table()
+            .filter(
+                centrifuge_procedures::procedure
+                    .eq(procedure)
+                    .and(centrifuge_procedures::procedure_template.eq(procedure_template)),
             )
             .order_by(centrifuge_procedures::procedure.asc())
             .load::<Self>(conn)

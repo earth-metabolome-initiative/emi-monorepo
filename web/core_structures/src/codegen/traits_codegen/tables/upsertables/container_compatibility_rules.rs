@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::ContainerCompatibilityRule
-{
+for crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -24,13 +23,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::ContainerCompatibilityRule
-{
+for crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -53,6 +51,6 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

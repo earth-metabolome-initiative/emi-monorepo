@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVo
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialVolumeMeasuringDeviceLot as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceLot as diesel::Insertable<
-            <crate::CommercialVolumeMeasuringDeviceLot as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialVolumeMeasuringDeviceLot,
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -27,14 +27,16 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::VolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
-    crate::VolumeMeasuringDeviceModel: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialVolumeMeasuringDeviceLot;
+    type Row = crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceLotAttribute,

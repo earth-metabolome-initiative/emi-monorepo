@@ -1,26 +1,55 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezingProcedureForeignKeys {
-    pub frozen_container: Option<crate::VolumetricContainer>,
-    pub frozen_container_model: Option<crate::VolumetricContainerModel>,
-    pub frozen_with: Option<crate::Freezer>,
-    pub frozen_with_model: Option<crate::FreezerModel>,
-    pub freezing_procedures_frozen_with_model_frozen_container_mod_fkey:
-        Option<crate::AssetCompatibilityRule>,
-    pub procedure: Option<crate::Procedure>,
-    pub procedure_frozen_container: Option<crate::ProcedureAsset>,
-    pub procedure_frozen_with: Option<crate::ProcedureAsset>,
-    pub procedure_template: Option<crate::FreezingProcedureTemplate>,
-    pub procedure_template_frozen_container_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_template_frozen_with_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
+    >,
+    pub frozen_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub frozen_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_template_frozen_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_frozen_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub frozen_with: Option<crate::codegen::structs_codegen::tables::freezers::Freezer>,
+    pub frozen_with_model: Option<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+    >,
+    pub procedure_template_frozen_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_frozen_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub freezing_procedures_frozen_with_model_frozen_container_mod_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::FreezingProcedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure
+{
     type ForeignKeys = FreezingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
+                self.procedure_template,
+            ),
+        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.frozen_container,
@@ -29,6 +58,19 @@ impl web_common_traits::prelude::HasForeignKeys for crate::FreezingProcedure {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
                 self.frozen_container_model,
+            ),
+        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_frozen_container_model,
+                    ),
+                ),
+            );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_frozen_container,
             ),
         ));
         if let Some(frozen_with) = self.frozen_with {
@@ -41,38 +83,6 @@ impl web_common_traits::prelude::HasForeignKeys for crate::FreezingProcedure {
                 self.frozen_with_model,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.frozen_with_model,
-                self.frozen_container_model,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_frozen_container,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_frozen_with,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_frozen_container_model,
-                    ),
-                ),
-            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -81,21 +91,32 @@ impl web_common_traits::prelude::HasForeignKeys for crate::FreezingProcedure {
                     ),
                 ),
             );
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_frozen_with,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.frozen_with_model,
+                self.frozen_container_model,
+            )),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.frozen_container.is_some()
+        foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.frozen_container.is_some()
             && foreign_keys.frozen_container_model.is_some()
+            && foreign_keys.procedure_template_frozen_container_model.is_some()
+            && foreign_keys.procedure_frozen_container.is_some()
             && (foreign_keys.frozen_with.is_some() || self.frozen_with.is_some())
             && foreign_keys.frozen_with_model.is_some()
+            && foreign_keys.procedure_template_frozen_with_model.is_some()
+            && foreign_keys.procedure_frozen_with.is_some()
             && foreign_keys
                 .freezing_procedures_frozen_with_model_frozen_container_mod_fkey
                 .is_some()
-            && foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_frozen_container.is_some()
-            && foreign_keys.procedure_frozen_with.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.procedure_template_frozen_container_model.is_some()
-            && foreign_keys.procedure_template_frozen_with_model.is_some()
     }
     fn update(
         &self,

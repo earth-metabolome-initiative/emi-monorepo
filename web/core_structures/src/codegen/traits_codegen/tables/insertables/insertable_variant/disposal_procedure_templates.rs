@@ -7,14 +7,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProc
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::DisposalProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplate as diesel::Insertable<
-            <crate::DisposalProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::DisposalProcedureTemplate,
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -24,17 +24,24 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateAttribute,
     >,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::DisposalProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::DisposalProcedureTemplateAttribute,
@@ -75,7 +82,7 @@ where
             procedure_template_disposed_asset_model,
         ) = self.procedure_template_disposed_asset_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_disposed_asset_model,
                 conn,
             )?;

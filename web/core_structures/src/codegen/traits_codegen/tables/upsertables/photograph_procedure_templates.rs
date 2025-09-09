@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::PhotographProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -20,20 +19,28 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 photographed_with_model
                     .ne(excluded(photographed_with_model))
-                    .or(procedure_template_photographed_with_model
-                        .ne(excluded(procedure_template_photographed_with_model)))
+                    .or(
+                        procedure_template_photographed_with_model
+                            .ne(excluded(procedure_template_photographed_with_model)),
+                    )
                     .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
-                    .or(procedure_template_photographed_asset_model
-                        .ne(excluded(procedure_template_photographed_asset_model))),
+                    .or(
+                        procedure_template_photographed_asset_model
+                            .ne(excluded(procedure_template_photographed_asset_model)),
+                    )
+                    .or(photograph_model.ne(excluded(photograph_model)))
+                    .or(
+                        procedure_template_photograph_model
+                            .ne(excluded(procedure_template_photograph_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::PhotographProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -52,13 +59,22 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 photographed_with_model
                     .ne(excluded(photographed_with_model))
-                    .or(procedure_template_photographed_with_model
-                        .ne(excluded(procedure_template_photographed_with_model)))
+                    .or(
+                        procedure_template_photographed_with_model
+                            .ne(excluded(procedure_template_photographed_with_model)),
+                    )
                     .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
-                    .or(procedure_template_photographed_asset_model
-                        .ne(excluded(procedure_template_photographed_asset_model))),
+                    .or(
+                        procedure_template_photographed_asset_model
+                            .ne(excluded(procedure_template_photographed_asset_model)),
+                    )
+                    .or(photograph_model.ne(excluded(photograph_model)))
+                    .or(
+                        procedure_template_photograph_model
+                            .ne(excluded(procedure_template_photograph_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

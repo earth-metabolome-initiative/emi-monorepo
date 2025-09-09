@@ -30,8 +30,11 @@ impl<'a> From<&'a User>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::User> for User where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::users::User>
+    for User
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for User {

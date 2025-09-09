@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::CommercialFreezeDryerLot, foreign_key = model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers
@@ -31,16 +36,28 @@ impl<'a> From<&'a FreezeDryer>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for FreezeDryer where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for FreezeDryer
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAsset> for FreezeDryer where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for FreezeDryer
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::FreezeDryer> for FreezeDryer where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer,
+    > for FreezeDryer
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for FreezeDryer {
@@ -53,39 +70,51 @@ impl FreezeDryer {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot::read(
+            self.model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn freeze_dryers_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
-    }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::CommercialFreezeDryerLot, diesel::result::Error>
-    where
-        crate::CommercialFreezeDryerLot: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::CommercialFreezeDryerLot::read(self.model, conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

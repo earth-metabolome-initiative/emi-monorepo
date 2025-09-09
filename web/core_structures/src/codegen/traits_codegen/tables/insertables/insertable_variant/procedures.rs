@@ -4,19 +4,25 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Procedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedure as diesel::Insertable<
-            <crate::Procedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::procedures::Procedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Procedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
     C: diesel::connection::LoadConnection,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
     >,
-    crate::Procedure: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::Procedure;
+    type Row = crate::codegen::structs_codegen::tables::procedures::Procedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
@@ -46,7 +52,10 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(parent_procedure) = self.parent_procedure {
-            let procedures = crate::Procedure::read(parent_procedure, conn)?;
+            let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+                parent_procedure,
+                conn,
+            )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self,
                 Some(procedures.procedure_template),

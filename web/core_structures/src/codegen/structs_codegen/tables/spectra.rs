@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::SpectraCollection, foreign_key = spectra_collection_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        foreign_key = spectra_collection_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::spectra::spectra)]
 pub struct Spectrum {
@@ -29,16 +34,28 @@ impl<'a> From<&'a Spectrum>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Spectrum where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for Spectrum
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::DigitalAsset> for Spectrum where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+    > for Spectrum
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Spectrum> for Spectrum where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::spectra::Spectrum,
+    > for Spectrum
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for Spectrum {
@@ -51,22 +68,33 @@ impl Spectrum {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DigitalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::DigitalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
     }
     pub fn spectra_collection<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::SpectraCollection, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        diesel::result::Error,
+    >
     where
-        crate::SpectraCollection: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::SpectraCollection::read(self.spectra_collection_id, conn)
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::read(
+            self.spectra_collection_id,
+            conn,
+        )
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

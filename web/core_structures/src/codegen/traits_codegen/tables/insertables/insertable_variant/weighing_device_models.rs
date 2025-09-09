@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDevi
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::WeighingDeviceModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModel as diesel::Insertable<
-            <crate::WeighingDeviceModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::WeighingDeviceModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::WeighingDeviceModel;
+    type Row = crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,

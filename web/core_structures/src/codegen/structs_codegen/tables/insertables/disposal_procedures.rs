@@ -57,13 +57,15 @@ impl core::fmt::Display for DisposalProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::DisposedAsset => write!(f, "disposed_asset"),
-            Self::ProcedureTemplateDisposedAssetModel => {
-                write!(f, "procedure_template_disposed_asset_model")
+            Self::Procedure => write!(f, "disposal_procedures.procedure"),
+            Self::ProcedureTemplate => {
+                write!(f, "disposal_procedures.procedure_template")
             }
-            Self::ProcedureDisposedAsset(e) => write!(f, "{e}"),
+            Self::DisposedAsset => write!(f, "disposal_procedures.disposed_asset"),
+            Self::ProcedureTemplateDisposedAssetModel => {
+                write!(f, "disposal_procedures.procedure_template_disposed_asset_model")
+            }
+            Self::ProcedureDisposedAsset(e) => write!(f, "disposal_procedures.{e}"),
         }
     }
 }
@@ -86,65 +88,101 @@ impl InsertableDisposalProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     where
-        crate::Procedure: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DisposalProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::DisposalProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::DisposalProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn disposed_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::PhysicalAsset>, diesel::result::Error>
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(disposed_asset) = self.disposed_asset else {
             return Ok(None);
         };
-        crate::PhysicalAsset::read(disposed_asset, conn).map(Some)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
+            disposed_asset,
+            conn,
+        )
+        .optional()
     }
-    pub fn procedure_template_disposed_asset_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_disposed_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_disposed_asset_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_disposed_asset_model,
+            conn,
+        )
     }
     pub fn procedure_disposed_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_disposed_asset, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_disposed_asset,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn disposal_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -153,17 +191,22 @@ impl InsertableDisposalProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn disposal_procedures_procedure_template_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::DisposalProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::DisposalProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -172,17 +215,22 @@ impl InsertableDisposalProcedure {
                             .eq(&self.procedure_template_disposed_asset_model),
                     ),
             )
-            .first::<crate::DisposalProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn disposal_procedures_procedure_disposed_asset_procedure_tem_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_disposed_asset)
@@ -191,20 +239,26 @@ impl InsertableDisposalProcedure {
                             .eq(&self.procedure_template_disposed_asset_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn disposal_procedures_procedure_disposed_asset_disposed_asse_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::ProcedureAsset>, diesel::result::Error> {
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(disposed_asset) = self.disposed_asset else {
             return Ok(None);
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_disposed_asset)
@@ -213,8 +267,10 @@ impl InsertableDisposalProcedure {
                             .eq(disposed_asset),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
-            .map(Some)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -447,10 +503,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -496,22 +552,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`disposal_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_disposed_asset_model(
@@ -551,10 +607,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_disposed_asset_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "disposed_asset"}
     /// class v0 directly-involved-column
     /// end
@@ -566,12 +622,12 @@ impl<
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
     /// v0 --->|"`associated same as`"| v3
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -869,7 +925,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::DisposalProcedure,
+            Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
             Error = web_common_traits::database::InsertError<DisposalProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
@@ -884,7 +940,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::DisposalProcedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

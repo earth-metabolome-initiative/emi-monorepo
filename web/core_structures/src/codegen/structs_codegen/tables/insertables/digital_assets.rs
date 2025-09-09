@@ -40,8 +40,8 @@ impl core::fmt::Display for DigitalAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Model => write!(f, "model"),
+            Self::Id => write!(f, "digital_assets.id"),
+            Self::Model => write!(f, "digital_assets.model"),
         }
     }
 }
@@ -61,39 +61,46 @@ impl InsertableDigitalAsset {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Asset, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error>
     where
-        crate::Asset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::assets::Asset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Asset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::assets::Asset::read(self.id, conn)
     }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DigitalAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::DigitalAssetModel::read(self.model, conn)
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
+            self.model, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn digital_assets_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -409,7 +416,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::DigitalAsset,
+            Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
             Error = web_common_traits::database::InsertError<DigitalAssetAttribute>,
         >,
     Asset: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
@@ -422,7 +429,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::DigitalAsset = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

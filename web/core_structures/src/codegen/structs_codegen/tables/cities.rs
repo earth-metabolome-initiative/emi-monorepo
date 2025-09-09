@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Country, foreign_key = iso))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::countries::Country,
+        foreign_key = iso
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cities::cities)]
 pub struct City {
@@ -30,8 +35,12 @@ impl<'a> From<&'a City>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::City> for City where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::cities::City,
+    > for City
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for City {
@@ -44,12 +53,13 @@ impl City {
     pub fn iso<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Country, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::countries::Country, diesel::result::Error>
     where
-        crate::Country: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::countries::Country:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Country::read(self.iso, conn)
+        crate::codegen::structs_codegen::tables::countries::Country::read(self.iso, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

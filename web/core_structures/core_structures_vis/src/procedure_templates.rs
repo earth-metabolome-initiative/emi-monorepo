@@ -1,7 +1,7 @@
 //! Submodule providing an illustration of a procedure and its subprocedures
 //! using a Flowchart Diagram in Mermaid syntax.
 
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, hash::Hash, rc::Rc};
 
 use core_structures::{
     NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
@@ -41,6 +41,7 @@ fn to_mermaid_node(
         ProcedureTemplateAssetModel,
         (Rc<StyleClass>, Rc<StyleClass>),
     >,
+    procedure_template_nodes: &mut HashMap<ProcedureTemplate, Rc<FlowchartNode>>,
     procedure_template_class: &Rc<StyleClass>,
     procedure_template: &ProcedureTemplate,
     builder: &mut FlowchartBuilder,
@@ -107,6 +108,7 @@ fn to_mermaid_node(
             metadata,
             procedure_template_asset_model_nodes,
             procedure_template_asset_model_classes,
+            procedure_template_nodes,
             procedure_template_class,
             &subprocedure,
             builder,
@@ -122,21 +124,25 @@ fn to_mermaid_node(
     {
         let current_procedure = subprocedure.predecessor(conn)?;
         let next_procedure = subprocedure.successor(conn)?;
+        let source_node = procedure_template_nodes
+            .get(&current_procedure)
+            .cloned()
+            .expect(&format!("Current procedure node \"{}\" not found", current_procedure.name));
+        let destination_node = procedure_template_nodes
+            .get(&next_procedure)
+            .cloned()
+            .expect(&format!("Next procedure node \"{}\" not found", next_procedure.name));
         builder.edge(
             FlowchartEdgeBuilder::default()
-                .source(builder.get_node_by_label(&current_procedure.name).expect(&format!(
-                    "Predecessor procedure node \"{}\" not found",
-                    current_procedure.name
-                )))?
-                .destination(builder.get_node_by_label(&next_procedure.name).expect(&format!(
-                    "Successor procedure node \"{}\" not found",
-                    next_procedure.name
-                )))?
+                .source(source_node)?
+                .destination(destination_node)?
                 .right_arrow_shape(ArrowShape::Normal)?,
         )?;
     }
 
-    Ok(builder.node(node_builder)?)
+    let node = builder.node(node_builder)?;
+    procedure_template_nodes.insert(procedure_template.clone(), node.clone());
+    Ok(node)
 }
 
 /// Procedure structuring all metadata associated to a procedure template
@@ -489,10 +495,12 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
             let _ = builder.node(foreign_procedure_template_node_builder)?;
         }
 
+        let mut procedure_template_nodes = HashMap::new();
         let _root_node = to_mermaid_node(
             &metadata,
             &mut procedure_template_asset_model_nodes,
             &procedure_template_asset_model_classes,
+            &mut procedure_template_nodes,
             &procedure_template_class,
             &metadata.root_procedure_template,
             &mut builder,

@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Address as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAddress as diesel::Insertable<
-            <crate::Address as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Address>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::addresses::Address,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Address;
+    type Row = crate::codegen::structs_codegen::tables::addresses::Address;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAddress;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AddressAttribute,

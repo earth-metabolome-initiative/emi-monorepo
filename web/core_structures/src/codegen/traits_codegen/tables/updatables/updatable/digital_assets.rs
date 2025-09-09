@@ -1,10 +1,13 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::DigitalAsset
+    for crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset
 where
-    crate::Asset: web_common_traits::database::Read<C>,
-    crate::Asset: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::DigitalAssetModel: web_common_traits::database::Read<C>,
-    crate::DigitalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::assets::Asset:
+        web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

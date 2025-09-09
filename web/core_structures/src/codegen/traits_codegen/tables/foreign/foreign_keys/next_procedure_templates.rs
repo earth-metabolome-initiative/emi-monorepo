@@ -1,14 +1,26 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NextProcedureTemplateForeignKeys {
-    pub created_by: Option<crate::User>,
-    pub parent: Option<crate::ProcedureTemplate>,
-    pub next_procedure_templates_parent_predecessor_fkey: Option<crate::ParentProcedureTemplate>,
-    pub next_procedure_templates_parent_successor_fkey: Option<crate::ParentProcedureTemplate>,
-    pub predecessor: Option<crate::ProcedureTemplate>,
-    pub successor: Option<crate::ProcedureTemplate>,
+    pub parent: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub predecessor: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub successor: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub next_procedure_templates_parent_predecessor_fkey: Option<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+    >,
+    pub next_procedure_templates_parent_successor_fkey: Option<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::NextProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate
+{
     type ForeignKeys = NextProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -16,14 +28,24 @@ impl web_common_traits::prelude::HasForeignKeys for crate::NextProcedureTemplate
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.parent,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.predecessor,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.successor,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.parent,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ParentProcedureTemplate((
                 self.parent,
                 self.predecessor,
@@ -34,25 +56,15 @@ impl web_common_traits::prelude::HasForeignKeys for crate::NextProcedureTemplate
                 self.parent,
                 self.successor,
             )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.predecessor,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.successor,
-            ),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.created_by.is_some()
-            && foreign_keys.parent.is_some()
-            && foreign_keys.next_procedure_templates_parent_predecessor_fkey.is_some()
-            && foreign_keys.next_procedure_templates_parent_successor_fkey.is_some()
+        foreign_keys.parent.is_some()
             && foreign_keys.predecessor.is_some()
             && foreign_keys.successor.is_some()
+            && foreign_keys.created_by.is_some()
+            && foreign_keys.next_procedure_templates_parent_predecessor_fkey.is_some()
+            && foreign_keys.next_procedure_templates_parent_successor_fkey.is_some()
     }
     fn update(
         &self,

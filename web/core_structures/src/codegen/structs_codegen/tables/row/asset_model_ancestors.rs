@@ -1,9 +1,15 @@
-impl From<crate::AssetModelAncestor> for super::Row {
-    fn from(value: crate::AssetModelAncestor) -> Self {
+impl From<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor>
+    for super::Row
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    ) -> Self {
         super::Row::AssetModelAncestor(value)
     }
 }
-impl TryFrom<super::Row> for crate::AssetModelAncestor {
+impl TryFrom<super::Row>
+    for crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

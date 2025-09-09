@@ -53,8 +53,8 @@ impl core::fmt::Display for CommercialFreezerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::FreezerModel => write!(f, "freezer_model"),
+            Self::Id => write!(f, "commercial_freezer_models.id"),
+            Self::FreezerModel => write!(f, "commercial_freezer_models.freezer_model"),
         }
     }
 }
@@ -74,42 +74,62 @@ impl InsertableCommercialFreezerModel {
     pub fn freezer_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::FreezerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        diesel::result::Error,
+    >
     where
-        crate::FreezerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::FreezerModel::read(self.freezer_model, conn)
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(
+            self.freezer_model,
+            conn,
+        )
     }
     pub fn commercial_freezer_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::FreezerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel,
+        diesel::result::Error,
+    >
     where
-        crate::FreezerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::FreezerModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(self.id, conn)
     }
     pub fn commercial_freezer_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProduct, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProduct: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProduct::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
+            self.id, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_freezer_models_id_freezer_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -118,7 +138,9 @@ impl InsertableCommercialFreezerModel {
                             .eq(&self.freezer_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -515,9 +537,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -562,15 +584,18 @@ where
     }
 }
 impl<CommercialProduct, FreezerModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel>
+for InsertableCommercialFreezerModelBuilder<CommercialProduct, FreezerModel>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::CommercialFreezerModel,
-            Error = web_common_traits::database::InsertError<CommercialFreezerModelAttribute>,
-        >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+        Error = web_common_traits::database::InsertError<CommercialFreezerModelAttribute>,
+    >,
+    CommercialProduct: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialFreezerModelAttribute;
@@ -578,10 +603,14 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialFreezerModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

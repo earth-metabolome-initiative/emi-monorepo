@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePositioningD
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PositioningDevice as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDevice as diesel::Insertable<
-            <crate::PositioningDevice as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PositioningDevice>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PositioningDevice;
+    type Row = crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDevice;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PositioningDeviceAttribute,

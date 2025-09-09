@@ -1,4 +1,5 @@
-impl<C> web_common_traits::prelude::ProcedureTemplate<C> for crate::ProcedureTemplate
+impl<C> web_common_traits::prelude::ProcedureTemplate<C>
+for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate
 where
     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     C: diesel::connection::LoadConnection,
@@ -13,7 +14,7 @@ where
         &'a crate::ProcedureTemplate,
     >>::Output: diesel::query_dsl::LoadQuery<'a, C, crate::ProcedureTemplateAssetModel>,
 {
-    type Procedure = crate::Procedure;
+    type Procedure = crate::codegen::structs_codegen::tables::procedures::Procedure;
     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
     fn procedure_template_asset_models(
         &self,

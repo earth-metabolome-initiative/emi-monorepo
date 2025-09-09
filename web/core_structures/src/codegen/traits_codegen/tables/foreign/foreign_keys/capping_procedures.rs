@@ -1,19 +1,40 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CappingProcedureForeignKeys {
-    pub procedure: Option<crate::Procedure>,
-    pub procedure_template: Option<crate::CappingProcedureTemplate>,
-    pub capped_container: Option<crate::VolumetricContainer>,
-    pub capped_container_model: Option<crate::VolumetricContainerModel>,
-    pub procedure_template_capped_container_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_capped_container: Option<crate::ProcedureAsset>,
-    pub capped_with_model: Option<crate::CapModel>,
-    pub procedure_template_capped_with_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_capped_with: Option<crate::ProcedureAsset>,
-    pub capping_procedures_capped_container_model_capped_with_mode_fkey:
-        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+    >,
+    pub capped_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub capped_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_template_capped_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_capped_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub capped_with_model: Option<
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
+    >,
+    pub procedure_template_capped_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_capped_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub capping_procedures_capped_container_model_capped_with_mode_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CappingProcedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure
+{
     type ForeignKeys = CappingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

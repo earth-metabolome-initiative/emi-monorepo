@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::PhotographProcedure {
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -25,7 +27,11 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Pho
                     .or(photographed_with.ne(excluded(photographed_with)))
                     .or(procedure_template_photographed_with_model
                         .ne(excluded(procedure_template_photographed_with_model)))
-                    .or(procedure_photographed_with.ne(excluded(procedure_photographed_with))),
+                    .or(procedure_photographed_with.ne(excluded(procedure_photographed_with)))
+                    .or(photograph.ne(excluded(photograph)))
+                    .or(procedure_template_photograph_model
+                        .ne(excluded(procedure_template_photograph_model)))
+                    .or(procedure_photograph.ne(excluded(procedure_photograph))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -33,7 +39,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Pho
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::PhotographProcedure
+    for crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure
 {
     fn upsert(
         &self,
@@ -60,7 +66,11 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(photographed_with.ne(excluded(photographed_with)))
                     .or(procedure_template_photographed_with_model
                         .ne(excluded(procedure_template_photographed_with_model)))
-                    .or(procedure_photographed_with.ne(excluded(procedure_photographed_with))),
+                    .or(procedure_photographed_with.ne(excluded(procedure_photographed_with)))
+                    .or(photograph.ne(excluded(photograph)))
+                    .or(procedure_template_photograph_model
+                        .ne(excluded(procedure_template_photograph_model)))
+                    .or(procedure_photograph.ne(excluded(procedure_photograph))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

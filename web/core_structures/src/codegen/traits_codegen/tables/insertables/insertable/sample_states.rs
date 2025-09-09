@@ -1,4 +1,6 @@
-impl web_common_traits::database::Insertable for crate::SampleState {
+impl web_common_traits::database::Insertable
+    for crate::codegen::structs_codegen::tables::sample_states::SampleState
+{
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder;
     type InsertableVariant =

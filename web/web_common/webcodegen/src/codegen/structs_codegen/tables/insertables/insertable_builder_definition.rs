@@ -27,7 +27,7 @@ impl Codegen<'_> {
             .generics_for_table_builder_implementation(table)?;
         let extension_network = self.table_extension_network().expect("Extension network exists");
 
-        let has_default_types = insertable_columns.iter().all(Column::has_default);
+        let has_sql_default_types = insertable_columns.iter().any(Column::has_default);
         let mut derives = vec![
             quote::quote!(Clone),
             quote::quote!(Debug),
@@ -43,11 +43,11 @@ impl Codegen<'_> {
             derives.push(quote::quote!(Ord));
         }
 
-        if !has_default_types {
+        if !has_sql_default_types {
             derives.push(quote::quote!(Default));
         }
 
-        let insertable_builder_default_impl = if has_default_types {
+        let insertable_builder_default_impl = if has_sql_default_types {
             let mut default_impl_attributes = Vec::new();
             let mut defalt_where_requirements = Vec::new();
 

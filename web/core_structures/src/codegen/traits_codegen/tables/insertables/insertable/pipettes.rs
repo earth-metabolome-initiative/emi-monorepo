@@ -1,4 +1,6 @@
-impl web_common_traits::database::Insertable for crate::Pipette {
+impl web_common_traits::database::Insertable
+    for crate::codegen::structs_codegen::tables::pipettes::Pipette
+{
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertablePipetteBuilder;
     type InsertableVariant =

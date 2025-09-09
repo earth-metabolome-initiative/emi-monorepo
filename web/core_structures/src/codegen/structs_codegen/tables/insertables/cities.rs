@@ -20,9 +20,9 @@ impl core::str::FromStr for CityAttribute {
 impl core::fmt::Display for CityAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Iso => write!(f, "iso"),
+            Self::Id => write!(f, "cities.id"),
+            Self::Name => write!(f, "cities.name"),
+            Self::Iso => write!(f, "cities.iso"),
         }
     }
 }
@@ -40,12 +40,13 @@ impl InsertableCity {
     pub fn iso<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Country, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::countries::Country, diesel::result::Error>
     where
-        crate::Country: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::countries::Country:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Country::read(self.iso, conn)
+        crate::codegen::structs_codegen::tables::countries::Country::read(self.iso, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -158,7 +159,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::City,
+            Row = crate::codegen::structs_codegen::tables::cities::City,
             Error = web_common_traits::database::InsertError<CityAttribute>,
         >,
 {
@@ -170,7 +171,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::City = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::cities::City =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

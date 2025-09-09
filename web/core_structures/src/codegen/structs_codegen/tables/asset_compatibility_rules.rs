@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::User, foreign_key = created_by))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
 #[diesel(primary_key(left_asset_model, right_asset_model))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules
@@ -35,8 +40,10 @@ for web_common_traits::database::IdOrBuilder<
         ))
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetCompatibilityRule>
-    for AssetCompatibilityRule
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    > for AssetCompatibilityRule
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
 {
@@ -51,32 +58,46 @@ impl AssetCompatibilityRule {
     pub fn left_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.left_asset_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.left_asset_model,
+            conn,
+        )
     }
     pub fn right_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.right_asset_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.right_asset_model,
+            conn,
+        )
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn from_left_asset_model<C>(
         left_asset_model: i32,

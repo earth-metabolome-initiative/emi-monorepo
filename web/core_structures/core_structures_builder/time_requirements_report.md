@@ -1,110 +1,135 @@
 # Time Report for Building Core Structures
 
-The total time spent on all tasks was 16 seconds.
-The slowest task was `Code Generation` which took 7 seconds, 164 ms, 751 µs and 683 ns (43.75% of all time).
+The total time spent on all tasks was 21 seconds.
+The slowest task was `Setting up Docker and Database Connection` which took 8 seconds, 769 ms, 191 µs and 9 ns (38.10% of all time).
 
 | name                                      | time                                 | percentage | comment |
 |-------------------------------------------|--------------------------------------|------------|---------|
-| Setting up Docker and Database Connection | 4 seconds, 776 ms, 472 µs and 669 ns | 25.00%     |         |
-| Init DB                                   | 4 seconds, 379 ms, 392 µs and 99 ns  | 25.00%     |         |
-| Code Generation                           | 7 seconds, 164 ms, 751 µs and 683 ns | 43.75%     |         |
+| Setting up Docker and Database Connection | 8 seconds, 769 ms, 191 µs and 9 ns   | 38.10%     |         |
+| Init DB                                   | 5 seconds, 691 ms, 76 µs and 591 ns  | 23.81%     |         |
+| Code Generation                           | 6 seconds, 768 ms, 867 µs and 335 ns | 28.57%     |         |
 
 ## Time Report for Init DB
 
 The total time spent on all tasks was now.
-The slowest task was `Init DB Transaction` which took 4 seconds, 379 ms, 279 µs and 679 ns (100.00% of all time).
+The slowest task was `Init DB Transaction` which took 5 seconds, 690 ms, 959 µs and 664 ns (100.00% of all time).
 
 | name                | time                                 | percentage | comment |
 |---------------------|--------------------------------------|------------|---------|
-| Retrieve CSVs       | 112 µs and 420 ns                    | 0.00%      |         |
-| Init DB Transaction | 4 seconds, 379 ms, 279 µs and 679 ns | 100.00%    |         |
+| Retrieve CSVs       | 116 µs and 927 ns                    | 0.00%      |         |
+| Init DB Transaction | 5 seconds, 690 ms, 959 µs and 664 ns | 100.00%    |         |
 
 ### Time Report for Init DB Transaction
 
 The total time spent on all tasks was now.
-The slowest task was `Initialize CSVs` which took 3 seconds, 905 ms, 630 µs and 142 ns (75.00% of all time).
+The slowest task was `Initialize CSVs` which took 3 seconds, 918 ms, 841 µs and 243 ns (60.00% of all time).
 
-| name                  | time                                 | percentage | comment |
-|-----------------------|--------------------------------------|------------|---------|
-| Initialize CSVs       | 3 seconds, 905 ms, 630 µs and 142 ns | 75.00%     |         |
-| Initialize Migrations | 473 ms, 649 µs and 537 ns            | 0.00%      |         |
+| name                          | time                                 | percentage | comment |
+|-------------------------------|--------------------------------------|------------|---------|
+| Initialize CSVs               | 3 seconds, 918 ms, 841 µs and 243 ns | 60.00%     |         |
+| Initialize Migrations         | 469 ms, 142 µs and 560 ns            | 0.00%      |         |
+| Consistency Constraint Checks | 1 second, 302 ms, 975 µs and 861 ns  | 20.00%     |         |
+
+#### Time Report for Consistency Constraint Checks
+
+The total time spent on all tasks was now.
+The slowest task was `Procedure and procedure template alignment` which took 751 ms, 902 µs and 448 ns (0.00% of all time).
+
+| name                                               | time                      | percentage | comment |
+|----------------------------------------------------|---------------------------|------------|---------|
+| Procedure and procedure template alignment         | 751 ms, 902 µs and 448 ns | 0.00%      |         |
+| Check constraints in schema 'public'               | 153 ms, 85 µs and 974 ns  | 0.00%      |         |
+| Procedure and procedure template check constraints | 397 ms, 987 µs and 439 ns | 0.00%      |         |
+
+##### Time Report for Check constraints in schema 'public'
+
+The total time spent on all tasks was now.
+The slowest task was `Compatible foreign type constraints` which took 140 ms, 801 µs and 127 ns (NaN% of all time).
+
+| name                                     | time                      | percentage | comment |
+|------------------------------------------|---------------------------|------------|---------|
+| Compatible foreign type constraints      | 140 ms, 801 µs and 127 ns | NaN%       |         |
+| Lowercase column and table names         | 1 ms, 137 µs and 653 ns   | NaN%       |         |
+| Standard column names and types          | 6 ms, 90 µs and 595 ns    | NaN%       |         |
+| Not-null constraints on standard columns | 3 ms, 780 µs and 686 ns   | NaN%       |         |
+| Word deprecation constraints             | 1 ms, 275 µs and 913 ns   | NaN%       |         |
 
 ## Time Report for Code Generation
 
 The total time spent on all tasks was now.
-The slowest task was `Code generation` which took 6 seconds, 996 ms, 220 µs and 878 ns (85.71% of all time).
+The slowest task was `Code generation` which took 6 seconds, 598 ms, 873 µs and 848 ns (100.00% of all time).
 
 | name              | time                                 | percentage | comment |
 |-------------------|--------------------------------------|------------|---------|
-| Code generation   | 6 seconds, 996 ms, 220 µs and 878 ns | 85.71%     |         |
-| Procedure Codegen | 168 ms, 530 µs and 805 ns            | 0.00%      |         |
+| Code generation   | 6 seconds, 598 ms, 873 µs and 848 ns | 100.00%    |         |
+| Procedure Codegen | 169 ms, 993 µs and 487 ns            | 0.00%      |         |
 
 ### Time Report for Code generation
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Structs` which took 6 seconds, 165 ms, 135 µs and 185 ns (100.00% of all time).
+The slowest task was `Generate Structs` which took 5 seconds, 928 ms, 393 µs and 702 ns (83.33% of all time).
 
 | name                             | time                                 | percentage | comment |
 |----------------------------------|--------------------------------------|------------|---------|
-| Retrieving tables                | 13 ms, 708 µs and 51 ns              | 0.00%      |         |
-| Creating table extension network | 26 ms, 92 µs and 886 ns              | 0.00%      |         |
-| Generating Diesel code           | 171 ms, 930 µs and 501 ns            | 0.00%      |         |
-| Generate Structs                 | 6 seconds, 165 ms, 135 µs and 185 ns | 100.00%    |         |
-| Generate Web Common Traits       | 619 ms, 354 µs and 255 ns            | 0.00%      |         |
+| Retrieving tables                | 175 µs and 576 ns                    | 0.00%      |         |
+| Creating table extension network | 12 ms, 693 µs and 577 ns             | 0.00%      |         |
+| Generating Diesel code           | 28 ms, 308 µs and 460 ns             | 0.00%      |         |
+| Generate Structs                 | 5 seconds, 928 ms, 393 µs and 702 ns | 83.33%     |         |
+| Generate Web Common Traits       | 629 ms, 302 µs and 533 ns            | 0.00%      |         |
 
 #### Time Report for Generating Diesel code
 
 The total time spent on all tasks was now.
-The slowest task was `Generating allow tables to appear in same query schema` which took 100 ms, 919 µs and 511 ns (NaN% of all time).
+The slowest task was `Generating allow tables to appear in same query schema` which took 14 ms, 398 µs and 540 ns (NaN% of all time).
 
-| name                                                   | time                      | percentage | comment |
-|--------------------------------------------------------|---------------------------|------------|---------|
-| Generating tables schema                               | 67 ms, 69 µs and 84 ns    | NaN%       |         |
-| Generating types schema                                | 3 ms, 941 µs and 906 ns   | NaN%       |         |
-| Generating allow tables to appear in same query schema | 100 ms, 919 µs and 511 ns | NaN%       |         |
+| name                                                   | time                     | percentage | comment |
+|--------------------------------------------------------|--------------------------|------------|---------|
+| Generating tables schema                               | 9 ms, 935 µs and 891 ns  | NaN%       |         |
+| Generating types schema                                | 3 ms, 974 µs and 29 ns   | NaN%       |         |
+| Generating allow tables to appear in same query schema | 14 ms, 398 µs and 540 ns | NaN%       |         |
 
 #### Time Report for Generate Structs
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Table Structs` which took 6 seconds, 161 ms, 751 µs and 74 ns (100.00% of all time).
+The slowest task was `Generate Table Structs` which took 5 seconds, 925 ms, 324 µs and 764 ns (100.00% of all time).
 
-| name                   | time                                | percentage | comment |
-|------------------------|-------------------------------------|------------|---------|
-| Generate Types Structs | 3 ms, 384 µs and 111 ns             | 0.00%      |         |
-| Generate Table Structs | 6 seconds, 161 ms, 751 µs and 74 ns | 100.00%    |         |
+| name                   | time                                 | percentage | comment |
+|------------------------|--------------------------------------|------------|---------|
+| Generate Types Structs | 3 ms, 68 µs and 938 ns               | 0.00%      |         |
+| Generate Table Structs | 5 seconds, 925 ms, 324 µs and 764 ns | 100.00%    |         |
 
 #### Time Report for Generate Web Common Traits
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Table Traits` which took 616 ms, 982 µs and 119 ns (NaN% of all time).
+The slowest task was `Generate Table Traits` which took 626 ms, 191 µs and 731 ns (NaN% of all time).
 
 | name                  | time                      | percentage | comment |
 |-----------------------|---------------------------|------------|---------|
-| Generate Types Traits | 2 ms, 372 µs and 136 ns   | NaN%       |         |
-| Generate Table Traits | 616 ms, 982 µs and 119 ns | NaN%       |         |
+| Generate Types Traits | 3 ms, 110 µs and 802 ns   | NaN%       |         |
+| Generate Table Traits | 626 ms, 191 µs and 731 ns | NaN%       |         |
 
 ##### Time Report for Generate Table Traits
 
 The total time spent on all tasks was now.
-The slowest task was `Generate Insertable Traits` which took 331 ms, 40 µs and 463 ns (NaN% of all time).
+The slowest task was `Generate Insertable Traits` which took 344 ms, 476 µs and 905 ns (NaN% of all time).
 
-| name                       | time                     | percentage | comment |
-|----------------------------|--------------------------|------------|---------|
-| Generate CRUD Traits       | 13 ms, 279 µs and 732 ns | NaN%       |         |
-| Generate Deletable Traits  | 55 ms, 409 µs and 759 ns | NaN%       |         |
-| Generate Upsertable Traits | 34 ms, 749 µs and 18 ns  | NaN%       |         |
-| Generate Foreign Traits    | 133 ms, 830 µs and 91 ns | NaN%       |         |
-| Generate Insertable Traits | 331 ms, 40 µs and 463 ns | NaN%       |         |
-| Generate Updatable Traits  | 48 ms, 673 µs and 56 ns  | NaN%       |         |
+| name                       | time                      | percentage | comment |
+|----------------------------|---------------------------|------------|---------|
+| Generate CRUD Traits       | 16 ms, 776 µs and 822 ns  | NaN%       |         |
+| Generate Deletable Traits  | 37 ms, 343 µs and 897 ns  | NaN%       |         |
+| Generate Upsertable Traits | 35 ms, 166 µs and 58 ns   | NaN%       |         |
+| Generate Foreign Traits    | 139 ms, 810 µs and 357 ns | NaN%       |         |
+| Generate Insertable Traits | 344 ms, 476 µs and 905 ns | NaN%       |         |
+| Generate Updatable Traits  | 52 ms, 617 µs and 692 ns  | NaN%       |         |
 
 ### Time Report for Procedure Codegen
 
 The total time spent on all tasks was now.
-The slowest task was `procedure template Impl Codegen` which took 157 ms, 330 µs and 726 ns (NaN% of all time).
+The slowest task was `procedure template Impl Codegen` which took 158 ms, 501 µs and 309 ns (NaN% of all time).
 
 | name                            | time                      | percentage | comment |
 |---------------------------------|---------------------------|------------|---------|
-| Procedure Impl Codegen          | 11 ms, 200 µs and 79 ns   | NaN%       |         |
-| procedure template Impl Codegen | 157 ms, 330 µs and 726 ns | NaN%       |         |
+| Procedure Impl Codegen          | 11 ms, 492 µs and 178 ns  | NaN%       |         |
+| procedure template Impl Codegen | 158 ms, 501 µs and 309 ns | NaN%       |         |
 
 ![Plot](time_requirements_report.png)

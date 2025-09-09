@@ -1,10 +1,13 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::TeamProject
+    for crate::codegen::structs_codegen::tables::team_projects::TeamProject
 where
-    crate::Project: web_common_traits::database::Read<C>,
-    crate::Project: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::Team: web_common_traits::database::Read<C>,
-    crate::Team: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::projects::Project:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::projects::Project:
+        web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::teams::Team:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(
@@ -12,10 +15,10 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.project(conn)?.can_update(user_id, conn)? {
+        if !self.team(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.team(conn)?.can_update(user_id, conn)? {
+        if !self.project(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

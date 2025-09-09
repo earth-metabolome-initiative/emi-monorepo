@@ -28,8 +28,11 @@ impl<'a> From<&'a Rank>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Rank> for Rank where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::ranks::Rank>
+    for Rank
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
 {
 }
 impl diesel::Identifiable for Rank {

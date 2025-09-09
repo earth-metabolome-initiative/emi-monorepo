@@ -9,11 +9,24 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::VolumetricContainer, foreign_key = capped_container))]
 #[diesel(
-    belongs_to(crate::VolumetricContainerModel, foreign_key = capped_container_model)
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        foreign_key = capped_container
+    )
 )]
-#[diesel(belongs_to(crate::CapModel, foreign_key = capped_with_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        foreign_key = capped_container_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
+        foreign_key = capped_with_model
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures
@@ -42,12 +55,20 @@ impl<'a> From<&'a CappingProcedure>
         web_common_traits::database::IdOrBuilder::Id(value.procedure)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Procedure> for CappingProcedure where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    > for CappingProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CappingProcedure> for CappingProcedure where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
+    > for CappingProcedure
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for CappingProcedure {
@@ -60,52 +81,83 @@ impl CappingProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     where
-        crate::Procedure: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CappingProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::CappingProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CappingProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn capped_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.capped_container, conn)
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.capped_container,
+            conn,
+        )
     }
     pub fn capped_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.capped_container_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.capped_container_model,
+            conn,
+        )
     }
-    pub fn procedure_template_capped_container_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_capped_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_capped_container_model,
             conn,
         )
@@ -113,52 +165,79 @@ impl CappingProcedure {
     pub fn procedure_capped_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_capped_container, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_capped_container,
+            conn,
+        )
     }
     pub fn capped_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CapModel, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::cap_models::CapModel, diesel::result::Error>
     where
-        crate::CapModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CapModel::read(self.capped_with_model, conn)
+        crate::codegen::structs_codegen::tables::cap_models::CapModel::read(
+            self.capped_with_model,
+            conn,
+        )
     }
     pub fn procedure_template_capped_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_capped_with_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_capped_with_model,
+            conn,
+        )
     }
     pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_capped_with, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_capped_with,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -167,17 +246,22 @@ impl CappingProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_template_procedure_template_c_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::CappingProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::CappingProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -186,17 +270,22 @@ impl CappingProcedure {
                             .eq(&self.procedure_template_capped_container_model),
                     ),
             )
-            .first::<crate::CappingProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_template_procedure_template_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::CappingProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::CappingProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -205,17 +294,22 @@ impl CappingProcedure {
                             .eq(&self.procedure_template_capped_with_model),
                     ),
             )
-            .first::<crate::CappingProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_container_procedure_te_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_container)
@@ -224,17 +318,22 @@ impl CappingProcedure {
                             .eq(&self.procedure_template_capped_container_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_with_procedure_templat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_with)
@@ -243,17 +342,22 @@ impl CappingProcedure {
                             .eq(&self.procedure_template_capped_with_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_container_capped_conta_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_container)
@@ -262,17 +366,22 @@ impl CappingProcedure {
                             .eq(&self.capped_container_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_with_capped_with_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_with)
@@ -281,17 +390,22 @@ impl CappingProcedure {
                             .eq(&self.capped_with_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_container_capped_cont_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_container)
@@ -300,19 +414,25 @@ impl CappingProcedure {
                             .eq(&self.capped_container),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn capping_procedures_capped_container_model_capped_with_mode_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
     where
-        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetCompatibilityRule::read(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
             (self.capped_container_model, self.capped_with_model),
             conn,
         )

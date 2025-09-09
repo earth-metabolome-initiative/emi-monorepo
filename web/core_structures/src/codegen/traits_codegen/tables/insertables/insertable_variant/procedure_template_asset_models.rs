@@ -4,26 +4,38 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel as diesel::Insertable<
-            <crate::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     C: diesel::connection::LoadConnection,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
     >,
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
-    type Row = crate::ProcedureTemplateAssetModel;
+    type Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
@@ -39,13 +51,13 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.asset_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.asset_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -64,7 +76,7 @@ where
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(based_on) = self.based_on {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 based_on,
                 conn,
             )?;

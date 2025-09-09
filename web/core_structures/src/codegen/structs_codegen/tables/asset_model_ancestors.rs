@@ -23,8 +23,12 @@ impl<'a> From<&'a AssetModelAncestor>
         web_common_traits::database::IdOrBuilder::Id((value.descendant_model, value.ancestor_model))
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModelAncestor> for AssetModelAncestor where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    > for AssetModelAncestor
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
 {
 }
 impl diesel::Identifiable for AssetModelAncestor {
@@ -37,22 +41,36 @@ impl AssetModelAncestor {
     pub fn descendant_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.descendant_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.descendant_model,
+            conn,
+        )
     }
     pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.ancestor_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.ancestor_model,
+            conn,
+        )
     }
     pub fn from_descendant_model<C>(
         descendant_model: i32,

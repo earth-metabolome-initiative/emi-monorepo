@@ -1,27 +1,58 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BallMillProcedureForeignKeys {
-    pub procedure: Option<crate::Procedure>,
-    pub procedure_template: Option<crate::BallMillProcedureTemplate>,
-    pub bead_model: Option<crate::BeadModel>,
-    pub procedure_template_bead_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_bead: Option<crate::ProcedureAsset>,
-    pub milled_with_model: Option<crate::BallMillMachineModel>,
-    pub procedure_template_milled_with_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_milled_with: Option<crate::ProcedureAsset>,
-    pub milled_with: Option<crate::BallMillMachine>,
-    pub milled_container: Option<crate::VolumetricContainer>,
-    pub milled_container_model: Option<crate::VolumetricContainerModel>,
-    pub procedure_template_milled_container_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_milled_container: Option<crate::ProcedureAsset>,
-    pub ball_mill_procedures_milled_with_model_milled_container_mo_fkey:
-        Option<crate::AssetCompatibilityRule>,
-    pub ball_mill_procedures_milled_with_model_bead_model_fkey:
-        Option<crate::AssetCompatibilityRule>,
-    pub ball_mill_procedures_bead_model_milled_container_model_fkey:
-        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+    >,
+    pub bead_model: Option<
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
+    >,
+    pub procedure_template_bead_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_bead: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub milled_with_model: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
+    pub procedure_template_milled_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_milled_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub milled_with: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
+    >,
+    pub milled_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub milled_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_template_milled_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_milled_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub ball_mill_procedures_milled_with_model_milled_container_mo_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
+    pub ball_mill_procedures_milled_with_model_bead_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
+    pub ball_mill_procedures_bead_model_milled_container_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::BallMillProcedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure
+{
     type ForeignKeys = BallMillProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

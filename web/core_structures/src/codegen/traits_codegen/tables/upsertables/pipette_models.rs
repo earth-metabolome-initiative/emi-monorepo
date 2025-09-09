@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::PipetteModel {
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::pipette_models::PipetteModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -16,7 +18,9 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Pip
     }
 }
 #[cfg(feature = "sqlite")]
-impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection> for crate::PipetteModel {
+impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
+    for crate::codegen::structs_codegen::tables::pipette_models::PipetteModel
+{
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,

@@ -19,8 +19,8 @@ impl core::str::FromStr for CountryAttribute {
 impl core::fmt::Display for CountryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Iso => write!(f, "iso"),
-            Self::Name => write!(f, "name"),
+            Self::Iso => write!(f, "countries.iso"),
+            Self::Name => write!(f, "countries.name"),
         }
     }
 }
@@ -148,7 +148,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Country,
+            Row = crate::codegen::structs_codegen::tables::countries::Country,
             Error = web_common_traits::database::InsertError<CountryAttribute>,
         >,
 {
@@ -160,7 +160,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Country = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::countries::Country =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

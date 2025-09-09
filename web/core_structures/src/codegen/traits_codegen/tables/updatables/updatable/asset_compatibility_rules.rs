@@ -1,8 +1,10 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::AssetCompatibilityRule
+    for crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule
 where
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

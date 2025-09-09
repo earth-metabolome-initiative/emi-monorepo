@@ -26,11 +26,11 @@ impl core::str::FromStr for UserEmailAttribute {
 impl core::fmt::Display for UserEmailAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Email => write!(f, "email"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::PrimaryEmail => write!(f, "primary_email"),
+            Self::Id => write!(f, "user_emails.id"),
+            Self::Email => write!(f, "user_emails.email"),
+            Self::CreatedBy => write!(f, "user_emails.created_by"),
+            Self::CreatedAt => write!(f, "user_emails.created_at"),
+            Self::PrimaryEmail => write!(f, "user_emails.primary_email"),
         }
     }
 }
@@ -50,15 +50,15 @@ impl InsertableUserEmail {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserEmailBuilder {
     pub(crate) email: Option<String>,
@@ -71,6 +71,16 @@ impl From<InsertableUserEmailBuilder>
 {
     fn from(builder: InsertableUserEmailBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableUserEmailBuilder {
+    fn default() -> Self {
+        Self {
+            email: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            primary_email: Some(true),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -263,7 +273,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::UserEmail,
+            Row = crate::codegen::structs_codegen::tables::user_emails::UserEmail,
             Error = web_common_traits::database::InsertError<UserEmailAttribute>,
         >,
 {
@@ -275,7 +285,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::UserEmail = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::user_emails::UserEmail =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

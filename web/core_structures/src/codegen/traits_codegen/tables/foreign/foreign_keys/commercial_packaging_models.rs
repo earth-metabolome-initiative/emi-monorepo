@@ -1,28 +1,45 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialPackagingModelForeignKeys {
-    pub packaging_model: Option<crate::PackagingModel>,
-    pub commercial_packaging_models_id_fkey: Option<crate::PackagingModel>,
-    pub commercial_packaging_models_id_fkey1: Option<crate::CommercialProduct>,
+    pub packaging_model:
+        Option<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
+    pub commercial_packaging_models_id_fkey:
+        Option<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
+    pub commercial_packaging_models_id_fkey1:
+        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CommercialPackagingModel {
+impl web_common_traits::prelude::HasForeignKeys
+for crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel {
     type ForeignKeys = CommercialPackagingModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
-                self.packaging_model,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(self.id),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
+                        self.packaging_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
+                        self.id,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
+                        self.id,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.packaging_model.is_some()
@@ -44,7 +61,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CommercialPackagingMo
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == commercial_products.id {
-                    foreign_keys.commercial_packaging_models_id_fkey1 = Some(commercial_products);
+                    foreign_keys.commercial_packaging_models_id_fkey1 = Some(
+                        commercial_products,
+                    );
                     updated = true;
                 }
             }
@@ -68,7 +87,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CommercialPackagingMo
                     updated = true;
                 }
                 if self.id == packaging_models.id {
-                    foreign_keys.commercial_packaging_models_id_fkey = Some(packaging_models);
+                    foreign_keys.commercial_packaging_models_id_fkey = Some(
+                        packaging_models,
+                    );
                     updated = true;
                 }
             }

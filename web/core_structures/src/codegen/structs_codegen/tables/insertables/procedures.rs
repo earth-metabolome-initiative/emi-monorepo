@@ -40,15 +40,17 @@ impl core::str::FromStr for ProcedureAttribute {
 impl core::fmt::Display for ProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::ParentProcedure => write!(f, "parent_procedure"),
-            Self::ParentProcedureTemplate => write!(f, "parent_procedure_template"),
-            Self::MostConcreteTable => write!(f, "most_concrete_table"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Procedure => write!(f, "procedures.procedure"),
+            Self::ProcedureTemplate => write!(f, "procedures.procedure_template"),
+            Self::ParentProcedure => write!(f, "procedures.parent_procedure"),
+            Self::ParentProcedureTemplate => {
+                write!(f, "procedures.parent_procedure_template")
+            }
+            Self::MostConcreteTable => write!(f, "procedures.most_concrete_table"),
+            Self::CreatedBy => write!(f, "procedures.created_by"),
+            Self::CreatedAt => write!(f, "procedures.created_at"),
+            Self::UpdatedBy => write!(f, "procedures.updated_by"),
+            Self::UpdatedAt => write!(f, "procedures.updated_at"),
         }
     }
 }
@@ -70,36 +72,95 @@ pub struct InsertableProcedure {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedure {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn parent_procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::Procedure>, diesel::result::Error>
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
+        diesel::result::Error,
+    >
     where
-        crate::Procedure: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(parent_procedure) = self.parent_procedure else {
             return Ok(None);
         };
-        crate::Procedure::read(parent_procedure, conn).map(Some)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(parent_procedure, conn)
+            .optional()
+    }
+    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_procedure_template) = self.parent_procedure_template else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            parent_procedure_template,
+            conn,
+        )
+        .optional()
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn procedures_parent_procedure_parent_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::Procedure>, diesel::result::Error> {
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedures::Procedure>,
+        diesel::result::Error,
+    > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(parent_procedure) = self.parent_procedure else {
             return Ok(None);
@@ -107,7 +168,7 @@ impl InsertableProcedure {
         let Some(parent_procedure_template) = self.parent_procedure_template else {
             return Ok(None);
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(parent_procedure)
@@ -116,63 +177,40 @@ impl InsertableProcedure {
                             .eq(parent_procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-            .map(Some)
-    }
-    pub fn parent_procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::ProcedureTemplate>, diesel::result::Error>
-    where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
-            return Ok(None);
-        };
-        crate::ProcedureTemplate::read(parent_procedure_template, conn).map(Some)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+            .optional()
     }
     pub fn procedures_parent_procedure_template_procedure_template_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::ParentProcedureTemplate>, diesel::result::Error>
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        >,
+        diesel::result::Error,
+    >
     where
-        crate::ParentProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(parent_procedure_template) = self.parent_procedure_template else {
             return Ok(None);
         };
-        crate::ParentProcedureTemplate::read(
-            (parent_procedure_template, self.procedure_template),
-            conn,
-        )
-        .map(Some)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
-    where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
-    where
-        crate::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::read(
+                (parent_procedure_template, self.procedure_template),
+                conn,
+            )
+            .optional()
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureBuilder {
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,
@@ -190,6 +228,21 @@ impl From<InsertableProcedureBuilder>
 {
     fn from(builder: InsertableProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableProcedureBuilder {
+    fn default() -> Self {
+        Self {
+            procedure: Some(rosetta_uuid::Uuid::new_v4()),
+            procedure_template: Default::default(),
+            parent_procedure: Default::default(),
+            parent_procedure_template: Default::default(),
+            most_concrete_table: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -611,7 +664,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Procedure,
+            Row = crate::codegen::structs_codegen::tables::procedures::Procedure,
             Error = web_common_traits::database::InsertError<ProcedureAttribute>,
         >,
 {
@@ -623,7 +676,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Procedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::procedures::Procedure =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

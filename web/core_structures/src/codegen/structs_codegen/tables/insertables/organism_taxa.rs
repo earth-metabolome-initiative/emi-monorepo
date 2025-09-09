@@ -25,10 +25,10 @@ impl core::str::FromStr for OrganismTaxonAttribute {
 impl core::fmt::Display for OrganismTaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::OrganismId => write!(f, "organism_id"),
-            Self::TaxonId => write!(f, "taxon_id"),
+            Self::CreatedBy => write!(f, "organism_taxa.created_by"),
+            Self::CreatedAt => write!(f, "organism_taxa.created_at"),
+            Self::OrganismId => write!(f, "organism_taxa.organism_id"),
+            Self::TaxonId => write!(f, "organism_taxa.taxon_id"),
         }
     }
 }
@@ -50,41 +50,52 @@ impl InsertableOrganismTaxon {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn organism<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Organism, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::organisms::Organism, diesel::result::Error>
     where
-        crate::Organism: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::organisms::Organism:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Organism::read(self.organism_id, conn)
+        crate::codegen::structs_codegen::tables::organisms::Organism::read(self.organism_id, conn)
     }
     pub fn taxon<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Taxon, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::taxa::Taxon, diesel::result::Error>
     where
-        crate::Taxon: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Taxon::read(self.taxon_id, conn)
+        crate::codegen::structs_codegen::tables::taxa::Taxon::read(self.taxon_id, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismTaxonBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) organism_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) taxon_id: Option<i32>,
+}
+impl Default for InsertableOrganismTaxonBuilder {
+    fn default() -> Self {
+        Self {
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            organism_id: Default::default(),
+            taxon_id: Default::default(),
+        }
+    }
 }
 impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder
@@ -251,7 +262,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::OrganismTaxon,
+            Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
             Error = web_common_traits::database::InsertError<OrganismTaxonAttribute>,
         >,
 {
@@ -263,7 +274,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::OrganismTaxon = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

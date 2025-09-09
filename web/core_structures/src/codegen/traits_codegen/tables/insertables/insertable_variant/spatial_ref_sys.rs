@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::SpatialRefSy as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSy as diesel::Insertable<
-            <crate::SpatialRefSy as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::SpatialRefSy>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::SpatialRefSy;
+    type Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSy;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::SpatialRefSyAttribute,

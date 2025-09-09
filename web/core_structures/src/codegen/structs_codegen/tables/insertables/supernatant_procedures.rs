@@ -115,29 +115,41 @@ impl core::fmt::Display for SupernatantProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::StratifiedSource => write!(f, "stratified_source"),
+            Self::Procedure => write!(f, "supernatant_procedures.procedure"),
+            Self::ProcedureTemplate => {
+                write!(f, "supernatant_procedures.procedure_template")
+            }
+            Self::StratifiedSource => {
+                write!(f, "supernatant_procedures.stratified_source")
+            }
             Self::ProcedureTemplateStratifiedSourceModel => {
-                write!(f, "procedure_template_stratified_source_model")
+                write!(f, "supernatant_procedures.procedure_template_stratified_source_model")
             }
-            Self::ProcedureStratifiedSource(e) => write!(f, "{e}"),
-            Self::SupernatantDestination => write!(f, "supernatant_destination"),
+            Self::ProcedureStratifiedSource(e) => write!(f, "supernatant_procedures.{e}"),
+            Self::SupernatantDestination => {
+                write!(f, "supernatant_procedures.supernatant_destination")
+            }
             Self::ProcedureTemplateSupernatantDestinationModel => {
-                write!(f, "procedure_template_supernatant_destination_model")
+                write!(f, "supernatant_procedures.procedure_template_supernatant_destination_model")
             }
-            Self::ProcedureSupernatantDestination(e) => write!(f, "{e}"),
-            Self::TransferredWith => write!(f, "transferred_with"),
-            Self::TransferredWithModel => write!(f, "transferred_with_model"),
+            Self::ProcedureSupernatantDestination(e) => {
+                write!(f, "supernatant_procedures.{e}")
+            }
+            Self::TransferredWith => write!(f, "supernatant_procedures.transferred_with"),
+            Self::TransferredWithModel => {
+                write!(f, "supernatant_procedures.transferred_with_model")
+            }
             Self::ProcedureTemplateTransferredWithModel => {
-                write!(f, "procedure_template_transferred_with_model")
+                write!(f, "supernatant_procedures.procedure_template_transferred_with_model")
             }
-            Self::ProcedureTransferredWith(e) => write!(f, "{e}"),
-            Self::PipetteTipModel => write!(f, "pipette_tip_model"),
+            Self::ProcedureTransferredWith(e) => write!(f, "supernatant_procedures.{e}"),
+            Self::PipetteTipModel => {
+                write!(f, "supernatant_procedures.pipette_tip_model")
+            }
             Self::ProcedureTemplatePipetteTipModel => {
-                write!(f, "procedure_template_pipette_tip_model")
+                write!(f, "supernatant_procedures.procedure_template_pipette_tip_model")
             }
-            Self::ProcedurePipetteTip(e) => write!(f, "{e}"),
+            Self::ProcedurePipetteTip(e) => write!(f, "supernatant_procedures.{e}"),
         }
     }
 }
@@ -167,102 +179,273 @@ pub struct InsertableSupernatantProcedure {
     pub(crate) procedure_pipette_tip: ::rosetta_uuid::Uuid,
 }
 impl InsertableSupernatantProcedure {
-    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PipetteTipModel, diesel::result::Error>
-    where
-        crate::PipetteTipModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PipetteTipModel::read(self.pipette_tip_model, conn)
-    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     where
-        crate::Procedure: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn stratified_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.stratified_source,
+            conn,
+        )
+    }
+    pub fn procedure_template_stratified_source_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_stratified_source_model,
+            conn,
+        )
+    }
+    pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_stratified_source,
+            conn,
+        )
+    }
+    pub fn supernatant_destination<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.supernatant_destination,
+            conn,
+        )
+    }
+    pub fn procedure_template_supernatant_destination_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_supernatant_destination_model,
+            conn,
+        )
+    }
+    pub fn procedure_supernatant_destination<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_supernatant_destination,
+            conn,
+        )
+    }
+    pub fn transferred_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::pipettes::Pipette, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::pipettes::Pipette:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipettes::Pipette::read(
+            self.transferred_with,
+            conn,
+        )
+    }
+    pub fn transferred_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+            self.transferred_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_transferred_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_transferred_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_transferred_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_transferred_with,
+            conn,
+        )
+    }
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+            self.pipette_tip_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_pipette_tip_model,
+            conn,
+        )
     }
     pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_pipette_tip, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_pipette_tip_pipette_tip_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_pipette_tip)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.pipette_tip_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_pipette_tip_pipette_tip_m_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_pipette_tip)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.pipette_tip_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_pipette_tip_procedure_tem_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_pipette_tip)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_pipette_tip_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_pipette_tip,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn supernatant_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -271,190 +454,22 @@ impl InsertableSupernatantProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-    }
-    pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_stratified_source, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_stratified_source_procedu_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stratified_source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_stratified_source_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_stratified_source_stratif_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stratified_source)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.stratified_source),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    pub fn procedure_supernatant_destination<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_supernatant_destination, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_supernatant_destination_p_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_supernatant_destination)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_supernatant_destination_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_supernatant_destination_s_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_supernatant_destination)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.supernatant_destination),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::SupernatantProcedureTemplate, diesel::result::Error>
-    where
-        crate::SupernatantProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::SupernatantProcedureTemplate::read(self.procedure_template, conn)
-    }
-    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_pipette_tip_model, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::SupernatantProcedureTemplate, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::SupernatantProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_supernatant_destination_model
-                            .eq(&self.procedure_template_supernatant_destination_model),
-                    ),
-            )
-            .first::<crate::SupernatantProcedureTemplate>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey2(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::SupernatantProcedureTemplate, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::SupernatantProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_transferred_with_model
-                            .eq(&self.procedure_template_transferred_with_model),
-                    ),
-            )
-            .first::<crate::SupernatantProcedureTemplate>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey3(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::SupernatantProcedureTemplate, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::SupernatantProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_pipette_tip_model
-                            .eq(&self.procedure_template_pipette_tip_model),
-                    ),
-            )
-            .first::<crate::SupernatantProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn supernatant_procedures_procedure_template_procedure_templa_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::SupernatantProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::SupernatantProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -463,104 +478,142 @@ impl InsertableSupernatantProcedure {
                             .eq(&self.procedure_template_stratified_source_model),
                     ),
             )
-            .first::<crate::SupernatantProcedureTemplate>(conn)
-    }
-    pub fn procedure_template_stratified_source_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_stratified_source_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_supernatant_destination_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_supernatant_destination_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_transferred_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_transferred_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_transferred_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_transferred_with, conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_transferred_with_procedur_fkey(
+    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_transferred_with)
+                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_supernatant_destination_model
+                            .eq(&self.procedure_template_supernatant_destination_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey2(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_transferred_with_model
                             .eq(&self.procedure_template_transferred_with_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_transferred_with_transfe_fkey1(
+    pub fn supernatant_procedures_procedure_template_procedure_templ_fkey3(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_transferred_with)
+                crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.transferred_with_model),
+                        crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_pipette_tip_model
+                            .eq(&self.procedure_template_pipette_tip_model),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_stratified_source_stratif_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stratified_source)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.stratified_source),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_supernatant_destination_s_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_supernatant_destination)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.supernatant_destination),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn supernatant_procedures_procedure_transferred_with_transfer_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_transferred_with)
@@ -569,62 +622,196 @@ impl InsertableSupernatantProcedure {
                             .eq(&self.transferred_with),
                     ),
             )
-            .first::<crate::ProcedureAsset>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn stratified_source<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_pipette_tip_pipette_tip_m_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
-    where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.stratified_source, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_pipette_tip)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn supernatant_destination<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_stratified_source_procedu_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
-    where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.supernatant_destination, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stratified_source)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_stratified_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn transferred_with<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_supernatant_destination_p_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::Pipette, diesel::result::Error>
-    where
-        crate::Pipette: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Pipette::read(self.transferred_with, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_supernatant_destination)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_supernatant_destination_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn transferred_with_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_transferred_with_procedur_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::PipetteModel, diesel::result::Error>
-    where
-        crate::PipetteModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PipetteModel::read(self.transferred_with_model, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_transferred_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_transferred_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_pipette_tip_procedure_tem_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_pipette_tip)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn supernatant_procedures_transferred_with_model_pipette_tip_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
     where
-        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetCompatibilityRule::read(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
             (self.transferred_with_model, self.pipette_tip_model),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_transferred_with_transfe_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_transferred_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.transferred_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedures_procedure_pipette_tip_pipette_tip_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_pipette_tip)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -1111,8 +1298,6 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
-    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v5 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
@@ -1121,8 +1306,9 @@ impl<
     /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v4 directly-involved-column
     /// end
-    /// v4 --->|"`associated same as`"| v6
     /// v5 --->|"`associated same as`"| v6
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v4
@@ -1131,6 +1317,7 @@ impl<
     /// v1 -.->|"`foreign defines`"| v3
     /// v2 --->|"`associated same as`"| v6
     /// v3 --->|"`associated same as`"| v6
+    /// v4 --->|"`associated same as`"| v6
     /// v9 --->|"`extends`"| v8
     /// v9 ---o|"`associated with`"| v7
     /// ```
@@ -1171,16 +1358,16 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stratified_source"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stratified_source"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stratified_source(
@@ -1226,16 +1413,16 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stratified_source"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_stratified_source_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stratified_source_model(
@@ -1285,18 +1472,18 @@ impl<
     /// subgraph v7 ["`supernatant_procedures`"]
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
-    ///    v4@{shape: rounded, label: "stratified_source"}
-    /// class v4 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_stratified_source"}
     /// class v2 column-of-interest
+    ///    v4@{shape: rounded, label: "stratified_source"}
+    /// class v4 directly-involved-column
     /// end
     /// v3 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v4
+    /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_stratified_source<PSS>(
@@ -1312,6 +1499,38 @@ impl<
         >,
     {
         let mut procedure_stratified_source = procedure_stratified_source.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_stratified_source
+        {
+            procedure_stratified_source = if let (Some(stratified_source), Some(asset)) =
+                (self.stratified_source, builder.asset)
+            {
+                if stratified_source != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StratifiedSource,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.stratified_source = Some(asset);
+                builder.into()
+            } else if let Some(stratified_source) = self.stratified_source {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(stratified_source),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureStratifiedSource(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_stratified_source
         {
@@ -1353,38 +1572,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_stratified_source
-        {
-            procedure_stratified_source = if let (Some(stratified_source), Some(asset)) =
-                (self.stratified_source, builder.asset)
-            {
-                if stratified_source != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StratifiedSource,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.stratified_source = Some(asset);
-                builder.into()
-            } else if let Some(stratified_source) = self.stratified_source {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(stratified_source),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStratifiedSource(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_stratified_source = procedure_stratified_source;
         Ok(self)
     }
@@ -1403,10 +1590,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "supernatant_destination"}
@@ -1459,22 +1646,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_supernatant_destination_model(
@@ -1516,12 +1703,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_supernatant_destination"}
@@ -1553,6 +1740,40 @@ impl<
         >,
     {
         let mut procedure_supernatant_destination = procedure_supernatant_destination.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_supernatant_destination
+        {
+            procedure_supernatant_destination = if let (
+                Some(supernatant_destination),
+                Some(asset),
+            ) = (self.supernatant_destination, builder.asset)
+            {
+                if supernatant_destination != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::SupernatantDestination,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.supernatant_destination = Some(asset);
+                builder.into()
+            } else if let Some(supernatant_destination) = self.supernatant_destination {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(supernatant_destination),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSupernatantDestination(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_supernatant_destination
         {
@@ -1596,40 +1817,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_supernatant_destination
-        {
-            procedure_supernatant_destination = if let (
-                Some(supernatant_destination),
-                Some(asset),
-            ) = (self.supernatant_destination, builder.asset)
-            {
-                if supernatant_destination != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::SupernatantDestination,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.supernatant_destination = Some(asset);
-                builder.into()
-            } else if let Some(supernatant_destination) = self.supernatant_destination {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(supernatant_destination),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureSupernatantDestination(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_supernatant_destination = procedure_supernatant_destination;
         Ok(self)
     }
@@ -1648,23 +1835,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "transferred_with"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_transferred_with"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn transferred_with(
@@ -1703,10 +1890,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "transferred_with_model"}
@@ -1759,23 +1946,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_transferred_with"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_transferred_with_model(
@@ -1815,25 +2002,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
-    ///    v6@{shape: rounded, label: "transferred_with_model"}
-    /// class v6 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v4 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v3 directly-involved-column
     ///    v5@{shape: rounded, label: "transferred_with"}
     /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "transferred_with_model"}
+    /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
+    /// class v4 column-of-interest
     /// end
+    /// v3 --->|"`associated same as`"| v2
+    /// v5 --->|"`associated same as`"| v0
     /// v6 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v7
     /// v4 --->|"`associated same as`"| v7
@@ -1843,8 +2032,6 @@ impl<
     /// v4 -.->|"`foreign defines`"| v6
     /// v4 -.->|"`foreign defines`"| v5
     /// v0 -.->|"`foreign defines`"| v1
-    /// v3 --->|"`associated same as`"| v2
-    /// v5 --->|"`associated same as`"| v0
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_transferred_with<PTW>(
@@ -1860,6 +2047,38 @@ impl<
         >,
     {
         let mut procedure_transferred_with = procedure_transferred_with.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_transferred_with
+        {
+            procedure_transferred_with = if let (Some(transferred_with), Some(asset)) =
+                (self.transferred_with, builder.asset)
+            {
+                if transferred_with != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::TransferredWith,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.transferred_with = Some(asset);
+                builder.into()
+            } else if let Some(transferred_with) = self.transferred_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(transferred_with),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureTransferredWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_transferred_with
         {
@@ -1933,38 +2152,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_transferred_with
-        {
-            procedure_transferred_with = if let (Some(transferred_with), Some(asset)) =
-                (self.transferred_with, builder.asset)
-            {
-                if transferred_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::TransferredWith,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.transferred_with = Some(asset);
-                builder.into()
-            } else if let Some(transferred_with) = self.transferred_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(transferred_with),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTransferredWith(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_transferred_with = procedure_transferred_with;
         Ok(self)
     }
@@ -1989,19 +2176,19 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_pipette_tip"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn pipette_tip_model(
@@ -2055,10 +2242,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
@@ -2110,21 +2297,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
+    ///    v2@{shape: rounded, label: "pipette_tip_model"}
+    /// class v2 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v3 column-of-interest
-    ///    v2@{shape: rounded, label: "pipette_tip_model"}
-    /// class v2 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 --->|"`associated same as`"| v0
     /// v4 --->|"`associated same as`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
@@ -2133,8 +2322,6 @@ impl<
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_pipette_tip<PPT>(
@@ -2150,36 +2337,6 @@ impl<
         >,
     {
         let mut procedure_pipette_tip = procedure_pipette_tip.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
-            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
-                (self.pipette_tip_model, builder.asset_model)
-            {
-                if pipette_tip_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PipetteTipModel,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.pipette_tip_model = Some(asset_model);
-                builder.into()
-            } else if let Some(pipette_tip_model) = self.pipette_tip_model {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
-                        builder,
-                        pipette_tip_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
             procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
                 (self.pipette_tip_model, builder.asset_model)
@@ -2236,6 +2393,36 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_pipette_tip_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePipetteTip(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
+            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
+                (self.pipette_tip_model, builder.asset_model)
+            {
+                if pipette_tip_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PipetteTipModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.pipette_tip_model = Some(asset_model);
+                builder.into()
+            } else if let Some(pipette_tip_model) = self.pipette_tip_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        pipette_tip_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -2456,27 +2643,35 @@ where
     }
 }
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableSupernatantProcedureBuilder<Procedure>
+for InsertableSupernatantProcedureBuilder<Procedure>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::SupernatantProcedure,
-            Error = web_common_traits::database::InsertError<SupernatantProcedureAttribute>,
-        >,
-    Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
-        web_common_traits::database::TryInsertGeneric<C>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+        Error = web_common_traits::database::InsertError<SupernatantProcedureAttribute>,
+    >,
+    Procedure: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = SupernatantProcedureAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::SupernatantProcedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

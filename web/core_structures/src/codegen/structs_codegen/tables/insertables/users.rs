@@ -26,11 +26,11 @@ impl core::str::FromStr for UserAttribute {
 impl core::fmt::Display for UserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::FirstName => write!(f, "first_name"),
-            Self::LastName => write!(f, "last_name"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "users.id"),
+            Self::FirstName => write!(f, "users.first_name"),
+            Self::LastName => write!(f, "users.last_name"),
+            Self::CreatedAt => write!(f, "users.created_at"),
+            Self::UpdatedAt => write!(f, "users.updated_at"),
         }
     }
 }
@@ -47,7 +47,7 @@ pub struct InsertableUser {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserBuilder {
     pub(crate) first_name: Option<String>,
@@ -60,6 +60,16 @@ impl From<InsertableUserBuilder>
 {
     fn from(builder: InsertableUserBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableUserBuilder {
+    fn default() -> Self {
+        Self {
+            first_name: Default::default(),
+            last_name: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -285,7 +295,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::User,
+            Row = crate::codegen::structs_codegen::tables::users::User,
             Error = web_common_traits::database::InsertError<UserAttribute>,
         >,
 {
@@ -297,7 +307,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::User = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::users::User =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

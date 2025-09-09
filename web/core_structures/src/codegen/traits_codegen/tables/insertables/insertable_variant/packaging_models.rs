@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePackagingMod
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PackagingModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel as diesel::Insertable<
-            <crate::PackagingModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PackagingModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
@@ -19,7 +23,7 @@ where
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PackagingModel;
+    type Row = crate::codegen::structs_codegen::tables::packaging_models::PackagingModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,

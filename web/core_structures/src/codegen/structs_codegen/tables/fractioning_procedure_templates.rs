@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::WeighingDeviceModel, foreign_key = weighed_with_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        foreign_key = weighed_with_model
+    )
+)]
 #[diesel(primary_key(procedure_template))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates
@@ -37,18 +42,20 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
-    for FractioningProcedureTemplate
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    > for FractioningProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::FractioningProcedureTemplate>
-    for FractioningProcedureTemplate
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+> for FractioningProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl diesel::Identifiable for FractioningProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -59,52 +66,89 @@ impl FractioningProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn weighed_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::WeighingDeviceModel::read(self.weighed_with_model, conn)
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.weighed_with_model,
+            conn,
+        )
     }
     pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_weighed_with_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_weighed_with_model,
+            conn,
+        )
     }
     pub fn fragment_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.fragment_container_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.fragment_container_model,
+            conn,
+        )
     }
-    pub fn procedure_template_fragment_container_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_fragment_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_fragment_container_model,
             conn,
         )
@@ -112,22 +156,37 @@ impl FractioningProcedureTemplate {
     pub fn fragment_placed_into_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.fragment_placed_into_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.fragment_placed_into_model,
+            conn,
+        )
     }
-    pub fn procedure_template_fragment_placed_into_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_fragment_placed_into_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_fragment_placed_into_model,
             conn,
         )
@@ -136,11 +195,14 @@ impl FractioningProcedureTemplate {
     pub fn fractioning_procedure_templa_procedure_template_weighed_w_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_weighed_with_model)
@@ -149,17 +211,22 @@ impl FractioningProcedureTemplate {
                             .eq(&self.weighed_with_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn fractioning_procedure_templa_procedure_template_fragment_fkey2(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_fragment_container_model)
@@ -168,17 +235,22 @@ impl FractioningProcedureTemplate {
                             .eq(&self.fragment_container_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn fractioning_procedure_templa_procedure_template_fragment_fkey3(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_fragment_placed_into_model)
@@ -187,7 +259,9 @@ impl FractioningProcedureTemplate {
                             .eq(&self.fragment_placed_into_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_weighed_with_model(

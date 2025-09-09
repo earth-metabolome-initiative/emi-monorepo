@@ -10,7 +10,10 @@
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
-    belongs_to(crate::CommercialVolumeMeasuringDeviceModel, foreign_key = product_model)
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        foreign_key = product_model
+    )
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -32,36 +35,42 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel>
-    for CommercialVolumeMeasuringDeviceLot
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for CommercialVolumeMeasuringDeviceLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialProductLot>
-    for CommercialVolumeMeasuringDeviceLot
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    > for CommercialVolumeMeasuringDeviceLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
-    for CommercialVolumeMeasuringDeviceLot
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for CommercialVolumeMeasuringDeviceLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::VolumeMeasuringDeviceModel>
-    for CommercialVolumeMeasuringDeviceLot
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+> for CommercialVolumeMeasuringDeviceLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialVolumeMeasuringDeviceLot>
-    for CommercialVolumeMeasuringDeviceLot
+{}
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+> for CommercialVolumeMeasuringDeviceLot
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl diesel::Identifiable for CommercialVolumeMeasuringDeviceLot {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -72,42 +81,69 @@ impl CommercialVolumeMeasuringDeviceLot {
     pub fn commercial_volume_measuring_device_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProductLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProductLot::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
+            self.id, conn,
+        )
     }
-    pub fn commercial_volume_measuring_device_lots_id_fkey1<C: diesel::connection::LoadConnection>(
+    pub fn commercial_volume_measuring_device_lots_id_fkey1<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumeMeasuringDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumeMeasuringDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel::read(
+            self.id,
+            conn,
+        )
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialVolumeMeasuringDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CommercialVolumeMeasuringDeviceModel::read(self.product_model, conn)
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel::read(
+            self.product_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_volume_measuring_device_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -116,7 +152,9 @@ impl CommercialVolumeMeasuringDeviceLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

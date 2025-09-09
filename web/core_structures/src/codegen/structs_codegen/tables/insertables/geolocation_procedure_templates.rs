@@ -85,11 +85,21 @@ impl core::fmt::Display for GeolocationProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::GeolocatedWithModel => write!(f, "geolocated_with_model"),
-            Self::ProcedureTemplateGeolocatedWithModel(e) => write!(f, "{e}"),
-            Self::GeolocatedAssetModel => write!(f, "geolocated_asset_model"),
-            Self::ProcedureTemplateGeolocatedAssetModel(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate => {
+                write!(f, "geolocation_procedure_templates.procedure_template")
+            }
+            Self::GeolocatedWithModel => {
+                write!(f, "geolocation_procedure_templates.geolocated_with_model")
+            }
+            Self::ProcedureTemplateGeolocatedWithModel(e) => {
+                write!(f, "geolocation_procedure_templates.{e}")
+            }
+            Self::GeolocatedAssetModel => {
+                write!(f, "geolocation_procedure_templates.geolocated_asset_model")
+            }
+            Self::ProcedureTemplateGeolocatedAssetModel(e) => {
+                write!(f, "geolocation_procedure_templates.{e}")
+            }
         }
     }
 }
@@ -109,15 +119,93 @@ pub struct InsertableGeolocationProcedureTemplate {
     pub(crate) procedure_template_geolocated_asset_model: i32,
 }
 impl InsertableGeolocationProcedureTemplate {
-    pub fn procedure_template_geolocated_asset_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn geolocated_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
+            self.geolocated_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_geolocated_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_geolocated_with_model,
+            conn,
+        )
+    }
+    pub fn geolocated_asset_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.geolocated_asset_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_geolocated_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_geolocated_asset_model,
             conn,
         )
@@ -126,11 +214,14 @@ impl InsertableGeolocationProcedureTemplate {
     pub fn geolocation_procedure_templa_procedure_template_geolocate_fkey2(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_geolocated_with_model)
@@ -139,17 +230,22 @@ impl InsertableGeolocationProcedureTemplate {
                             .eq(&self.geolocated_with_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn geolocation_procedure_templa_procedure_template_geolocate_fkey3(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_geolocated_asset_model)
@@ -158,50 +254,9 @@ impl InsertableGeolocationProcedureTemplate {
                             .eq(&self.geolocated_asset_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
-    }
-    pub fn procedure_template_geolocated_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_with_model,
-            conn,
-        )
-    }
-    pub fn geolocated_asset_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PhysicalAssetModel, diesel::result::Error>
-    where
-        crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PhysicalAssetModel::read(self.geolocated_asset_model, conn)
-    }
-    pub fn geolocated_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
-    where
-        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PositioningDeviceModel::read(self.geolocated_with_model, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
-    where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -390,10 +445,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -439,10 +494,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "geolocated_with_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_geolocated_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "geolocated_with_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -450,10 +505,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_geolocated_with_model<PTGWM>(
@@ -525,10 +580,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "geolocated_asset_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -536,10 +591,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn geolocated_asset_model(
@@ -588,10 +643,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -860,7 +915,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
         C,
         UserId = i32,
-        Row = crate::GeolocationProcedureTemplate,
+        Row = crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
         Error = web_common_traits::database::InsertError<
             GeolocationProcedureTemplateAttribute,
         >,
@@ -884,7 +939,7 @@ where
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::GeolocationProcedureTemplate = self
+        let insertable: crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())
     }

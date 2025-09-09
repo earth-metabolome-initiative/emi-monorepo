@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::AssetModel, foreign_key = parent_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        foreign_key = parent_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::asset_models::asset_models
@@ -38,8 +43,12 @@ impl<'a> From<&'a AssetModel>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for AssetModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for AssetModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl<C> web_common_traits::prelude::Ancestor<C> for AssetModel
@@ -76,35 +85,41 @@ impl AssetModel {
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::AssetModel>, diesel::result::Error>
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
-        crate::AssetModel::read(parent_model, conn).map(Some)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(parent_model, conn)
+            .optional()
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

@@ -19,8 +19,8 @@ impl core::str::FromStr for UserOrganizationAttribute {
 impl core::fmt::Display for UserOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::UserId => write!(f, "user_id"),
-            Self::OrganizationId => write!(f, "organization_id"),
+            Self::UserId => write!(f, "user_organizations.user_id"),
+            Self::OrganizationId => write!(f, "user_organizations.organization_id"),
         }
     }
 }
@@ -37,25 +37,32 @@ pub struct InsertableUserOrganization {
     pub(crate) organization_id: i16,
 }
 impl InsertableUserOrganization {
-    pub fn organization<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Organization, diesel::result::Error>
-    where
-        crate::Organization: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Organization::read(self.organization_id, conn)
-    }
     pub fn user<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.user_id, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.user_id, conn)
+    }
+    pub fn organization<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::organizations::Organization:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::organizations::Organization::read(
+            self.organization_id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -154,7 +161,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::UserOrganization,
+            Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
             Error = web_common_traits::database::InsertError<UserOrganizationAttribute>,
         >,
 {
@@ -166,7 +173,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::UserOrganization = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

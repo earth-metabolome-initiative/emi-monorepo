@@ -4,20 +4,25 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::AssetCompatibilityRule as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRule as diesel::Insertable<
-            <crate::AssetCompatibilityRule as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::AssetCompatibilityRule,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
     C: diesel::connection::LoadConnection,
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
-    type Row = crate::AssetCompatibilityRule;
+    type Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRule;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute,

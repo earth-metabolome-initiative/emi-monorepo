@@ -285,9 +285,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::DisposalProcedure)
                     .collect::<Vec<_>>()
             }
-            super::Rows::Document(rows) => {
-                rows.into_iter().map(crate::codegen::tables::row::Row::Document).collect::<Vec<_>>()
-            }
             super::Rows::EmailProvider(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::EmailProvider)
@@ -427,6 +424,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::PhotographProcedure)
                     .collect::<Vec<_>>()
             }
+            super::Rows::Photograph(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::Photograph)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PhysicalAssetModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PhysicalAssetModel)
@@ -512,10 +514,28 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Room(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Room).collect::<Vec<_>>()
             }
+            super::Rows::SampleModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SampleModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::SampleSourceModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SampleSourceModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::SampleSource(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SampleSource)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::SampleState(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SampleState)
                     .collect::<Vec<_>>()
+            }
+            super::Rows::Sample(rows) => {
+                rows.into_iter().map(crate::codegen::tables::row::Row::Sample).collect::<Vec<_>>()
             }
             super::Rows::SpatialRefSy(rows) => {
                 rows.into_iter()

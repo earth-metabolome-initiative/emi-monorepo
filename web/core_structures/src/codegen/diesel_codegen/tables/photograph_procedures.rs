@@ -6,5 +6,7 @@ diesel::table! {
     ::rosetta_uuid::diesel_impls::Uuid, photographed_with -> diesel::sql_types::Nullable
     < ::rosetta_uuid::diesel_impls::Uuid >, procedure_template_photographed_with_model ->
     diesel::sql_types::Integer, procedure_photographed_with ->
-    ::rosetta_uuid::diesel_impls::Uuid }
+    ::rosetta_uuid::diesel_impls::Uuid, photograph -> ::rosetta_uuid::diesel_impls::Uuid,
+    procedure_template_photograph_model -> diesel::sql_types::Integer,
+    procedure_photograph -> ::rosetta_uuid::diesel_impls::Uuid }
 }

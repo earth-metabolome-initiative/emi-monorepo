@@ -28,36 +28,44 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel>
-    for CommercialBallMillMachineModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for CommercialBallMillMachineModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::BallMillMachineModel>
-    for CommercialBallMillMachineModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    > for CommercialBallMillMachineModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct>
-    for CommercialBallMillMachineModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+    > for CommercialBallMillMachineModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
-    for CommercialBallMillMachineModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for CommercialBallMillMachineModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialBallMillMachineModel>
-    for CommercialBallMillMachineModel
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+> for CommercialBallMillMachineModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl diesel::Identifiable for CommercialBallMillMachineModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -68,42 +76,65 @@ impl CommercialBallMillMachineModel {
     pub fn ball_mill_machine_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::BallMillMachineModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+        diesel::result::Error,
+    >
     where
-        crate::BallMillMachineModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::BallMillMachineModel::read(self.ball_mill_machine_model, conn)
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::read(
+            self.ball_mill_machine_model,
+            conn,
+        )
     }
     pub fn commercial_ball_mill_machine_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::BallMillMachineModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+        diesel::result::Error,
+    >
     where
-        crate::BallMillMachineModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::BallMillMachineModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::read(
+            self.id,
+            conn,
+        )
     }
     pub fn commercial_ball_mill_machine_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProduct, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProduct: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProduct::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
+            self.id, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_ball_mill_machine_mo_id_ball_mill_machine_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -112,7 +143,9 @@ impl CommercialBallMillMachineModel {
                             .eq(&self.ball_mill_machine_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
     pub fn from_ball_mill_machine_model<C>(
         ball_mill_machine_model: i32,

@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::CappingProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -20,20 +19,23 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 capped_container_model
                     .ne(excluded(capped_container_model))
-                    .or(procedure_template_capped_container_model
-                        .ne(excluded(procedure_template_capped_container_model)))
+                    .or(
+                        procedure_template_capped_container_model
+                            .ne(excluded(procedure_template_capped_container_model)),
+                    )
                     .or(capped_with_model.ne(excluded(capped_with_model)))
-                    .or(procedure_template_capped_with_model
-                        .ne(excluded(procedure_template_capped_with_model))),
+                    .or(
+                        procedure_template_capped_with_model
+                            .ne(excluded(procedure_template_capped_with_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::CappingProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -52,13 +54,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 capped_container_model
                     .ne(excluded(capped_container_model))
-                    .or(procedure_template_capped_container_model
-                        .ne(excluded(procedure_template_capped_container_model)))
+                    .or(
+                        procedure_template_capped_container_model
+                            .ne(excluded(procedure_template_capped_container_model)),
+                    )
                     .or(capped_with_model.ne(excluded(capped_with_model)))
-                    .or(procedure_template_capped_with_model
-                        .ne(excluded(procedure_template_capped_with_model))),
+                    .or(
+                        procedure_template_capped_with_model
+                            .ne(excluded(procedure_template_capped_with_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

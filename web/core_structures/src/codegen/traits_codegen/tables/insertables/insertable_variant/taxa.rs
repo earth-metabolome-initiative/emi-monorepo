@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Taxon as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTaxon as diesel::Insertable<
-            <crate::Taxon as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Taxon>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::taxa::Taxon,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Taxon;
+    type Row = crate::codegen::structs_codegen::tables::taxa::Taxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTaxon;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TaxonAttribute,

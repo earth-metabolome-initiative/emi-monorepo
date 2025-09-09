@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Color, foreign_key = color_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::colors::Color,
+        foreign_key = color_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::sample_states::sample_states
@@ -34,8 +39,12 @@ impl<'a> From<&'a SampleState>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::SampleState> for SampleState where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::sample_states::SampleState,
+    > for SampleState
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
 {
 }
 impl diesel::Identifiable for SampleState {
@@ -48,12 +57,13 @@ impl SampleState {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
     where
-        crate::Color: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

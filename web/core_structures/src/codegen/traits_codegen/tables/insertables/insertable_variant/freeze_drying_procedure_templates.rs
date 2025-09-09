@@ -7,14 +7,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDrying
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate as diesel::Insertable<
-            <crate::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::FreezeDryingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -24,21 +24,28 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute,
     >,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::FreezeDryingProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureTemplateAttribute,
@@ -56,16 +63,16 @@ where
         self.set_most_concrete_table("freeze_drying_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct
-            .procedure_template_freeze_dried_with_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_freeze_dried_with_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -88,7 +95,7 @@ where
             procedure_template_freeze_dried_with_model,
         ) = self.procedure_template_freeze_dried_with_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_freeze_dried_with_model,
                 conn,
             )?;
@@ -101,7 +108,7 @@ where
             procedure_template_freeze_dried_container_model,
         ) = self.procedure_template_freeze_dried_container_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_freeze_dried_container_model,
                 conn,
             )?;

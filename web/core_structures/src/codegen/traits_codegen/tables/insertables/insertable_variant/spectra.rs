@@ -7,23 +7,37 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuil
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::Spectrum as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::spectra::Spectrum as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum as diesel::Insertable<
-            <crate::Spectrum as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::spectra::Spectrum as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Spectrum>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::spectra::Spectrum,
+    >,
     C: diesel::connection::LoadConnection,
     DigitalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::DigitalAsset: web_common_traits::database::Read<C>,
-    crate::DigitalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::SpectraCollection: web_common_traits::database::Read<C>,
-    crate::SpectraCollection: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::Spectrum;
+    type Row = crate::codegen::structs_codegen::tables::spectra::Spectrum;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectrum;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::SpectrumAttribute,

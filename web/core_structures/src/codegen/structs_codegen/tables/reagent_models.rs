@@ -31,12 +31,20 @@ impl<'a> From<&'a ReagentModel>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for ReagentModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for ReagentModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::ReagentModel> for ReagentModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
+    > for ReagentModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for ReagentModel {
@@ -49,12 +57,16 @@ impl ReagentModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_cas_code(

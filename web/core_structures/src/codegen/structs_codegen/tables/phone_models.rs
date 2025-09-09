@@ -22,24 +22,44 @@ impl<'a> From<&'a PhoneModel>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for PhoneModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CameraModel> for PhoneModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel> for PhoneModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PositioningDeviceModel> for PhoneModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhoneModel> for PhoneModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
+    > for PhoneModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for PhoneModel {
@@ -52,22 +72,33 @@ impl PhoneModel {
     pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CameraModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel,
+        diesel::result::Error,
+    >
     where
-        crate::CameraModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CameraModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::camera_models::CameraModel::read(self.id, conn)
     }
     pub fn phone_models_positioning<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PositioningDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
+            self.id,
+            conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

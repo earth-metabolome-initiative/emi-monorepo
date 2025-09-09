@@ -9,8 +9,18 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::PipetteModel, foreign_key = aliquoted_with_model))]
-#[diesel(belongs_to(crate::PipetteTipModel, foreign_key = pipette_tip_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        foreign_key = aliquoted_with_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        foreign_key = pipette_tip_model
+    )
+)]
 #[diesel(primary_key(procedure_template))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates
@@ -39,18 +49,20 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplate>
-    for AliquotingProcedureTemplate
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    > for AliquotingProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AliquotingProcedureTemplate>
-    for AliquotingProcedureTemplate
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
+> for AliquotingProcedureTemplate
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl diesel::Identifiable for AliquotingProcedureTemplate {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -61,102 +73,180 @@ impl AliquotingProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn aliquoted_from_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.aliquoted_from_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.aliquoted_from_model,
+            conn,
+        )
     }
-    pub fn procedure_template_aliquoted_from_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_aliquoted_from_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_aliquoted_from_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_from_model,
+            conn,
+        )
     }
     pub fn aliquoted_into_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.aliquoted_into_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.aliquoted_into_model,
+            conn,
+        )
     }
-    pub fn procedure_template_aliquoted_into_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_aliquoted_into_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_aliquoted_into_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_into_model,
+            conn,
+        )
     }
     pub fn aliquoted_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PipetteModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        diesel::result::Error,
+    >
     where
-        crate::PipetteModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PipetteModel::read(self.aliquoted_with_model, conn)
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+            self.aliquoted_with_model,
+            conn,
+        )
     }
-    pub fn procedure_template_aliquoted_with_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_aliquoted_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_aliquoted_with_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_with_model,
+            conn,
+        )
     }
     pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PipetteTipModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
     where
-        crate::PipetteTipModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PipetteTipModel::read(self.pipette_tip_model, conn)
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+            self.pipette_tip_model,
+            conn,
+        )
     }
     pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_pipette_tip_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_pipette_tip_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn aliquoting_procedure_templat_procedure_template_aliquoted_fkey3(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_aliquoted_with_model)
@@ -165,17 +255,22 @@ impl AliquotingProcedureTemplate {
                             .eq(&self.aliquoted_with_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn aliquoting_procedure_templat_procedure_template_pipette_t_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_pipette_tip_model)
@@ -184,19 +279,25 @@ impl AliquotingProcedureTemplate {
                             .eq(&self.pipette_tip_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn aliquoting_procedure_template_aliquoted_with_model_pipette_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
     where
-        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetCompatibilityRule::read(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
             (self.aliquoted_with_model, self.pipette_tip_model),
             conn,
         )
@@ -205,11 +306,14 @@ impl AliquotingProcedureTemplate {
     pub fn aliquoting_procedure_templat_procedure_template_aliquoted_fkey4(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_aliquoted_from_model)
@@ -218,17 +322,22 @@ impl AliquotingProcedureTemplate {
                             .eq(&self.aliquoted_from_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn aliquoting_procedure_templat_procedure_template_aliquoted_fkey5(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_aliquoted_into_model)
@@ -237,7 +346,9 @@ impl AliquotingProcedureTemplate {
                             .eq(&self.aliquoted_into_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_aliquoted_from_model(

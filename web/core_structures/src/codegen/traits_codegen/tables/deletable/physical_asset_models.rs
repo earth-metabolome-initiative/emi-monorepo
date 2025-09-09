@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Deletable for crate::PhysicalAssetModel {
+impl web_common_traits::prelude::Deletable
+    for crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel
+{
     type Conn = diesel::PgConnection;
     type UserId = i32;
     fn delete(

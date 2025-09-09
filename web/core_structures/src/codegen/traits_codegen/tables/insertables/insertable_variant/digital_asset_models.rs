@@ -7,18 +7,27 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::DigitalAssetModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModel as diesel::Insertable<
-            <crate::DigitalAssetModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::DigitalAssetModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
+    >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::DigitalAssetModel;
+    type Row = crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute,
@@ -53,6 +62,13 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        let mime_type = self
+            .mime_type
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute::MimeType,
+                ),
+            )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
@@ -66,6 +82,7 @@ where
         Ok(Self::InsertableVariant {
             id,
             parent_model: self.parent_model,
+            mime_type,
         })
     }
 }

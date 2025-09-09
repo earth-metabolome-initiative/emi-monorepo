@@ -32,13 +32,13 @@ impl core::str::FromStr for LoginProviderAttribute {
 impl core::fmt::Display for LoginProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Icon => write!(f, "icon"),
-            Self::ClientId => write!(f, "client_id"),
-            Self::RedirectUri => write!(f, "redirect_uri"),
-            Self::OauthUrl => write!(f, "oauth_url"),
-            Self::Scope => write!(f, "scope"),
+            Self::Id => write!(f, "login_providers.id"),
+            Self::Name => write!(f, "login_providers.name"),
+            Self::Icon => write!(f, "login_providers.icon"),
+            Self::ClientId => write!(f, "login_providers.client_id"),
+            Self::RedirectUri => write!(f, "login_providers.redirect_uri"),
+            Self::OauthUrl => write!(f, "login_providers.oauth_url"),
+            Self::Scope => write!(f, "login_providers.scope"),
         }
     }
 }
@@ -380,7 +380,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::LoginProvider,
+            Row = crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
             Error = web_common_traits::database::InsertError<LoginProviderAttribute>,
         >,
 {
@@ -392,7 +392,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::LoginProvider = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::login_providers::LoginProvider =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -1,27 +1,40 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DisposalProcedureTemplateForeignKeys {
-    pub procedure_template: Option<crate::ProcedureTemplate>,
-    pub disposed_asset_model: Option<crate::PhysicalAssetModel>,
-    pub procedure_template_disposed_asset_model: Option<crate::ProcedureTemplateAssetModel>,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub disposed_asset_model: Option<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    >,
+    pub procedure_template_disposed_asset_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::DisposalProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys
+for crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate {
     type ForeignKeys = DisposalProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                self.disposed_asset_model,
-            ),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                        self.disposed_asset_model,
+                    ),
+                ),
+            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -45,7 +58,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::DisposalProcedureTemp
         let mut updated = false;
         match (row, crud) {
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(
+                    physical_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
@@ -56,7 +71,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::DisposalProcedureTemp
                 }
             }
             (
-                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(
+                    physical_asset_models,
+                ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
                 if self.disposed_asset_model == physical_asset_models.id {
@@ -75,8 +92,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::DisposalProcedureTemp
                 if self.procedure_template_disposed_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_disposed_asset_model =
-                        Some(procedure_template_asset_models);
+                    foreign_keys.procedure_template_disposed_asset_model = Some(
+                        procedure_template_asset_models,
+                    );
                     updated = true;
                 }
             }

@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePackagingPro
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PackagingProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedure as diesel::Insertable<
-            <crate::PackagingProcedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PackagingProcedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
+    >,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -20,18 +24,27 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute,
     >,
-    crate::PackagingProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PackagingProcedure;
+    type Row = crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute,
@@ -69,7 +82,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let packaging_procedure_templates = crate::PackagingProcedureTemplate::read(
+            let packaging_procedure_templates = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -85,7 +98,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_sample) = self
             .procedure_sample
         {
-            let procedure_assets = crate::ProcedureAsset::read(procedure_sample, conn)?;
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+                procedure_sample,
+                conn,
+            )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
                 self,
                 procedure_assets.procedure_template_asset_model,
@@ -104,7 +120,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_packaged_with) = self
             .procedure_packaged_with
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_packaged_with,
                 conn,
             )?;

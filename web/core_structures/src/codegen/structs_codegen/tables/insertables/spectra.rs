@@ -40,8 +40,8 @@ impl core::fmt::Display for SpectrumAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::SpectraCollectionId => write!(f, "spectra_collection_id"),
+            Self::Id => write!(f, "spectra.id"),
+            Self::SpectraCollectionId => write!(f, "spectra.spectra_collection_id"),
         }
     }
 }
@@ -59,22 +59,33 @@ impl InsertableSpectrum {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DigitalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::DigitalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
     }
     pub fn spectra_collection<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::SpectraCollection, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        diesel::result::Error,
+    >
     where
-        crate::SpectraCollection: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::SpectraCollection::read(self.spectra_collection_id, conn)
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection::read(
+            self.spectra_collection_id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -390,7 +401,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Spectrum,
+            Row = crate::codegen::structs_codegen::tables::spectra::Spectrum,
             Error = web_common_traits::database::InsertError<SpectrumAttribute>,
         >,
     DigitalAsset:
@@ -404,7 +415,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Spectrum = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::spectra::Spectrum =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

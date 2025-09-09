@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPo
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialPositioningDeviceModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModel as diesel::Insertable<
-            <crate::CommercialPositioningDeviceModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialPositioningDeviceModel,
+        crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -27,14 +27,16 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
-    crate::PositioningDeviceModel: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialPositioningDeviceModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPositioningDeviceModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialPositioningDeviceModelAttribute,

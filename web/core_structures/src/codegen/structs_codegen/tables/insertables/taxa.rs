@@ -25,10 +25,10 @@ impl core::str::FromStr for TaxonAttribute {
 impl core::fmt::Display for TaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::ParentId => write!(f, "parent_id"),
-            Self::RankId => write!(f, "rank_id"),
+            Self::Id => write!(f, "taxa.id"),
+            Self::Name => write!(f, "taxa.name"),
+            Self::ParentId => write!(f, "taxa.parent_id"),
+            Self::RankId => write!(f, "taxa.rank_id"),
         }
     }
 }
@@ -48,12 +48,12 @@ impl InsertableTaxon {
     pub fn rank<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Rank, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::ranks::Rank, diesel::result::Error>
     where
-        crate::Rank: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::ranks::Rank: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Rank::read(self.rank_id, conn)
+        crate::codegen::structs_codegen::tables::ranks::Rank::read(self.rank_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -238,7 +238,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Taxon,
+            Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
             Error = web_common_traits::database::InsertError<TaxonAttribute>,
         >,
 {
@@ -250,7 +250,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Taxon = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::taxa::Taxon =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

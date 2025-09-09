@@ -1,10 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EmailProviderForeignKeys {
-    pub email: Option<crate::UserEmail>,
-    pub login_provider: Option<crate::LoginProvider>,
+    pub email: Option<crate::codegen::structs_codegen::tables::user_emails::UserEmail>,
+    pub login_provider:
+        Option<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::EmailProvider {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::email_providers::EmailProvider
+{
     type ForeignKeys = EmailProviderForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

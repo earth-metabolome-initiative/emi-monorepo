@@ -9,22 +9,31 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPi
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialPipetteLot as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLot as diesel::Insertable<
-            <crate::CommercialPipetteLot as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CommercialPipetteLot>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+    >,
     C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
     PipetteModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::PipetteModel: web_common_traits::database::Read<C>,
-    crate::PipetteModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_models::PipetteModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialPipetteLot;
+    type Row = crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute,

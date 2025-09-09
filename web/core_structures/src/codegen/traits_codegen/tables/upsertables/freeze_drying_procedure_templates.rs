@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::FreezeDryingProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -20,24 +19,35 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
                     .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
                     .or(freeze_dried_with_model.ne(excluded(freeze_dried_with_model)))
-                    .or(procedure_template_freeze_dried_with_model
-                        .ne(excluded(procedure_template_freeze_dried_with_model)))
-                    .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
-                    .or(procedure_template_freeze_dried_container_model
-                        .ne(excluded(procedure_template_freeze_dried_container_model))),
+                    .or(
+                        procedure_template_freeze_dried_with_model
+                            .ne(excluded(procedure_template_freeze_dried_with_model)),
+                    )
+                    .or(
+                        freeze_dried_container_model
+                            .ne(excluded(freeze_dried_container_model)),
+                    )
+                    .or(
+                        procedure_template_freeze_dried_container_model
+                            .ne(
+                                excluded(procedure_template_freeze_dried_container_model),
+                            ),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::FreezeDryingProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -56,17 +66,29 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
                     .or(pascal.ne(excluded(pascal)))
                     .or(seconds.ne(excluded(seconds)))
                     .or(freeze_dried_with_model.ne(excluded(freeze_dried_with_model)))
-                    .or(procedure_template_freeze_dried_with_model
-                        .ne(excluded(procedure_template_freeze_dried_with_model)))
-                    .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
-                    .or(procedure_template_freeze_dried_container_model
-                        .ne(excluded(procedure_template_freeze_dried_container_model))),
+                    .or(
+                        procedure_template_freeze_dried_with_model
+                            .ne(excluded(procedure_template_freeze_dried_with_model)),
+                    )
+                    .or(
+                        freeze_dried_container_model
+                            .ne(excluded(freeze_dried_container_model)),
+                    )
+                    .or(
+                        procedure_template_freeze_dried_container_model
+                            .ne(
+                                excluded(procedure_template_freeze_dried_container_model),
+                            ),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

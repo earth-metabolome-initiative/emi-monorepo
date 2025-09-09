@@ -29,12 +29,12 @@ impl core::str::FromStr for AddressAttribute {
 impl core::fmt::Display for AddressAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::CityId => write!(f, "city_id"),
-            Self::StreetName => write!(f, "street_name"),
-            Self::StreetNumber => write!(f, "street_number"),
-            Self::PostalCode => write!(f, "postal_code"),
-            Self::Geolocation => write!(f, "geolocation"),
+            Self::Id => write!(f, "addresses.id"),
+            Self::CityId => write!(f, "addresses.city_id"),
+            Self::StreetName => write!(f, "addresses.street_name"),
+            Self::StreetNumber => write!(f, "addresses.street_number"),
+            Self::PostalCode => write!(f, "addresses.postal_code"),
+            Self::Geolocation => write!(f, "addresses.geolocation"),
         }
     }
 }
@@ -55,12 +55,12 @@ impl InsertableAddress {
     pub fn city<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::City, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::cities::City, diesel::result::Error>
     where
-        crate::City: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::cities::City: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::City::read(self.city_id, conn)
+        crate::codegen::structs_codegen::tables::cities::City::read(self.city_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
@@ -309,7 +309,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Address,
+            Row = crate::codegen::structs_codegen::tables::addresses::Address,
             Error = web_common_traits::database::InsertError<AddressAttribute>,
         >,
 {
@@ -321,7 +321,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Address = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::addresses::Address =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

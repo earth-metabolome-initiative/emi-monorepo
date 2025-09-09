@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::CommercialCapModel, foreign_key = product_model))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
+        foreign_key = product_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_cap_lots::commercial_cap_lots
@@ -31,24 +36,44 @@ impl<'a> From<&'a CommercialCapLot>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialCapLot where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for CommercialCapLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CapModel> for CommercialCapLot where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
+    > for CommercialCapLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialProductLot> for CommercialCapLot where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    > for CommercialCapLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel> for CommercialCapLot where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for CommercialCapLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialCapLot> for CommercialCapLot where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
+    > for CommercialCapLot
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for CommercialCapLot {
@@ -61,42 +86,59 @@ impl CommercialCapLot {
     pub fn commercial_cap_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProductLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProductLot::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
+            self.id, conn,
+        )
     }
     pub fn commercial_cap_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CapModel, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::cap_models::CapModel, diesel::result::Error>
     where
-        crate::CapModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CapModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::cap_models::CapModel::read(self.id, conn)
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialCapModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialCapModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialCapModel::read(self.product_model, conn)
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel::read(
+            self.product_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_cap_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -105,7 +147,9 @@ impl CommercialCapLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

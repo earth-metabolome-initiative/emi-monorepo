@@ -32,13 +32,13 @@ impl core::str::FromStr for OrganizationAttribute {
 impl core::fmt::Display for OrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::Url => write!(f, "url"),
-            Self::Country => write!(f, "country"),
-            Self::AlphaTwoCode => write!(f, "alpha_two_code"),
-            Self::StateProvince => write!(f, "state_province"),
-            Self::Domain => write!(f, "domain"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "organizations.name"),
+            Self::Url => write!(f, "organizations.url"),
+            Self::Country => write!(f, "organizations.country"),
+            Self::AlphaTwoCode => write!(f, "organizations.alpha_two_code"),
+            Self::StateProvince => write!(f, "organizations.state_province"),
+            Self::Domain => write!(f, "organizations.domain"),
+            Self::Id => write!(f, "organizations.id"),
         }
     }
 }
@@ -357,7 +357,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Organization,
+            Row = crate::codegen::structs_codegen::tables::organizations::Organization,
             Error = web_common_traits::database::InsertError<OrganizationAttribute>,
         >,
 {
@@ -369,7 +369,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Organization = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::organizations::Organization =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum representing the `assets` table builder DAG.
 pub enum AssetBuilderDAG {
@@ -36,6 +36,10 @@ pub enum AssetBuilderDAG {
     Organism(
         crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder,
     ),
+    ///Builder for the `photographs` table.
+    Photograph(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhotographBuilder,
+    ),
     ///Builder for the `physical_assets` table.
     PhysicalAsset(
         crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder,
@@ -47,6 +51,14 @@ pub enum AssetBuilderDAG {
     ///Builder for the `positioning_devices` table.
     PositioningDevice(
         crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceBuilder,
+    ),
+    ///Builder for the `sample_sources` table.
+    SampleSource(
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceBuilder,
+    ),
+    ///Builder for the `samples` table.
+    Sample(
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleBuilder,
     ),
     ///Builder for the `spectra` table.
     Spectrum(
@@ -150,6 +162,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableOrgani
         AssetBuilderDAG::Organism(value)
     }
 }
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhotographBuilder>
+    for AssetBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertablePhotographBuilder,
+    ) -> Self {
+        AssetBuilderDAG::Photograph(value)
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder>
     for AssetBuilderDAG
 {
@@ -175,6 +196,24 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePositi
         value: crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceBuilder,
     ) -> Self {
         AssetBuilderDAG::PositioningDevice(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceBuilder>
+    for AssetBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceBuilder,
+    ) -> Self {
+        AssetBuilderDAG::SampleSource(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSampleBuilder>
+    for AssetBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleBuilder,
+    ) -> Self {
+        AssetBuilderDAG::Sample(value)
     }
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder>

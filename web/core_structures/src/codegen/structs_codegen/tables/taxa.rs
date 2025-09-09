@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Rank, foreign_key = rank_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::ranks::Rank,
+        foreign_key = rank_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::taxa::taxa)]
 pub struct Taxon {
@@ -31,8 +36,11 @@ impl<'a> From<&'a Taxon>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Taxon> for Taxon where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::taxa::Taxon>
+    for Taxon
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for Taxon {
@@ -45,12 +53,12 @@ impl Taxon {
     pub fn rank<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Rank, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::ranks::Rank, diesel::result::Error>
     where
-        crate::Rank: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::ranks::Rank: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Rank::read(self.rank_id, conn)
+        crate::codegen::structs_codegen::tables::ranks::Rank::read(self.rank_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

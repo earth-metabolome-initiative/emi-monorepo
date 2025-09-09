@@ -22,16 +22,28 @@ impl<'a> From<&'a SpectraCollection>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for SpectraCollection where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for SpectraCollection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::DigitalAsset> for SpectraCollection where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+    > for SpectraCollection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::SpectraCollection> for SpectraCollection where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    > for SpectraCollection
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for SpectraCollection {
@@ -44,12 +56,16 @@ impl SpectraCollection {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DigitalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::DigitalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

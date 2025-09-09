@@ -61,7 +61,6 @@ pub enum TableName {
     DigitalAsset,
     DisposalProcedureTemplate,
     DisposalProcedure,
-    Document,
     EmailProvider,
     FractioningProcedureTemplate,
     FractioningProcedure,
@@ -91,6 +90,7 @@ pub enum TableName {
     PhoneModel,
     PhotographProcedureTemplate,
     PhotographProcedure,
+    Photograph,
     PhysicalAssetModel,
     PhysicalAsset,
     PipetteModel,
@@ -110,7 +110,11 @@ pub enum TableName {
     ReagentModel,
     Role,
     Room,
+    SampleModel,
+    SampleSourceModel,
+    SampleSource,
     SampleState,
+    Sample,
     SpatialRefSy,
     Spectrum,
     SpectraCollection,
@@ -260,7 +264,6 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(DisposalProcedureTemplate))
             }
             TableName::DisposalProcedure => write!(f, stringify!(DisposalProcedure)),
-            TableName::Document => write!(f, stringify!(Document)),
             TableName::EmailProvider => write!(f, stringify!(EmailProvider)),
             TableName::FractioningProcedureTemplate => {
                 write!(f, stringify!(FractioningProcedureTemplate))
@@ -312,6 +315,7 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(PhotographProcedureTemplate))
             }
             TableName::PhotographProcedure => write!(f, stringify!(PhotographProcedure)),
+            TableName::Photograph => write!(f, stringify!(Photograph)),
             TableName::PhysicalAssetModel => write!(f, stringify!(PhysicalAssetModel)),
             TableName::PhysicalAsset => write!(f, stringify!(PhysicalAsset)),
             TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
@@ -337,7 +341,11 @@ impl core::fmt::Display for TableName {
             TableName::ReagentModel => write!(f, stringify!(ReagentModel)),
             TableName::Role => write!(f, stringify!(Role)),
             TableName::Room => write!(f, stringify!(Room)),
+            TableName::SampleModel => write!(f, stringify!(SampleModel)),
+            TableName::SampleSourceModel => write!(f, stringify!(SampleSourceModel)),
+            TableName::SampleSource => write!(f, stringify!(SampleSource)),
             TableName::SampleState => write!(f, stringify!(SampleState)),
+            TableName::Sample => write!(f, stringify!(Sample)),
             TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
             TableName::Spectrum => write!(f, stringify!(Spectrum)),
             TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),

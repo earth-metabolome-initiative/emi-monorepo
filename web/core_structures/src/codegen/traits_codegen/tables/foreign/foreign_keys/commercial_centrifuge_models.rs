@@ -1,28 +1,45 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialCentrifugeModelForeignKeys {
-    pub centrifuge_model: Option<crate::CentrifugeModel>,
-    pub commercial_centrifuge_models_id_fkey: Option<crate::CentrifugeModel>,
-    pub commercial_centrifuge_models_id_fkey1: Option<crate::CommercialProduct>,
+    pub centrifuge_model:
+        Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
+    pub commercial_centrifuge_models_id_fkey:
+        Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
+    pub commercial_centrifuge_models_id_fkey1:
+        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CommercialCentrifugeModel {
+impl web_common_traits::prelude::HasForeignKeys
+for crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel {
     type ForeignKeys = CommercialCentrifugeModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
-                self.centrifuge_model,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(self.id),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(self.id),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
+                        self.centrifuge_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CentrifugeModel(
+                        self.id,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
+                        self.id,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.centrifuge_model.is_some()
@@ -48,7 +65,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CommercialCentrifugeM
                     updated = true;
                 }
                 if self.id == centrifuge_models.id {
-                    foreign_keys.commercial_centrifuge_models_id_fkey = Some(centrifuge_models);
+                    foreign_keys.commercial_centrifuge_models_id_fkey = Some(
+                        centrifuge_models,
+                    );
                     updated = true;
                 }
             }
@@ -72,7 +91,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CommercialCentrifugeM
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.id == commercial_products.id {
-                    foreign_keys.commercial_centrifuge_models_id_fkey1 = Some(commercial_products);
+                    foreign_keys.commercial_centrifuge_models_id_fkey1 = Some(
+                        commercial_products,
+                    );
                     updated = true;
                 }
             }

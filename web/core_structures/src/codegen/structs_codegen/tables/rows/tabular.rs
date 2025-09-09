@@ -162,7 +162,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::DisposalProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::DisposalProcedure
             }
-            super::Rows::Document(_) => crate::codegen::tables::table_names::TableName::Document,
             super::Rows::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
             }
@@ -244,6 +243,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::PhotographProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedure
             }
+            super::Rows::Photograph(_) => {
+                crate::codegen::tables::table_names::TableName::Photograph
+            }
             super::Rows::PhysicalAssetModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhysicalAssetModel
             }
@@ -289,9 +291,19 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             super::Rows::Room(_) => crate::codegen::tables::table_names::TableName::Room,
+            super::Rows::SampleModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleModel
+            }
+            super::Rows::SampleSourceModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSourceModel
+            }
+            super::Rows::SampleSource(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSource
+            }
             super::Rows::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
+            super::Rows::Sample(_) => crate::codegen::tables::table_names::TableName::Sample,
             super::Rows::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
             }

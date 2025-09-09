@@ -7,6 +7,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     photograph_procedures,
     photograph_procedure_templates
 );
+use crate::codegen::diesel_codegen::tables::photographs::photographs;
+diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, photographs);
 use crate::codegen::diesel_codegen::tables::physical_assets::physical_assets;
 diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, physical_assets);
 use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;

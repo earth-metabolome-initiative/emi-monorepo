@@ -117,7 +117,12 @@ pub enum ConstraintError {
     },
     /// The same_as constraint is set to cascade on delete, which is not
     /// allowed.
-    SameAsConstraintMustNotCascade(Box<KeyColumnUsage>),
+    SameAsConstraintMustNotCascade {
+        /// The columns in the host table that have the same_as constraint.
+        columns: Vec<Column>,
+        /// The foreign columns in the referenced table.
+        foreign_columns: Vec<Column>,
+    },
     /// Redundant foreign keys detected.
     RedundantForeignKeys {
         /// The first foreign key
@@ -271,13 +276,12 @@ impl Display for ConstraintError {
                     column.table_schema, column.table_name,
                 )
             }
-            ConstraintError::SameAsConstraintMustNotCascade(same_as_constraint) => {
+            ConstraintError::SameAsConstraintMustNotCascade { columns, foreign_columns } => {
                 write!(
                     f,
-                    "The same_as constraint `{}.{}` on table `{}` must not be set to cascade on delete.",
-                    same_as_constraint.constraint_catalog,
-                    same_as_constraint.constraint_name,
-                    same_as_constraint.table_name
+                    "The same_as constraint on columns {} referencing {} must not have ON DELETE CASCADE",
+                    format_column_list(columns),
+                    format_column_list(foreign_columns),
                 )
             }
             ConstraintError::RedundantForeignKeys {

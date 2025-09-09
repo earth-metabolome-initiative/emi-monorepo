@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(
     diesel::Selectable,
@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Address, foreign_key = addresses_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::addresses::Address,
+        foreign_key = addresses_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::rooms::rooms)]
 pub struct Room {
@@ -37,8 +42,11 @@ impl<'a> From<&'a Room>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Room> for Room where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::rooms::Room>
+    for Room
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for Room {
@@ -51,32 +59,33 @@ impl Room {
     pub fn addresses<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Address, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
     where
-        crate::Address: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::addresses::Address:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Address::read(self.addresses_id, conn)
+        crate::codegen::structs_codegen::tables::addresses::Address::read(self.addresses_id, conn)
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_qrcode(

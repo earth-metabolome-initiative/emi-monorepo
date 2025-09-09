@@ -7,14 +7,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProc
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::WeighingProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplate as diesel::Insertable<
-            <crate::WeighingProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::WeighingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -24,21 +24,28 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute,
     >,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::WeighingProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute,
@@ -88,7 +95,7 @@ where
             procedure_template_weighed_container_model,
         ) = self.procedure_template_weighed_container_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_weighed_container_model,
                 conn,
             )?;
@@ -101,7 +108,7 @@ where
             procedure_template_weighed_with_model,
         ) = self.procedure_template_weighed_with_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_weighed_with_model,
                 conn,
             )?;

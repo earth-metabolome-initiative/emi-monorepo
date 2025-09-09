@@ -32,8 +32,12 @@ impl<'a> From<&'a SpatialRefSy>
         web_common_traits::database::IdOrBuilder::Id(value.srid)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::SpatialRefSy> for SpatialRefSy where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
+    > for SpatialRefSy
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for SpatialRefSy {

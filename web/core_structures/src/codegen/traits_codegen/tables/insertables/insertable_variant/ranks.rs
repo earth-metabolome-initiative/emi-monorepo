@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Rank as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableRank as diesel::Insertable<
-            <crate::Rank as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::ranks::Rank as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Rank>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::ranks::Rank,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Rank;
+    type Row = crate::codegen::structs_codegen::tables::ranks::Rank;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRank;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::RankAttribute,

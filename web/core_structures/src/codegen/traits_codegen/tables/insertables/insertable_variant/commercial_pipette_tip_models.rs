@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPi
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialPipetteTipModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel as diesel::Insertable<
-            <crate::CommercialPipetteTipModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialPipetteTipModel,
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -24,11 +24,16 @@ where
         PrimaryKey = i32,
     >,
     PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::PipetteTipModel: web_common_traits::database::Read<C>,
-    crate::PipetteTipModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialPipetteTipModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,

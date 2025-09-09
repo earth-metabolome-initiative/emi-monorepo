@@ -1,10 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VolumeMeasuringDeviceForeignKeys {
-    pub id: Option<crate::PhysicalAsset>,
-    pub model: Option<crate::CommercialVolumeMeasuringDeviceLot>,
+    pub id: Option<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    >,
+    pub model: Option<
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::VolumeMeasuringDevice {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice
+{
     type ForeignKeys = VolumeMeasuringDeviceForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

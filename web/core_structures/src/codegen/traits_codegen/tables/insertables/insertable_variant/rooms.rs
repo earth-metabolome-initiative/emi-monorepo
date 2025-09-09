@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Room as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::rooms::Room as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableRoom as diesel::Insertable<
-            <crate::Room as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::rooms::Room as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Room>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::rooms::Room,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Room;
+    type Row = crate::codegen::structs_codegen::tables::rooms::Room;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableRoom;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::RoomAttribute,

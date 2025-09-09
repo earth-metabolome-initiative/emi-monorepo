@@ -28,11 +28,11 @@ impl core::str::FromStr for NextProcedureTemplateAttribute {
 impl core::fmt::Display for NextProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Parent => write!(f, "parent"),
-            Self::Predecessor => write!(f, "predecessor"),
-            Self::Successor => write!(f, "successor"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
+            Self::Parent => write!(f, "next_procedure_templates.parent"),
+            Self::Predecessor => write!(f, "next_procedure_templates.predecessor"),
+            Self::Successor => write!(f, "next_procedure_templates.successor"),
+            Self::CreatedBy => write!(f, "next_procedure_templates.created_by"),
+            Self::CreatedAt => write!(f, "next_procedure_templates.created_at"),
         }
     }
 }
@@ -52,68 +52,109 @@ pub struct InsertableNextProcedureTemplate {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableNextProcedureTemplate {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
-    where
-        crate::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
-    }
     pub fn parent<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.parent, conn)
-    }
-    pub fn next_procedure_templates_parent_predecessor_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ParentProcedureTemplate, diesel::result::Error>
-    where
-        crate::ParentProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ParentProcedureTemplate::read((self.parent, self.predecessor), conn)
-    }
-    pub fn next_procedure_templates_parent_successor_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ParentProcedureTemplate, diesel::result::Error>
-    where
-        crate::ParentProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ParentProcedureTemplate::read((self.parent, self.successor), conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.parent,
+            conn,
+        )
     }
     pub fn predecessor<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.predecessor, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.predecessor,
+            conn,
+        )
     }
     pub fn successor<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.successor, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.successor,
+            conn,
+        )
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn next_procedure_templates_parent_predecessor_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::read(
+            (self.parent, self.predecessor),
+            conn,
+        )
+    }
+    pub fn next_procedure_templates_parent_successor_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::read(
+            (self.parent, self.successor),
+            conn,
+        )
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableNextProcedureTemplateBuilder {
     pub(crate) parent: Option<i32>,
@@ -121,6 +162,17 @@ pub struct InsertableNextProcedureTemplateBuilder {
     pub(crate) successor: Option<i32>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl Default for InsertableNextProcedureTemplateBuilder {
+    fn default() -> Self {
+        Self {
+            parent: Default::default(),
+            predecessor: Default::default(),
+            successor: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
 }
 impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateBuilder
@@ -341,24 +393,29 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableNextProcedureTempla
         self
     }
 }
-impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableNextProcedureTemplateBuilder
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableNextProcedureTemplateBuilder
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::NextProcedureTemplate,
-            Error = web_common_traits::database::InsertError<NextProcedureTemplateAttribute>,
-        >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
+        Error = web_common_traits::database::InsertError<NextProcedureTemplateAttribute>,
+    >,
 {
     type Attributes = NextProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::NextProcedureTemplate = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

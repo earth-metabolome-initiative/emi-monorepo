@@ -1,10 +1,15 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoneModelForeignKeys {
-    pub phone_models_camera: Option<crate::CameraModel>,
-    pub phone_models_positioning: Option<crate::PositioningDeviceModel>,
+    pub phone_models_camera:
+        Option<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
+    pub phone_models_positioning: Option<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::PhoneModel {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::phone_models::PhoneModel
+{
     type ForeignKeys = PhoneModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

@@ -1,14 +1,20 @@
-impl From<crate::FreezerModel> for super::Rows {
-    fn from(value: crate::FreezerModel) -> Self {
+impl From<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel> for super::Rows {
+    fn from(value: crate::codegen::structs_codegen::tables::freezer_models::FreezerModel) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::FreezerModel>> for super::Rows {
-    fn from(value: Vec<crate::FreezerModel>) -> Self {
+impl From<Vec<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>>
+    for super::Rows
+{
+    fn from(
+        value: Vec<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
+    ) -> Self {
         super::Rows::FreezerModel(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::FreezerModel> {
+impl TryFrom<super::Rows>
+    for Vec<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

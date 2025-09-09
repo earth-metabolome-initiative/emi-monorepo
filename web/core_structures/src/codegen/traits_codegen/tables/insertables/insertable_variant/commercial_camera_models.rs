@@ -9,22 +9,31 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCa
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialCameraModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModel as diesel::Insertable<
-            <crate::CommercialCameraModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CommercialCameraModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+    >,
     C: diesel::connection::LoadConnection,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::CameraModel: web_common_traits::database::Read<C>,
-    crate::CameraModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialCameraModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialCameraModelAttribute,

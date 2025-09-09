@@ -4,16 +4,25 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::TeamMember as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::team_members::TeamMember as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember as diesel::Insertable<
-            <crate::TeamMember as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::team_members::TeamMember as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::TeamMember>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::team_members::TeamMember,
+    >,
     C: diesel::connection::LoadConnection,
-    crate::Team: web_common_traits::database::Read<C>,
-    crate::Team: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
-    type Row = crate::TeamMember;
+    type Row = crate::codegen::structs_codegen::tables::team_members::TeamMember;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableTeamMember;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute,

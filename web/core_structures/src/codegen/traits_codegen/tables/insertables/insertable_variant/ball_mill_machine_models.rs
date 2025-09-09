@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMach
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::BallMillMachineModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModel as diesel::Insertable<
-            <crate::BallMillMachineModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::BallMillMachineModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::BallMillMachineModel;
+    type Row = crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,

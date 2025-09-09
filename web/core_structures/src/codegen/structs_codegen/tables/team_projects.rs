@@ -8,8 +8,18 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Project, foreign_key = project_id))]
-#[diesel(belongs_to(crate::Team, foreign_key = team_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::projects::Project,
+        foreign_key = project_id
+    )
+)]
 #[diesel(primary_key(team_id, project_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_projects::team_projects
@@ -31,8 +41,12 @@ impl<'a> From<&'a TeamProject>
         web_common_traits::database::IdOrBuilder::Id((value.team_id, value.project_id))
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::TeamProject> for TeamProject where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::team_projects::TeamProject,
+    > for TeamProject
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
 {
 }
 impl diesel::Identifiable for TeamProject {
@@ -42,25 +56,26 @@ impl diesel::Identifiable for TeamProject {
     }
 }
 impl TeamProject {
-    pub fn project<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Project, diesel::result::Error>
-    where
-        crate::Project: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Project::read(self.project_id, conn)
-    }
     pub fn team<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Team, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
     where
-        crate::Team: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Team::read(self.team_id, conn)
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
+    }
+    pub fn project<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::projects::Project, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::projects::Project:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::projects::Project::read(self.project_id, conn)
     }
 }
 impl AsRef<TeamProject> for TeamProject {

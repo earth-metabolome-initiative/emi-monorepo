@@ -37,7 +37,7 @@ impl core::fmt::Display for SpectraCollectionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
+            Self::Id => write!(f, "spectra_collections.id"),
         }
     }
 }
@@ -56,12 +56,16 @@ impl InsertableSpectraCollection {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::DigitalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::DigitalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -349,7 +353,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::SpectraCollection,
+            Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
             Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>,
         >,
     DigitalAsset:
@@ -363,7 +367,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::SpectraCollection = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

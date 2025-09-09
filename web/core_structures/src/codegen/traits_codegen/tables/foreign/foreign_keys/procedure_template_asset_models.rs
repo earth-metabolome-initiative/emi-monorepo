@@ -1,23 +1,33 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureTemplateAssetModelForeignKeys {
-    pub asset_model: Option<crate::AssetModel>,
-    pub based_on: Option<crate::ProcedureTemplateAssetModel>,
-    pub created_by: Option<crate::User>,
-    pub procedure_template: Option<crate::ProcedureTemplate>,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub based_on: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub asset_model: Option<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    >,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureTemplateAssetModel {
+impl web_common_traits::prelude::HasForeignKeys
+for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
     type ForeignKeys = ProcedureTemplateAssetModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.asset_model,
-            ),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
         if let Some(based_on) = self.based_on {
             connector
                 .send(
@@ -28,20 +38,27 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureTemplateAsse
                     ),
                 );
         }
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
+                        self.asset_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
+                        self.created_by,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.asset_model.is_some()
+        foreign_keys.procedure_template.is_some()
             && (foreign_keys.based_on.is_some() || self.based_on.is_some())
-            && foreign_keys.created_by.is_some()
-            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.asset_model.is_some() && foreign_keys.created_by.is_some()
     }
     fn update(
         &self,
@@ -81,7 +98,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureTemplateAsse
             ) => {
                 if self
                     .based_on
-                    .is_some_and(|based_on| based_on == procedure_template_asset_models.id)
+                    .is_some_and(|based_on| {
+                        based_on == procedure_template_asset_models.id
+                    })
                 {
                     foreign_keys.based_on = Some(procedure_template_asset_models);
                     updated = true;
@@ -95,7 +114,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureTemplateAsse
             ) => {
                 if self
                     .based_on
-                    .is_some_and(|based_on| based_on == procedure_template_asset_models.id)
+                    .is_some_and(|based_on| {
+                        based_on == procedure_template_asset_models.id
+                    })
                 {
                     foreign_keys.based_on = None;
                     updated = true;

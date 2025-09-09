@@ -7,23 +7,37 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::DigitalAsset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset as diesel::Insertable<
-            <crate::DigitalAsset as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::DigitalAsset>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
+    >,
     Asset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     C: diesel::connection::LoadConnection,
-    crate::Asset: web_common_traits::database::Read<C>,
-    crate::Asset: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::DigitalAssetModel: web_common_traits::database::Read<C>,
-    crate::DigitalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::DigitalAsset;
+    type Row = crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,

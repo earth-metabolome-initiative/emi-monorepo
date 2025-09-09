@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFr
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialFreezerModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModel as diesel::Insertable<
-            <crate::CommercialFreezerModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialFreezerModel,
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -24,11 +24,16 @@ where
         PrimaryKey = i32,
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::FreezerModel: web_common_traits::database::Read<C>,
-    crate::FreezerModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialFreezerModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,

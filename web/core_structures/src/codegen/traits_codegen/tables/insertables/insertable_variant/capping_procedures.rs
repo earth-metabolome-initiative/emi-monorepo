@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCappingProce
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CappingProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedure as diesel::Insertable<
-            <crate::CappingProcedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CappingProcedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
+    >,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -20,18 +24,27 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute,
     >,
-    crate::CappingProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CappingProcedure;
+    type Row = crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute,
@@ -69,7 +82,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let capping_procedure_templates = crate::CappingProcedureTemplate::read(
+            let capping_procedure_templates = crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -86,7 +99,7 @@ where
             procedure_capped_container,
         ) = self.procedure_capped_container
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_capped_container,
                 conn,
             )?;
@@ -108,7 +121,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_capped_with) = self
             .procedure_capped_with
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_capped_with,
                 conn,
             )?;

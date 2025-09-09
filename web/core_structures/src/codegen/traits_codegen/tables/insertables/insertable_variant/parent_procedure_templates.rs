@@ -4,20 +4,25 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::ParentProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplate as diesel::Insertable<
-            <crate::ParentProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::ParentProcedureTemplate,
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
 {
-    type Row = crate::ParentProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute,
@@ -33,13 +38,13 @@ where
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.child(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct.parent(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct.child(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

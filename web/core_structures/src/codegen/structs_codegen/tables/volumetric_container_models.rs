@@ -28,26 +28,36 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for VolumetricContainerModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::ContainerModel> for VolumetricContainerModel where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
-{
-}
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAssetModel>
-    for VolumetricContainerModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for VolumetricContainerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::VolumetricContainerModel>
-    for VolumetricContainerModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    > for VolumetricContainerModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for VolumetricContainerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+> for VolumetricContainerModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{}
 impl diesel::Identifiable for VolumetricContainerModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -58,12 +68,18 @@ impl VolumetricContainerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::ContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ContainerModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
+            self.id, conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::OrganismTaxon as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxon as diesel::Insertable<
-            <crate::OrganismTaxon as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::OrganismTaxon>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::OrganismTaxon;
+    type Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxon;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::OrganismTaxonAttribute,

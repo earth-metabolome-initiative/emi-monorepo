@@ -111,15 +111,31 @@ impl core::fmt::Display for FractioningProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::Kilograms => write!(f, "kilograms"),
-            Self::TolerancePercentage => write!(f, "tolerance_percentage"),
-            Self::WeighedWithModel => write!(f, "weighed_with_model"),
-            Self::ProcedureTemplateWeighedWithModel(e) => write!(f, "{e}"),
-            Self::FragmentContainerModel => write!(f, "fragment_container_model"),
-            Self::ProcedureTemplateFragmentContainerModel(e) => write!(f, "{e}"),
-            Self::FragmentPlacedIntoModel => write!(f, "fragment_placed_into_model"),
-            Self::ProcedureTemplateFragmentPlacedIntoModel(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate => {
+                write!(f, "fractioning_procedure_templates.procedure_template")
+            }
+            Self::Kilograms => write!(f, "fractioning_procedure_templates.kilograms"),
+            Self::TolerancePercentage => {
+                write!(f, "fractioning_procedure_templates.tolerance_percentage")
+            }
+            Self::WeighedWithModel => {
+                write!(f, "fractioning_procedure_templates.weighed_with_model")
+            }
+            Self::ProcedureTemplateWeighedWithModel(e) => {
+                write!(f, "fractioning_procedure_templates.{e}")
+            }
+            Self::FragmentContainerModel => {
+                write!(f, "fractioning_procedure_templates.fragment_container_model")
+            }
+            Self::ProcedureTemplateFragmentContainerModel(e) => {
+                write!(f, "fractioning_procedure_templates.{e}")
+            }
+            Self::FragmentPlacedIntoModel => {
+                write!(f, "fractioning_procedure_templates.fragment_placed_into_model")
+            }
+            Self::ProcedureTemplateFragmentPlacedIntoModel(e) => {
+                write!(f, "fractioning_procedure_templates.{e}")
+            }
         }
     }
 }
@@ -146,52 +162,89 @@ impl InsertableFractioningProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
     pub fn weighed_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::WeighingDeviceModel::read(self.weighed_with_model, conn)
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.weighed_with_model,
+            conn,
+        )
     }
     pub fn procedure_template_weighed_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_weighed_with_model, conn)
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_weighed_with_model,
+            conn,
+        )
     }
     pub fn fragment_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.fragment_container_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.fragment_container_model,
+            conn,
+        )
     }
-    pub fn procedure_template_fragment_container_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_fragment_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_fragment_container_model,
             conn,
         )
@@ -199,22 +252,37 @@ impl InsertableFractioningProcedureTemplate {
     pub fn fragment_placed_into_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.fragment_placed_into_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.fragment_placed_into_model,
+            conn,
+        )
     }
-    pub fn procedure_template_fragment_placed_into_model<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_fragment_placed_into_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_fragment_placed_into_model,
             conn,
         )
@@ -223,11 +291,14 @@ impl InsertableFractioningProcedureTemplate {
     pub fn fractioning_procedure_templa_procedure_template_weighed_w_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_weighed_with_model)
@@ -236,17 +307,22 @@ impl InsertableFractioningProcedureTemplate {
                             .eq(&self.weighed_with_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn fractioning_procedure_templa_procedure_template_fragment_fkey2(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_fragment_container_model)
@@ -255,17 +331,22 @@ impl InsertableFractioningProcedureTemplate {
                             .eq(&self.fragment_container_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn fractioning_procedure_templa_procedure_template_fragment_fkey3(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(&self.procedure_template_fragment_placed_into_model)
@@ -274,7 +355,9 @@ impl InsertableFractioningProcedureTemplate {
                             .eq(&self.fragment_placed_into_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
@@ -641,10 +724,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -690,21 +773,21 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "weighed_with_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "weighed_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_weighed_with_model<PTWWM>(
@@ -783,10 +866,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -834,10 +917,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "fragment_container_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -845,10 +928,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_fragment_container_model<PTFCM>(
@@ -928,10 +1011,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1258,7 +1341,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
         C,
         UserId = i32,
-        Row = crate::FractioningProcedureTemplate,
+        Row = crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
         Error = web_common_traits::database::InsertError<
             FractioningProcedureTemplateAttribute,
         >,
@@ -1282,7 +1365,7 @@ where
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::FractioningProcedureTemplate = self
+        let insertable: crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())
     }

@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasur
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::VolumeMeasuringDevice as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDevice as diesel::Insertable<
-            <crate::VolumeMeasuringDevice as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::VolumeMeasuringDevice>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::VolumeMeasuringDevice;
+    type Row = crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDevice;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceAttribute,

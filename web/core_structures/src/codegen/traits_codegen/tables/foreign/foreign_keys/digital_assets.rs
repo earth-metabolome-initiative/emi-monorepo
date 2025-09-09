@@ -1,10 +1,13 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DigitalAssetForeignKeys {
-    pub id: Option<crate::Asset>,
-    pub model: Option<crate::DigitalAssetModel>,
+    pub id: Option<crate::codegen::structs_codegen::tables::assets::Asset>,
+    pub model:
+        Option<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::DigitalAsset {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset
+{
     type ForeignKeys = DigitalAssetForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

@@ -25,10 +25,14 @@ impl core::str::FromStr for AssetCompatibilityRuleAttribute {
 impl core::fmt::Display for AssetCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::LeftAssetModel => write!(f, "left_asset_model"),
-            Self::RightAssetModel => write!(f, "right_asset_model"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
+            Self::LeftAssetModel => {
+                write!(f, "asset_compatibility_rules.left_asset_model")
+            }
+            Self::RightAssetModel => {
+                write!(f, "asset_compatibility_rules.right_asset_model")
+            }
+            Self::CreatedBy => write!(f, "asset_compatibility_rules.created_by"),
+            Self::CreatedAt => write!(f, "asset_compatibility_rules.created_at"),
         }
     }
 }
@@ -50,41 +54,65 @@ impl InsertableAssetCompatibilityRule {
     pub fn left_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.left_asset_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.left_asset_model,
+            conn,
+        )
     }
     pub fn right_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.right_asset_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.right_asset_model,
+            conn,
+        )
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetCompatibilityRuleBuilder {
     pub(crate) left_asset_model: Option<i32>,
     pub(crate) right_asset_model: Option<i32>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl Default for InsertableAssetCompatibilityRuleBuilder {
+    fn default() -> Self {
+        Self {
+            left_asset_model: Default::default(),
+            right_asset_model: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
+    }
 }
 impl common_traits::builder::IsCompleteBuilder
 for crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleBuilder {
@@ -271,24 +299,29 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAssetCompatibilityR
         self
     }
 }
-impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableAssetCompatibilityRuleBuilder
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableAssetCompatibilityRuleBuilder
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::AssetCompatibilityRule,
-            Error = web_common_traits::database::InsertError<AssetCompatibilityRuleAttribute>,
-        >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        Error = web_common_traits::database::InsertError<AssetCompatibilityRuleAttribute>,
+    >,
 {
     type Attributes = AssetCompatibilityRuleAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::AssetCompatibilityRule = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

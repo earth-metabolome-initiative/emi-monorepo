@@ -40,8 +40,8 @@ impl core::fmt::Display for PhysicalAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::ParentModel => write!(f, "parent_model"),
+            Self::Id => write!(f, "physical_asset_models.id"),
+            Self::ParentModel => write!(f, "physical_asset_models.parent_model"),
         }
     }
 }
@@ -61,25 +61,55 @@ impl InsertablePhysicalAssetModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
+    }
+    pub fn parent_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_model) = self.parent_model else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            parent_model,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn physical_asset_models_id_parent_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::AssetModel>, diesel::result::Error> {
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -88,21 +118,10 @@ impl InsertablePhysicalAssetModel {
                             .eq(parent_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
-            .map(Some)
-    }
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::PhysicalAssetModel>, diesel::result::Error>
-    where
-        crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(parent_model) = self.parent_model else {
-            return Ok(None);
-        };
-        crate::PhysicalAssetModel::read(parent_model, conn).map(Some)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -401,14 +420,14 @@ where
     }
 }
 impl<AssetModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertablePhysicalAssetModelBuilder<AssetModel>
+for InsertablePhysicalAssetModelBuilder<AssetModel>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::PhysicalAssetModel,
-            Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
-        >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
+    >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = PhysicalAssetModelAttribute;
@@ -416,10 +435,14 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::PhysicalAssetModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

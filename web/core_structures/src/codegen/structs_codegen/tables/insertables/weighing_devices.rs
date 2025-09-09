@@ -40,8 +40,8 @@ impl core::fmt::Display for WeighingDeviceAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Model => write!(f, "model"),
+            Self::Id => write!(f, "weighing_devices.id"),
+            Self::Model => write!(f, "weighing_devices.model"),
         }
     }
 }
@@ -61,39 +61,51 @@ impl InsertableWeighingDevice {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot::read(
+            self.model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn weighing_devices_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
-    }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::CommercialWeighingDeviceLot, diesel::result::Error>
-    where
-        crate::CommercialWeighingDeviceLot: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::CommercialWeighingDeviceLot::read(self.model, conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -187,11 +199,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v3
+    ///v5 --->|"`extends`"| v4
     ///```
     fn model(
         mut self,
@@ -441,8 +453,8 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
+    ///v4 --->|"`extends`"| v3
     ///```
     fn model(
         self,
@@ -477,7 +489,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::WeighingDevice,
+            Row = crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
             Error = web_common_traits::database::InsertError<WeighingDeviceAttribute>,
         >,
     PhysicalAsset:
@@ -491,7 +503,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::WeighingDevice = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

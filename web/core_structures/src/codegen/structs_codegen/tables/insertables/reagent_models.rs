@@ -46,10 +46,10 @@ impl core::fmt::Display for ReagentModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Purity => write!(f, "purity"),
-            Self::CasCode => write!(f, "cas_code"),
-            Self::MolecularFormula => write!(f, "molecular_formula"),
+            Self::Id => write!(f, "reagent_models.id"),
+            Self::Purity => write!(f, "reagent_models.purity"),
+            Self::CasCode => write!(f, "reagent_models.cas_code"),
+            Self::MolecularFormula => write!(f, "reagent_models.molecular_formula"),
         }
     }
 }
@@ -71,12 +71,16 @@ impl InsertableReagentModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
@@ -441,7 +445,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::ReagentModel,
+            Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
             Error = web_common_traits::database::InsertError<ReagentModelAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -454,7 +458,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::ReagentModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::reagent_models::ReagentModel =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

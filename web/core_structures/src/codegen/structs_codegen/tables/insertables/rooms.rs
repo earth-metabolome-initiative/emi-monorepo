@@ -41,16 +41,16 @@ impl core::str::FromStr for RoomAttribute {
 impl core::fmt::Display for RoomAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Qrcode => write!(f, "qrcode"),
-            Self::AddressesId => write!(f, "addresses_id"),
-            Self::Geolocation => write!(f, "geolocation"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "rooms.id"),
+            Self::Name => write!(f, "rooms.name"),
+            Self::Description => write!(f, "rooms.description"),
+            Self::Qrcode => write!(f, "rooms.qrcode"),
+            Self::AddressesId => write!(f, "rooms.addresses_id"),
+            Self::Geolocation => write!(f, "rooms.geolocation"),
+            Self::CreatedBy => write!(f, "rooms.created_by"),
+            Self::CreatedAt => write!(f, "rooms.created_at"),
+            Self::UpdatedBy => write!(f, "rooms.updated_by"),
+            Self::UpdatedAt => write!(f, "rooms.updated_at"),
         }
     }
 }
@@ -75,35 +75,36 @@ impl InsertableRoom {
     pub fn addresses<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Address, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
     where
-        crate::Address: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::addresses::Address:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Address::read(self.addresses_id, conn)
+        crate::codegen::structs_codegen::tables::addresses::Address::read(self.addresses_id, conn)
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRoomBuilder {
     pub(crate) name: Option<String>,
@@ -121,6 +122,21 @@ impl From<InsertableRoomBuilder>
 {
     fn from(builder: InsertableRoomBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableRoomBuilder {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            description: Default::default(),
+            qrcode: Default::default(),
+            addresses_id: Default::default(),
+            geolocation: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -541,7 +557,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Room,
+            Row = crate::codegen::structs_codegen::tables::rooms::Room,
             Error = web_common_traits::database::InsertError<RoomAttribute>,
         >,
 {
@@ -553,7 +569,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Room = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::rooms::Room =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

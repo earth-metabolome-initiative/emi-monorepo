@@ -9,27 +9,38 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBu
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PhoneModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::phone_models::PhoneModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel as diesel::Insertable<
-            <crate::PhoneModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::phone_models::PhoneModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PhoneModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
+    >,
     C: diesel::connection::LoadConnection,
     CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::CameraModel: web_common_traits::database::Read<C>,
-    crate::CameraModel: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
-    crate::PositioningDeviceModel: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PhoneModel;
+    type Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute,

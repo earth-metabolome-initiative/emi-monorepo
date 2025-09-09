@@ -55,8 +55,10 @@ impl core::fmt::Display for CommercialWeighingDeviceLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::ProductModel => write!(f, "product_model"),
+            Self::Id => write!(f, "commercial_weighing_device_lots.id"),
+            Self::ProductModel => {
+                write!(f, "commercial_weighing_device_lots.product_model")
+            }
         }
     }
 }
@@ -76,42 +78,65 @@ impl InsertableCommercialWeighingDeviceLot {
     pub fn commercial_weighing_device_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProductLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProductLot::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
+            self.id, conn,
+        )
     }
     pub fn commercial_weighing_device_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::WeighingDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::WeighingDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.id, conn,
+        )
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialWeighingDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialWeighingDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::CommercialWeighingDeviceModel::read(self.product_model, conn)
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel::read(
+            self.product_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_weighing_device_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -120,7 +145,9 @@ impl InsertableCommercialWeighingDeviceLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -193,10 +220,10 @@ pub trait CommercialWeighingDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     WeighingDeviceModel,
@@ -235,12 +262,12 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
+    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
@@ -516,8 +543,8 @@ where
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v5
     ///v4 --->|"`extends`"| v3
+    ///v3 --->|"`extends`"| v5
     ///```
     fn product_model(
         self,
@@ -570,14 +597,14 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
@@ -628,27 +655,46 @@ where
         self
     }
 }
-impl<CommercialProductLot, WeighingDeviceModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialWeighingDeviceLotBuilder<CommercialProductLot, WeighingDeviceModel>
+impl<
+    CommercialProductLot,
+    WeighingDeviceModel,
+    C,
+> web_common_traits::database::TryInsertGeneric<C>
+for InsertableCommercialWeighingDeviceLotBuilder<
+    CommercialProductLot,
+    WeighingDeviceModel,
+>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::CommercialWeighingDeviceLot,
-            Error = web_common_traits::database::InsertError<CommercialWeighingDeviceLotAttribute>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+        Error = web_common_traits::database::InsertError<
+            CommercialWeighingDeviceLotAttribute,
         >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    WeighingDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    >,
+    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    WeighingDeviceModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
 {
     type Attributes = CommercialWeighingDeviceLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialWeighingDeviceLot = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

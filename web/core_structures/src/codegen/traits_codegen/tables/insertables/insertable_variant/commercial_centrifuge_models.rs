@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCe
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModel as diesel::Insertable<
-            <crate::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialCentrifugeModel,
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
     >,
     C: diesel::connection::LoadConnection,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -24,11 +24,16 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::CentrifugeModel: web_common_traits::database::Read<C>,
-    crate::CentrifugeModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialCentrifugeModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,

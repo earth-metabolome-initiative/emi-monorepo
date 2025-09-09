@@ -1,14 +1,20 @@
-impl From<crate::SpatialRefSy> for super::Rows {
-    fn from(value: crate::SpatialRefSy) -> Self {
+impl From<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy> for super::Rows {
+    fn from(value: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::SpatialRefSy>> for super::Rows {
-    fn from(value: Vec<crate::SpatialRefSy>) -> Self {
+impl From<Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>>
+    for super::Rows
+{
+    fn from(
+        value: Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>,
+    ) -> Self {
         super::Rows::SpatialRefSy(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::SpatialRefSy> {
+impl TryFrom<super::Rows>
+    for Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

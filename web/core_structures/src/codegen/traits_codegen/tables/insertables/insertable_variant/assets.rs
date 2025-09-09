@@ -4,17 +4,26 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Asset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAsset as diesel::Insertable<
-            <crate::Asset as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::assets::Asset as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Asset>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    >,
     C: diesel::connection::LoadConnection,
-    crate::AssetModel: web_common_traits::database::Read<C>,
-    crate::AssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::Asset;
+    type Row = crate::codegen::structs_codegen::tables::assets::Asset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AssetAttribute,

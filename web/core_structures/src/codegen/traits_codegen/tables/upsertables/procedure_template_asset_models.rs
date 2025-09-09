@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::ProcedureTemplateAssetModel
-{
+for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -18,7 +17,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                name
+                    .ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
                     .or(asset_model.ne(excluded(asset_model)))
@@ -26,13 +26,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::ProcedureTemplateAssetModel
-{
+for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -49,7 +48,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .do_update()
             .set(self)
             .filter(
-                name.ne(excluded(name))
+                name
+                    .ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
                     .or(asset_model.ne(excluded(asset_model)))
@@ -57,6 +57,6 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(created_at.ne(excluded(created_at))),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

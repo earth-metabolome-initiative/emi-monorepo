@@ -72,7 +72,7 @@ impl Codegen<'_> {
         let documentation = format!("Enum representing the `{table_name}` table builder DAG.");
 
         Ok(quote! {
-            #[derive(Debug, Clone, PartialEq, PartialOrd)]
+            #[derive(Debug, Clone, PartialEq)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #[doc = #documentation]
             pub enum #builder_dag_ident {

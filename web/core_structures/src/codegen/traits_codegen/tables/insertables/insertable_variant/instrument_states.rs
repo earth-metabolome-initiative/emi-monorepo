@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentStateBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::InstrumentState as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::instrument_states::InstrumentState as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentState as diesel::Insertable<
-            <crate::InstrumentState as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::instrument_states::InstrumentState as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::InstrumentState>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::InstrumentState;
+    type Row = crate::codegen::structs_codegen::tables::instrument_states::InstrumentState;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableInstrumentState;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::InstrumentStateAttribute,

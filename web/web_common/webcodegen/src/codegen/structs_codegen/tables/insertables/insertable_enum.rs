@@ -300,14 +300,16 @@ impl Table {
                 insertable_enum_variants.push(quote::quote! {
                     #enum_variant(#foreign_table_enum)
                 });
+                let pattern = format!("{}.{{e}}", self.snake_case_name()?,);
                 display_insertable_enum_variants.push(quote::quote! {
-                    Self::#enum_variant(e) => write!(f, "{e}")
+                    Self::#enum_variant(e) => write!(f, #pattern)
                 });
             } else {
                 insertable_enum_variants.push(quote::quote! {
                     #enum_variant
                 });
-                let enum_variant_name = insertable_column.snake_case_name()?;
+                let enum_variant_name =
+                    format!("{}.{}", self.snake_case_name()?, insertable_column.snake_case_name()?);
                 display_insertable_enum_variants.push(quote::quote! {
                     Self::#enum_variant => write!(f, #enum_variant_name)
                 });

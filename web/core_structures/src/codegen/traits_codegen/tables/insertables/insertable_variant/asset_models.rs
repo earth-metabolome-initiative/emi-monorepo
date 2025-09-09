@@ -4,15 +4,19 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::AssetModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel as diesel::Insertable<
-            <crate::AssetModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::asset_models::AssetModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::AssetModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    >,
     C: diesel::connection::LoadConnection,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::AssetModel;
+    type Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,

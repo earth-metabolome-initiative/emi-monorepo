@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFr
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialFreezeDryerLot as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLot as diesel::Insertable<
-            <crate::CommercialFreezeDryerLot as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialFreezeDryerLot,
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -24,11 +24,16 @@ where
         PrimaryKey = i32,
     >,
     FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::FreezeDryerModel: web_common_traits::database::Read<C>,
-    crate::FreezeDryerModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialFreezeDryerLot;
+    type Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerLotAttribute,

@@ -40,8 +40,10 @@ impl core::fmt::Display for VolumetricContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::VolumetricContainerModel => write!(f, "volumetric_container_model"),
+            Self::Id => write!(f, "volumetric_containers.id"),
+            Self::VolumetricContainerModel => {
+                write!(f, "volumetric_containers.volumetric_container_model")
+            }
         }
     }
 }
@@ -61,39 +63,48 @@ impl InsertableVolumetricContainer {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Container, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
     where
-        crate::Container: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Container::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::containers::Container::read(self.id, conn)
+    }
+    pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.volumetric_container_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn volumetric_containers_id_volumetric_container_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.volumetric_container_model),
                 ),
             )
-            .first::<crate::Asset>(conn)
-    }
-    pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
-    where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.volumetric_container_model, conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -198,14 +209,14 @@ impl<
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
     /// class v2 column-of-interest
     /// end
-    /// v1 --->|"`ancestral same as`"| v3
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`inferred ancestral same as`"| v1
     /// v2 --->|"`ancestral same as`"| v3
     /// v2 -.->|"`inferred ancestral same as`"| v0
     /// v2 -.->|"`inferred ancestral same as`"| v1
-    /// v6 --->|"`extends`"| v4
+    /// v1 --->|"`ancestral same as`"| v3
     /// v7 --->|"`extends`"| v5
+    /// v6 --->|"`extends`"| v4
     /// v5 --->|"`extends`"| v6
     /// ```
     fn volumetric_container_model(
@@ -463,8 +474,8 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v3
     ///v3 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v3
     ///```
     fn container_model(
         self,
@@ -516,15 +527,15 @@ where
     ///    v1@{shape: rounded, label: "volumetric_container_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v5
     ///v6 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v6
     ///```
     fn model(
         self,
@@ -554,25 +565,32 @@ where
     }
 }
 impl<Container, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableVolumetricContainerBuilder<Container>
+for InsertableVolumetricContainerBuilder<Container>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::VolumetricContainer,
-            Error = web_common_traits::database::InsertError<VolumetricContainerAttribute>,
-        >,
-    Container: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        Error = web_common_traits::database::InsertError<VolumetricContainerAttribute>,
+    >,
+    Container: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
 {
     type Attributes = VolumetricContainerAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::VolumetricContainer = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

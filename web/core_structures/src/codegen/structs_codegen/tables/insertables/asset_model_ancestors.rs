@@ -19,8 +19,8 @@ impl core::str::FromStr for AssetModelAncestorAttribute {
 impl core::fmt::Display for AssetModelAncestorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::DescendantModel => write!(f, "descendant_model"),
-            Self::AncestorModel => write!(f, "ancestor_model"),
+            Self::DescendantModel => write!(f, "asset_model_ancestors.descendant_model"),
+            Self::AncestorModel => write!(f, "asset_model_ancestors.ancestor_model"),
         }
     }
 }
@@ -40,22 +40,36 @@ impl InsertableAssetModelAncestor {
     pub fn descendant_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.descendant_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.descendant_model,
+            conn,
+        )
     }
     pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.ancestor_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.ancestor_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -151,24 +165,29 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAssetModelAncestorB
         self
     }
 }
-impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableAssetModelAncestorBuilder
+impl<C> web_common_traits::database::TryInsertGeneric<C>
+for InsertableAssetModelAncestorBuilder
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::AssetModelAncestor,
-            Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
-        >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+        Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
+    >,
 {
     type Attributes = AssetModelAncestorAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::AssetModelAncestor = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

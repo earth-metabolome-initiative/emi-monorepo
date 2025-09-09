@@ -20,9 +20,9 @@ impl core::str::FromStr for TemporaryUserAttribute {
 impl core::fmt::Display for TemporaryUserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Email => write!(f, "email"),
-            Self::LoginProviderId => write!(f, "login_provider_id"),
+            Self::Id => write!(f, "temporary_user.id"),
+            Self::Email => write!(f, "temporary_user.email"),
+            Self::LoginProviderId => write!(f, "temporary_user.login_provider_id"),
         }
     }
 }
@@ -42,12 +42,19 @@ impl InsertableTemporaryUser {
     pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::LoginProvider, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        diesel::result::Error,
+    >
     where
-        crate::LoginProvider: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::LoginProvider::read(self.login_provider_id, conn)
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::read(
+            self.login_provider_id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -167,7 +174,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::TemporaryUser,
+            Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
             Error = web_common_traits::database::InsertError<TemporaryUserAttribute>,
         >,
 {
@@ -179,7 +186,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::TemporaryUser = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

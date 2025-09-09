@@ -53,8 +53,10 @@ impl core::fmt::Display for CommercialPackagingModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::PackagingModel => write!(f, "packaging_model"),
+            Self::Id => write!(f, "commercial_packaging_models.id"),
+            Self::PackagingModel => {
+                write!(f, "commercial_packaging_models.packaging_model")
+            }
         }
     }
 }
@@ -74,42 +76,64 @@ impl InsertableCommercialPackagingModel {
     pub fn packaging_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PackagingModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
     where
-        crate::PackagingModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PackagingModel::read(self.packaging_model, conn)
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
+            self.packaging_model,
+            conn,
+        )
     }
     pub fn commercial_packaging_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PackagingModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
     where
-        crate::PackagingModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PackagingModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
+            self.id, conn,
+        )
     }
     pub fn commercial_packaging_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProduct, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProduct: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProduct::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
+            self.id, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_packaging_models_id_packaging_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -118,7 +142,9 @@ impl InsertableCommercialPackagingModel {
                             .eq(&self.packaging_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -515,9 +541,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -561,16 +587,25 @@ where
         self
     }
 }
-impl<CommercialProduct, PackagingModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialPackagingModelBuilder<CommercialProduct, PackagingModel>
+impl<
+    CommercialProduct,
+    PackagingModel,
+    C,
+> web_common_traits::database::TryInsertGeneric<C>
+for InsertableCommercialPackagingModelBuilder<CommercialProduct, PackagingModel>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::CommercialPackagingModel,
-            Error = web_common_traits::database::InsertError<CommercialPackagingModelAttribute>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+        Error = web_common_traits::database::InsertError<
+            CommercialPackagingModelAttribute,
         >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    >,
+    CommercialProduct: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialPackagingModelAttribute;
@@ -578,10 +613,14 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialPackagingModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

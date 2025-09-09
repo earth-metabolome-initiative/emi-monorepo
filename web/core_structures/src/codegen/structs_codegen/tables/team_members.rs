@@ -8,8 +8,18 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::User, foreign_key = member_id))]
-#[diesel(belongs_to(crate::Team, foreign_key = team_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = member_id
+    )
+)]
 #[diesel(primary_key(team_id, member_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_members::team_members
@@ -31,8 +41,12 @@ impl<'a> From<&'a TeamMember>
         web_common_traits::database::IdOrBuilder::Id((value.team_id, value.member_id))
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::TeamMember> for TeamMember where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::team_members::TeamMember,
+    > for TeamMember
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
 {
 }
 impl diesel::Identifiable for TeamMember {
@@ -42,25 +56,25 @@ impl diesel::Identifiable for TeamMember {
     }
 }
 impl TeamMember {
-    pub fn member<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
-    where
-        crate::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::User::read(self.member_id, conn)
-    }
     pub fn team<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Team, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
     where
-        crate::Team: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Team::read(self.team_id, conn)
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
+    }
+    pub fn member<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.member_id, conn)
     }
 }
 impl AsRef<TeamMember> for TeamMember {

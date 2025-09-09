@@ -1,10 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VolumetricContainerForeignKeys {
-    pub id: Option<crate::Container>,
-    pub volumetric_container_model: Option<crate::VolumetricContainerModel>,
+    pub id: Option<crate::codegen::structs_codegen::tables::containers::Container>,
+    pub volumetric_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::VolumetricContainer {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer
+{
     type ForeignKeys = VolumetricContainerForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

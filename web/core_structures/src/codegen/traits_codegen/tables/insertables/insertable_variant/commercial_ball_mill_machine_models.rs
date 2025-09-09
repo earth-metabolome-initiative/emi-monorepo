@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBa
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialBallMillMachineModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModel as diesel::Insertable<
-            <crate::CommercialBallMillMachineModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialBallMillMachineModel,
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
     >,
     BallMillMachineModel: web_common_traits::database::TryInsertGeneric<
         C,
@@ -27,11 +27,16 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::BallMillMachineModel: web_common_traits::database::Read<C>,
-    crate::BallMillMachineModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialBallMillMachineModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialBallMillMachineModelAttribute,

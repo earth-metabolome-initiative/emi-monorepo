@@ -9,14 +9,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWe
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialWeighingDeviceModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModel as diesel::Insertable<
-            <crate::CommercialWeighingDeviceModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::CommercialWeighingDeviceModel,
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
     >,
     C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -27,11 +27,16 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::WeighingDeviceModel: web_common_traits::database::Read<C>,
-    crate::WeighingDeviceModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialWeighingDeviceModel;
+    type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute,

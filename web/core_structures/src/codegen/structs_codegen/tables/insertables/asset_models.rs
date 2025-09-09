@@ -38,15 +38,15 @@ impl core::str::FromStr for AssetModelAttribute {
 impl core::fmt::Display for AssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::MostConcreteTable => write!(f, "most_concrete_table"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::ParentModel => write!(f, "parent_model"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "asset_models.id"),
+            Self::MostConcreteTable => write!(f, "asset_models.most_concrete_table"),
+            Self::Name => write!(f, "asset_models.name"),
+            Self::Description => write!(f, "asset_models.description"),
+            Self::ParentModel => write!(f, "asset_models.parent_model"),
+            Self::CreatedBy => write!(f, "asset_models.created_by"),
+            Self::CreatedAt => write!(f, "asset_models.created_at"),
+            Self::UpdatedBy => write!(f, "asset_models.updated_by"),
+            Self::UpdatedAt => write!(f, "asset_models.updated_at"),
         }
     }
 }
@@ -72,38 +72,44 @@ impl InsertableAssetModel {
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::AssetModel>, diesel::result::Error>
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
-        crate::AssetModel::read(parent_model, conn).map(Some)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(parent_model, conn)
+            .optional()
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetModelBuilder {
     pub(crate) most_concrete_table: Option<String>,
@@ -120,6 +126,20 @@ impl From<InsertableAssetModelBuilder>
 {
     fn from(builder: InsertableAssetModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableAssetModelBuilder {
+    fn default() -> Self {
+        Self {
+            most_concrete_table: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            parent_model: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -357,13 +377,6 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::Description)
         })?;
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
-                    )
-            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -374,6 +387,13 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
                         )
                 })?;
         }
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
+                    )
+            })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -491,7 +511,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::AssetModel,
+            Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             Error = web_common_traits::database::InsertError<AssetModelAttribute>,
         >,
 {
@@ -503,7 +523,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::AssetModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::asset_models::AssetModel =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -169,7 +169,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::DisposalProcedure(disposal_procedures) => {
                 crate::codegen::tables::rows::Rows::from(disposal_procedures)
             }
-            super::Row::Document(documents) => crate::codegen::tables::rows::Rows::from(documents),
             super::Row::EmailProvider(email_providers) => {
                 crate::codegen::tables::rows::Rows::from(email_providers)
             }
@@ -251,6 +250,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PhotographProcedure(photograph_procedures) => {
                 crate::codegen::tables::rows::Rows::from(photograph_procedures)
             }
+            super::Row::Photograph(photographs) => {
+                crate::codegen::tables::rows::Rows::from(photographs)
+            }
             super::Row::PhysicalAssetModel(physical_asset_models) => {
                 crate::codegen::tables::rows::Rows::from(physical_asset_models)
             }
@@ -298,9 +300,19 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::Role(roles) => crate::codegen::tables::rows::Rows::from(roles),
             super::Row::Room(rooms) => crate::codegen::tables::rows::Rows::from(rooms),
+            super::Row::SampleModel(sample_models) => {
+                crate::codegen::tables::rows::Rows::from(sample_models)
+            }
+            super::Row::SampleSourceModel(sample_source_models) => {
+                crate::codegen::tables::rows::Rows::from(sample_source_models)
+            }
+            super::Row::SampleSource(sample_sources) => {
+                crate::codegen::tables::rows::Rows::from(sample_sources)
+            }
             super::Row::SampleState(sample_states) => {
                 crate::codegen::tables::rows::Rows::from(sample_states)
             }
+            super::Row::Sample(samples) => crate::codegen::tables::rows::Rows::from(samples),
             super::Row::SpatialRefSy(spatial_ref_sys) => {
                 crate::codegen::tables::rows::Rows::from(spatial_ref_sys)
             }

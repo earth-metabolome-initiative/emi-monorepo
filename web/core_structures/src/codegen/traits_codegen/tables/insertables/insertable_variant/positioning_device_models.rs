@@ -7,25 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePositioningD
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PositioningDeviceModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModel as diesel::Insertable<
-            <crate::PositioningDeviceModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::PositioningDeviceModel,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PositioningDeviceModel;
+    type Row = crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,

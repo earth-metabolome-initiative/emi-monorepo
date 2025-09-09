@@ -84,20 +84,37 @@ impl core::fmt::Display for FreezeDryingProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::FreezeDriedContainer => write!(f, "freeze_dried_container"),
-            Self::FreezeDriedContainerModel => write!(f, "freeze_dried_container_model"),
+            Self::Procedure => write!(f, "freeze_drying_procedures.procedure"),
+            Self::ProcedureTemplate => {
+                write!(f, "freeze_drying_procedures.procedure_template")
+            }
+            Self::FreezeDriedContainer => {
+                write!(f, "freeze_drying_procedures.freeze_dried_container")
+            }
+            Self::FreezeDriedContainerModel => {
+                write!(f, "freeze_drying_procedures.freeze_dried_container_model")
+            }
             Self::ProcedureTemplateFreezeDriedContainerModel => {
-                write!(f, "procedure_template_freeze_dried_container_model")
+                write!(
+                    f,
+                    "freeze_drying_procedures.procedure_template_freeze_dried_container_model"
+                )
             }
-            Self::ProcedureFreezeDriedContainer(e) => write!(f, "{e}"),
-            Self::FreezeDriedWith => write!(f, "freeze_dried_with"),
-            Self::FreezeDriedWithModel => write!(f, "freeze_dried_with_model"),
+            Self::ProcedureFreezeDriedContainer(e) => {
+                write!(f, "freeze_drying_procedures.{e}")
+            }
+            Self::FreezeDriedWith => {
+                write!(f, "freeze_drying_procedures.freeze_dried_with")
+            }
+            Self::FreezeDriedWithModel => {
+                write!(f, "freeze_drying_procedures.freeze_dried_with_model")
+            }
             Self::ProcedureTemplateFreezeDriedWithModel => {
-                write!(f, "procedure_template_freeze_dried_with_model")
+                write!(f, "freeze_drying_procedures.procedure_template_freeze_dried_with_model")
             }
-            Self::ProcedureFreezeDriedWith(e) => write!(f, "{e}"),
+            Self::ProcedureFreezeDriedWith(e) => {
+                write!(f, "freeze_drying_procedures.{e}")
+            }
         }
     }
 }
@@ -122,244 +139,193 @@ pub struct InsertableFreezeDryingProcedure {
     pub(crate) procedure_freeze_dried_with: ::rosetta_uuid::Uuid,
 }
 impl InsertableFreezeDryingProcedure {
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
     pub fn freeze_dried_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainer, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainer: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainer::read(self.freeze_dried_container, conn)
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.freeze_dried_container,
+            conn,
+        )
     }
     pub fn freeze_dried_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::VolumetricContainerModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
     where
-        crate::VolumetricContainerModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::VolumetricContainerModel::read(self.freeze_dried_container_model, conn)
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.freeze_dried_container_model,
+            conn,
+        )
     }
-    pub fn freeze_dried_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::FreezeDryer>, diesel::result::Error>
-    where
-        crate::FreezeDryer: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(freeze_dried_with) = self.freeze_dried_with else {
-            return Ok(None);
-        };
-        crate::FreezeDryer::read(freeze_dried_with, conn).map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_freeze_dried_with_freeze_dried_wi_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::Asset>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        let Some(freeze_dried_with) = self.freeze_dried_with else {
-            return Ok(None);
-        };
-        crate::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
-                    .eq(freeze_dried_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                            .eq(&self.freeze_dried_with_model),
-                    ),
-            )
-            .first::<crate::Asset>(conn)
-            .map(Some)
-    }
-    pub fn freeze_dried_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::FreezeDryerModel, diesel::result::Error>
-    where
-        crate::FreezeDryerModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::FreezeDryerModel::read(self.freeze_dried_with_model, conn)
-    }
-    pub fn freeze_drying_procedures_freeze_dried_with_model_freeze_dr_fkey<
+    pub fn procedure_template_freeze_dried_container_model<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::AssetCompatibilityRule::read(
-            (self.freeze_dried_with_model, self.freeze_dried_container_model),
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_freeze_dried_container_model,
             conn,
         )
-    }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
-    where
-        crate::Procedure: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_freeze_dried_container_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
     }
     pub fn procedure_freeze_dried_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_freeze_dried_container, conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_freeze_dried_container,
+            conn,
+        )
     }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey1(
+    pub fn freeze_dried_with<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(freeze_dried_with) = self.freeze_dried_with else {
+            return Ok(None);
         };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.freeze_dried_container_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer::read(
+            freeze_dried_with,
+            conn,
+        )
+        .optional()
     }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey2(
+    pub fn freeze_dried_with_model<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.freeze_dried_container),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel::read(
+            self.freeze_dried_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_freeze_dried_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_freeze_dried_with_model,
+            conn,
+        )
     }
     pub fn procedure_freeze_dried_with<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
     where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_freeze_dried_with, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_with_free_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::ProcedureAsset>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        let Some(freeze_dried_with) = self.freeze_dried_with else {
-            return Ok(None);
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(freeze_dried_with),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-            .map(Some)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_with_freez_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.freeze_dried_with_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_freeze_dried_with_proce_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_freeze_dried_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_freeze_dried_with_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_freeze_dried_with,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn freeze_drying_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -368,72 +334,47 @@ impl InsertableFreezeDryingProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::FreezeDryingProcedureTemplate, diesel::result::Error>
-    where
-        crate::FreezeDryingProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::FreezeDryingProcedureTemplate::read(self.procedure_template, conn)
-    }
-    pub fn procedure_template_freeze_dried_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_freeze_dried_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_freeze_dried_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(
-            self.procedure_template_freeze_dried_with_model,
-            conn,
-        )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn freeze_drying_procedures_procedure_template_procedure_tem_fkey1(
+    pub fn freeze_drying_procedures_freeze_dried_with_freeze_dried_wi_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::FreezeDryingProcedureTemplate, diesel::result::Error> {
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
-        crate::FreezeDryingProcedureTemplate::table()
+        let Some(freeze_dried_with) = self.freeze_dried_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
+                    .eq(freeze_dried_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template_freeze_dried_container_model
-                            .eq(&self.procedure_template_freeze_dried_container_model),
+                        crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                            .eq(&self.freeze_dried_with_model),
                     ),
             )
-            .first::<crate::FreezeDryingProcedureTemplate>(conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn freeze_drying_procedures_procedure_template_procedure_temp_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::FreezeDryingProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::FreezeDryingProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -442,7 +383,201 @@ impl InsertableFreezeDryingProcedure {
                             .eq(&self.procedure_template_freeze_dried_with_model),
                     ),
             )
-            .first::<crate::FreezeDryingProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_template_procedure_tem_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template_freeze_dried_container_model
+                            .eq(&self.procedure_template_freeze_dried_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_freeze_dried_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_with_proce_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_freeze_dried_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn freeze_drying_procedures_freeze_dried_with_model_freeze_dr_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.freeze_dried_with_model, self.freeze_dried_container_model),
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.freeze_dried_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_with_freez_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.freeze_dried_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_container_fkey2(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.freeze_dried_container),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freeze_drying_procedures_procedure_freeze_dried_with_free_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(freeze_dried_with) = self.freeze_dried_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_freeze_dried_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(freeze_dried_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -766,12 +901,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`freeze_drying_procedures`"]
+    ///    v2@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
+    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
-    /// class v2 directly-involved-column
     /// end
     /// subgraph v6 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
@@ -781,11 +916,11 @@ impl<
     ///    v3@{shape: rounded, label: "procedure_template"}
     /// class v3 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v4
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
     /// v1 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
     /// v5 --->|"`extends`"| v7
     /// v5 ---o|"`associated with`"| v6
     /// ```
@@ -820,10 +955,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedures`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_container"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_freeze_dried_container"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_container"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -831,12 +966,12 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn freeze_dried_container(
@@ -875,23 +1010,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedures`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_freeze_dried_container"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_container_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn freeze_dried_container_model(
@@ -931,23 +1066,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_freeze_dried_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_freeze_dried_container_model(
@@ -988,26 +1123,26 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`freeze_drying_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
-    /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "freeze_dried_container_model"}
+    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "freeze_dried_container"}
     /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_freeze_dried_container"}
     /// class v2 column-of-interest
-    ///    v1@{shape: rounded, label: "freeze_dried_container_model"}
-    /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_freeze_dried_container_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
-    ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v6
+    /// v1 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1016,7 +1151,7 @@ impl<
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v0
-    /// v1 --->|"`associated same as`"| v5
+    /// v3 --->|"`associated same as`"| v6
     /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
@@ -1160,31 +1295,31 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`freeze_drying_procedures`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_with"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "freeze_dried_with_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_with"}
+    /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_freeze_dried_with"}
     /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset_model"}
     /// class v4 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     /// end
-    /// v3 -.->|"`foreign defines`"| v4
+    /// v1 --->|"`associated same as`"| v4
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
+    /// v3 -.->|"`foreign defines`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn freeze_dried_with(
@@ -1223,10 +1358,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freeze_drying_procedures`"]
-    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_freeze_dried_with"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "freeze_dried_with_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -1234,12 +1369,12 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn freeze_dried_with_model(
@@ -1285,10 +1420,10 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
@@ -1337,28 +1472,28 @@ impl<
     /// subgraph v8 ["`freeze_drying_procedures`"]
     ///    v0@{shape: rounded, label: "freeze_dried_with"}
     /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "freeze_dried_with_model"}
-    /// class v1 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_freeze_dried_with_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "freeze_dried_with_model"}
+    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_freeze_dried_with"}
     /// class v2 column-of-interest
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
-    /// v4 -.->|"`foreign defines`"| v5
-    /// v1 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v6
+    /// v1 --->|"`associated same as`"| v5
+    /// v4 -.->|"`foreign defines`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1384,24 +1519,33 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_freeze_dried_with
         {
-            procedure_freeze_dried_with = if let (Some(freeze_dried_with), Some(asset)) =
-                (self.freeze_dried_with, builder.asset)
-            {
-                if freeze_dried_with != asset {
+            procedure_freeze_dried_with = if let (
+                Some(procedure_template_freeze_dried_with_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_freeze_dried_with_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_freeze_dried_with_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::FreezeDriedWith,
+                            Self::Attributes::ProcedureTemplateFreezeDriedWithModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.freeze_dried_with = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_freeze_dried_with_model =
+                    Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(freeze_dried_with) = self.freeze_dried_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_freeze_dried_with_model) =
+                self.procedure_template_freeze_dried_with_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(freeze_dried_with),
+                        procedure_template_freeze_dried_with_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1450,33 +1594,24 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_freeze_dried_with
         {
-            procedure_freeze_dried_with = if let (
-                Some(procedure_template_freeze_dried_with_model),
-                Some(procedure_template_asset_model),
-            ) = (
-                self.procedure_template_freeze_dried_with_model,
-                builder.procedure_template_asset_model,
-            ) {
-                if procedure_template_freeze_dried_with_model != procedure_template_asset_model {
+            procedure_freeze_dried_with = if let (Some(freeze_dried_with), Some(asset)) =
+                (self.freeze_dried_with, builder.asset)
+            {
+                if freeze_dried_with != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateFreezeDriedWithModel,
+                            Self::Attributes::FreezeDriedWith,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_freeze_dried_with_model =
-                    Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.freeze_dried_with = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_freeze_dried_with_model) =
-                self.procedure_template_freeze_dried_with_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(freeze_dried_with) = self.freeze_dried_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_freeze_dried_with_model,
+                        Some(freeze_dried_with),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1697,27 +1832,35 @@ where
     }
 }
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableFreezeDryingProcedureBuilder<Procedure>
+for InsertableFreezeDryingProcedureBuilder<Procedure>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::FreezeDryingProcedure,
-            Error = web_common_traits::database::InsertError<FreezeDryingProcedureAttribute>,
-        >,
-    Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
-        web_common_traits::database::TryInsertGeneric<C>,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
+        Error = web_common_traits::database::InsertError<FreezeDryingProcedureAttribute>,
+    >,
+    Procedure: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+    >,
 {
     type Attributes = FreezeDryingProcedureAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::FreezeDryingProcedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

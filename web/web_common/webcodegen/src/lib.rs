@@ -21,8 +21,7 @@ pub use custom_schema_constraints::{
     CompatibleForeignTypeConstraint, ConstraintError, CustomColumnConstraint,
     CustomTableConstraint, DuplicatedCheckConstraint, DuplicatedUniqueIndexConstraint,
     HasSpecificTypeConstraint, IsForeignKeyConstraint, LowercaseColumnConstraint,
-    LowercaseTableConstraint, NotNullColumnConstraint, SameAsConstraintMustNotCascade,
-    WordDeprecationConstraint,
+    LowercaseTableConstraint, NotNullColumnConstraint, WordDeprecationConstraint,
 };
 pub use postgis::{GeographyColumn, GeometryColumn};
 pub use table_extension_network::TableExtensionNetwork;

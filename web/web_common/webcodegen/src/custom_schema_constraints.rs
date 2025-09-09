@@ -8,7 +8,6 @@ mod is_foreign_key_column_constraint;
 mod lowercase_column_constraint;
 mod lowercase_table_constraint;
 mod not_null_column_constraint;
-mod same_as_constraint_must_not_cascade;
 mod word_deprecation_constraint;
 
 pub use compatible_foreign_type::CompatibleForeignTypeConstraint;
@@ -21,5 +20,4 @@ pub use is_foreign_key_column_constraint::IsForeignKeyConstraint;
 pub use lowercase_column_constraint::LowercaseColumnConstraint;
 pub use lowercase_table_constraint::LowercaseTableConstraint;
 pub use not_null_column_constraint::NotNullColumnConstraint;
-pub use same_as_constraint_must_not_cascade::SameAsConstraintMustNotCascade;
 pub use word_deprecation_constraint::WordDeprecationConstraint;

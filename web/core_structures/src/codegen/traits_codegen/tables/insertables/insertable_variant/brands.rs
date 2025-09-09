@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Brand as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableBrand as diesel::Insertable<
-            <crate::Brand as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::brands::Brand as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Brand>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::brands::Brand,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Brand;
+    type Row = crate::codegen::structs_codegen::tables::brands::Brand;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBrand;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::BrandAttribute,

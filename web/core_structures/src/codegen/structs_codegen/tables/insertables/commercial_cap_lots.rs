@@ -53,8 +53,8 @@ impl core::fmt::Display for CommercialCapLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::ProductModel => write!(f, "product_model"),
+            Self::Id => write!(f, "commercial_cap_lots.id"),
+            Self::ProductModel => write!(f, "commercial_cap_lots.product_model"),
         }
     }
 }
@@ -74,42 +74,59 @@ impl InsertableCommercialCapLot {
     pub fn commercial_cap_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProductLot, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProductLot: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProductLot::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
+            self.id, conn,
+        )
     }
     pub fn commercial_cap_lots_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CapModel, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::cap_models::CapModel, diesel::result::Error>
     where
-        crate::CapModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::cap_models::CapModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CapModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::cap_models::CapModel::read(self.id, conn)
     }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialCapModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialCapModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialCapModel::read(self.product_model, conn)
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel::read(
+            self.product_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_cap_lots_id_product_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -118,7 +135,9 @@ impl InsertableCommercialCapLot {
                             .eq(&self.product_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -228,14 +247,14 @@ for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v2 --->|"`ancestral same as`"| v3
-    ///v6 --->|"`extends`"| v7
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
@@ -507,11 +526,11 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
+    ///v3 --->|"`extends`"| v4
     ///```
     fn product_model(
         self,
@@ -561,15 +580,15 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v6
     ///```
     fn parent_model(
         self,
@@ -618,7 +637,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::CommercialCapLot,
+            Row = crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
             Error = web_common_traits::database::InsertError<CommercialCapLotAttribute>,
         >,
     CapModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -632,7 +651,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialCapLot = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -7,14 +7,14 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantP
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::SupernatantProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate as diesel::Insertable<
-            <crate::SupernatantProcedureTemplate as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::SupernatantProcedureTemplate,
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
     >,
     C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
@@ -24,15 +24,10 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute,
     >,
-    crate::AssetCompatibilityRule: web_common_traits::database::Read<C>,
-    crate::AssetCompatibilityRule: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: web_common_traits::database::Read<
         C,
-        UserId = i32,
     >,
-    crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplate: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+    crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule: web_common_traits::database::Updatable<
         C,
         UserId = i32,
     >,
@@ -41,9 +36,23 @@ where
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         PrimaryKey = i32,
     >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::SupernatantProcedureTemplate;
+    type Row = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute,
@@ -61,19 +70,7 @@ where
         self.set_most_concrete_table("supernatant_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct
-            .supernatant_pm_compatibility_rules(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct
-            .procedure_template_pipette_tip_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -97,7 +94,19 @@ where
                     .into(),
             );
         }
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_pipette_tip_model(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct
+            .supernatant_pm_compatibility_rules(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -120,7 +129,7 @@ where
             procedure_template_stratified_source_model,
         ) = self.procedure_template_stratified_source_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_stratified_source_model,
                 conn,
             )?;
@@ -133,7 +142,7 @@ where
             procedure_template_supernatant_destination_model,
         ) = self.procedure_template_supernatant_destination_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_supernatant_destination_model,
                 conn,
             )?;
@@ -146,7 +155,7 @@ where
             procedure_template_transferred_with_model,
         ) = self.procedure_template_transferred_with_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_transferred_with_model,
                 conn,
             )?;
@@ -159,7 +168,7 @@ where
             procedure_template_pipette_tip_model,
         ) = self.procedure_template_pipette_tip_model
         {
-            let procedure_template_asset_models = crate::ProcedureTemplateAssetModel::read(
+            let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
                 procedure_template_pipette_tip_model,
                 conn,
             )?;

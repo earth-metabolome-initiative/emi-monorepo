@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipMo
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PipetteTipModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModel as diesel::Insertable<
-            <crate::PipetteTipModel as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PipetteTipModel>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PipetteTipModel;
+    type Row = crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModel;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,

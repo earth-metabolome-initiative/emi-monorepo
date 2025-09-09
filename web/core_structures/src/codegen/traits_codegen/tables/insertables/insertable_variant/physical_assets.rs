@@ -7,23 +7,37 @@ for crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsse
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::PhysicalAsset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset as diesel::Insertable<
-            <crate::PhysicalAsset as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::PhysicalAsset>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    >,
     Asset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     C: diesel::connection::LoadConnection,
-    crate::Asset: web_common_traits::database::Read<C>,
-    crate::Asset: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::PhysicalAsset;
+    type Row = crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,

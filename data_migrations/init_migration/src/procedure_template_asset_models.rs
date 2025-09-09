@@ -12,6 +12,7 @@ pub mod freeze_dryer;
 pub mod freezer;
 pub mod organism;
 pub mod phone;
+pub mod photograph;
 pub mod pipette_tips;
 pub mod pipettes;
 pub mod safelock;

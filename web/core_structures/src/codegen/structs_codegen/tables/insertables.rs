@@ -317,10 +317,6 @@ pub use disposal_procedures::{
     DisposalProcedureAttribute, DisposalProcedureExtensionAttribute, DisposalProcedureSettable,
     InsertableDisposalProcedure, InsertableDisposalProcedureBuilder,
 };
-mod documents;
-pub use documents::{
-    DocumentAttribute, DocumentSettable, InsertableDocument, InsertableDocumentBuilder,
-};
 mod email_providers;
 pub use email_providers::{
     EmailProviderAttribute, EmailProviderSettable, InsertableEmailProvider,
@@ -475,6 +471,11 @@ pub use photograph_procedures::{
     PhotographProcedureAttribute, PhotographProcedureExtensionAttribute,
     PhotographProcedureSettable,
 };
+mod photographs;
+pub use photographs::{
+    InsertablePhotograph, InsertablePhotographBuilder, PhotographAttribute,
+    PhotographExtensionAttribute, PhotographSettable,
+};
 mod physical_asset_models;
 pub use physical_asset_models::{
     InsertablePhysicalAssetModel, InsertablePhysicalAssetModelBuilder, PhysicalAssetModelAttribute,
@@ -561,9 +562,29 @@ mod roles;
 pub use roles::{InsertableRole, InsertableRoleBuilder, RoleAttribute, RoleSettable};
 mod rooms;
 pub use rooms::{InsertableRoom, InsertableRoomBuilder, RoomAttribute, RoomSettable};
+mod sample_models;
+pub use sample_models::{
+    InsertableSampleModel, InsertableSampleModelBuilder, SampleModelAttribute,
+    SampleModelExtensionAttribute, SampleModelSettable,
+};
+mod sample_source_models;
+pub use sample_source_models::{
+    InsertableSampleSourceModel, InsertableSampleSourceModelBuilder, SampleSourceModelAttribute,
+    SampleSourceModelExtensionAttribute, SampleSourceModelSettable,
+};
+mod sample_sources;
+pub use sample_sources::{
+    InsertableSampleSource, InsertableSampleSourceBuilder, SampleSourceAttribute,
+    SampleSourceExtensionAttribute, SampleSourceSettable,
+};
 mod sample_states;
 pub use sample_states::{
     InsertableSampleState, InsertableSampleStateBuilder, SampleStateAttribute, SampleStateSettable,
+};
+mod samples;
+pub use samples::{
+    InsertableSample, InsertableSampleBuilder, SampleAttribute, SampleExtensionAttribute,
+    SampleSettable,
 };
 mod spatial_ref_sys;
 pub use spatial_ref_sys::{

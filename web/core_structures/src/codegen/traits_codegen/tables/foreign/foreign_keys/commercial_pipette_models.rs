@@ -1,11 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialPipetteModelForeignKeys {
-    pub pipette_model: Option<crate::PipetteModel>,
-    pub commercial_pipette_models_id_fkey: Option<crate::PipetteModel>,
-    pub commercial_pipette_models_id_fkey1: Option<crate::CommercialProduct>,
+    pub pipette_model:
+        Option<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>,
+    pub commercial_pipette_models_id_fkey:
+        Option<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>,
+    pub commercial_pipette_models_id_fkey1:
+        Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CommercialPipetteModel {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel
+{
     type ForeignKeys = CommercialPipetteModelForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

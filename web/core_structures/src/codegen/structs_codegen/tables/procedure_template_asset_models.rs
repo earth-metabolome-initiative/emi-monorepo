@@ -9,9 +9,24 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::AssetModel, foreign_key = asset_model))]
-#[diesel(belongs_to(crate::User, foreign_key = created_by))]
-#[diesel(belongs_to(crate::ProcedureTemplate, foreign_key = procedure_template))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        foreign_key = procedure_template
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        foreign_key = asset_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models
@@ -37,12 +52,12 @@ for web_common_traits::database::IdOrBuilder<
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::ProcedureTemplateAssetModel>
-    for ProcedureTemplateAssetModel
+impl web_common_traits::prelude::ExtensionTable<
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+> for ProcedureTemplateAssetModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
-}
+{}
 impl<C> web_common_traits::prelude::Ancestor<C> for ProcedureTemplateAssetModel
 where
     Self: web_common_traits::prelude::TableName + Sized,
@@ -76,28 +91,93 @@ impl diesel::Identifiable for ProcedureTemplateAssetModel {
     }
 }
 impl ProcedureTemplateAssetModel {
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn based_on<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(based_on) = self.based_on else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                based_on,
+                conn,
+            )
+            .optional()
+    }
     pub fn asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.asset_model, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.asset_model,
+            conn,
+        )
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn procedure_template_asset_models_based_on_asset_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::ProcedureTemplateAssetModel>, diesel::result::Error> {
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+        diesel::result::Error,
+    >{
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(based_on) = self.based_on else {
             return Ok(None);
         };
-        crate::ProcedureTemplateAssetModel::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
                     .eq(based_on)
@@ -106,41 +186,10 @@ impl ProcedureTemplateAssetModel {
                             .eq(&self.asset_model),
                     ),
             )
-            .first::<crate::ProcedureTemplateAssetModel>(conn)
-            .map(Some)
-    }
-    pub fn based_on<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::ProcedureTemplateAssetModel>, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(based_on) = self.based_on else {
-            return Ok(None);
-        };
-        crate::ProcedureTemplateAssetModel::read(based_on, conn).map(Some)
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
-    where
-        crate::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplate, diesel::result::Error>
-    where
-        crate::ProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplate::read(self.procedure_template, conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_name_and_procedure_template(
@@ -203,6 +252,19 @@ impl ProcedureTemplateAssetModel {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_based_on(
+        based_on: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
+        Self::table()
+            .filter(procedure_template_asset_models::based_on.eq(based_on))
+            .order_by(procedure_template_asset_models::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_based_on_and_asset_model(
         based_on: i32,
         asset_model: i32,
@@ -219,19 +281,6 @@ impl ProcedureTemplateAssetModel {
                     .eq(based_on)
                     .and(procedure_template_asset_models::asset_model.eq(asset_model)),
             )
-            .order_by(procedure_template_asset_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_based_on(
-        based_on: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
-        Self::table()
-            .filter(procedure_template_asset_models::based_on.eq(based_on))
             .order_by(procedure_template_asset_models::id.asc())
             .load::<Self>(conn)
     }

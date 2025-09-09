@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProc
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::WeighingProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedure as diesel::Insertable<
-            <crate::WeighingProcedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::WeighingProcedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+    >,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -20,23 +24,34 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::WeighingProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute,
     >,
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    crate::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
-    crate::WeighingProcedureTemplate: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::WeighingProcedure;
+    type Row = crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute,
@@ -83,7 +98,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let weighing_procedure_templates = crate::WeighingProcedureTemplate::read(
+            let weighing_procedure_templates = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -100,7 +115,7 @@ where
             procedure_weighed_container,
         ) = self.procedure_weighed_container
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_weighed_container,
                 conn,
             )?;
@@ -118,7 +133,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_weighed_with) = self
             .procedure_weighed_with
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_weighed_with,
                 conn,
             )?;

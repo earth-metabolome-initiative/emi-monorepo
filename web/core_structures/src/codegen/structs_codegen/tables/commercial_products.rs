@@ -9,7 +9,12 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Brand, foreign_key = brand_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::brands::Brand,
+        foreign_key = brand_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::commercial_products::commercial_products
@@ -32,12 +37,20 @@ impl<'a> From<&'a CommercialProduct>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::AssetModel> for CommercialProduct where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+    > for CommercialProduct
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::CommercialProduct> for CommercialProduct where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+    > for CommercialProduct
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for CommercialProduct {
@@ -50,22 +63,27 @@ impl CommercialProduct {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
     pub fn brand<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Brand, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
     where
-        crate::Brand: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::brands::Brand:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Brand::read(self.brand_id, conn)
+        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

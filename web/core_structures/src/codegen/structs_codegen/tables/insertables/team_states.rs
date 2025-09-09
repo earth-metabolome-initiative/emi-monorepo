@@ -26,11 +26,11 @@ impl core::str::FromStr for TeamStateAttribute {
 impl core::fmt::Display for TeamStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Icon => write!(f, "icon"),
-            Self::ColorId => write!(f, "color_id"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "team_states.name"),
+            Self::Description => write!(f, "team_states.description"),
+            Self::Icon => write!(f, "team_states.icon"),
+            Self::ColorId => write!(f, "team_states.color_id"),
+            Self::Id => write!(f, "team_states.id"),
         }
     }
 }
@@ -50,12 +50,13 @@ impl InsertableTeamState {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
     where
-        crate::Color: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -255,7 +256,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::TeamState,
+            Row = crate::codegen::structs_codegen::tables::team_states::TeamState,
             Error = web_common_traits::database::InsertError<TeamStateAttribute>,
         >,
 {
@@ -267,7 +268,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::TeamState = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::team_states::TeamState =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

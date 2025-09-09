@@ -41,16 +41,20 @@ impl core::str::FromStr for ProcedureTemplateAttribute {
 impl core::fmt::Display for ProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::MostConcreteTable => write!(f, "most_concrete_table"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Icon => write!(f, "icon"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
-            Self::Deprecated => write!(f, "deprecated"),
+            Self::ProcedureTemplate => {
+                write!(f, "procedure_templates.procedure_template")
+            }
+            Self::MostConcreteTable => {
+                write!(f, "procedure_templates.most_concrete_table")
+            }
+            Self::Name => write!(f, "procedure_templates.name"),
+            Self::Description => write!(f, "procedure_templates.description"),
+            Self::Icon => write!(f, "procedure_templates.icon"),
+            Self::CreatedBy => write!(f, "procedure_templates.created_by"),
+            Self::CreatedAt => write!(f, "procedure_templates.created_at"),
+            Self::UpdatedBy => write!(f, "procedure_templates.updated_by"),
+            Self::UpdatedAt => write!(f, "procedure_templates.updated_at"),
+            Self::Deprecated => write!(f, "procedure_templates.deprecated"),
         }
     }
 }
@@ -77,25 +81,25 @@ impl InsertableProcedureTemplate {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplateBuilder {
     pub(crate) most_concrete_table: Option<String>,
@@ -113,6 +117,21 @@ impl From<InsertableProcedureTemplateBuilder>
 {
     fn from(builder: InsertableProcedureTemplateBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableProcedureTemplateBuilder {
+    fn default() -> Self {
+        Self {
+            most_concrete_table: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            icon: Some("book".to_owned()),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            deprecated: Some(false),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -386,13 +405,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAttribute::Description)
         })?;
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                    )
-            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -403,6 +415,13 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                         )
                 })?;
         }
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                    )
+            })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -551,7 +570,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::ProcedureTemplate,
+            Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
             Error = web_common_traits::database::InsertError<ProcedureTemplateAttribute>,
         >,
 {
@@ -563,7 +582,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::ProcedureTemplate = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

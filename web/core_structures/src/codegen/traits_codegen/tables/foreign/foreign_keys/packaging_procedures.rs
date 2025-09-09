@@ -1,19 +1,40 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PackagingProcedureForeignKeys {
-    pub packaged_with_model: Option<crate::PackagingModel>,
-    pub packaging_procedures_packaged_with_model_sample_model_fkey:
-        Option<crate::AssetCompatibilityRule>,
-    pub procedure: Option<crate::Procedure>,
-    pub procedure_packaged_with: Option<crate::ProcedureAsset>,
-    pub procedure_sample: Option<crate::ProcedureAsset>,
-    pub procedure_template: Option<crate::PackagingProcedureTemplate>,
-    pub procedure_template_packaged_with_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_template_sample_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub sample: Option<crate::PhysicalAsset>,
-    pub sample_model: Option<crate::PhysicalAssetModel>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+    >,
+    pub sample: Option<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    >,
+    pub sample_model: Option<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    >,
+    pub procedure_template_sample_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_sample: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub packaged_with_model: Option<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+    >,
+    pub procedure_template_packaged_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_packaged_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub packaging_procedures_packaged_with_model_sample_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure
+{
     type ForeignKeys = PackagingProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -21,32 +42,37 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
-                self.packaged_with_model,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.packaged_with_model,
-                self.sample_model,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_packaged_with,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureTemplate(
+                self.procedure_template,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.sample),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.sample_model,
+            ),
+        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_sample_model,
+                    ),
+                ),
+            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
                 self.procedure_sample,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingProcedureTemplate(
-                self.procedure_template,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PackagingModel(
+                self.packaged_with_model,
             ),
         ));
         connector
@@ -57,34 +83,29 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
                     ),
                 ),
             );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_sample_model,
-                    ),
-                ),
-            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.sample),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_packaged_with,
+            ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.packaged_with_model,
                 self.sample_model,
-            ),
+            )),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.packaged_with_model.is_some()
-            && foreign_keys.packaging_procedures_packaged_with_model_sample_model_fkey.is_some()
-            && foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_packaged_with.is_some()
-            && foreign_keys.procedure_sample.is_some()
+        foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template.is_some()
-            && foreign_keys.procedure_template_packaged_with_model.is_some()
-            && foreign_keys.procedure_template_sample_model.is_some()
             && foreign_keys.sample.is_some()
             && foreign_keys.sample_model.is_some()
+            && foreign_keys.procedure_template_sample_model.is_some()
+            && foreign_keys.procedure_sample.is_some()
+            && foreign_keys.packaged_with_model.is_some()
+            && foreign_keys.procedure_template_packaged_with_model.is_some()
+            && foreign_keys.procedure_packaged_with.is_some()
+            && foreign_keys.packaging_procedures_packaged_with_model_sample_model_fkey.is_some()
     }
     fn update(
         &self,
@@ -209,12 +230,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_packaged_with == procedure_assets.id {
-                    foreign_keys.procedure_packaged_with = Some(procedure_assets);
-                    updated = true;
-                }
                 if self.procedure_sample == procedure_assets.id {
                     foreign_keys.procedure_sample = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_packaged_with == procedure_assets.id {
+                    foreign_keys.procedure_packaged_with = Some(procedure_assets);
                     updated = true;
                 }
             }
@@ -222,12 +243,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_packaged_with == procedure_assets.id {
-                    foreign_keys.procedure_packaged_with = None;
-                    updated = true;
-                }
                 if self.procedure_sample == procedure_assets.id {
                     foreign_keys.procedure_sample = None;
+                    updated = true;
+                }
+                if self.procedure_packaged_with == procedure_assets.id {
+                    foreign_keys.procedure_packaged_with = None;
                     updated = true;
                 }
             }
@@ -239,14 +260,14 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_packaged_with_model == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_packaged_with_model =
+                if self.procedure_template_sample_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_sample_model =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
-                if self.procedure_template_sample_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_sample_model =
+                if self.procedure_template_packaged_with_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_packaged_with_model =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -257,13 +278,13 @@ impl web_common_traits::prelude::HasForeignKeys for crate::PackagingProcedure {
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.procedure_template_sample_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_sample_model = None;
+                    updated = true;
+                }
                 if self.procedure_template_packaged_with_model == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_packaged_with_model = None;
-                    updated = true;
-                }
-                if self.procedure_template_sample_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_sample_model = None;
                     updated = true;
                 }
             }

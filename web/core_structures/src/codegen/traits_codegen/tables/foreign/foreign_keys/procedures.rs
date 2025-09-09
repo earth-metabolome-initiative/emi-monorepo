@@ -1,15 +1,24 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureForeignKeys {
-    pub created_by: Option<crate::User>,
-    pub parent_procedure: Option<crate::Procedure>,
-    pub parent_procedure_template: Option<crate::ProcedureTemplate>,
-    pub procedures_parent_procedure_template_procedure_template_fkey:
-        Option<crate::ParentProcedureTemplate>,
-    pub procedure_template: Option<crate::ProcedureTemplate>,
-    pub updated_by: Option<crate::User>,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub parent_procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub parent_procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub procedures_parent_procedure_template_procedure_template_fkey: Option<
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::procedures::Procedure
+{
     type ForeignKeys = ProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -17,7 +26,9 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.procedure_template,
+            ),
         ));
         if let Some(parent_procedure) = self.parent_procedure {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -33,6 +44,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
                 ),
             ));
         }
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.updated_by),
+        ));
         if let Some(parent_procedure_template) = self.parent_procedure_template {
             connector
                 .send(
@@ -44,24 +61,16 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
                     ),
                 );
         }
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.updated_by),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.created_by.is_some()
+        foreign_keys.procedure_template.is_some()
             && (foreign_keys.parent_procedure.is_some() || self.parent_procedure.is_some())
             && (foreign_keys.parent_procedure_template.is_some()
                 || self.parent_procedure_template.is_some())
+            && foreign_keys.created_by.is_some()
+            && foreign_keys.updated_by.is_some()
             && (foreign_keys.procedures_parent_procedure_template_procedure_template_fkey.is_some()
                 || self.parent_procedure_template.is_some())
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.updated_by.is_some()
     }
     fn update(
         &self,
@@ -109,14 +118,14 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = Some(procedure_templates.clone());
+                    updated = true;
+                }
                 if self.parent_procedure_template.is_some_and(|parent_procedure_template| {
                     parent_procedure_template == procedure_templates.procedure_template
                 }) {
                     foreign_keys.parent_procedure_template = Some(procedure_templates.clone());
-                    updated = true;
-                }
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = Some(procedure_templates.clone());
                     updated = true;
                 }
             }
@@ -124,14 +133,14 @@ impl web_common_traits::prelude::HasForeignKeys for crate::Procedure {
                 crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.procedure_template == procedure_templates.procedure_template {
+                    foreign_keys.procedure_template = None;
+                    updated = true;
+                }
                 if self.parent_procedure_template.is_some_and(|parent_procedure_template| {
                     parent_procedure_template == procedure_templates.procedure_template
                 }) {
                     foreign_keys.parent_procedure_template = None;
-                    updated = true;
-                }
-                if self.procedure_template == procedure_templates.procedure_template {
-                    foreign_keys.procedure_template = None;
                     updated = true;
                 }
             }

@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPr
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CommercialProductLot as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot as diesel::Insertable<
-            <crate::CommercialProductLot as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CommercialProductLot>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    crate::PhysicalAssetModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CommercialProductLot;
+    type Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,

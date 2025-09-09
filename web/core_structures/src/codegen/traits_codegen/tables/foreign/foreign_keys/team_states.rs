@@ -1,9 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TeamStateForeignKeys {
-    pub color: Option<crate::Color>,
+    pub color: Option<crate::codegen::structs_codegen::tables::colors::Color>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::TeamState {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::team_states::TeamState
+{
     type ForeignKeys = TeamStateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

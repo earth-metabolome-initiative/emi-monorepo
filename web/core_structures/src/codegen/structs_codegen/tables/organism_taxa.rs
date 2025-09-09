@@ -9,9 +9,24 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::User, foreign_key = created_by))]
-#[diesel(belongs_to(crate::Organism, foreign_key = organism_id))]
-#[diesel(belongs_to(crate::Taxon, foreign_key = taxon_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organisms::Organism,
+        foreign_key = organism_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::taxa::Taxon,
+        foreign_key = taxon_id
+    )
+)]
 #[diesel(primary_key(organism_id, taxon_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa
@@ -35,8 +50,12 @@ impl<'a> From<&'a OrganismTaxon>
         web_common_traits::database::IdOrBuilder::Id((value.organism_id, value.taxon_id))
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::OrganismTaxon> for OrganismTaxon where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
+    > for OrganismTaxon
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>,
 {
 }
 impl diesel::Identifiable for OrganismTaxon {
@@ -49,32 +68,33 @@ impl OrganismTaxon {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn organism<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Organism, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::organisms::Organism, diesel::result::Error>
     where
-        crate::Organism: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::organisms::Organism:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Organism::read(self.organism_id, conn)
+        crate::codegen::structs_codegen::tables::organisms::Organism::read(self.organism_id, conn)
     }
     pub fn taxon<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Taxon, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::taxa::Taxon, diesel::result::Error>
     where
-        crate::Taxon: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Taxon::read(self.taxon_id, conn)
+        crate::codegen::structs_codegen::tables::taxa::Taxon::read(self.taxon_id, conn)
     }
     pub fn from_created_at<C>(
         created_at: ::rosetta_timestamp::TimestampUTC,

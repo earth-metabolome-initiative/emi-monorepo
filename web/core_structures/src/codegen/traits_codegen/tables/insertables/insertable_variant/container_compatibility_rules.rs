@@ -4,18 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule as diesel::Insertable<
-            <crate::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::ContainerCompatibilityRule,
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
     >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::ContainerCompatibilityRule;
+    type Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute,

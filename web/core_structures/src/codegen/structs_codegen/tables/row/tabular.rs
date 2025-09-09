@@ -158,7 +158,6 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::DisposalProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::DisposalProcedure
             }
-            super::Row::Document(_) => crate::codegen::tables::table_names::TableName::Document,
             super::Row::EmailProvider(_) => {
                 crate::codegen::tables::table_names::TableName::EmailProvider
             }
@@ -238,6 +237,7 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::PhotographProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedure
             }
+            super::Row::Photograph(_) => crate::codegen::tables::table_names::TableName::Photograph,
             super::Row::PhysicalAssetModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhysicalAssetModel
             }
@@ -283,9 +283,19 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::Role(_) => crate::codegen::tables::table_names::TableName::Role,
             super::Row::Room(_) => crate::codegen::tables::table_names::TableName::Room,
+            super::Row::SampleModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleModel
+            }
+            super::Row::SampleSourceModel(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSourceModel
+            }
+            super::Row::SampleSource(_) => {
+                crate::codegen::tables::table_names::TableName::SampleSource
+            }
             super::Row::SampleState(_) => {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
+            super::Row::Sample(_) => crate::codegen::tables::table_names::TableName::Sample,
             super::Row::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
             }

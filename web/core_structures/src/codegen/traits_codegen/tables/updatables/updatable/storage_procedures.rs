@@ -1,8 +1,10 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::StorageProcedure
+    for crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure
 where
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::procedures::Procedure:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedures::Procedure:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

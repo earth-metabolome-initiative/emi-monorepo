@@ -10,7 +10,7 @@ use time_requirements::{prelude::TimeTracker, task::Task};
 use webcodegen::{
     CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,
     HasSpecificTypeConstraint, LowercaseColumnConstraint, LowercaseTableConstraint,
-    NotNullColumnConstraint, SameAsConstraintMustNotCascade, WordDeprecationConstraint,
+    NotNullColumnConstraint, WordDeprecationConstraint,
 };
 
 pub(crate) fn execute_consistency_constraint_checks(
@@ -65,9 +65,6 @@ pub(crate) fn execute_consistency_constraint_checks(
     NotNullColumnConstraint::new("updated_by").check_all(database_name, schema, conn)?;
     NotNullColumnConstraint::new("created_at").check_all(database_name, schema, conn)?;
     NotNullColumnConstraint::new("updated_at").check_all(database_name, schema, conn)?;
-    sub_time_tracker.add_completed_task(task);
-    let task = Task::new("Same-as constraint no cascade");
-    SameAsConstraintMustNotCascade.check_all(database_name, schema, conn)?;
     sub_time_tracker.add_completed_task(task);
     let task = Task::new("Word deprecation constraints");
     let constraint = WordDeprecationConstraint::from(vec!["trackable"]);

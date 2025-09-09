@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCameraBuilde
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::Camera as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::cameras::Camera as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCamera as diesel::Insertable<
-            <crate::Camera as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::cameras::Camera as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Camera>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::cameras::Camera,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::Camera;
+    type Row = crate::codegen::structs_codegen::tables::cameras::Camera;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCamera;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CameraAttribute,

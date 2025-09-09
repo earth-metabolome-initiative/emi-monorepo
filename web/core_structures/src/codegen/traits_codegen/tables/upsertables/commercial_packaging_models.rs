@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::CommercialPackagingModel
-{
+for crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -18,13 +17,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(packaging_model.ne(excluded(packaging_model)))
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::CommercialPackagingModel
-{
+for crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -41,6 +39,6 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(packaging_model.ne(excluded(packaging_model)))
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

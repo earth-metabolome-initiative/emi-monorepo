@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantP
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::SupernatantProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedure as diesel::Insertable<
-            <crate::SupernatantProcedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::SupernatantProcedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+    >,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -20,18 +24,27 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
     >,
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    crate::SupernatantProcedureTemplate: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
+    crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::SupernatantProcedure;
+    type Row = crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
@@ -69,7 +82,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let supernatant_procedure_templates = crate::SupernatantProcedureTemplate::read(
+            let supernatant_procedure_templates = crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -96,7 +109,7 @@ where
             procedure_stratified_source,
         ) = self.procedure_stratified_source
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_stratified_source,
                 conn,
             )?;
@@ -115,7 +128,7 @@ where
             procedure_supernatant_destination,
         ) = self.procedure_supernatant_destination
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_supernatant_destination,
                 conn,
             )?;
@@ -134,7 +147,7 @@ where
             procedure_transferred_with,
         ) = self.procedure_transferred_with
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_transferred_with,
                 conn,
             )?;
@@ -156,7 +169,7 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_pipette_tip) = self
             .procedure_pipette_tip
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_pipette_tip,
                 conn,
             )?;

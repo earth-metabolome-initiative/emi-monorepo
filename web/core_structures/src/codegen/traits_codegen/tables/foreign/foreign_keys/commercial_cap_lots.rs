@@ -1,11 +1,17 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialCapLotForeignKeys {
-    pub commercial_cap_lots_id_fkey: Option<crate::CommercialProductLot>,
-    pub commercial_cap_lots_id_fkey1: Option<crate::CapModel>,
-    pub product_model: Option<crate::CommercialCapModel>,
+    pub commercial_cap_lots_id_fkey: Option<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    >,
+    pub commercial_cap_lots_id_fkey1:
+        Option<crate::codegen::structs_codegen::tables::cap_models::CapModel>,
+    pub product_model:
+        Option<crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CommercialCapLot {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot
+{
     type ForeignKeys = CommercialCapLotForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

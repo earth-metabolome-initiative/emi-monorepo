@@ -19,8 +19,8 @@ impl core::str::FromStr for TeamProjectAttribute {
 impl core::fmt::Display for TeamProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::TeamId => write!(f, "team_id"),
-            Self::ProjectId => write!(f, "project_id"),
+            Self::TeamId => write!(f, "team_projects.team_id"),
+            Self::ProjectId => write!(f, "team_projects.project_id"),
         }
     }
 }
@@ -37,25 +37,26 @@ pub struct InsertableTeamProject {
     pub(crate) project_id: i32,
 }
 impl InsertableTeamProject {
-    pub fn project<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Project, diesel::result::Error>
-    where
-        crate::Project: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Project::read(self.project_id, conn)
-    }
     pub fn team<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Team, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
     where
-        crate::Team: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Team::read(self.team_id, conn)
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
+    }
+    pub fn project<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::projects::Project, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::projects::Project:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::projects::Project::read(self.project_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -151,7 +152,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::TeamProject,
+            Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject,
             Error = web_common_traits::database::InsertError<TeamProjectAttribute>,
         >,
 {
@@ -163,7 +164,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::TeamProject = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::team_projects::TeamProject =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

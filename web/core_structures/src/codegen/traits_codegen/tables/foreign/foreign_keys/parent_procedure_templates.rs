@@ -1,11 +1,15 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ParentProcedureTemplateForeignKeys {
-    pub child: Option<crate::ProcedureTemplate>,
-    pub created_by: Option<crate::User>,
-    pub parent: Option<crate::ProcedureTemplate>,
+    pub parent:
+        Option<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate>,
+    pub child:
+        Option<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::ParentProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate
+{
     type ForeignKeys = ParentProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
@@ -14,22 +18,22 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ParentProcedureTempla
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.parent,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                 self.child,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.parent,
-            ),
-        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.child.is_some()
+        foreign_keys.parent.is_some()
+            && foreign_keys.child.is_some()
             && foreign_keys.created_by.is_some()
-            && foreign_keys.parent.is_some()
     }
     fn update(
         &self,
@@ -45,12 +49,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ParentProcedureTempla
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.child == procedure_templates.procedure_template {
-                    foreign_keys.child = Some(procedure_templates.clone());
-                    updated = true;
-                }
                 if self.parent == procedure_templates.procedure_template {
                     foreign_keys.parent = Some(procedure_templates.clone());
+                    updated = true;
+                }
+                if self.child == procedure_templates.procedure_template {
+                    foreign_keys.child = Some(procedure_templates.clone());
                     updated = true;
                 }
             }
@@ -58,12 +62,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::ParentProcedureTempla
                 crate::codegen::tables::row::Row::ProcedureTemplate(procedure_templates),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.child == procedure_templates.procedure_template {
-                    foreign_keys.child = None;
-                    updated = true;
-                }
                 if self.parent == procedure_templates.procedure_template {
                     foreign_keys.parent = None;
+                    updated = true;
+                }
+                if self.child == procedure_templates.procedure_template {
+                    foreign_keys.child = None;
                     updated = true;
                 }
             }

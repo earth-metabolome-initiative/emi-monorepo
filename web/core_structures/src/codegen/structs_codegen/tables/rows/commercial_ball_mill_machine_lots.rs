@@ -1,14 +1,29 @@
-impl From<crate::CommercialBallMillMachineLot> for super::Rows {
-    fn from(value: crate::CommercialBallMillMachineLot) -> Self {
+impl From<
+    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+> for super::Rows {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+    ) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::CommercialBallMillMachineLot>> for super::Rows {
-    fn from(value: Vec<crate::CommercialBallMillMachineLot>) -> Self {
+impl From<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+    >,
+> for super::Rows {
+    fn from(
+        value: Vec<
+            crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        >,
+    ) -> Self {
         super::Rows::CommercialBallMillMachineLot(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::CommercialBallMillMachineLot> {
+impl TryFrom<super::Rows>
+for Vec<
+    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

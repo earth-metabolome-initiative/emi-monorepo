@@ -76,20 +76,20 @@ impl core::fmt::Display for StorageProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Procedure => write!(f, "procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_template"),
-            Self::StoredAsset => write!(f, "stored_asset"),
-            Self::StoredAssetModel => write!(f, "stored_asset_model"),
+            Self::Procedure => write!(f, "storage_procedures.procedure"),
+            Self::ProcedureTemplate => write!(f, "storage_procedures.procedure_template"),
+            Self::StoredAsset => write!(f, "storage_procedures.stored_asset"),
+            Self::StoredAssetModel => write!(f, "storage_procedures.stored_asset_model"),
             Self::ProcedureTemplateStoredAssetModel => {
-                write!(f, "procedure_template_stored_asset_model")
+                write!(f, "storage_procedures.procedure_template_stored_asset_model")
             }
-            Self::ProcedureStoredAsset(e) => write!(f, "{e}"),
-            Self::StoredInto => write!(f, "stored_into"),
-            Self::StoredIntoModel => write!(f, "stored_into_model"),
+            Self::ProcedureStoredAsset(e) => write!(f, "storage_procedures.{e}"),
+            Self::StoredInto => write!(f, "storage_procedures.stored_into"),
+            Self::StoredIntoModel => write!(f, "storage_procedures.stored_into_model"),
             Self::ProcedureTemplateStoredIntoModel => {
-                write!(f, "procedure_template_stored_into_model")
+                write!(f, "storage_procedures.procedure_template_stored_into_model")
             }
-            Self::ProcedureStoredInto(e) => write!(f, "{e}"),
+            Self::ProcedureStoredInto(e) => write!(f, "storage_procedures.{e}"),
         }
     }
 }
@@ -117,22 +117,174 @@ impl InsertableStorageProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Procedure, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
     where
-        crate::Procedure: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Procedure::read(self.procedure, conn)
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn stored_asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
+            self.stored_asset,
+            conn,
+        )
+    }
+    pub fn stored_asset_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.stored_asset_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_stored_asset_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_stored_asset_model,
+            conn,
+        )
+    }
+    pub fn procedure_stored_asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_stored_asset,
+            conn,
+        )
+    }
+    pub fn stored_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::containers::Container::read(self.stored_into, conn)
+    }
+    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
+            self.stored_into_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_stored_into_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_stored_into_model,
+            conn,
+        )
+    }
+    pub fn procedure_stored_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_stored_into,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn storage_procedures_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Procedure, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Procedure::table()
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
                     .eq(&self.procedure)
@@ -141,180 +293,22 @@ impl InsertableStorageProcedure {
                             .eq(&self.procedure_template),
                     ),
             )
-            .first::<crate::Procedure>(conn)
-    }
-    pub fn procedure_stored_asset<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_stored_asset, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_asset_procedure_templa_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_stored_asset_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_asset_stored_asset_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.stored_asset),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_asset_stored_asset_mod_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.stored_asset_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    pub fn procedure_stored_into<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error>
-    where
-        crate::ProcedureAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureAsset::read(self.procedure_stored_into, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_into_procedure_templat_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_stored_into_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_into_stored_into_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.stored_into),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_into_stored_into_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::ProcedureAsset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.stored_into_model),
-                    ),
-            )
-            .first::<crate::ProcedureAsset>(conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::StorageProcedureTemplate, diesel::result::Error>
-    where
-        crate::StorageProcedureTemplate: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::StorageProcedureTemplate::read(self.procedure_template, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_template_procedure_template_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::StorageProcedureTemplate, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::StorageProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_into_model
-                            .eq(&self.procedure_template_stored_into_model),
-                    ),
-            )
-            .first::<crate::StorageProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn storage_procedures_procedure_template_procedure_template_s_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::StorageProcedureTemplate, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+        diesel::result::Error,
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::StorageProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
                     .eq(&self.procedure_template)
@@ -323,82 +317,197 @@ impl InsertableStorageProcedure {
                             .eq(&self.procedure_template_stored_asset_model),
                     ),
             )
-            .first::<crate::StorageProcedureTemplate>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+            >(conn)
     }
-    pub fn procedure_template_stored_asset_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_template_procedure_template_fkey1(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_stored_asset_model, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_into_model
+                            .eq(&self.procedure_template_stored_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+            >(conn)
     }
-    pub fn procedure_template_stored_into_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_asset_procedure_templa_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::ProcedureTemplateAssetModel, diesel::result::Error>
-    where
-        crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ProcedureTemplateAssetModel::read(self.procedure_template_stored_into_model, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_stored_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn stored_asset<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_into_procedure_templat_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
-    where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.stored_asset, conn)
-    }
-    pub fn stored_asset_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::PhysicalAssetModel, diesel::result::Error>
-    where
-        crate::PhysicalAssetModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::PhysicalAssetModel::read(self.stored_asset_model, conn)
-    }
-    pub fn stored_into<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Container, diesel::result::Error>
-    where
-        crate::Container: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Container::read(self.stored_into, conn)
-    }
-    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::ContainerModel, diesel::result::Error>
-    where
-        crate::ContainerModel: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::ContainerModel::read(self.stored_into_model, conn)
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_stored_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn storage_procedures_stored_into_model_stored_asset_model_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
-    ) -> Result<crate::ContainerCompatibilityRule, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
+        diesel::result::Error,
+    >
     where
-        crate::ContainerCompatibilityRule: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::ContainerCompatibilityRule::read(
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule::read(
             (self.stored_into_model, self.stored_asset_model),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_asset_stored_asset_mod_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.stored_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_into_stored_into_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.stored_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_asset_stored_asset_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.stored_asset),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_into_stored_into_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.stored_into),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -722,18 +831,18 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`storage_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    /// class v1 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
     /// end
-    /// v3 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v3 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
     /// ```
@@ -767,10 +876,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
@@ -828,17 +937,17 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_asset_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset_model(
@@ -878,10 +987,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
@@ -933,12 +1042,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
@@ -947,12 +1056,11 @@ impl<
     /// class v5 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_stored_asset"}
     /// class v3 column-of-interest
-    ///    v6@{shape: rounded, label: "stored_asset_model"}
-    /// class v6 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v4 directly-involved-column
+    ///    v6@{shape: rounded, label: "stored_asset_model"}
+    /// class v6 directly-involved-column
     /// end
-    /// v0 -.->|"`foreign defines`"| v1
     /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -961,8 +1069,9 @@ impl<
     /// v3 -.->|"`foreign defines`"| v4
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
-    /// v6 --->|"`associated same as`"| v1
+    /// v0 -.->|"`foreign defines`"| v1
     /// v4 --->|"`associated same as`"| v2
+    /// v6 --->|"`associated same as`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_stored_asset<PSA>(
@@ -1016,36 +1125,6 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
-            procedure_stored_asset = if let (Some(stored_asset), Some(asset)) =
-                (self.stored_asset, builder.asset)
-            {
-                if stored_asset != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredAsset,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.stored_asset = Some(asset);
-                builder.into()
-            } else if let Some(stored_asset) = self.stored_asset {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(stored_asset),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredAsset(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
             procedure_stored_asset = if let (Some(stored_asset_model), Some(asset_model)) =
                 (self.stored_asset_model, builder.asset_model)
             {
@@ -1064,6 +1143,36 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                         builder,
                         stored_asset_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureStoredAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
+            procedure_stored_asset = if let (Some(stored_asset), Some(asset)) =
+                (self.stored_asset, builder.asset)
+            {
+                if stored_asset != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StoredAsset,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.stored_asset = Some(asset);
+                builder.into()
+            } else if let Some(stored_asset) = self.stored_asset {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(stored_asset),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1098,17 +1207,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_into"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_into"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into(
@@ -1147,23 +1256,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
@@ -1257,25 +1366,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_stored_into"}
-    /// class v3 column-of-interest
-    ///    v5@{shape: rounded, label: "stored_into"}
-    /// class v5 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v4 directly-involved-column
+    ///    v5@{shape: rounded, label: "stored_into"}
+    /// class v5 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_stored_into"}
+    /// class v3 column-of-interest
     ///    v6@{shape: rounded, label: "stored_into_model"}
     /// class v6 directly-involved-column
     /// end
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v4 --->|"`associated same as`"| v2
+    /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -1283,10 +1395,7 @@ impl<
     /// v3 -.->|"`foreign defines`"| v4
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
-    /// v5 --->|"`associated same as`"| v0
-    /// v4 --->|"`associated same as`"| v2
     /// v6 --->|"`associated same as`"| v1
-    /// v0 -.->|"`foreign defines`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_stored_into<PSI>(
@@ -1340,36 +1449,6 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
-            procedure_stored_into = if let (Some(stored_into), Some(asset)) =
-                (self.stored_into, builder.asset)
-            {
-                if stored_into != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredInto,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.stored_into = Some(asset);
-                builder.into()
-            } else if let Some(stored_into) = self.stored_into {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(stored_into),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredInto(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
             procedure_stored_into = if let (Some(stored_into_model), Some(asset_model)) =
                 (self.stored_into_model, builder.asset_model)
             {
@@ -1388,6 +1467,36 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                         builder,
                         stored_into_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureStoredInto(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
+            procedure_stored_into = if let (Some(stored_into), Some(asset)) =
+                (self.stored_into, builder.asset)
+            {
+                if stored_into != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StoredInto,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.stored_into = Some(asset);
+                builder.into()
+            } else if let Some(stored_into) = self.stored_into {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(stored_into),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1610,7 +1719,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::StorageProcedure,
+            Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
             Error = web_common_traits::database::InsertError<StorageProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
@@ -1625,7 +1734,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::StorageProcedure = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

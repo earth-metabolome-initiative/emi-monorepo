@@ -18,7 +18,6 @@ mod containers;
 mod digital_asset_models;
 mod digital_assets;
 mod disposal_procedure_templates;
-mod documents;
 mod fractioning_procedure_templates;
 mod freeze_dryer_models;
 mod freeze_dryers;

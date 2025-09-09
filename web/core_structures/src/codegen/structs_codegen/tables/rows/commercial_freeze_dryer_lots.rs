@@ -1,14 +1,29 @@
-impl From<crate::CommercialFreezeDryerLot> for super::Rows {
-    fn from(value: crate::CommercialFreezeDryerLot) -> Self {
+impl From<
+    crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+> for super::Rows {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+    ) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::CommercialFreezeDryerLot>> for super::Rows {
-    fn from(value: Vec<crate::CommercialFreezeDryerLot>) -> Self {
+impl From<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+    >,
+> for super::Rows {
+    fn from(
+        value: Vec<
+            crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+        >,
+    ) -> Self {
         super::Rows::CommercialFreezeDryerLot(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::CommercialFreezeDryerLot> {
+impl TryFrom<super::Rows>
+for Vec<
+    crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

@@ -23,10 +23,10 @@ impl core::str::FromStr for ColorAttribute {
 impl core::fmt::Display for ColorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::HexadecimalValue => write!(f, "hexadecimal_value"),
-            Self::Description => write!(f, "description"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "colors.name"),
+            Self::HexadecimalValue => write!(f, "colors.hexadecimal_value"),
+            Self::Description => write!(f, "colors.description"),
+            Self::Id => write!(f, "colors.id"),
         }
     }
 }
@@ -206,7 +206,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Color,
+            Row = crate::codegen::structs_codegen::tables::colors::Color,
             Error = web_common_traits::database::InsertError<ColorAttribute>,
         >,
 {
@@ -218,7 +218,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Color = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::colors::Color =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::VolumetricContainer {
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -21,7 +23,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Vol
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::VolumetricContainer
+    for crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer
 {
     fn upsert(
         &self,

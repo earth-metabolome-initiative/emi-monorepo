@@ -46,17 +46,17 @@ impl core::str::FromStr for TeamAttribute {
 impl core::fmt::Display for TeamAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Icon => write!(f, "icon"),
-            Self::ColorId => write!(f, "color_id"),
-            Self::StateId => write!(f, "state_id"),
-            Self::ParentTeamId => write!(f, "parent_team_id"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "teams.id"),
+            Self::Name => write!(f, "teams.name"),
+            Self::Description => write!(f, "teams.description"),
+            Self::Icon => write!(f, "teams.icon"),
+            Self::ColorId => write!(f, "teams.color_id"),
+            Self::StateId => write!(f, "teams.state_id"),
+            Self::ParentTeamId => write!(f, "teams.parent_team_id"),
+            Self::CreatedBy => write!(f, "teams.created_by"),
+            Self::CreatedAt => write!(f, "teams.created_at"),
+            Self::UpdatedBy => write!(f, "teams.updated_by"),
+            Self::UpdatedAt => write!(f, "teams.updated_at"),
         }
     }
 }
@@ -80,61 +80,67 @@ pub struct InsertableTeam {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableTeam {
-    pub fn color<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
-    where
-        crate::Color: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
-    }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
-    }
-    pub fn parent_team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::Team>, diesel::result::Error>
-    where
-        crate::Team: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(parent_team_id) = self.parent_team_id else {
-            return Ok(None);
-        };
-        crate::Team::read(parent_team_id, conn).map(Some)
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::TeamState, diesel::result::Error>
-    where
-        crate::TeamState: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::TeamState::read(self.state_id, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
+    }
+    pub fn color<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::team_states::TeamState:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::team_states::TeamState::read(self.state_id, conn)
+    }
+    pub fn parent_team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::teams::Team>, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_team_id) = self.parent_team_id else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::teams::Team::read(parent_team_id, conn).optional()
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamBuilder {
     pub(crate) id: Option<i32>,
@@ -154,6 +160,23 @@ impl From<InsertableTeamBuilder>
 {
     fn from(builder: InsertableTeamBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl Default for InsertableTeamBuilder {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            description: Default::default(),
+            icon: Default::default(),
+            color_id: Some(15i16),
+            state_id: Some(1i16),
+            parent_team_id: Default::default(),
+            created_by: Default::default(),
+            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
+            updated_by: Default::default(),
+            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
+        }
     }
 }
 impl common_traits::builder::IsCompleteBuilder
@@ -642,7 +665,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Team,
+            Row = crate::codegen::structs_codegen::tables::teams::Team,
             Error = web_common_traits::database::InsertError<TeamAttribute>,
         >,
 {
@@ -654,7 +677,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Team = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::teams::Team =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

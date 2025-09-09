@@ -1,11 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssetCompatibilityRuleForeignKeys {
-    pub left_asset_model: Option<crate::AssetModel>,
-    pub right_asset_model: Option<crate::AssetModel>,
-    pub created_by: Option<crate::User>,
+    pub left_asset_model: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+    pub right_asset_model:
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::AssetCompatibilityRule {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule
+{
     type ForeignKeys = AssetCompatibilityRuleForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

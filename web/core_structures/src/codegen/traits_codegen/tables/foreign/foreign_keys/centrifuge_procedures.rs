@@ -1,31 +1,49 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CentrifugeProcedureForeignKeys {
-    pub procedure_centrifuged_with: Option<crate::ProcedureAsset>,
-    pub procedure: Option<crate::Procedure>,
-    pub procedure_template: Option<crate::CentrifugeProcedureTemplate>,
-    pub centrifuged_container: Option<crate::VolumetricContainer>,
-    pub centrifuged_container_model: Option<crate::VolumetricContainerModel>,
-    pub procedure_template_centrifuged_container_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub procedure_centrifuged_container: Option<crate::ProcedureAsset>,
-    pub centrifuged_with_model: Option<crate::CentrifugeModel>,
-    pub centrifuged_with: Option<crate::Centrifuge>,
-    pub procedure_template_centrifuged_with_model: Option<crate::ProcedureTemplateAssetModel>,
-    pub centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey:
-        Option<crate::AssetCompatibilityRule>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+    >,
+    pub centrifuged_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub centrifuged_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub procedure_template_centrifuged_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_centrifuged_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub centrifuged_with_model: Option<
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+    >,
+    pub centrifuged_with: Option<
+        crate::codegen::structs_codegen::tables::centrifuges::Centrifuge,
+    >,
+    pub procedure_template_centrifuged_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_centrifuged_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure
+{
     type ForeignKeys = CentrifugeProcedureForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_centrifuged_with,
-            ),
-        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
@@ -81,6 +99,11 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_centrifuged_with,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
                 self.centrifuged_with_model,
                 self.centrifuged_container_model,
@@ -88,8 +111,7 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_centrifuged_with.is_some()
-            && foreign_keys.procedure.is_some()
+        foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template.is_some()
             && foreign_keys.centrifuged_container.is_some()
             && foreign_keys.centrifuged_container_model.is_some()
@@ -98,6 +120,7 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
             && foreign_keys.centrifuged_with_model.is_some()
             && (foreign_keys.centrifuged_with.is_some() || self.centrifuged_with.is_some())
             && foreign_keys.procedure_template_centrifuged_with_model.is_some()
+            && foreign_keys.procedure_centrifuged_with.is_some()
             && foreign_keys
                 .centrifuge_procedures_centrifuged_with_model_centrifuged_c_fkey
                 .is_some()
@@ -214,12 +237,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_centrifuged_with == procedure_assets.id {
-                    foreign_keys.procedure_centrifuged_with = Some(procedure_assets);
-                    updated = true;
-                }
                 if self.procedure_centrifuged_container == procedure_assets.id {
                     foreign_keys.procedure_centrifuged_container = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_centrifuged_with == procedure_assets.id {
+                    foreign_keys.procedure_centrifuged_with = Some(procedure_assets);
                     updated = true;
                 }
             }
@@ -227,12 +250,12 @@ impl web_common_traits::prelude::HasForeignKeys for crate::CentrifugeProcedure {
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_centrifuged_with == procedure_assets.id {
-                    foreign_keys.procedure_centrifuged_with = None;
-                    updated = true;
-                }
                 if self.procedure_centrifuged_container == procedure_assets.id {
                     foreign_keys.procedure_centrifuged_container = None;
+                    updated = true;
+                }
+                if self.procedure_centrifuged_with == procedure_assets.id {
+                    foreign_keys.procedure_centrifuged_with = None;
                     updated = true;
                 }
             }

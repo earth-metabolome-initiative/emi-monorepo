@@ -1,10 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureTemplateForeignKeys {
-    pub created_by: Option<crate::User>,
-    pub updated_by: Option<crate::User>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::ProcedureTemplate {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate
+{
     type ForeignKeys = ProcedureTemplateForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

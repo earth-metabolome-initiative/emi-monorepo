@@ -20,16 +20,36 @@ impl<'a> From<&'a Organism>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Asset> for Organism where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::PhysicalAsset> for Organism where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Organism> for Organism where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organisms::Organism,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
 {
 }
 impl diesel::Identifiable for Organism {
@@ -42,12 +62,16 @@ impl Organism {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(self.id, conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,
@@ -96,11 +120,11 @@ impl Organism {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, physical_assets::physical_assets,
+            organisms::organisms, sample_sources::sample_sources,
         };
         Self::table()
-            .inner_join(physical_assets::table.on(organisms::id.eq(physical_assets::id)))
-            .filter(physical_assets::model.eq(model))
+            .inner_join(sample_sources::table.on(organisms::id.eq(sample_sources::id)))
+            .filter(sample_sources::model.eq(model))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

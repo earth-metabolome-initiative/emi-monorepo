@@ -40,8 +40,8 @@ impl core::fmt::Display for FreezerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Model => write!(f, "model"),
+            Self::Id => write!(f, "freezers.id"),
+            Self::Model => write!(f, "freezers.model"),
         }
     }
 }
@@ -59,39 +59,49 @@ impl InsertableFreezer {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PhysicalAsset, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
     where
-        crate::PhysicalAsset: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PhysicalAsset::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot::read(
+            self.model, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn freezers_id_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::Asset, diesel::result::Error> {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::Asset::table()
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                         .eq(&self.model),
                 ),
             )
-            .first::<crate::Asset>(conn)
-    }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::CommercialFreezerLot, diesel::result::Error>
-    where
-        crate::CommercialFreezerLot: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::CommercialFreezerLot::read(self.model, conn)
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -181,11 +191,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn model(
         mut self,
@@ -430,9 +440,9 @@ where
     ///    v0@{shape: rounded, label: "model"}
     /// class v0 column-of-interest
     /// end
-    /// v0 --->|"`ancestral same as`"| v2
     /// v1 --->|"`ancestral same as`"| v2
     /// v1 -.->|"`inferred ancestral same as`"| v0
+    /// v0 --->|"`ancestral same as`"| v2
     /// v4 --->|"`extends`"| v5
     /// v5 --->|"`extends`"| v3
     /// ```
@@ -469,7 +479,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Freezer,
+            Row = crate::codegen::structs_codegen::tables::freezers::Freezer,
             Error = web_common_traits::database::InsertError<FreezerAttribute>,
         >,
     PhysicalAsset:
@@ -483,7 +493,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Freezer = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::freezers::Freezer =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

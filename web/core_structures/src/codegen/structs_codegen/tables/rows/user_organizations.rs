@@ -1,14 +1,24 @@
-impl From<crate::UserOrganization> for super::Rows {
-    fn from(value: crate::UserOrganization) -> Self {
+impl From<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>
+    for super::Rows
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
+    ) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::UserOrganization>> for super::Rows {
-    fn from(value: Vec<crate::UserOrganization>) -> Self {
+impl From<Vec<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>>
+    for super::Rows
+{
+    fn from(
+        value: Vec<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>,
+    ) -> Self {
         super::Rows::UserOrganization(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::UserOrganization> {
+impl TryFrom<super::Rows>
+    for Vec<crate::codegen::structs_codegen::tables::user_organizations::UserOrganization>
+{
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

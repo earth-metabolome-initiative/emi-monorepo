@@ -19,8 +19,8 @@ impl core::str::FromStr for EmailProviderAttribute {
 impl core::fmt::Display for EmailProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::EmailId => write!(f, "email_id"),
-            Self::LoginProviderId => write!(f, "login_provider_id"),
+            Self::EmailId => write!(f, "email_providers.email_id"),
+            Self::LoginProviderId => write!(f, "email_providers.login_provider_id"),
         }
     }
 }
@@ -40,22 +40,33 @@ impl InsertableEmailProvider {
     pub fn email<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::UserEmail, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail,
+        diesel::result::Error,
+    >
     where
-        crate::UserEmail: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::UserEmail::read(self.email_id, conn)
+        crate::codegen::structs_codegen::tables::user_emails::UserEmail::read(self.email_id, conn)
     }
     pub fn login_provider<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::LoginProvider, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        diesel::result::Error,
+    >
     where
-        crate::LoginProvider: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::LoginProvider::read(self.login_provider_id, conn)
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::read(
+            self.login_provider_id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -151,7 +162,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::EmailProvider,
+            Row = crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
             Error = web_common_traits::database::InsertError<EmailProviderAttribute>,
         >,
 {
@@ -163,7 +174,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::EmailProvider = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::email_providers::EmailProvider =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

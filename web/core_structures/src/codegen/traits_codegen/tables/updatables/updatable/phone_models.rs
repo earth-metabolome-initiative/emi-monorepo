@@ -1,10 +1,14 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::PhoneModel
+    for crate::codegen::structs_codegen::tables::phone_models::PhoneModel
 where
-    crate::CameraModel: web_common_traits::database::Read<C>,
-    crate::CameraModel: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
-    crate::PositioningDeviceModel: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::camera_models::CameraModel:
+        web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+        web_common_traits::database::Updatable<C, UserId = i32>,
 {
     type UserId = i32;
     fn can_update(

@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricCo
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::VolumetricContainer as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainer as diesel::Insertable<
-            <crate::VolumetricContainer as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::VolumetricContainer>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
     C: diesel::connection::LoadConnection,
     Container: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::Container: web_common_traits::database::Read<C>,
-    crate::Container: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::VolumetricContainer;
+    type Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainer;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,

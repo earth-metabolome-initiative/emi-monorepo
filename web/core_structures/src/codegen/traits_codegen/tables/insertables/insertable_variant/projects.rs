@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Project as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProject as diesel::Insertable<
-            <crate::Project as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Project>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::projects::Project,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Project;
+    type Row = crate::codegen::structs_codegen::tables::projects::Project;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProject;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProjectAttribute,

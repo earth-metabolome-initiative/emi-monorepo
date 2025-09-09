@@ -26,11 +26,11 @@ impl core::str::FromStr for ObservationSubjectAttribute {
 impl core::fmt::Display for ObservationSubjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Icon => write!(f, "icon"),
-            Self::ColorId => write!(f, "color_id"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "observation_subjects.name"),
+            Self::Description => write!(f, "observation_subjects.description"),
+            Self::Icon => write!(f, "observation_subjects.icon"),
+            Self::ColorId => write!(f, "observation_subjects.color_id"),
+            Self::Id => write!(f, "observation_subjects.id"),
         }
     }
 }
@@ -52,12 +52,13 @@ impl InsertableObservationSubject {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
     where
-        crate::Color: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -262,7 +263,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::ObservationSubject,
+            Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
             Error = web_common_traits::database::InsertError<ObservationSubjectAttribute>,
         >,
 {
@@ -274,7 +275,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::ObservationSubject = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

@@ -1,5 +1,5 @@
 impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C>
-    for crate::AssetModel
+    for crate::codegen::structs_codegen::tables::asset_models::AssetModel
 {
     type UserId = i32;
     fn can_update(

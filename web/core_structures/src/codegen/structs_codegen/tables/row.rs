@@ -58,7 +58,6 @@ mod digital_asset_models;
 mod digital_assets;
 mod disposal_procedure_templates;
 mod disposal_procedures;
-mod documents;
 mod email_providers;
 mod fractioning_procedure_templates;
 mod fractioning_procedures;
@@ -89,6 +88,7 @@ mod permanence_categories;
 mod phone_models;
 mod photograph_procedure_templates;
 mod photograph_procedures;
+mod photographs;
 mod physical_asset_models;
 mod physical_assets;
 mod pipette_models;
@@ -109,7 +109,11 @@ mod read_dispatch;
 mod reagent_models;
 mod roles;
 mod rooms;
+mod sample_models;
+mod sample_source_models;
+mod sample_sources;
 mod sample_states;
+mod samples;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
@@ -139,141 +143,331 @@ mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Row {
-    Address(crate::Address),
-    AliquotingProcedureTemplate(crate::AliquotingProcedureTemplate),
-    AliquotingProcedure(crate::AliquotingProcedure),
-    AssetCompatibilityRule(crate::AssetCompatibilityRule),
-    AssetModelAncestor(crate::AssetModelAncestor),
-    AssetModel(crate::AssetModel),
-    Asset(crate::Asset),
-    BallMillMachineModel(crate::BallMillMachineModel),
-    BallMillMachine(crate::BallMillMachine),
-    BallMillProcedureTemplate(crate::BallMillProcedureTemplate),
-    BallMillProcedure(crate::BallMillProcedure),
-    BeadModel(crate::BeadModel),
-    Brand(crate::Brand),
-    CameraModel(crate::CameraModel),
-    Camera(crate::Camera),
-    CapModel(crate::CapModel),
-    CappingProcedureTemplate(crate::CappingProcedureTemplate),
-    CappingProcedure(crate::CappingProcedure),
-    CentrifugeModel(crate::CentrifugeModel),
-    CentrifugeProcedureTemplate(crate::CentrifugeProcedureTemplate),
-    CentrifugeProcedure(crate::CentrifugeProcedure),
-    Centrifuge(crate::Centrifuge),
-    City(crate::City),
-    Color(crate::Color),
-    CommercialBallMillMachineLot(crate::CommercialBallMillMachineLot),
-    CommercialBallMillMachineModel(crate::CommercialBallMillMachineModel),
-    CommercialBeadLot(crate::CommercialBeadLot),
-    CommercialBeadModel(crate::CommercialBeadModel),
-    CommercialCameraLot(crate::CommercialCameraLot),
-    CommercialCameraModel(crate::CommercialCameraModel),
-    CommercialCapLot(crate::CommercialCapLot),
-    CommercialCapModel(crate::CommercialCapModel),
-    CommercialCentrifugeLot(crate::CommercialCentrifugeLot),
-    CommercialCentrifugeModel(crate::CommercialCentrifugeModel),
-    CommercialFreezeDryerLot(crate::CommercialFreezeDryerLot),
-    CommercialFreezeDryerModel(crate::CommercialFreezeDryerModel),
-    CommercialFreezerLot(crate::CommercialFreezerLot),
-    CommercialFreezerModel(crate::CommercialFreezerModel),
-    CommercialPackagingLot(crate::CommercialPackagingLot),
-    CommercialPackagingModel(crate::CommercialPackagingModel),
-    CommercialPipetteLot(crate::CommercialPipetteLot),
-    CommercialPipetteModel(crate::CommercialPipetteModel),
-    CommercialPipetteTipLot(crate::CommercialPipetteTipLot),
-    CommercialPipetteTipModel(crate::CommercialPipetteTipModel),
-    CommercialPositioningDeviceLot(crate::CommercialPositioningDeviceLot),
-    CommercialPositioningDeviceModel(crate::CommercialPositioningDeviceModel),
-    CommercialProductLot(crate::CommercialProductLot),
-    CommercialProduct(crate::CommercialProduct),
-    CommercialVolumeMeasuringDeviceLot(crate::CommercialVolumeMeasuringDeviceLot),
-    CommercialVolumeMeasuringDeviceModel(crate::CommercialVolumeMeasuringDeviceModel),
-    CommercialWeighingDeviceLot(crate::CommercialWeighingDeviceLot),
-    CommercialWeighingDeviceModel(crate::CommercialWeighingDeviceModel),
-    ContainerCompatibilityRule(crate::ContainerCompatibilityRule),
-    ContainerModel(crate::ContainerModel),
-    Container(crate::Container),
-    Country(crate::Country),
-    DigitalAssetModel(crate::DigitalAssetModel),
-    DigitalAsset(crate::DigitalAsset),
-    DisposalProcedureTemplate(crate::DisposalProcedureTemplate),
-    DisposalProcedure(crate::DisposalProcedure),
-    Document(crate::Document),
-    EmailProvider(crate::EmailProvider),
-    FractioningProcedureTemplate(crate::FractioningProcedureTemplate),
-    FractioningProcedure(crate::FractioningProcedure),
-    FreezeDryerModel(crate::FreezeDryerModel),
-    FreezeDryer(crate::FreezeDryer),
-    FreezeDryingProcedureTemplate(crate::FreezeDryingProcedureTemplate),
-    FreezeDryingProcedure(crate::FreezeDryingProcedure),
-    FreezerModel(crate::FreezerModel),
-    Freezer(crate::Freezer),
-    FreezingProcedureTemplate(crate::FreezingProcedureTemplate),
-    FreezingProcedure(crate::FreezingProcedure),
-    GeolocationProcedureTemplate(crate::GeolocationProcedureTemplate),
-    GeolocationProcedure(crate::GeolocationProcedure),
-    InstrumentState(crate::InstrumentState),
-    LoginProvider(crate::LoginProvider),
-    Material(crate::Material),
-    NextProcedureTemplate(crate::NextProcedureTemplate),
-    ObservationSubject(crate::ObservationSubject),
-    OrganismTaxon(crate::OrganismTaxon),
-    Organism(crate::Organism),
-    Organization(crate::Organization),
-    PackagingModel(crate::PackagingModel),
-    PackagingProcedureTemplate(crate::PackagingProcedureTemplate),
-    PackagingProcedure(crate::PackagingProcedure),
-    ParentProcedureTemplate(crate::ParentProcedureTemplate),
-    PermanenceCategory(crate::PermanenceCategory),
-    PhoneModel(crate::PhoneModel),
-    PhotographProcedureTemplate(crate::PhotographProcedureTemplate),
-    PhotographProcedure(crate::PhotographProcedure),
-    PhysicalAssetModel(crate::PhysicalAssetModel),
-    PhysicalAsset(crate::PhysicalAsset),
-    PipetteModel(crate::PipetteModel),
-    PipetteTipModel(crate::PipetteTipModel),
-    Pipette(crate::Pipette),
-    PositioningDeviceModel(crate::PositioningDeviceModel),
-    PositioningDevice(crate::PositioningDevice),
-    PouringProcedureTemplate(crate::PouringProcedureTemplate),
-    PouringProcedure(crate::PouringProcedure),
-    ProcedureAsset(crate::ProcedureAsset),
-    ProcedureTemplateAssetModel(crate::ProcedureTemplateAssetModel),
-    ProcedureTemplate(crate::ProcedureTemplate),
-    Procedure(crate::Procedure),
-    ProjectState(crate::ProjectState),
-    Project(crate::Project),
-    Rank(crate::Rank),
-    ReagentModel(crate::ReagentModel),
-    Role(crate::Role),
-    Room(crate::Room),
-    SampleState(crate::SampleState),
-    SpatialRefSy(crate::SpatialRefSy),
-    Spectrum(crate::Spectrum),
-    SpectraCollection(crate::SpectraCollection),
-    StorageProcedureTemplate(crate::StorageProcedureTemplate),
-    StorageProcedure(crate::StorageProcedure),
-    SupernatantProcedureTemplate(crate::SupernatantProcedureTemplate),
-    SupernatantProcedure(crate::SupernatantProcedure),
-    Taxon(crate::Taxon),
-    TeamMember(crate::TeamMember),
-    TeamProject(crate::TeamProject),
-    TeamState(crate::TeamState),
-    Team(crate::Team),
-    TemporaryUser(crate::TemporaryUser),
-    Unit(crate::Unit),
-    UserEmail(crate::UserEmail),
-    UserOrganization(crate::UserOrganization),
-    User(crate::User),
-    VolumeMeasuringDeviceModel(crate::VolumeMeasuringDeviceModel),
-    VolumeMeasuringDevice(crate::VolumeMeasuringDevice),
-    VolumetricContainerModel(crate::VolumetricContainerModel),
-    VolumetricContainer(crate::VolumetricContainer),
-    WeighingDeviceModel(crate::WeighingDeviceModel),
-    WeighingDevice(crate::WeighingDevice),
-    WeighingProcedureTemplate(crate::WeighingProcedureTemplate),
-    WeighingProcedure(crate::WeighingProcedure),
+    Address(crate::codegen::structs_codegen::tables::addresses::Address),
+    AliquotingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
+    ),
+    AliquotingProcedure(
+        crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
+    ),
+    AssetCompatibilityRule(
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    ),
+    AssetModelAncestor(
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    ),
+    AssetModel(crate::codegen::structs_codegen::tables::asset_models::AssetModel),
+    Asset(crate::codegen::structs_codegen::tables::assets::Asset),
+    BallMillMachineModel(
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    ),
+    BallMillMachine(
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
+    ),
+    BallMillProcedureTemplate(
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+    ),
+    BallMillProcedure(
+        crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
+    ),
+    BeadModel(crate::codegen::structs_codegen::tables::bead_models::BeadModel),
+    Brand(crate::codegen::structs_codegen::tables::brands::Brand),
+    CameraModel(crate::codegen::structs_codegen::tables::camera_models::CameraModel),
+    Camera(crate::codegen::structs_codegen::tables::cameras::Camera),
+    CapModel(crate::codegen::structs_codegen::tables::cap_models::CapModel),
+    CappingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+    ),
+    CappingProcedure(
+        crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
+    ),
+    CentrifugeModel(
+        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
+    ),
+    CentrifugeProcedureTemplate(
+        crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+    ),
+    CentrifugeProcedure(
+        crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+    ),
+    Centrifuge(crate::codegen::structs_codegen::tables::centrifuges::Centrifuge),
+    City(crate::codegen::structs_codegen::tables::cities::City),
+    Color(crate::codegen::structs_codegen::tables::colors::Color),
+    CommercialBallMillMachineLot(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+    ),
+    CommercialBallMillMachineModel(
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+    ),
+    CommercialBeadLot(
+        crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
+    ),
+    CommercialBeadModel(
+        crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
+    ),
+    CommercialCameraLot(
+        crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
+    ),
+    CommercialCameraModel(
+        crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+    ),
+    CommercialCapLot(
+        crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
+    ),
+    CommercialCapModel(
+        crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
+    ),
+    CommercialCentrifugeLot(
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+    ),
+    CommercialCentrifugeModel(
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+    ),
+    CommercialFreezeDryerLot(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+    ),
+    CommercialFreezeDryerModel(
+        crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel,
+    ),
+    CommercialFreezerLot(
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+    ),
+    CommercialFreezerModel(
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+    ),
+    CommercialPackagingLot(
+        crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
+    ),
+    CommercialPackagingModel(
+        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+    ),
+    CommercialPipetteLot(
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+    ),
+    CommercialPipetteModel(
+        crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
+    ),
+    CommercialPipetteTipLot(
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+    ),
+    CommercialPipetteTipModel(
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
+    ),
+    CommercialPositioningDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
+    ),
+    CommercialPositioningDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+    ),
+    CommercialProductLot(
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    ),
+    CommercialProduct(
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+    ),
+    CommercialVolumeMeasuringDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+    ),
+    CommercialVolumeMeasuringDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+    ),
+    CommercialWeighingDeviceLot(
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+    ),
+    CommercialWeighingDeviceModel(
+        crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
+    ),
+    ContainerCompatibilityRule(
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
+    ),
+    ContainerModel(
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    ),
+    Container(crate::codegen::structs_codegen::tables::containers::Container),
+    Country(crate::codegen::structs_codegen::tables::countries::Country),
+    DigitalAssetModel(
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
+    ),
+    DigitalAsset(crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset),
+    DisposalProcedureTemplate(
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+    ),
+    DisposalProcedure(
+        crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
+    ),
+    EmailProvider(
+        crate::codegen::structs_codegen::tables::email_providers::EmailProvider,
+    ),
+    FractioningProcedureTemplate(
+        crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
+    ),
+    FractioningProcedure(
+        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+    ),
+    FreezeDryerModel(
+        crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
+    ),
+    FreezeDryer(crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer),
+    FreezeDryingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+    ),
+    FreezeDryingProcedure(
+        crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
+    ),
+    FreezerModel(crate::codegen::structs_codegen::tables::freezer_models::FreezerModel),
+    Freezer(crate::codegen::structs_codegen::tables::freezers::Freezer),
+    FreezingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
+    ),
+    FreezingProcedure(
+        crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
+    ),
+    GeolocationProcedureTemplate(
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+    ),
+    GeolocationProcedure(
+        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    ),
+    InstrumentState(
+        crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
+    ),
+    LoginProvider(
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+    ),
+    Material(crate::codegen::structs_codegen::tables::materials::Material),
+    NextProcedureTemplate(
+        crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
+    ),
+    ObservationSubject(
+        crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
+    ),
+    OrganismTaxon(crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon),
+    Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
+    Organization(crate::codegen::structs_codegen::tables::organizations::Organization),
+    PackagingModel(
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+    ),
+    PackagingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+    ),
+    PackagingProcedure(
+        crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
+    ),
+    ParentProcedureTemplate(
+        crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+    ),
+    PermanenceCategory(
+        crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
+    ),
+    PhoneModel(crate::codegen::structs_codegen::tables::phone_models::PhoneModel),
+    PhotographProcedureTemplate(
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
+    ),
+    PhotographProcedure(
+        crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
+    ),
+    Photograph(crate::codegen::structs_codegen::tables::photographs::Photograph),
+    PhysicalAssetModel(
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    ),
+    PhysicalAsset(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    ),
+    PipetteModel(crate::codegen::structs_codegen::tables::pipette_models::PipetteModel),
+    PipetteTipModel(
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    ),
+    Pipette(crate::codegen::structs_codegen::tables::pipettes::Pipette),
+    PositioningDeviceModel(
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+    ),
+    PositioningDevice(
+        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
+    ),
+    PouringProcedureTemplate(
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+    ),
+    PouringProcedure(
+        crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+    ),
+    ProcedureAsset(
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    ),
+    ProcedureTemplateAssetModel(
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    ),
+    ProcedureTemplate(
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    ),
+    Procedure(crate::codegen::structs_codegen::tables::procedures::Procedure),
+    ProjectState(crate::codegen::structs_codegen::tables::project_states::ProjectState),
+    Project(crate::codegen::structs_codegen::tables::projects::Project),
+    Rank(crate::codegen::structs_codegen::tables::ranks::Rank),
+    ReagentModel(crate::codegen::structs_codegen::tables::reagent_models::ReagentModel),
+    Role(crate::codegen::structs_codegen::tables::roles::Role),
+    Room(crate::codegen::structs_codegen::tables::rooms::Room),
+    SampleModel(crate::codegen::structs_codegen::tables::sample_models::SampleModel),
+    SampleSourceModel(
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+    ),
+    SampleSource(crate::codegen::structs_codegen::tables::sample_sources::SampleSource),
+    SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
+    Sample(crate::codegen::structs_codegen::tables::samples::Sample),
+    SpatialRefSy(crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy),
+    Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
+    SpectraCollection(
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    ),
+    StorageProcedureTemplate(
+        crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+    ),
+    StorageProcedure(
+        crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
+    ),
+    SupernatantProcedureTemplate(
+        crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+    ),
+    SupernatantProcedure(
+        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+    ),
+    Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
+    TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
+    TeamProject(crate::codegen::structs_codegen::tables::team_projects::TeamProject),
+    TeamState(crate::codegen::structs_codegen::tables::team_states::TeamState),
+    Team(crate::codegen::structs_codegen::tables::teams::Team),
+    TemporaryUser(
+        crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
+    ),
+    Unit(crate::codegen::structs_codegen::tables::units::Unit),
+    UserEmail(crate::codegen::structs_codegen::tables::user_emails::UserEmail),
+    UserOrganization(
+        crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
+    ),
+    User(crate::codegen::structs_codegen::tables::users::User),
+    VolumeMeasuringDeviceModel(
+        crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+    ),
+    VolumeMeasuringDevice(
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    ),
+    VolumetricContainerModel(
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    ),
+    VolumetricContainer(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    ),
+    WeighingDeviceModel(
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+    ),
+    WeighingDevice(
+        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
+    ),
+    WeighingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
+    ),
+    WeighingProcedure(
+        crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+    ),
 }
 impl Row {
     #[cfg(feature = "sqlite")]
@@ -434,7 +628,6 @@ impl Row {
             Row::DisposalProcedure(disposal_procedures) => {
                 disposal_procedures.upsert(conn)?.map(Row::from)
             }
-            Row::Document(documents) => documents.upsert(conn)?.map(Row::from),
             Row::EmailProvider(email_providers) => email_providers.upsert(conn)?.map(Row::from),
             Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
                 fractioning_procedure_templates.upsert(conn)?.map(Row::from)
@@ -500,6 +693,7 @@ impl Row {
             Row::PhotographProcedure(photograph_procedures) => {
                 photograph_procedures.upsert(conn)?.map(Row::from)
             }
+            Row::Photograph(photographs) => photographs.upsert(conn)?.map(Row::from),
             Row::PhysicalAssetModel(physical_asset_models) => {
                 physical_asset_models.upsert(conn)?.map(Row::from)
             }
@@ -535,7 +729,13 @@ impl Row {
             Row::ReagentModel(reagent_models) => reagent_models.upsert(conn)?.map(Row::from),
             Row::Role(roles) => roles.upsert(conn)?.map(Row::from),
             Row::Room(rooms) => rooms.upsert(conn)?.map(Row::from),
+            Row::SampleModel(sample_models) => sample_models.upsert(conn)?.map(Row::from),
+            Row::SampleSourceModel(sample_source_models) => {
+                sample_source_models.upsert(conn)?.map(Row::from)
+            }
+            Row::SampleSource(sample_sources) => sample_sources.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
+            Row::Sample(samples) => samples.upsert(conn)?.map(Row::from),
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.upsert(conn)?.map(Row::from),
             Row::Spectrum(spectra) => spectra.upsert(conn)?.map(Row::from),
             Row::SpectraCollection(spectra_collections) => {
@@ -718,7 +918,6 @@ impl web_common_traits::prelude::Row for Row {
                 disposal_procedure_templates.primary_key()
             }
             Row::DisposalProcedure(disposal_procedures) => disposal_procedures.primary_key(),
-            Row::Document(documents) => documents.primary_key(),
             Row::EmailProvider(email_providers) => email_providers.primary_key(),
             Row::FractioningProcedureTemplate(fractioning_procedure_templates) => {
                 fractioning_procedure_templates.primary_key()
@@ -770,6 +969,7 @@ impl web_common_traits::prelude::Row for Row {
                 photograph_procedure_templates.primary_key()
             }
             Row::PhotographProcedure(photograph_procedures) => photograph_procedures.primary_key(),
+            Row::Photograph(photographs) => photographs.primary_key(),
             Row::PhysicalAssetModel(physical_asset_models) => physical_asset_models.primary_key(),
             Row::PhysicalAsset(physical_assets) => physical_assets.primary_key(),
             Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
@@ -795,7 +995,11 @@ impl web_common_traits::prelude::Row for Row {
             Row::ReagentModel(reagent_models) => reagent_models.primary_key(),
             Row::Role(roles) => roles.primary_key(),
             Row::Room(rooms) => rooms.primary_key(),
+            Row::SampleModel(sample_models) => sample_models.primary_key(),
+            Row::SampleSourceModel(sample_source_models) => sample_source_models.primary_key(),
+            Row::SampleSource(sample_sources) => sample_sources.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),
+            Row::Sample(samples) => samples.primary_key(),
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_key(),
             Row::Spectrum(spectra) => spectra.primary_key(),
             Row::SpectraCollection(spectra_collections) => spectra_collections.primary_key(),

@@ -1,4 +1,6 @@
-impl web_common_traits::database::Insertable for crate::WeighingDevice {
+impl web_common_traits::database::Insertable
+    for crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice
+{
     type InsertableBuilder =
         crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceBuilder;
     type InsertableVariant =

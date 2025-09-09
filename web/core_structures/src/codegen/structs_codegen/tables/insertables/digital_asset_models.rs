@@ -25,13 +25,16 @@ pub enum DigitalAssetModelAttribute {
     Extension(DigitalAssetModelExtensionAttribute),
     Id,
     ParentModel,
+    MimeType,
 }
 impl core::str::FromStr for DigitalAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "ParentModel" => Ok(Self::ParentModel),
+            "MimeType" => Ok(Self::MimeType),
             "parent_model" => Ok(Self::ParentModel),
+            "mime_type" => Ok(Self::MimeType),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -40,8 +43,9 @@ impl core::fmt::Display for DigitalAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::ParentModel => write!(f, "parent_model"),
+            Self::Id => write!(f, "digital_asset_models.id"),
+            Self::ParentModel => write!(f, "digital_asset_models.parent_model"),
+            Self::MimeType => write!(f, "digital_asset_models.mime_type"),
         }
     }
 }
@@ -56,43 +60,61 @@ impl core::fmt::Display for DigitalAssetModelAttribute {
 pub struct InsertableDigitalAssetModel {
     pub(crate) id: i32,
     pub(crate) parent_model: Option<i32>,
+    pub(crate) mime_type: ::media_types::MediaType,
 }
 impl InsertableDigitalAssetModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::AssetModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
     where
-        crate::AssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::AssetModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::DigitalAssetModel>, diesel::result::Error>
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>,
+        diesel::result::Error,
+    >
     where
-        crate::DigitalAssetModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+            web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
         let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
-        crate::DigitalAssetModel::read(parent_model, conn).map(Some)
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
+            parent_model,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn digital_asset_models_id_parent_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::AssetModel>, diesel::result::Error> {
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+        diesel::result::Error,
+    > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
         };
         let Some(parent_model) = self.parent_model else {
             return Ok(None);
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -101,8 +123,10 @@ impl InsertableDigitalAssetModel {
                             .eq(parent_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
-            .map(Some)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -111,6 +135,7 @@ pub struct InsertableDigitalAssetModelBuilder<
     AssetModel = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
 > {
     pub(crate) parent_model: Option<i32>,
+    pub(crate) mime_type: Option<::media_types::MediaType>,
     pub(crate) id: AssetModel,
 }
 impl From<InsertableDigitalAssetModelBuilder>
@@ -128,7 +153,7 @@ where
     AssetModel: common_traits::builder::IsCompleteBuilder,
 {
     fn is_complete(&self) -> bool {
-        self.id.is_complete()
+        self.id.is_complete() && self.mime_type.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `DigitalAssetModel`
@@ -158,6 +183,32 @@ pub trait DigitalAssetModelSettable: Sized {
         self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.digital_asset_models.mime_type` column.
+    ///
+    /// # Arguments
+    /// * `mime_type`: The value to set for the
+    ///   `public.digital_asset_models.mime_type` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::media_types::MediaType`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn mime_type<MT>(
+        self,
+        mime_type: MT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MT: TryInto<::media_types::MediaType>,
+        validation_errors::SingleFieldError: From<<MT as TryInto<::media_types::MediaType>>::Error>;
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
@@ -204,6 +255,22 @@ impl<
                 ))
             })?;
         self.parent_model = parent_model;
+        Ok(self)
+    }
+    /// Sets the value of the `public.digital_asset_models.mime_type` column.
+    fn mime_type<MT>(
+        mut self,
+        mime_type: MT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MT: TryInto<::media_types::MediaType>,
+        validation_errors::SingleFieldError: From<<MT as TryInto<::media_types::MediaType>>::Error>,
+    {
+        let mime_type = mime_type.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(DigitalAssetModelAttribute::MimeType)
+        })?;
+        self.mime_type = Some(mime_type);
         Ok(self)
     }
 }
@@ -404,7 +471,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::DigitalAssetModel,
+            Row = crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
             Error = web_common_traits::database::InsertError<DigitalAssetModelAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
@@ -417,7 +484,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::DigitalAssetModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

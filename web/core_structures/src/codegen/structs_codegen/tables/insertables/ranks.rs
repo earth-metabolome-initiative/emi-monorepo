@@ -20,9 +20,9 @@ impl core::str::FromStr for RankAttribute {
 impl core::fmt::Display for RankAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "ranks.name"),
+            Self::Description => write!(f, "ranks.description"),
+            Self::Id => write!(f, "ranks.id"),
         }
     }
 }
@@ -158,7 +158,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::Rank,
+            Row = crate::codegen::structs_codegen::tables::ranks::Rank,
             Error = web_common_traits::database::InsertError<RankAttribute>,
         >,
 {
@@ -170,7 +170,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::Rank = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::ranks::Rank =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

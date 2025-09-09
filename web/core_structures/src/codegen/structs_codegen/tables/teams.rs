@@ -9,9 +9,24 @@
     diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(belongs_to(crate::Color, foreign_key = color_id))]
-#[diesel(belongs_to(crate::Team, foreign_key = parent_team_id))]
-#[diesel(belongs_to(crate::TeamState, foreign_key = state_id))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::colors::Color,
+        foreign_key = color_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        foreign_key = state_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = parent_team_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::teams::teams)]
 pub struct Team {
@@ -40,8 +55,11 @@ impl<'a> From<&'a Team>
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
-impl web_common_traits::prelude::ExtensionTable<crate::Team> for Team where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::teams::Team>
+    for Team
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl<C> web_common_traits::prelude::Ancestor<C> for Team
@@ -75,58 +93,64 @@ impl diesel::Identifiable for Team {
     }
 }
 impl Team {
-    pub fn color<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::Color, diesel::result::Error>
-    where
-        crate::Color: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::Color::read(self.color_id, conn)
-    }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.created_by, conn)
-    }
-    pub fn parent_team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::Team>, diesel::result::Error>
-    where
-        crate::Team: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        let Some(parent_team_id) = self.parent_team_id else {
-            return Ok(None);
-        };
-        crate::Team::read(parent_team_id, conn).map(Some)
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::TeamState, diesel::result::Error>
-    where
-        crate::TeamState: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::TeamState::read(self.state_id, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::User, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::User: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::User::read(self.updated_by, conn)
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
+    }
+    pub fn color<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::team_states::TeamState:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::team_states::TeamState::read(self.state_id, conn)
+    }
+    pub fn parent_team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::teams::Team>, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_team_id) = self.parent_team_id else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::teams::Team::read(parent_team_id, conn).optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

@@ -1,9 +1,9 @@
-impl From<crate::Container> for super::Row {
-    fn from(value: crate::Container) -> Self {
+impl From<crate::codegen::structs_codegen::tables::containers::Container> for super::Row {
+    fn from(value: crate::codegen::structs_codegen::tables::containers::Container) -> Self {
         super::Row::Container(value)
     }
 }
-impl TryFrom<super::Row> for crate::Container {
+impl TryFrom<super::Row> for crate::codegen::structs_codegen::tables::containers::Container {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

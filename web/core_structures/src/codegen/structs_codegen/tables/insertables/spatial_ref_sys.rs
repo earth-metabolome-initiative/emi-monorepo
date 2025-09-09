@@ -28,11 +28,11 @@ impl core::str::FromStr for SpatialRefSyAttribute {
 impl core::fmt::Display for SpatialRefSyAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Srid => write!(f, "srid"),
-            Self::AuthName => write!(f, "auth_name"),
-            Self::AuthSrid => write!(f, "auth_srid"),
-            Self::Srtext => write!(f, "srtext"),
-            Self::Proj4text => write!(f, "proj4text"),
+            Self::Srid => write!(f, "spatial_ref_sys.srid"),
+            Self::AuthName => write!(f, "spatial_ref_sys.auth_name"),
+            Self::AuthSrid => write!(f, "spatial_ref_sys.auth_srid"),
+            Self::Srtext => write!(f, "spatial_ref_sys.srtext"),
+            Self::Proj4text => write!(f, "spatial_ref_sys.proj4text"),
         }
     }
 }
@@ -294,7 +294,7 @@ where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::SpatialRefSy,
+            Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
             Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>,
         >,
 {
@@ -306,7 +306,8 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::SpatialRefSy = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy =
+            self.insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

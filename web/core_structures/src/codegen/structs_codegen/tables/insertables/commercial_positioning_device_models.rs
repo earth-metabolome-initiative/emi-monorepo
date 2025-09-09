@@ -55,8 +55,10 @@ impl core::fmt::Display for CommercialPositioningDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::PositioningDeviceModel => write!(f, "positioning_device_model"),
+            Self::Id => write!(f, "commercial_positioning_device_models.id"),
+            Self::PositioningDeviceModel => {
+                write!(f, "commercial_positioning_device_models.positioning_device_model")
+            }
         }
     }
 }
@@ -76,42 +78,65 @@ impl InsertableCommercialPositioningDeviceModel {
     pub fn positioning_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PositioningDeviceModel::read(self.positioning_device_model, conn)
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
+            self.positioning_device_model,
+            conn,
+        )
     }
     pub fn commercial_positioning_device_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::PositioningDeviceModel, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+        diesel::result::Error,
+    >
     where
-        crate::PositioningDeviceModel: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::PositioningDeviceModel::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::read(
+            self.id,
+            conn,
+        )
     }
     pub fn commercial_positioning_device_models_id_fkey1<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<crate::CommercialProduct, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
+        diesel::result::Error,
+    >
     where
-        crate::CommercialProduct: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::CommercialProduct::read(self.id, conn)
+        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
+            self.id, conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn commercial_positioning_device_id_positioning_device_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::AssetModel, diesel::result::Error> {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::AssetModel::table()
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
                     .eq(&self.id)
@@ -120,7 +145,9 @@ impl InsertableCommercialPositioningDeviceModel {
                             .eq(&self.positioning_device_model),
                     ),
             )
-            .first::<crate::AssetModel>(conn)
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -579,29 +606,46 @@ where
         self
     }
 }
-impl<CommercialProduct, PositioningDeviceModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialPositioningDeviceModelBuilder<CommercialProduct, PositioningDeviceModel>
+impl<
+    CommercialProduct,
+    PositioningDeviceModel,
+    C,
+> web_common_traits::database::TryInsertGeneric<C>
+for InsertableCommercialPositioningDeviceModelBuilder<
+    CommercialProduct,
+    PositioningDeviceModel,
+>
 where
     Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::CommercialPositioningDeviceModel,
-            Error = web_common_traits::database::InsertError<
-                CommercialPositioningDeviceModelAttribute,
-            >,
+        C,
+        UserId = i32,
+        Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+        Error = web_common_traits::database::InsertError<
+            CommercialPositioningDeviceModelAttribute,
         >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    >,
+    CommercialProduct: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
 {
     type Attributes = CommercialPositioningDeviceModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<Self::Attributes>,
+    > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::CommercialPositioningDeviceModel = self.insert(user_id, conn)?;
+        let insertable: crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel = self
+            .insert(user_id, conn)?;
         Ok(insertable.id())
     }
 }

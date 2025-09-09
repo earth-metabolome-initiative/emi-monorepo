@@ -1,7 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::BallMillProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -20,27 +19,36 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
                     .or(seconds.ne(excluded(seconds)))
                     .or(hertz.ne(excluded(hertz)))
                     .or(bead_model.ne(excluded(bead_model)))
-                    .or(procedure_template_bead_model.ne(excluded(procedure_template_bead_model)))
+                    .or(
+                        procedure_template_bead_model
+                            .ne(excluded(procedure_template_bead_model)),
+                    )
                     .or(number_of_beads.ne(excluded(number_of_beads)))
                     .or(milled_with_model.ne(excluded(milled_with_model)))
-                    .or(procedure_template_milled_with_model
-                        .ne(excluded(procedure_template_milled_with_model)))
+                    .or(
+                        procedure_template_milled_with_model
+                            .ne(excluded(procedure_template_milled_with_model)),
+                    )
                     .or(milled_container_model.ne(excluded(milled_container_model)))
-                    .or(procedure_template_milled_container_model
-                        .ne(excluded(procedure_template_milled_container_model))),
+                    .or(
+                        procedure_template_milled_container_model
+                            .ne(excluded(procedure_template_milled_container_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::BallMillProcedureTemplate
-{
+for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
@@ -59,20 +67,30 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .filter(
                 kelvin
                     .ne(excluded(kelvin))
-                    .or(kelvin_tolerance_percentage.ne(excluded(kelvin_tolerance_percentage)))
+                    .or(
+                        kelvin_tolerance_percentage
+                            .ne(excluded(kelvin_tolerance_percentage)),
+                    )
                     .or(seconds.ne(excluded(seconds)))
                     .or(hertz.ne(excluded(hertz)))
                     .or(bead_model.ne(excluded(bead_model)))
-                    .or(procedure_template_bead_model.ne(excluded(procedure_template_bead_model)))
+                    .or(
+                        procedure_template_bead_model
+                            .ne(excluded(procedure_template_bead_model)),
+                    )
                     .or(number_of_beads.ne(excluded(number_of_beads)))
                     .or(milled_with_model.ne(excluded(milled_with_model)))
-                    .or(procedure_template_milled_with_model
-                        .ne(excluded(procedure_template_milled_with_model)))
+                    .or(
+                        procedure_template_milled_with_model
+                            .ne(excluded(procedure_template_milled_with_model)),
+                    )
                     .or(milled_container_model.ne(excluded(milled_container_model)))
-                    .or(procedure_template_milled_container_model
-                        .ne(excluded(procedure_template_milled_container_model))),
+                    .or(
+                        procedure_template_milled_container_model
+                            .ne(excluded(procedure_template_milled_container_model)),
+                    ),
             )
             .get_results(conn)
-            .map(|mut result| result.pop())
+            .map(|mut result| { result.pop() })
     }
 }

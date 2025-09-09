@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Country as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCountry as diesel::Insertable<
-            <crate::Country as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Country>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::countries::Country,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Country;
+    type Row = crate::codegen::structs_codegen::tables::countries::Country;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCountry;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CountryAttribute,

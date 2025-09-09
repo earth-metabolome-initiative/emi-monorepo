@@ -1,9 +1,14 @@
-impl From<crate::GeolocationProcedureTemplate> for super::Row {
-    fn from(value: crate::GeolocationProcedureTemplate) -> Self {
+impl From<
+    crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+> for super::Row {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+    ) -> Self {
         super::Row::GeolocationProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Row> for crate::GeolocationProcedureTemplate {
+impl TryFrom<super::Row>
+for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Row) -> Result<Self, Self::Error> {
         match value {

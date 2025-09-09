@@ -1,14 +1,29 @@
-impl From<crate::CommercialCentrifugeLot> for super::Rows {
-    fn from(value: crate::CommercialCentrifugeLot) -> Self {
+impl From<
+    crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+> for super::Rows {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+    ) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::CommercialCentrifugeLot>> for super::Rows {
-    fn from(value: Vec<crate::CommercialCentrifugeLot>) -> Self {
+impl From<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+    >,
+> for super::Rows {
+    fn from(
+        value: Vec<
+            crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+        >,
+    ) -> Self {
         super::Rows::CommercialCentrifugeLot(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::CommercialCentrifugeLot> {
+impl TryFrom<super::Rows>
+for Vec<
+    crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+> {
     type Error = std::convert::Infallible;
     fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
         match value {

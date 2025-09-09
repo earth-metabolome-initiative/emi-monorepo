@@ -1,10 +1,12 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssetModelAncestorForeignKeys {
-    pub descendant_model: Option<crate::AssetModel>,
-    pub ancestor_model: Option<crate::AssetModel>,
+    pub descendant_model: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
+    pub ancestor_model: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
 }
-impl web_common_traits::prelude::HasForeignKeys for crate::AssetModelAncestor {
+impl web_common_traits::prelude::HasForeignKeys
+    for crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor
+{
     type ForeignKeys = AssetModelAncestorForeignKeys;
     type Row = crate::codegen::tables::row::Row;
     fn load_foreign_keys<C>(&self, connector: &C)

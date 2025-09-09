@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::GeolocationProcedure {
+impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
+    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
+{
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
@@ -25,7 +27,8 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Geo
                     .or(geolocated_with.ne(excluded(geolocated_with)))
                     .or(procedure_geolocated_with.ne(excluded(procedure_geolocated_with)))
                     .or(procedure_template_geolocated_with_model
-                        .ne(excluded(procedure_template_geolocated_with_model))),
+                        .ne(excluded(procedure_template_geolocated_with_model)))
+                    .or(location.ne(excluded(location))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -33,7 +36,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection> for crate::Geo
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::GeolocationProcedure
+    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
 {
     fn upsert(
         &self,
@@ -60,7 +63,8 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(geolocated_with.ne(excluded(geolocated_with)))
                     .or(procedure_geolocated_with.ne(excluded(procedure_geolocated_with)))
                     .or(procedure_template_geolocated_with_model
-                        .ne(excluded(procedure_template_geolocated_with_model))),
+                        .ne(excluded(procedure_template_geolocated_with_model)))
+                    .or(location.ne(excluded(location))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

@@ -2,14 +2,16 @@ use core_structures::{
     GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate, User,
     tables::insertables::{
         GeolocationProcedureTemplateSettable, PhotographProcedureTemplateSettable,
-        ProcedureTemplateSettable,
+        ProcedureTemplateAssetModelSettable, ProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::procedure_template_asset_models::{organism::organism_builder, phone::phone_builder};
+use crate::procedure_template_asset_models::{
+    organism::organism_builder, phone::phone_builder, photograph::photograph_builder,
+};
 
 /// Initializes the Organism observation procedure template in the database.
 ///
@@ -55,6 +57,9 @@ pub(crate) fn init_organism_observation_procedure(
         .description("Photograph of the organism in its surrounding ecosystem.")?
         .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
         .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_photograph_model(
+            photograph_builder(user, conn)?.name("Organism in Ecosystem Picture")?,
+        )?
         .created_by(user.id)?
         .insert(user.id, conn)?;
     let organism = organism_in_ecosystem_picture.procedure_template_photographed_asset_model;
@@ -66,6 +71,9 @@ pub(crate) fn init_organism_observation_procedure(
         .description("Photograph of the full organism for identification.")?
         .procedure_template_photographed_with_model(phone)?
         .procedure_template_photographed_asset_model(organism)?
+        .procedure_template_photograph_model(
+            photograph_builder(user, conn)?.name("Organism Picture")?,
+        )?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
@@ -76,6 +84,9 @@ pub(crate) fn init_organism_observation_procedure(
         .description("Photograph of details of the organism to facilitate identification.")?
         .procedure_template_photographed_with_model(phone)?
         .procedure_template_photographed_asset_model(organism)?
+        .procedure_template_photograph_model(
+            photograph_builder(user, conn)?.name("Organism Details Picture")?,
+        )?
         .created_by(user.id)?
         .insert(user.id, conn)?;
 

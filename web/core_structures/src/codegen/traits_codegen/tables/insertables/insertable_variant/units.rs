@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Unit as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::units::Unit as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableUnit as diesel::Insertable<
-            <crate::Unit as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::units::Unit as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Unit>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::units::Unit,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Unit;
+    type Row = crate::codegen::structs_codegen::tables::units::Unit;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUnit;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::UnitAttribute,

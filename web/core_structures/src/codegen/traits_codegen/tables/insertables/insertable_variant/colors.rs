@@ -4,14 +4,18 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::Color as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableColor as diesel::Insertable<
-            <crate::Color as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Color>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::colors::Color,
+    >,
     C: diesel::connection::LoadConnection,
 {
-    type Row = crate::Color;
+    type Row = crate::codegen::structs_codegen::tables::colors::Color;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableColor;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ColorAttribute,

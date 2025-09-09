@@ -7,11 +7,15 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugePr
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::CentrifugeProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedure as diesel::Insertable<
-            <crate::CentrifugeProcedure as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::CentrifugeProcedure>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+    >,
     C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -20,19 +24,30 @@ where
     Self: crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable<
         Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute,
     >,
-    crate::Asset: web_common_traits::database::Read<C>,
-    crate::CentrifugeProcedureTemplate: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Read<C>,
-    crate::Procedure: web_common_traits::database::Updatable<C, UserId = i32>,
-    crate::ProcedureAsset: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
         Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::CentrifugeProcedure;
+    type Row = crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedure;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute,
@@ -70,7 +85,7 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
-            let centrifuge_procedure_templates = crate::CentrifugeProcedureTemplate::read(
+            let centrifuge_procedure_templates = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
@@ -88,7 +103,7 @@ where
             procedure_centrifuged_container,
         ) = self.procedure_centrifuged_container
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_centrifuged_container,
                 conn,
             )?;
@@ -108,7 +123,10 @@ where
             )?;
         }
         if let Some(centrifuged_with) = self.centrifuged_with {
-            let assets = crate::Asset::read(centrifuged_with, conn)?;
+            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
+                centrifuged_with,
+                conn,
+            )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureSettable>::centrifuged_with_model(
                 self,
                 assets.model,
@@ -118,7 +136,7 @@ where
             procedure_centrifuged_with,
         ) = self.procedure_centrifuged_with
         {
-            let procedure_assets = crate::ProcedureAsset::read(
+            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
                 procedure_centrifuged_with,
                 conn,
             )?;

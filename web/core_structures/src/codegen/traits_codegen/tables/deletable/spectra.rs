@@ -1,5 +1,7 @@
 #[cfg(feature = "postgres")]
-impl web_common_traits::prelude::Deletable for crate::Spectrum {
+impl web_common_traits::prelude::Deletable
+    for crate::codegen::structs_codegen::tables::spectra::Spectrum
+{
     type Conn = diesel::PgConnection;
     type UserId = i32;
     fn delete(

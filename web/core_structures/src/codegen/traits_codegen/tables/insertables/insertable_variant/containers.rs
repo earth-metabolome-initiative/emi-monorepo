@@ -7,21 +7,30 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableContainerBui
 >
 where
     diesel::query_builder::InsertStatement<
-        <crate::Container as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::containers::Container as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableContainer as diesel::Insertable<
-            <crate::Container as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::containers::Container as diesel::associations::HasTable>::Table,
         >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, crate::Container>,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::containers::Container,
+    >,
     C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::PhysicalAsset: web_common_traits::database::Read<C>,
-    crate::PhysicalAsset: web_common_traits::database::Updatable<C, UserId = i32>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
+        C,
+        UserId = i32,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::Container;
+    type Row = crate::codegen::structs_codegen::tables::containers::Container;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainer;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
