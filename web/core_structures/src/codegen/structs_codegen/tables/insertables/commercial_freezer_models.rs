@@ -121,7 +121,7 @@ impl InsertableCommercialFreezerModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialFreezerModelBuilder<
     CommercialProduct
@@ -144,6 +144,21 @@ impl From<InsertableCommercialFreezerModelBuilder>
 {
     fn from(builder: InsertableCommercialFreezerModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<FreezerModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelBuilder<
+    FreezerModel,
+    CommercialProduct,
+>
+where
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+    FreezerModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_freezer_models_id_fkey.is_complete()
+            && self.commercial_freezer_models_id_fkey1.is_complete()
+            && self.freezer_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -500,9 +515,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -559,11 +574,6 @@ where
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialFreezerModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_freezer_models_id_fkey1.is_complete()
-            && self.commercial_freezer_models_id_fkey.is_complete()
-            && self.freezer_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

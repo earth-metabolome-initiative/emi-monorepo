@@ -236,7 +236,7 @@ impl InsertableProcedureAsset {
         crate::ProcedureTemplate::read(self.procedure_template, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureAssetBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
@@ -259,19 +259,20 @@ impl From<InsertableProcedureAssetBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProcedureAssetBuilder {
-    fn default() -> Self {
-        Self {
-            id: Some(rosetta_uuid::Uuid::new_v4()),
-            procedure: Default::default(),
-            procedure_template: Default::default(),
-            asset_model: Default::default(),
-            asset: Default::default(),
-            procedure_template_asset_model: Default::default(),
-            ancestor_model: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.procedure.is_some()
+            && (self.procedure_template.is_some()
+                || self.procedure.is_some()
+                || self.procedure_template_asset_model.is_some())
+            && (self.asset_model.is_some() || self.asset.is_some())
+            && self.procedure_template_asset_model.is_some()
+            && (self.ancestor_model.is_some() || self.procedure_template_asset_model.is_some())
+            && self.created_by.is_some()
+            && self.created_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `ProcedureAsset` or
@@ -535,24 +536,6 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_assets.asset_model` column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "ancestor_model"}
-    /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "asset_model"}
-    /// class v1 column-of-interest
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 -.->|"`foreign defines`"| v0
-    /// ```
     fn asset_model(
         mut self,
         asset_model: i32,
@@ -615,24 +598,6 @@ impl ProcedureAssetSettable for InsertableProcedureAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_assets.ancestor_model` column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "ancestor_model"}
-    /// class v0 column-of-interest
-    /// v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 -.->|"`foreign defines`"| v0
-    /// ```
     fn ancestor_model(
         mut self,
         ancestor_model: i32,
@@ -683,16 +648,6 @@ where
         >,
 {
     type Attributes = ProcedureAssetAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_some()
-            && self.procedure.is_some()
-            && self.procedure_template.is_some()
-            && self.asset_model.is_some()
-            && self.procedure_template_asset_model.is_some()
-            && self.ancestor_model.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -66,7 +66,7 @@ impl InsertableFreezerModel {
         crate::PhysicalAssetModel::read(self.id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFreezerModelBuilder<
     PhysicalAssetModel
@@ -81,6 +81,17 @@ impl From<InsertableFreezerModelBuilder>
 {
     fn from(builder: InsertableFreezerModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAssetModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder<
+        PhysicalAssetModel,
+    >
+where
+    PhysicalAssetModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `FreezerModel` or
@@ -326,9 +337,6 @@ where
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = FreezerModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

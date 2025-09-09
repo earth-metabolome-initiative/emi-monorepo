@@ -121,7 +121,7 @@ impl InsertableCommercialPipetteLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialPipetteLotBuilder<
     CommercialProductLot
@@ -144,6 +144,21 @@ impl From<InsertableCommercialPipetteLotBuilder>
 {
     fn from(builder: InsertableCommercialPipetteLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CommercialProductLot, PipetteModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLotBuilder<
+        CommercialProductLot,
+        PipetteModel,
+    >
+where
+    CommercialProductLot: common_traits::builder::IsCompleteBuilder,
+    PipetteModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_pipette_lots_id_fkey.is_complete()
+            && self.commercial_pipette_lots_id_fkey1.is_complete()
+            && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -217,13 +232,13 @@ for InsertableCommercialPipetteLotBuilder<CommercialProductLot, PipetteModel> {
     ///end
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v6
+    ///v2 --->|"`ancestral same as`"| v3
     ///v6 --->|"`extends`"| v7
+    ///v5 --->|"`extends`"| v6
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -487,9 +502,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
     ///```
@@ -547,9 +562,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
-    ///v5 --->|"`extends`"| v6
     ///```
     fn parent_model(
         self,
@@ -612,11 +627,6 @@ where
     PipetteModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialPipetteLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_pipette_lots_id_fkey.is_complete()
-            && self.commercial_pipette_lots_id_fkey1.is_complete()
-            && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

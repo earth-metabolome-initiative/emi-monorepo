@@ -74,7 +74,7 @@ impl Codegen<'_> {
                 continue;
             }
 
-            std::fs::write(&table_file, self.beautify_code(&attribute_traits)?)?;
+            std::fs::write(&table_file, self.beautify_code(&attribute_traits))?;
 
             table_deletable_main_module.extend(quote::quote! {
                 mod #table_snake_case_ident;
@@ -82,7 +82,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_deletable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_deletable_main_module))?;
 
         Ok(())
     }

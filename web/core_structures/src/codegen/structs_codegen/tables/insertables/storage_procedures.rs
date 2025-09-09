@@ -401,7 +401,7 @@ impl InsertableStorageProcedure {
         )
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStorageProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -431,6 +431,32 @@ impl From<InsertableStorageProcedureBuilder>
 {
     fn from(builder: InsertableStorageProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Procedure> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureBuilder<
+        Procedure,
+    >
+where
+    Procedure: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_complete()
+            && self.procedure_template.is_some()
+            && (self.stored_asset.is_some() || self.procedure_stored_asset.is_complete())
+            && (self.stored_asset_model.is_some() || self.procedure_stored_asset.is_complete())
+            && (self.procedure_template_stored_asset_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_stored_asset.is_complete())
+            && self.procedure_stored_asset.is_complete()
+            && (self.stored_into.is_some() || self.procedure_stored_into.is_complete())
+            && (self.stored_into_model.is_some() || self.procedure_stored_into.is_complete())
+            && (self.procedure_template_stored_into_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_stored_into.is_complete())
+            && self.procedure_stored_into.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `StorageProcedure`
@@ -696,18 +722,18 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`storage_procedures`"]
+    ///    v3@{shape: rounded, label: "procedure_template_stored_into_model"}
+    /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
     /// class v1 column-of-interest
-    ///    v3@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v3 directly-involved-column
     /// end
+    /// v3 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v3 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
     /// ```
@@ -741,23 +767,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_asset"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_asset"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset(
@@ -795,30 +821,25 @@ impl<
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v6 ["`storage_procedures`"]
-    ///    v3@{shape: rounded, label: "stored_into_model"}
-    /// class v3 directly-involved-column
+    /// subgraph v5 ["`storage_procedures`"]
     ///    v2@{shape: rounded, label: "stored_asset_model"}
     /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
     /// class v1 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v6 ---o|"`associated with`"| v5
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset_model(
         mut self,
@@ -912,25 +933,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v3 column-of-interest
     ///    v5@{shape: rounded, label: "stored_asset"}
     /// class v5 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v4 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_stored_asset"}
+    /// class v3 column-of-interest
     ///    v6@{shape: rounded, label: "stored_asset_model"}
     /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v4 directly-involved-column
     /// end
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -938,10 +961,8 @@ impl<
     /// v3 -.->|"`foreign defines`"| v4
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
-    /// v5 --->|"`associated same as`"| v0
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v4 --->|"`associated same as`"| v2
     /// v6 --->|"`associated same as`"| v1
+    /// v4 --->|"`associated same as`"| v2
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_stored_asset<PSA>(
@@ -1077,17 +1098,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_into"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into(
@@ -1125,30 +1146,25 @@ impl<
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v4 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v6 ["`storage_procedures`"]
-    ///    v3@{shape: rounded, label: "stored_into_model"}
-    /// class v3 column-of-interest
+    /// subgraph v5 ["`storage_procedures`"]
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v2
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v3
     /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v6 ---o|"`associated with`"| v5
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
         mut self,
@@ -1192,17 +1208,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_stored_into_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_into_model(
@@ -1241,27 +1257,25 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
+    ///    v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
-    ///    v6@{shape: rounded, label: "stored_into_model"}
-    /// class v6 directly-involved-column
-    ///    v5@{shape: rounded, label: "stored_into"}
-    /// class v5 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_stored_into"}
     /// class v3 column-of-interest
+    ///    v5@{shape: rounded, label: "stored_into"}
+    /// class v5 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v4 directly-involved-column
+    ///    v6@{shape: rounded, label: "stored_into_model"}
+    /// class v6 directly-involved-column
     /// end
-    /// v6 --->|"`associated same as`"| v1
-    /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -1269,8 +1283,10 @@ impl<
     /// v3 -.->|"`foreign defines`"| v4
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
-    /// v0 -.->|"`foreign defines`"| v1
+    /// v5 --->|"`associated same as`"| v0
     /// v4 --->|"`associated same as`"| v2
+    /// v6 --->|"`associated same as`"| v1
+    /// v0 -.->|"`foreign defines`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_stored_into<PSI>(
@@ -1602,18 +1618,6 @@ where
         web_common_traits::database::TryInsertGeneric<C>,
 {
     type Attributes = StorageProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_complete()
-            && self.procedure_template.is_some()
-            && self.stored_asset.is_some()
-            && self.stored_asset_model.is_some()
-            && self.procedure_template_stored_asset_model.is_some()
-            && self.procedure_stored_asset.is_complete()
-            && self.stored_into.is_some()
-            && self.stored_into_model.is_some()
-            && self.procedure_template_stored_into_model.is_some()
-            && self.procedure_stored_into.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -47,7 +47,7 @@ pub struct InsertableUser {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableUser {}
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserBuilder {
     pub(crate) first_name: Option<String>,
@@ -62,14 +62,14 @@ impl From<InsertableUserBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableUserBuilder {
-    fn default() -> Self {
-        Self {
-            first_name: Default::default(),
-            last_name: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.first_name.is_some()
+            && self.last_name.is_some()
+            && self.created_at.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `User` or descendant
@@ -290,12 +290,6 @@ where
         >,
 {
     type Attributes = UserAttribute;
-    fn is_complete(&self) -> bool {
-        self.first_name.is_some()
-            && self.last_name.is_some()
-            && self.created_at.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

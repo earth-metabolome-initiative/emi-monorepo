@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::Builder;
+use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use crate::{
     diagrams::class_diagram::class_node::{ClassAttribute, ClassMethod, ClassNode},
@@ -90,14 +90,16 @@ impl ClassNodeBuilder {
     }
 }
 
+impl IsCompleteBuilder for ClassNodeBuilder {
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+}
+
 impl Builder for ClassNodeBuilder {
     type Attribute = ClassNodeAttribute;
     type Object = ClassNode;
     type Error = NodeError<Self::Attribute>;
-
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ClassNode {

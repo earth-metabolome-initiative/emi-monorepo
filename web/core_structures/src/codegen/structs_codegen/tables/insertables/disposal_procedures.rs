@@ -217,7 +217,7 @@ impl InsertableDisposalProcedure {
             .map(Some)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDisposalProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -239,6 +239,24 @@ impl From<InsertableDisposalProcedureBuilder>
 {
     fn from(builder: InsertableDisposalProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Procedure> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder<
+        Procedure,
+    >
+where
+    Procedure: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_complete()
+            && self.procedure_template.is_some()
+            && (self.procedure_template_disposed_asset_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_disposed_asset.is_complete())
+            && self.procedure_disposed_asset.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `DisposalProcedure`
@@ -373,10 +391,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "procedure_template_asset_model"}
@@ -386,9 +404,9 @@ impl<
     ///    v2@{shape: rounded, label: "procedure_template"}
     /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v3
     /// v0 --->|"`ancestral same as`"| v2
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v3
     /// v4 --->|"`extends`"| v6
     /// v4 ---o|"`associated with`"| v5
     /// ```
@@ -429,10 +447,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -478,10 +496,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -489,11 +507,11 @@ impl<
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_disposed_asset_model(
@@ -541,10 +559,10 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
@@ -859,12 +877,6 @@ where
         web_common_traits::database::TryInsertGeneric<C>,
 {
     type Attributes = DisposalProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_complete()
-            && self.procedure_template.is_some()
-            && self.procedure_template_disposed_asset_model.is_some()
-            && self.procedure_disposed_asset.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

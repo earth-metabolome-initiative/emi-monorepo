@@ -83,7 +83,7 @@ impl InsertableContainerCompatibilityRule {
         crate::User::read(self.created_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerCompatibilityRuleBuilder {
     pub(crate) container_model: Option<i32>,
@@ -92,15 +92,11 @@ pub struct InsertableContainerCompatibilityRuleBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
-impl Default for InsertableContainerCompatibilityRuleBuilder {
-    fn default() -> Self {
-        Self {
-            container_model: Default::default(),
-            contained_asset_model: Default::default(),
-            quantity: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder {
+    fn is_complete(&self) -> bool {
+        self.container_model.is_some() && self.contained_asset_model.is_some()
+            && self.created_by.is_some() && self.created_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -344,12 +340,6 @@ where
         >,
 {
     type Attributes = ContainerCompatibilityRuleAttribute;
-    fn is_complete(&self) -> bool {
-        self.container_model.is_some()
-            && self.contained_asset_model.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

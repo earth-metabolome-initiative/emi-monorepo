@@ -52,7 +52,7 @@ pub struct InsertableSpatialRefSy {
     pub(crate) proj4text: Option<String>,
 }
 impl InsertableSpatialRefSy {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srid: Option<i32>,
@@ -66,6 +66,13 @@ impl From<InsertableSpatialRefSyBuilder>
 {
     fn from(builder: InsertableSpatialRefSyBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.srid.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `SpatialRefSy` or
@@ -292,9 +299,6 @@ where
         >,
 {
     type Attributes = SpatialRefSyAttribute;
-    fn is_complete(&self) -> bool {
-        self.srid.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

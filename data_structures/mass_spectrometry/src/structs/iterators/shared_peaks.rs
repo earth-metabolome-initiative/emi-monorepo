@@ -2,7 +2,10 @@
 
 use core::iter::Peekable;
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 use num_traits::ConstZero;
 
 use crate::prelude::Spectrum;
@@ -131,6 +134,17 @@ where
     }
 }
 
+impl<'spectra, LeftSpectrum, RightSpectrum> IsCompleteBuilder
+    for GreedySharedPeaksBuilder<'spectra, LeftSpectrum, RightSpectrum>
+where
+    LeftSpectrum: Spectrum,
+    RightSpectrum: Spectrum<Mz = LeftSpectrum::Mz>,
+{
+    fn is_complete(&self) -> bool {
+        self.left.is_some() && self.right.is_some() && self.tolerance.is_some()
+    }
+}
+
 impl<'spectra, LeftSpectrum, RightSpectrum> Builder
     for GreedySharedPeaksBuilder<'spectra, LeftSpectrum, RightSpectrum>
 where
@@ -140,10 +154,6 @@ where
     type Object = GreedySharedPeaks<'spectra, LeftSpectrum, RightSpectrum>;
     type Error = BuilderError<Self::Attribute>;
     type Attribute = GreedySharedPeaksAttribute;
-
-    fn is_complete(&self) -> bool {
-        self.left.is_some() && self.right.is_some() && self.tolerance.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {

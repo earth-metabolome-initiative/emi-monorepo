@@ -2,7 +2,10 @@
 
 use core::marker::PhantomData;
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 
 use crate::traits::{
     BipartiteGraph, BipartiteGraphBuilder, MonoplexBipartiteGraph, MonoplexGraphBuilder,
@@ -99,6 +102,15 @@ impl From<common_traits::prelude::BuilderError<MonoplexBipartiteGraphBuilder>>
     }
 }
 
+impl<G: MonoplexBipartiteGraph> IsCompleteBuilder for GenericMonoplexBipartiteGraphBuilder<G>
+where
+    G: TryFrom<(G::LeftNodes, G::RightNodes, G::Edges), Error = MonoplexBipartiteGraphBuilderError>,
+{
+    fn is_complete(&self) -> bool {
+        self.left_nodes.is_some() && self.right_nodes.is_some() && self.edges.is_some()
+    }
+}
+
 impl<G: MonoplexBipartiteGraph> Builder for GenericMonoplexBipartiteGraphBuilder<G>
 where
     G: TryFrom<(G::LeftNodes, G::RightNodes, G::Edges), Error = MonoplexBipartiteGraphBuilderError>,
@@ -106,10 +118,6 @@ where
     type Object = G;
     type Error = MonoplexBipartiteGraphBuilderError;
     type Attribute = MonoplexBipartiteGraphBuilder;
-
-    fn is_complete(&self) -> bool {
-        self.left_nodes.is_some() && self.right_nodes.is_some() && self.edges.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         G::try_from((

@@ -216,7 +216,7 @@ impl InsertableCappingProcedureTemplate {
         )
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCappingProcedureTemplateBuilder<
     ProcedureTemplate
@@ -239,6 +239,24 @@ impl From<InsertableCappingProcedureTemplateBuilder>
 {
     fn from(builder: InsertableCappingProcedureTemplateBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<ProcedureTemplate> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
+where
+    ProcedureTemplate: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete()
+            && (self.capped_container_model.is_some()
+                || self.procedure_template_capped_container_model.is_complete())
+            && self.procedure_template_capped_container_model.is_complete()
+            && (self.capped_with_model.is_some()
+                || self.procedure_template_capped_with_model.is_complete())
+            && self.procedure_template_capped_with_model.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -376,28 +394,23 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`capping_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "capped_with_model"}
-    /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_capped_container_model"}
-    /// class v2 directly-involved-column
+    /// subgraph v4 ["`capping_procedure_templates`"]
     ///    v0@{shape: rounded, label: "capped_container_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_capped_container_model"}
+    /// class v1 directly-involved-column
     /// end
-    /// subgraph v6 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v5 ---o|"`associated with`"| v6
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn capped_container_model(
         mut self,
@@ -439,21 +452,21 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`capping_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "capped_container_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_capped_container_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "capped_container_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_capped_container_model<PTCCM>(
@@ -524,28 +537,23 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`capping_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "capped_container_model"}
-    /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "capped_with_model"}
-    /// class v1 column-of-interest
-    ///    v2@{shape: rounded, label: "procedure_template_capped_with_model"}
+    /// subgraph v4 ["`capping_procedure_templates`"]
+    ///    v0@{shape: rounded, label: "capped_with_model"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_capped_with_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// subgraph v6 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
+    /// v0 --->|"`associated same as`"| v2
+    /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v5 ---o|"`associated with`"| v6
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn capped_with_model(
         mut self,
@@ -591,10 +599,10 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -874,12 +882,6 @@ where
     >,
 {
     type Attributes = CappingProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure_template.is_complete() && self.capped_container_model.is_some()
-            && self.procedure_template_capped_container_model.is_complete()
-            && self.capped_with_model.is_some()
-            && self.procedure_template_capped_with_model.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

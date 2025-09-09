@@ -277,7 +277,7 @@ impl InsertableFractioningProcedureTemplate {
             .first::<crate::ProcedureTemplateAssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFractioningProcedureTemplateBuilder<
     ProcedureTemplate
@@ -307,6 +307,28 @@ impl From<InsertableFractioningProcedureTemplateBuilder>
 {
     fn from(builder: InsertableFractioningProcedureTemplateBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<ProcedureTemplate> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
+where
+    ProcedureTemplate: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete() && self.kilograms.is_some()
+            && self.tolerance_percentage.is_some()
+            && (self.weighed_with_model.is_some()
+                || self.procedure_template_weighed_with_model.is_complete())
+            && self.procedure_template_weighed_with_model.is_complete()
+            && (self.fragment_container_model.is_some()
+                || self.procedure_template_fragment_container_model.is_complete())
+            && self.procedure_template_fragment_container_model.is_complete()
+            && (self.fragment_placed_into_model.is_some()
+                || self.procedure_template_fragment_placed_into_model.is_complete())
+            && self.procedure_template_fragment_placed_into_model.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -613,10 +635,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "weighed_with_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "weighed_with_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -624,10 +646,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn weighed_with_model(
@@ -674,10 +696,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
@@ -755,21 +777,21 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "fragment_container_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "fragment_container_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn fragment_container_model(
@@ -906,10 +928,10 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1250,15 +1272,6 @@ where
     >,
 {
     type Attributes = FractioningProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure_template.is_complete() && self.kilograms.is_some()
-            && self.tolerance_percentage.is_some() && self.weighed_with_model.is_some()
-            && self.procedure_template_weighed_with_model.is_complete()
-            && self.fragment_container_model.is_some()
-            && self.procedure_template_fragment_container_model.is_complete()
-            && self.fragment_placed_into_model.is_some()
-            && self.procedure_template_fragment_placed_into_model.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

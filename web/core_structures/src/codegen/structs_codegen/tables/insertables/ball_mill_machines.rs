@@ -96,7 +96,7 @@ impl InsertableBallMillMachine {
             .first::<crate::Asset>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableBallMillMachineBuilder<
     PhysicalAsset
@@ -115,6 +115,17 @@ impl From<InsertableBallMillMachineBuilder>
 {
     fn from(builder: InsertableBallMillMachineBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineBuilder<
+        PhysicalAsset,
+    >
+where
+    PhysicalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `BallMillMachine` or
@@ -176,9 +187,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///v4 --->|"`extends`"| v5
     ///```
@@ -430,8 +441,8 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn model(
         self,
@@ -473,9 +484,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = BallMillMachineAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

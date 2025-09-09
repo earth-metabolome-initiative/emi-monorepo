@@ -121,7 +121,7 @@ impl InsertableCommercialCameraModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialCameraModelBuilder<
     CameraModel
@@ -144,6 +144,21 @@ impl From<InsertableCommercialCameraModelBuilder>
 {
     fn from(builder: InsertableCommercialCameraModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CameraModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCameraModelBuilder<
+        CameraModel,
+        CommercialProduct,
+    >
+where
+    CameraModel: common_traits::builder::IsCompleteBuilder,
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_camera_models_id_fkey.is_complete()
+            && self.commercial_camera_models_id_fkey1.is_complete()
+            && self.camera_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -562,11 +577,6 @@ where
     CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialCameraModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_camera_models_id_fkey.is_complete()
-            && self.commercial_camera_models_id_fkey1.is_complete()
-            && self.camera_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -155,7 +155,7 @@ impl Codegen<'_> {
                     #maybe_set_primary_key_impl
 
                     #try_insert_generic_impl
-                })?,
+                }),
             )?;
 
             let table_identifier = table.snake_case_ident()?;
@@ -166,7 +166,7 @@ impl Codegen<'_> {
         }
 
         let insertables_file = root.with_extension("rs");
-        std::fs::write(&insertables_file, self.beautify_code(&insertables_main_module)?)?;
+        std::fs::write(&insertables_file, self.beautify_code(&insertables_main_module))?;
 
         Ok(())
     }

@@ -96,7 +96,7 @@ impl InsertableDigitalAsset {
             .first::<crate::Asset>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDigitalAssetBuilder<
     Asset = crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
@@ -112,6 +112,15 @@ impl From<InsertableDigitalAssetBuilder>
 {
     fn from(builder: InsertableDigitalAssetBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Asset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetBuilder<Asset>
+where
+    Asset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `DigitalAsset` or
@@ -406,9 +415,6 @@ where
     Asset: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = DigitalAssetAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -627,7 +627,7 @@ impl InsertableSupernatantProcedure {
         )
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSupernatantProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -668,6 +668,43 @@ impl From<InsertableSupernatantProcedureBuilder>
 {
     fn from(builder: InsertableSupernatantProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Procedure> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        Procedure,
+    >
+where
+    Procedure: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_complete()
+            && self.procedure_template.is_some()
+            && (self.stratified_source.is_some() || self.procedure_stratified_source.is_complete())
+            && (self.procedure_template_stratified_source_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_stratified_source.is_complete())
+            && self.procedure_stratified_source.is_complete()
+            && (self.supernatant_destination.is_some()
+                || self.procedure_supernatant_destination.is_complete())
+            && (self.procedure_template_supernatant_destination_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_supernatant_destination.is_complete())
+            && self.procedure_supernatant_destination.is_complete()
+            && (self.transferred_with.is_some() || self.procedure_transferred_with.is_complete())
+            && (self.transferred_with_model.is_some()
+                || self.procedure_transferred_with.is_complete())
+            && (self.procedure_template_transferred_with_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_transferred_with.is_complete())
+            && self.procedure_transferred_with.is_complete()
+            && (self.pipette_tip_model.is_some() || self.procedure_pipette_tip.is_complete())
+            && (self.procedure_template_pipette_tip_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_pipette_tip.is_complete())
+            && self.procedure_pipette_tip.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -1074,25 +1111,25 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
+    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v4 directly-involved-column
+    ///    v5@{shape: rounded, label: "procedure_template_transferred_with_model"}
+    /// class v5 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
     /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 directly-involved-column
-    ///    v5@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v5 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
     /// end
+    /// v4 --->|"`associated same as`"| v6
+    /// v5 --->|"`associated same as`"| v6
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v4
     /// v1 -.->|"`foreign defines`"| v5
     /// v1 -.->|"`foreign defines`"| v2
     /// v1 -.->|"`foreign defines`"| v3
     /// v2 --->|"`associated same as`"| v6
-    /// v5 --->|"`associated same as`"| v6
-    /// v4 --->|"`associated same as`"| v6
     /// v3 --->|"`associated same as`"| v6
     /// v9 --->|"`extends`"| v8
     /// v9 ---o|"`associated with`"| v7
@@ -1238,28 +1275,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
     /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "stratified_source"}
     /// class v4 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_stratified_source"}
+    /// class v2 column-of-interest
     /// end
+    /// v3 --->|"`associated same as`"| v1
+    /// v4 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v4
-    /// v3 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_stratified_source<PSS>(
@@ -1366,10 +1403,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "supernatant_destination"}
@@ -1422,22 +1459,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_supernatant_destination_model(
@@ -1487,19 +1524,19 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
-    ///    v4@{shape: rounded, label: "supernatant_destination"}
-    /// class v4 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_supernatant_destination"}
     /// class v2 column-of-interest
+    ///    v4@{shape: rounded, label: "supernatant_destination"}
+    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
     /// class v3 directly-involved-column
     /// end
-    /// v4 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v5
     /// v2 -.->|"`foreign defines`"| v3
     /// v2 -.->|"`foreign defines`"| v4
+    /// v4 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v1
     /// v7 ---o|"`associated with`"| v6
     /// ```
@@ -1611,10 +1648,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_transferred_with"}
@@ -1665,31 +1702,25 @@ impl<
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v6 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// subgraph v5 ["`supernatant_procedures`"]
+    ///    v2@{shape: rounded, label: "transferred_with_model"}
+    /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_transferred_with"}
     /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "transferred_with_model"}
-    /// class v3 column-of-interest
-    ///    v2@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v1
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v6 ---o|"`associated with`"| v5
+    /// v2 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn transferred_with_model(
         mut self,
@@ -1728,23 +1759,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_transferred_with"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_transferred_with_model(
@@ -1794,15 +1825,16 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`supernatant_procedures`"]
-    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v4 column-of-interest
-    ///    v5@{shape: rounded, label: "transferred_with"}
-    /// class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "transferred_with_model"}
     /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_transferred_with"}
+    /// class v4 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v3 directly-involved-column
+    ///    v5@{shape: rounded, label: "transferred_with"}
+    /// class v5 directly-involved-column
     /// end
+    /// v6 --->|"`associated same as`"| v1
     /// v4 --->|"`associated same as`"| v7
     /// v4 --->|"`associated same as`"| v7
     /// v4 --->|"`associated same as`"| v7
@@ -1810,10 +1842,9 @@ impl<
     /// v4 -.->|"`foreign defines`"| v3
     /// v4 -.->|"`foreign defines`"| v6
     /// v4 -.->|"`foreign defines`"| v5
-    /// v5 --->|"`associated same as`"| v0
-    /// v6 --->|"`associated same as`"| v1
     /// v0 -.->|"`foreign defines`"| v1
     /// v3 --->|"`associated same as`"| v2
+    /// v5 --->|"`associated same as`"| v0
     /// v9 ---o|"`associated with`"| v8
     /// ```
     fn procedure_transferred_with<PTW>(
@@ -1951,32 +1982,27 @@ impl<
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v4 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v6 ["`supernatant_procedures`"]
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 column-of-interest
-    ///    v3@{shape: rounded, label: "transferred_with_model"}
-    /// class v3 directly-involved-column
+    /// subgraph v5 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v1
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v1
-    /// v6 ---o|"`associated with`"| v5
+    /// v1 --->|"`associated same as`"| v0
+    /// v1 --->|"`associated same as`"| v0
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn pipette_tip_model(
         mut self,
@@ -2035,17 +2061,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_pipette_tip_model(
@@ -2084,24 +2110,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
+    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`supernatant_procedures`"]
     ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v4 directly-involved-column
-    ///    v2@{shape: rounded, label: "pipette_tip_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v3 column-of-interest
+    ///    v2@{shape: rounded, label: "pipette_tip_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v4 --->|"`associated same as`"| v1
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
@@ -2109,6 +2133,8 @@ impl<
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
+    /// v2 --->|"`associated same as`"| v0
+    /// v2 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_pipette_tip<PPT>(
@@ -2443,23 +2469,6 @@ where
         web_common_traits::database::TryInsertGeneric<C>,
 {
     type Attributes = SupernatantProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_complete()
-            && self.procedure_template.is_some()
-            && self.stratified_source.is_some()
-            && self.procedure_template_stratified_source_model.is_some()
-            && self.procedure_stratified_source.is_complete()
-            && self.supernatant_destination.is_some()
-            && self.procedure_template_supernatant_destination_model.is_some()
-            && self.procedure_supernatant_destination.is_complete()
-            && self.transferred_with.is_some()
-            && self.transferred_with_model.is_some()
-            && self.procedure_template_transferred_with_model.is_some()
-            && self.procedure_transferred_with.is_complete()
-            && self.pipette_tip_model.is_some()
-            && self.procedure_template_pipette_tip_model.is_some()
-            && self.procedure_pipette_tip.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

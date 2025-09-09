@@ -204,7 +204,7 @@ impl InsertableGeolocationProcedureTemplate {
         crate::ProcedureTemplate::read(self.procedure_template, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableGeolocationProcedureTemplateBuilder<
     ProcedureTemplate
@@ -227,6 +227,24 @@ impl From<InsertableGeolocationProcedureTemplateBuilder>
 {
     fn from(builder: InsertableGeolocationProcedureTemplateBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<ProcedureTemplate> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
+where
+    ProcedureTemplate: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete()
+            && (self.geolocated_with_model.is_some()
+                || self.procedure_template_geolocated_with_model.is_complete())
+            && self.procedure_template_geolocated_with_model.is_complete()
+            && (self.geolocated_asset_model.is_some()
+                || self.procedure_template_geolocated_asset_model.is_complete())
+            && self.procedure_template_geolocated_asset_model.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -427,10 +445,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -507,21 +525,21 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedure_templates`"]
-    ///    v0@{shape: rounded, label: "geolocated_asset_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "geolocated_asset_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn geolocated_asset_model(
@@ -564,10 +582,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "geolocated_asset_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -575,10 +593,10 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_geolocated_asset_model<PTGAM>(
@@ -856,12 +874,6 @@ where
     >,
 {
     type Attributes = GeolocationProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure_template.is_complete() && self.geolocated_with_model.is_some()
-            && self.procedure_template_geolocated_with_model.is_complete()
-            && self.geolocated_asset_model.is_some()
-            && self.procedure_template_geolocated_asset_model.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

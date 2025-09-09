@@ -121,7 +121,7 @@ impl InsertableCommercialBeadLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialBeadLotBuilder<
     BeadModel
@@ -144,6 +144,21 @@ impl From<InsertableCommercialBeadLotBuilder>
 {
     fn from(builder: InsertableCommercialBeadLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CommercialProductLot, BeadModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadLotBuilder<
+        CommercialProductLot,
+        BeadModel,
+    >
+where
+    BeadModel: common_traits::builder::IsCompleteBuilder,
+    CommercialProductLot: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_bead_lots_id_fkey.is_complete()
+            && self.commercial_bead_lots_id_fkey1.is_complete()
+            && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `CommercialBeadLot`
@@ -217,12 +232,12 @@ for InsertableCommercialBeadLotBuilder<BeadModel, CommercialProductLot> {
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -573,15 +588,15 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v0 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v7
-    ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///```
     fn parent_model(
         self,
@@ -637,11 +652,6 @@ where
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialBeadLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_bead_lots_id_fkey1.is_complete()
-            && self.commercial_bead_lots_id_fkey.is_complete()
-            && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

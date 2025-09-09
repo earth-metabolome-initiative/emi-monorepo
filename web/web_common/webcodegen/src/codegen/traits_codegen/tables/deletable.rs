@@ -69,7 +69,7 @@ impl Codegen<'_> {
                         Ok(diesel::delete(Self::table().find(<&Self as Identifiable>::id(self))).execute(conn).map(|x| x > 0)?)
                     }
                 }
-            })?)?;
+            }))?;
 
             table_deletable_main_module.extend(quote::quote! {
                 mod #snake_case_ident;
@@ -77,7 +77,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_deletable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_deletable_main_module))?;
 
         Ok(())
     }

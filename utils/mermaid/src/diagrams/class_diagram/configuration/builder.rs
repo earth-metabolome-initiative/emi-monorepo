@@ -3,7 +3,7 @@
 
 use std::fmt::Display;
 
-use common_traits::prelude::Builder;
+use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use crate::{
     diagrams::class_diagram::configuration::ClassDiagramConfiguration,
@@ -56,14 +56,16 @@ impl Display for ClassDiagramConfigurationAttribute {
     }
 }
 
+impl IsCompleteBuilder for ClassDiagramConfigurationBuilder {
+    fn is_complete(&self) -> bool {
+        self.generic.is_complete()
+    }
+}
+
 impl Builder for ClassDiagramConfigurationBuilder {
     type Object = ClassDiagramConfiguration;
     type Attribute = ClassDiagramConfigurationAttribute;
     type Error = ConfigError<Self::Attribute>;
-
-    fn is_complete(&self) -> bool {
-        self.generic.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ClassDiagramConfiguration {

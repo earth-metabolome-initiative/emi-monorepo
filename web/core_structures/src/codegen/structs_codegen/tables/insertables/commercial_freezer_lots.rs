@@ -121,7 +121,7 @@ impl InsertableCommercialFreezerLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialFreezerLotBuilder<
     CommercialProductLot
@@ -144,6 +144,21 @@ impl From<InsertableCommercialFreezerLotBuilder>
 {
     fn from(builder: InsertableCommercialFreezerLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CommercialProductLot, FreezerModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotBuilder<
+        CommercialProductLot,
+        FreezerModel,
+    >
+where
+    CommercialProductLot: common_traits::builder::IsCompleteBuilder,
+    FreezerModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_freezer_lots_id_fkey.is_complete()
+            && self.commercial_freezer_lots_id_fkey1.is_complete()
+            && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -176,10 +191,10 @@ pub trait CommercialFreezerLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     FreezerModel,
@@ -215,12 +230,12 @@ for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel> {
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
@@ -487,11 +502,11 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
+    ///v3 --->|"`extends`"| v4
     ///```
     fn product_model(
         self,
@@ -554,8 +569,8 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v6 --->|"`extends`"| v7
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
@@ -612,11 +627,6 @@ where
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialFreezerLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_freezer_lots_id_fkey.is_complete()
-            && self.commercial_freezer_lots_id_fkey1.is_complete()
-            && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

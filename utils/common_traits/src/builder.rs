@@ -1,17 +1,26 @@
 //! Submodule defining a trait for what a `Builder` should be able to do.
 
+/// Trait defining what a `CompleteBuilder` should be able to do.
+pub trait IsCompleteBuilder {
+    /// Returns whether the builder is complete, meaning all required attributes
+    /// have been set.
+    fn is_complete(&self) -> bool;
+}
+
+impl<T> IsCompleteBuilder for Option<T> {
+    fn is_complete(&self) -> bool {
+        self.is_some()
+    }
+}
+
 /// Trait defining what a `Builder` should be able to do.
-pub trait Builder: Default {
+pub trait Builder: Default + IsCompleteBuilder {
     /// The type of the object being built.
     type Object;
     /// The type of errors that can occur during building.
     type Error: core::error::Error + From<BuilderError<Self::Attribute>>;
     /// The enumeration of the attributes that can be set.
     type Attribute: core::fmt::Debug + core::fmt::Display + 'static;
-
-    /// Returns whether the builder is complete, meaning all required attributes
-    /// have been set.
-    fn is_complete(&self) -> bool;
 
     /// Builds the object.
     ///

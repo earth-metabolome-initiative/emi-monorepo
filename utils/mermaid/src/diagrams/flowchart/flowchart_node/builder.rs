@@ -3,7 +3,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     diagrams::flowchart::flowchart_node::{ClickEvent, FlowchartNode, shape::FlowchartNodeShape},
@@ -124,14 +127,16 @@ impl Display for FlowchartNodeAttribute {
     }
 }
 
+impl IsCompleteBuilder for FlowchartNodeBuilder {
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+}
+
 impl Builder for FlowchartNodeBuilder {
     type Attribute = FlowchartNodeAttribute;
     type Object = FlowchartNode;
     type Error = NodeError<Self::Attribute>;
-
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.direction.is_some() && self.subnodes.is_empty() {

@@ -164,7 +164,7 @@ impl Codegen<'_> {
                             }
                         }
                     }
-                })?,
+                }),
             )?;
         }
 
@@ -248,7 +248,7 @@ impl Codegen<'_> {
                 &trait_file,
                 self.beautify_code(&quote! {
                     #trait_impl
-                })?,
+                }),
             )?;
             modules.push(quote::quote! {
                 mod #trait_module_ident;
@@ -280,7 +280,7 @@ impl Codegen<'_> {
                         }
                     }
                 }
-            })?,
+            }),
         )?;
 
         Ok(())

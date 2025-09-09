@@ -435,20 +435,20 @@ impl<'a> Codegen<'a> {
     }
 
     /// Dispatches beautification for the provided `TokenStream`, if requested.
-    pub(crate) fn beautify_code(&self, code: &TokenStream) -> Result<String, WebCodeGenError> {
+    pub(crate) fn beautify_code(&self, code: &TokenStream) -> String {
         if !self.beautify {
-            return Ok(code.to_string());
+            return code.to_string();
         }
 
         let code_string = code.to_string();
 
         // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string)?;
+        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
 
         // Use prettyplease to format the syntax tree
         let formatted_code = unparse(&syntax_tree);
 
-        Ok(formatted_code)
+        formatted_code
     }
 
     /// Returns the output directory.
@@ -584,7 +584,7 @@ impl<'a> Codegen<'a> {
             pub use #structs_codegen_ident::*;
 
             mod #traits_codegen_ident;
-        })?;
+        });
 
         std::fs::write(&codegen_module, codegen_module_impl)?;
 

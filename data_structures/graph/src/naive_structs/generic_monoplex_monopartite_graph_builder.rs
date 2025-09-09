@@ -2,7 +2,10 @@
 
 use core::marker::PhantomData;
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 
 use crate::traits::{MonopartiteGraphBuilder, MonoplexGraphBuilder, MonoplexMonopartiteGraph};
 
@@ -92,6 +95,15 @@ impl From<common_traits::prelude::BuilderError<MonoplexMonopartiteGraphBuilder>>
     }
 }
 
+impl<G: MonoplexMonopartiteGraph> IsCompleteBuilder for GenericMonoplexMonopartiteGraphBuilder<G>
+where
+    G: TryFrom<(G::Nodes, G::Edges), Error = MonoplexMonopartiteGraphBuilderError>,
+{
+    fn is_complete(&self) -> bool {
+        self.nodes.is_some() && self.edges.is_some()
+    }
+}
+
 impl<G: MonoplexMonopartiteGraph> Builder for GenericMonoplexMonopartiteGraphBuilder<G>
 where
     G: TryFrom<(G::Nodes, G::Edges), Error = MonoplexMonopartiteGraphBuilderError>,
@@ -99,10 +111,6 @@ where
     type Object = G;
     type Error = MonoplexMonopartiteGraphBuilderError;
     type Attribute = MonoplexMonopartiteGraphBuilder;
-
-    fn is_complete(&self) -> bool {
-        self.nodes.is_some() && self.edges.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         G::try_from((

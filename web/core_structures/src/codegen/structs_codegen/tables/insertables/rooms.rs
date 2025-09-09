@@ -103,7 +103,7 @@ impl InsertableRoom {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRoomBuilder {
     pub(crate) name: Option<String>,
@@ -123,19 +123,19 @@ impl From<InsertableRoomBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableRoomBuilder {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
-            description: Default::default(),
-            qrcode: Default::default(),
-            addresses_id: Default::default(),
-            geolocation: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.description.is_some()
+            && self.qrcode.is_some()
+            && self.addresses_id.is_some()
+            && self.geolocation.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Room` or descendant
@@ -546,17 +546,6 @@ where
         >,
 {
     type Attributes = RoomAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.description.is_some()
-            && self.qrcode.is_some()
-            && self.addresses_id.is_some()
-            && self.geolocation.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

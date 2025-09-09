@@ -96,7 +96,7 @@ impl InsertablePositioningDevice {
         crate::CommercialPositioningDeviceLot::read(self.model, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePositioningDeviceBuilder<
     PhysicalAsset
@@ -115,6 +115,17 @@ impl From<InsertablePositioningDeviceBuilder>
 {
     fn from(builder: InsertablePositioningDeviceBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePositioningDeviceBuilder<
+        PhysicalAsset,
+    >
+where
+    PhysicalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `PositioningDevice`
@@ -176,9 +187,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v3
     ///v5 --->|"`extends`"| v4
     ///```
@@ -473,9 +484,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = PositioningDeviceAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

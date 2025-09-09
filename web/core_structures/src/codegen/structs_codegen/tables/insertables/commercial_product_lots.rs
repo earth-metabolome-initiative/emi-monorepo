@@ -105,7 +105,7 @@ impl InsertableCommercialProductLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialProductLotBuilder<
     PhysicalAssetModel
@@ -122,6 +122,17 @@ impl From<InsertableCommercialProductLotBuilder>
 {
     fn from(builder: InsertableCommercialProductLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAssetModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
+        PhysicalAssetModel,
+    >
+where
+    PhysicalAssetModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.lot.is_some() && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -232,8 +243,8 @@ for InsertableCommercialProductLotBuilder<PhysicalAssetModel> {
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn product_model(
         mut self,
@@ -465,8 +476,8 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn parent_model(
         self,
@@ -515,9 +526,6 @@ where
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialProductLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.lot.is_some() && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

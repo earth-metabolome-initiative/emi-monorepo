@@ -3,7 +3,7 @@
 
 use std::fmt::Display;
 
-use common_traits::prelude::Builder;
+use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use crate::{
     diagrams::flowchart::{configuration::FlowchartConfiguration, curve_styles::CurveStyle},
@@ -80,14 +80,16 @@ impl Display for FlowchartConfigurationAttribute {
     }
 }
 
+impl IsCompleteBuilder for FlowchartConfigurationBuilder {
+    fn is_complete(&self) -> bool {
+        self.generic.is_complete()
+    }
+}
+
 impl Builder for FlowchartConfigurationBuilder {
     type Object = FlowchartConfiguration;
     type Attribute = FlowchartConfigurationAttribute;
     type Error = ConfigError<Self::Attribute>;
-
-    fn is_complete(&self) -> bool {
-        self.generic.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(FlowchartConfiguration {

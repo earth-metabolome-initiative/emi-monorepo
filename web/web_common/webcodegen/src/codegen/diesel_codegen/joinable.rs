@@ -106,8 +106,9 @@ impl Codegen<'_> {
             std::fs::write(
                 &table_file,
                 self.beautify_code(&quote::quote! {
-                use #table_path;
-                #overall_token_stream})?,
+                    use #table_path;
+                    #overall_token_stream
+                }),
             )?;
 
             joinable_main_module.extend(quote::quote! {
@@ -116,7 +117,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&joinable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&joinable_main_module))?;
 
         Ok(())
     }

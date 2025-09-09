@@ -84,7 +84,7 @@ impl InsertableCommercialProduct {
         crate::Brand::read(self.brand_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialProductBuilder<
     AssetModel = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
@@ -98,6 +98,17 @@ impl From<InsertableCommercialProductBuilder>
 {
     fn from(builder: InsertableCommercialProductBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<AssetModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
+        AssetModel,
+    >
+where
+    AssetModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.brand_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `CommercialProduct`
@@ -372,9 +383,6 @@ where
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialProductAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.brand_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -64,7 +64,7 @@ impl InsertableSpectraCollection {
         crate::DigitalAsset::read(self.id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpectraCollectionBuilder<
     DigitalAsset
@@ -82,6 +82,17 @@ impl From<InsertableSpectraCollectionBuilder>
 {
     fn from(builder: InsertableSpectraCollectionBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<DigitalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+        DigitalAsset,
+    >
+where
+    DigitalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `SpectraCollection`
@@ -345,9 +356,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = SpectraCollectionAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

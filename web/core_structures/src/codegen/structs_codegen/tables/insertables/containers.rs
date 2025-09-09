@@ -94,7 +94,7 @@ impl InsertableContainer {
             .first::<crate::Asset>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableContainerBuilder<
     PhysicalAsset
@@ -110,6 +110,17 @@ impl From<InsertableContainerBuilder>
 {
     fn from(builder: InsertableContainerBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        PhysicalAsset,
+    >
+where
+    PhysicalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.container_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Container` or
@@ -171,11 +182,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v4 --->|"`extends`"| v5
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn container_model(
         mut self,
@@ -466,9 +477,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = ContainerAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.container_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

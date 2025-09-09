@@ -58,11 +58,18 @@ impl InsertableAssetModelAncestor {
         crate::AssetModel::read(self.ancestor_model, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetModelAncestorBuilder {
     pub(crate) descendant_model: Option<i32>,
     pub(crate) ancestor_model: Option<i32>,
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.descendant_model.is_some() && self.ancestor_model.is_some()
+    }
 }
 /// Trait defining setters for attributes of an instance of `AssetModelAncestor`
 /// or descendant tables.
@@ -154,9 +161,6 @@ where
         >,
 {
     type Attributes = AssetModelAncestorAttribute;
-    fn is_complete(&self) -> bool {
-        self.descendant_model.is_some() && self.ancestor_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -58,7 +58,7 @@ impl InsertableUnit {
         crate::Color::read(self.color_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUnitBuilder {
     pub(crate) name: Option<String>,
@@ -71,6 +71,13 @@ impl From<InsertableUnitBuilder>
 {
     fn from(builder: InsertableUnitBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.unit.is_some() && self.icon.is_some() && self.color_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Unit` or descendant
@@ -247,9 +254,6 @@ where
         >,
 {
     type Attributes = UnitAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && self.unit.is_some() && self.icon.is_some() && self.color_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

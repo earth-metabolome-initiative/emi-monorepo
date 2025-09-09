@@ -154,7 +154,7 @@ impl InsertableProject {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProjectBuilder {
     pub(crate) id: Option<i32>,
@@ -180,25 +180,22 @@ impl From<InsertableProjectBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProjectBuilder {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            name: Default::default(),
-            description: Default::default(),
-            state_id: Some(1i16),
-            icon: Default::default(),
-            color_id: Some(1i16),
-            parent_project_id: Default::default(),
-            budget: Default::default(),
-            expenses: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            expected_end_date: Default::default(),
-            end_date: Default::default(),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.state_id.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
+            && self.expected_end_date.is_some()
+            && self.end_date.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Project` or
@@ -874,20 +871,6 @@ where
         >,
 {
     type Attributes = ProjectAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_some()
-            && self.name.is_some()
-            && self.description.is_some()
-            && self.state_id.is_some()
-            && self.icon.is_some()
-            && self.color_id.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-            && self.expected_end_date.is_some()
-            && self.end_date.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

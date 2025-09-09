@@ -123,7 +123,7 @@ impl InsertableCommercialFreezeDryerModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialFreezeDryerModelBuilder<
     CommercialProduct
@@ -146,6 +146,21 @@ impl From<InsertableCommercialFreezeDryerModelBuilder>
 {
     fn from(builder: InsertableCommercialFreezeDryerModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<FreezeDryerModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelBuilder<
+    FreezeDryerModel,
+    CommercialProduct,
+>
+where
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+    FreezeDryerModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_freeze_dryer_models_id_fkey.is_complete()
+            && self.commercial_freeze_dryer_models_id_fkey1.is_complete()
+            && self.freeze_dryer_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -210,9 +225,9 @@ for InsertableCommercialFreezeDryerModelBuilder<CommercialProduct, FreezeDryerMo
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn freeze_dryer_model(
@@ -561,11 +576,6 @@ where
     FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialFreezeDryerModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_freeze_dryer_models_id_fkey1.is_complete()
-            && self.commercial_freeze_dryer_models_id_fkey.is_complete()
-            && self.freeze_dryer_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

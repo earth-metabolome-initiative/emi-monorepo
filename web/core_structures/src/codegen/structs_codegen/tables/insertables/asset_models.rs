@@ -103,7 +103,7 @@ impl InsertableAssetModel {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetModelBuilder {
     pub(crate) most_concrete_table: Option<String>,
@@ -122,18 +122,17 @@ impl From<InsertableAssetModelBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableAssetModelBuilder {
-    fn default() -> Self {
-        Self {
-            most_concrete_table: Default::default(),
-            name: Default::default(),
-            description: Default::default(),
-            parent_model: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.most_concrete_table.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `AssetModel` or
@@ -497,15 +496,6 @@ where
         >,
 {
     type Attributes = AssetModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.most_concrete_table.is_some()
-            && self.name.is_some()
-            && self.description.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

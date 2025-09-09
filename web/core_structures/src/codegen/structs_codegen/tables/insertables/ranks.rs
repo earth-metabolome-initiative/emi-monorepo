@@ -37,7 +37,7 @@ pub struct InsertableRank {
     pub(crate) description: String,
 }
 impl InsertableRank {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableRankBuilder {
     pub(crate) name: Option<String>,
@@ -48,6 +48,13 @@ impl From<InsertableRankBuilder>
 {
     fn from(builder: InsertableRankBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.description.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Rank` or descendant
@@ -156,9 +163,6 @@ where
         >,
 {
     type Attributes = RankAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && self.description.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

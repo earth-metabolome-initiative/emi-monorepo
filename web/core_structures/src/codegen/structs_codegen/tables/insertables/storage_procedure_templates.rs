@@ -223,7 +223,7 @@ impl InsertableStorageProcedureTemplate {
         )
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableStorageProcedureTemplateBuilder<
     ProcedureTemplate
@@ -250,20 +250,23 @@ impl From<InsertableStorageProcedureTemplateBuilder>
         Self::Builder(builder)
     }
 }
-impl<ProcedureTemplate> Default for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
+impl<ProcedureTemplate> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
 where
-    ProcedureTemplate: Default,
+    ProcedureTemplate: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: common_traits::builder::IsCompleteBuilder,
 {
-    fn default() -> Self {
-        Self {
-            procedure_template: Default::default(),
-            kelvin: Some(293.15f32),
-            kelvin_tolerance_percentage: Some(1f32),
-            stored_into_model: Default::default(),
-            procedure_template_stored_into_model: Default::default(),
-            stored_asset_model: Default::default(),
-            procedure_template_stored_asset_model: Default::default(),
-        }
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete() && self.kelvin.is_some()
+            && self.kelvin_tolerance_percentage.is_some()
+            && (self.stored_into_model.is_some()
+                || self.procedure_template_stored_into_model.is_complete())
+            && self.procedure_template_stored_into_model.is_complete()
+            && (self.stored_asset_model.is_some()
+                || self.procedure_template_stored_asset_model.is_complete())
+            && self.procedure_template_stored_asset_model.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -515,28 +518,23 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    /// subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v6 ["`storage_procedure_templates`"]
+    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "stored_into_model"}
-    /// class v3 column-of-interest
-    ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v6 ---o|"`associated with`"| v5
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
         mut self,
@@ -576,21 +574,21 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_into_model<PTSIM>(
@@ -658,28 +656,23 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
     /// end
-    /// subgraph v6 ["`storage_procedure_templates`"]
-    ///    v3@{shape: rounded, label: "stored_into_model"}
-    /// class v3 directly-involved-column
+    /// subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_asset_model"}
     /// class v2 column-of-interest
     /// end
-    /// v3 --->|"`associated same as`"| v0
-    /// v3 -.->|"`foreign defines`"| v2
-    /// v1 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v0
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v6 ---o|"`associated with`"| v5
+    /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset_model(
         mut self,
@@ -1011,14 +1004,6 @@ where
     >,
 {
     type Attributes = StorageProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure_template.is_complete() && self.kelvin.is_some()
-            && self.kelvin_tolerance_percentage.is_some()
-            && self.stored_into_model.is_some()
-            && self.procedure_template_stored_into_model.is_complete()
-            && self.stored_asset_model.is_some()
-            && self.procedure_template_stored_asset_model.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

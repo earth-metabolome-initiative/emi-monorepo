@@ -59,7 +59,7 @@ pub struct InsertableOrganization {
     pub(crate) domain: String,
 }
 impl InsertableOrganization {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganizationBuilder {
     pub(crate) name: Option<String>,
@@ -74,6 +74,17 @@ impl From<InsertableOrganizationBuilder>
 {
     fn from(builder: InsertableOrganizationBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.url.is_some()
+            && self.country.is_some()
+            && self.alpha_two_code.is_some()
+            && self.domain.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Organization` or
@@ -351,13 +362,6 @@ where
         >,
 {
     type Attributes = OrganizationAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.url.is_some()
-            && self.country.is_some()
-            && self.alpha_two_code.is_some()
-            && self.domain.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

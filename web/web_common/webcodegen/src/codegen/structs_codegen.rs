@@ -74,7 +74,7 @@ impl Codegen<'_> {
             time_tracker.add_completed_task(task);
         }
 
-        std::fs::write(&submodule_file, self.beautify_code(&submodule_file_content)?)?;
+        std::fs::write(&submodule_file, self.beautify_code(&submodule_file_content))?;
 
         Ok(time_tracker)
     }

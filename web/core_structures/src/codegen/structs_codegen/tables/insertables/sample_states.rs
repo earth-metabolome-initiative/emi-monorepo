@@ -60,7 +60,7 @@ impl InsertableSampleState {
         crate::Color::read(self.color_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSampleStateBuilder {
     pub(crate) name: Option<String>,
@@ -73,6 +73,16 @@ impl From<InsertableSampleStateBuilder>
 {
     fn from(builder: InsertableSampleStateBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSampleStateBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `SampleState` or
@@ -252,12 +262,6 @@ where
         >,
 {
     type Attributes = SampleStateAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.description.is_some()
-            && self.icon.is_some()
-            && self.color_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

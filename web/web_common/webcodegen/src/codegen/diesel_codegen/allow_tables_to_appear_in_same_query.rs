@@ -110,7 +110,7 @@ impl Codegen<'_> {
                 self.beautify_code(&quote::quote! {
                     use #table_path;
                     #submodule_token_stream
-                })?,
+                }),
             )?;
 
             // main token stream
@@ -120,7 +120,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&allow_table_query_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&allow_table_query_module))?;
         Ok(())
     }
 }

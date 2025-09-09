@@ -95,7 +95,7 @@ impl InsertableProcedureTemplate {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplateBuilder {
     pub(crate) most_concrete_table: Option<String>,
@@ -115,19 +115,19 @@ impl From<InsertableProcedureTemplateBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProcedureTemplateBuilder {
-    fn default() -> Self {
-        Self {
-            most_concrete_table: Default::default(),
-            name: Default::default(),
-            description: Default::default(),
-            icon: Some("book".to_owned()),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            deprecated: Some(false),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.most_concrete_table.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
+            && self.deprecated.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `ProcedureTemplate`
@@ -556,17 +556,6 @@ where
         >,
 {
     type Attributes = ProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.most_concrete_table.is_some()
-            && self.name.is_some()
-            && self.description.is_some()
-            && self.icon.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-            && self.deprecated.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

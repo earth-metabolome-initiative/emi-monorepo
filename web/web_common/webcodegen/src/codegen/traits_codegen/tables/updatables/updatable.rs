@@ -249,7 +249,7 @@ impl Codegen<'_> {
                             Ok(true)
                         }
                     }
-                })?,
+                }),
             )?;
 
             updatable_main_module.extend(quote::quote! {
@@ -258,7 +258,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&updatable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&updatable_main_module))?;
 
         Ok(())
     }

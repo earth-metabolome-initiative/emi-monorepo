@@ -96,7 +96,7 @@ impl InsertableFreezeDryer {
         crate::CommercialFreezeDryerLot::read(self.model, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFreezeDryerBuilder<
     PhysicalAsset
@@ -112,6 +112,17 @@ impl From<InsertableFreezeDryerBuilder>
 {
     fn from(builder: InsertableFreezeDryerBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryerBuilder<
+        PhysicalAsset,
+    >
+where
+    PhysicalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `FreezeDryer` or
@@ -172,9 +183,9 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
     ///```
@@ -421,9 +432,9 @@ where
     ///    v0@{shape: rounded, label: "model"}
     /// class v0 column-of-interest
     /// end
-    /// v0 --->|"`ancestral same as`"| v2
     /// v1 --->|"`ancestral same as`"| v2
     /// v1 -.->|"`inferred ancestral same as`"| v0
+    /// v0 --->|"`ancestral same as`"| v2
     /// v4 --->|"`extends`"| v5
     /// v5 --->|"`extends`"| v3
     /// ```
@@ -467,9 +478,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = FreezeDryerAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -337,7 +337,7 @@ impl InsertableWeighingProcedure {
         crate::WeighingDevice::read(weighed_with, conn).map(Some)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableWeighingProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -366,6 +366,30 @@ impl From<InsertableWeighingProcedureBuilder>
 {
     fn from(builder: InsertableWeighingProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Procedure> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder<
+        Procedure,
+    >
+where
+    Procedure: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_complete()
+            && self.procedure_template.is_some()
+            && (self.weighed_container.is_some() || self.procedure_weighed_container.is_complete())
+            && (self.procedure_template_weighed_container_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_weighed_container.is_complete())
+            && self.procedure_weighed_container.is_complete()
+            && self.kilograms.is_some()
+            && (self.procedure_template_weighed_with_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_weighed_with.is_complete())
+            && self.procedure_weighed_with.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `WeighingProcedure`
@@ -614,16 +638,16 @@ impl<
     /// subgraph v7 ["`weighing_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
     /// class v1 column-of-interest
-    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v2
     /// v1 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
+    /// v3 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
     /// ```
@@ -658,22 +682,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_container"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn weighed_container(
@@ -719,16 +743,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_weighed_container"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_container_model(
@@ -770,26 +794,26 @@ impl<
     /// subgraph v6 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v3 column-of-interest
     ///    v4@{shape: rounded, label: "weighed_container"}
     /// class v4 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v3 column-of-interest
     /// end
+    /// v4 --->|"`associated same as`"| v0
+    /// v2 --->|"`associated same as`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
-    /// v4 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v1
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_weighed_container<PWC>(
@@ -918,22 +942,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_weighed_with"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_with"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_weighed_with"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn weighed_with(
@@ -973,22 +997,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_weighed_with"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_weighed_with"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_with_model(
@@ -1029,10 +1053,10 @@ impl<
     /// subgraph v6 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
     ///    v3@{shape: rounded, label: "procedure_weighed_with"}
@@ -1350,16 +1374,6 @@ where
         web_common_traits::database::TryInsertGeneric<C>,
 {
     type Attributes = WeighingProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_complete()
-            && self.procedure_template.is_some()
-            && self.weighed_container.is_some()
-            && self.procedure_template_weighed_container_model.is_some()
-            && self.procedure_weighed_container.is_complete()
-            && self.kilograms.is_some()
-            && self.procedure_template_weighed_with_model.is_some()
-            && self.procedure_weighed_with.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

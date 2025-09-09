@@ -87,7 +87,7 @@ impl InsertablePhoneModel {
         crate::PositioningDeviceModel::read(self.id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePhoneModelBuilder<
     CameraModel
@@ -109,6 +109,19 @@ impl From<InsertablePhoneModelBuilder>
 {
     fn from(builder: InsertablePhoneModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CameraModel, PositioningDeviceModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder<
+        CameraModel,
+        PositioningDeviceModel,
+    >
+where
+    CameraModel: common_traits::builder::IsCompleteBuilder,
+    PositioningDeviceModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.phone_models_camera.is_complete() && self.phone_models_positioning.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `PhoneModel` or
@@ -373,9 +386,6 @@ where
     PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = PhoneModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.phone_models_camera.is_complete() && self.phone_models_positioning.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

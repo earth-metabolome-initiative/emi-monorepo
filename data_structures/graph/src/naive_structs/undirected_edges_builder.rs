@@ -4,7 +4,7 @@
 use std::marker::PhantomData;
 
 use algebra::prelude::{SparseMatrixMut, Symmetrize};
-use common_traits::prelude::Builder;
+use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use super::GenericEdgesBuilder;
 use crate::{
@@ -85,6 +85,25 @@ where
     }
 }
 
+impl<EdgeIterator, GE, UE> IsCompleteBuilder
+    for GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE, UE>
+where
+    UE: UndirectedMonopartiteEdges<Edge = GE::Edge, EdgeId = GE::EdgeId>
+        + FromDirectedMonopartiteEdges<GE>,
+    GE: GrowableEdges<Error = EdgesBuilderError<GE>>
+        + MonopartiteEdges<MonopartiteMatrix = GE::GrowableMatrix>
+        + DirectedEdges<Matrix = GE::GrowableMatrix>,
+    Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = UE, IntermediateEdges = GE>,
+    EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
+    EdgesBuilderError<UE>: From<EdgesBuilderError<GE>>,
+    <GE as GrowableEdges>::GrowableMatrix:
+        Symmetrize<<UE as UndirectedMonopartiteEdges>::SymmetricSquaredMatrix>,
+{
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+}
+
 impl<EdgeIterator, GE, UE> Builder
     for GenericUndirectedMonopartiteEdgesBuilder<EdgeIterator, GE, UE>
 where
@@ -102,10 +121,6 @@ where
     type Object = UE;
     type Error = EdgesBuilderError<UE>;
     type Attribute = EdgesBuilderOptions;
-
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let directed_edges: GE = self.builder.build()?;

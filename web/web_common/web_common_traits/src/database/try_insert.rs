@@ -2,6 +2,8 @@
 //! insertable builder into an insertable object after having processed the
 //! necessary parent builders, if any.
 
+use common_traits::builder::IsCompleteBuilder;
+
 use crate::{
     database::{IdOrBuilder, InsertError},
     prelude::SetPrimaryKey,
@@ -9,12 +11,9 @@ use crate::{
 
 /// Trait defining the properties that any generic associated with a type
 /// implementing `TryInsert` must have.
-pub trait TryInsertGeneric<C>: SetPrimaryKey {
+pub trait TryInsertGeneric<C>: SetPrimaryKey + IsCompleteBuilder {
     /// Attributes enumeration for the insertable object.
     type Attributes;
-
-    /// Returns whether the generic is complete and can mint a primary key.
-    fn is_complete(&self) -> bool;
 
     /// Consumes the generic, potentially inserting it into the database,
     /// and returns the primary key.
@@ -43,10 +42,6 @@ where
     T: SetPrimaryKey<PrimaryKey = T>,
 {
     type Attributes = ();
-
-    fn is_complete(&self) -> bool {
-        self.is_some()
-    }
 
     fn mint_primary_key(
         self,
@@ -80,13 +75,6 @@ where
     Builder: TryInsertGeneric<C, PrimaryKey = Id>,
 {
     type Attributes = Builder::Attributes;
-
-    fn is_complete(&self) -> bool {
-        match self {
-            Self::Id(_) => true,
-            Self::Builder(builder) => builder.is_complete(),
-        }
-    }
 
     fn mint_primary_key(
         self,

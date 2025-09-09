@@ -126,7 +126,7 @@ impl InsertableProcedureTemplateAssetModel {
         crate::ProcedureTemplate::read(self.procedure_template, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureTemplateAssetModelBuilder {
     pub(crate) name: Option<String>,
@@ -143,16 +143,12 @@ impl From<InsertableProcedureTemplateAssetModelBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProcedureTemplateAssetModelBuilder {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
-            procedure_template: Default::default(),
-            based_on: Default::default(),
-            asset_model: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder {
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.procedure_template.is_some()
+            && (self.asset_model.is_some() || self.based_on.is_some())
+            && self.created_by.is_some() && self.created_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -424,13 +420,6 @@ where
         >,
 {
     type Attributes = ProcedureTemplateAssetModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.procedure_template.is_some()
-            && self.asset_model.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

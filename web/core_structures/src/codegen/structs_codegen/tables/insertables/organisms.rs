@@ -62,7 +62,7 @@ impl InsertableOrganism {
         crate::PhysicalAsset::read(self.id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismBuilder<
     PhysicalAsset
@@ -77,6 +77,17 @@ impl From<InsertableOrganismBuilder>
 {
     fn from(builder: InsertableOrganismBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<PhysicalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<
+        PhysicalAsset,
+    >
+where
+    PhysicalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of `Organism` or
@@ -339,9 +350,6 @@ where
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = OrganismAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

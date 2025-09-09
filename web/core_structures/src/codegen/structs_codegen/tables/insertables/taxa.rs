@@ -56,7 +56,7 @@ impl InsertableTaxon {
         crate::Rank::read(self.rank_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTaxonBuilder {
     pub(crate) id: Option<i32>,
@@ -69,6 +69,13 @@ impl From<InsertableTaxonBuilder>
 {
     fn from(builder: InsertableTaxonBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_some() && self.name.is_some() && self.rank_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Taxon` or
@@ -236,9 +243,6 @@ where
         >,
 {
     type Attributes = TaxonAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_some() && self.name.is_some() && self.rank_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

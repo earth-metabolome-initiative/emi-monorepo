@@ -58,7 +58,7 @@ impl InsertableMaterial {
         crate::Color::read(self.color_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableMaterialBuilder {
     pub(crate) name: Option<String>,
@@ -71,6 +71,16 @@ impl From<InsertableMaterialBuilder>
 {
     fn from(builder: InsertableMaterialBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Material` or
@@ -250,12 +260,6 @@ where
         >,
 {
     type Attributes = MaterialAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.description.is_some()
-            && self.icon.is_some()
-            && self.color_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

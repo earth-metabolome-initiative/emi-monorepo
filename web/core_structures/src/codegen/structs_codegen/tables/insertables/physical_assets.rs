@@ -96,7 +96,7 @@ impl InsertablePhysicalAsset {
         crate::PhysicalAssetModel::read(self.model, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertablePhysicalAssetBuilder<
     Asset = crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
@@ -112,6 +112,15 @@ impl From<InsertablePhysicalAssetBuilder>
 {
     fn from(builder: InsertablePhysicalAssetBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Asset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder<Asset>
+where
+    Asset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `PhysicalAsset` or
@@ -406,9 +415,6 @@ where
     Asset: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = PhysicalAssetAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

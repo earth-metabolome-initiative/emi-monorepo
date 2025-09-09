@@ -6,6 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 mod from_builder_to_id_or_builder_impl;
+mod is_complete_builder;
 use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
@@ -26,8 +27,21 @@ impl Codegen<'_> {
             .generics_for_table_builder_implementation(table)?;
         let extension_network = self.table_extension_network().expect("Extension network exists");
 
-        let has_default_types = insertable_columns.iter().any(Column::has_default);
-        let mut derives = vec![quote::quote!(Clone), quote::quote!(Debug)];
+        let has_default_types = insertable_columns.iter().all(Column::has_default);
+        let mut derives = vec![
+            quote::quote!(Clone),
+            quote::quote!(Debug),
+            quote::quote!(PartialEq),
+            quote::quote!(PartialOrd),
+        ];
+
+        if insertable_columns.iter().all(|c| c.supports_eq(conn).unwrap_or(false)) {
+            derives.push(quote::quote!(Eq));
+            derives.push(quote::quote!(Hash));
+        }
+        if insertable_columns.iter().all(|c| c.supports_ord(conn).unwrap_or(false)) {
+            derives.push(quote::quote!(Ord));
+        }
 
         if !has_default_types {
             derives.push(quote::quote!(Default));
@@ -120,6 +134,8 @@ impl Codegen<'_> {
             }),
         );
 
+        let is_complete_builder_impl =
+            self.generate_is_complete_builder_implementation(table, conn)?;
         let from_builder_to_id_or_builder_impl =
             self.from_builder_to_id_or_builder_impl(table, conn)?;
         let builder_trait_definition = table.generate_builder_trait(conn)?;
@@ -138,6 +154,7 @@ impl Codegen<'_> {
 
             #from_builder_to_id_or_builder_impl
             #insertable_builder_default_impl
+            #is_complete_builder_impl
 
             #builder_trait_definition
             #(#builder_trait_impls)*

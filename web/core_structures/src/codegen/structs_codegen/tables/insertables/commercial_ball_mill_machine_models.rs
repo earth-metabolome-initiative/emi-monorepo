@@ -123,7 +123,7 @@ impl InsertableCommercialBallMillMachineModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialBallMillMachineModelBuilder<
     BallMillMachineModel
@@ -149,6 +149,21 @@ impl From<InsertableCommercialBallMillMachineModelBuilder>
 {
     fn from(builder: InsertableCommercialBallMillMachineModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<BallMillMachineModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineModelBuilder<
+    BallMillMachineModel,
+    CommercialProduct,
+>
+where
+    BallMillMachineModel: common_traits::builder::IsCompleteBuilder,
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_ball_mill_machine_models_id_fkey.is_complete()
+            && self.commercial_ball_mill_machine_models_id_fkey1.is_complete()
+            && self.ball_mill_machine_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -518,9 +533,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -579,11 +594,6 @@ where
     CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialBallMillMachineModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_ball_mill_machine_models_id_fkey.is_complete()
-            && self.commercial_ball_mill_machine_models_id_fkey1.is_complete()
-            && self.ball_mill_machine_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -123,7 +123,7 @@ impl InsertableCommercialWeighingDeviceModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialWeighingDeviceModelBuilder<
     CommercialProduct
@@ -149,6 +149,21 @@ impl From<InsertableCommercialWeighingDeviceModelBuilder>
 {
     fn from(builder: InsertableCommercialWeighingDeviceModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<WeighingDeviceModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelBuilder<
+    WeighingDeviceModel,
+    CommercialProduct,
+>
+where
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+    WeighingDeviceModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_weighing_device_models_id_fkey.is_complete()
+            && self.commercial_weighing_device_models_id_fkey1.is_complete()
+            && self.weighing_device_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -217,9 +232,9 @@ for InsertableCommercialWeighingDeviceModelBuilder<
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn weighing_device_model(
@@ -511,9 +526,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -578,11 +593,6 @@ where
     WeighingDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialWeighingDeviceModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_weighing_device_models_id_fkey1.is_complete()
-            && self.commercial_weighing_device_models_id_fkey.is_complete()
-            && self.weighing_device_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

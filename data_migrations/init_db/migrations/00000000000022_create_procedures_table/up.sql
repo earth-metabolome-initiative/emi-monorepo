@@ -90,3 +90,26 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- corresponds to a specific asset (if any).
 	UNIQUE (id, asset)
 );
+
+-- When we insert a procedure assets, we ensure that the associated
+-- procedure parent, if any, has the analogue procedure asset or we
+-- insert it recursively.
+-- CREATE OR REPLACE FUNCTION insert_attribute_propagate()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     -- Insert attribute into parent if one exists
+--     INSERT INTO attributes (node_id, key, value)
+--     SELECT n.parent_id, NEW.key, NEW.value
+--     FROM nodes n
+--     WHERE n.id = NEW.node_id
+--       AND n.parent_id IS NOT NULL
+--     ON CONFLICT (node_id, key) DO NOTHING;
+
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER insert_attribute_propagate
+-- AFTER INSERT ON attributes
+-- FOR EACH ROW
+-- EXECUTE FUNCTION insert_attribute_propagate();

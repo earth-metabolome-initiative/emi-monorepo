@@ -79,7 +79,7 @@ impl InsertableReagentModel {
         crate::AssetModel::read(self.id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableReagentModelBuilder<
     AssetModel = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
@@ -94,6 +94,20 @@ impl From<InsertableReagentModelBuilder>
 {
     fn from(builder: InsertableReagentModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<AssetModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
+        AssetModel,
+    >
+where
+    AssetModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
+            && self.purity.is_some()
+            && self.cas_code.is_some()
+            && self.molecular_formula.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `ReagentModel` or
@@ -433,12 +447,6 @@ where
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = ReagentModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete()
-            && self.purity.is_some()
-            && self.cas_code.is_some()
-            && self.molecular_formula.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

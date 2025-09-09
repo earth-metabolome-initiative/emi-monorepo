@@ -121,7 +121,7 @@ impl InsertableCommercialPackagingLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialPackagingLotBuilder<
     CommercialProductLot
@@ -144,6 +144,21 @@ impl From<InsertableCommercialPackagingLotBuilder>
 {
     fn from(builder: InsertableCommercialPackagingLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CommercialProductLot, PackagingModel> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLotBuilder<
+    CommercialProductLot,
+    PackagingModel,
+>
+where
+    CommercialProductLot: common_traits::builder::IsCompleteBuilder,
+    PackagingModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_packaging_lots_id_fkey.is_complete()
+            && self.commercial_packaging_lots_id_fkey1.is_complete()
+            && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -176,10 +191,10 @@ pub trait CommercialPackagingLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PackagingModel,
@@ -215,14 +230,14 @@ for InsertableCommercialPackagingLotBuilder<CommercialProductLot, PackagingModel
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v7 --->|"`extends`"| v4
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
+    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///```
     fn product_model(
@@ -548,12 +563,12 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v6
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
@@ -612,11 +627,6 @@ where
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialPackagingLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_packaging_lots_id_fkey.is_complete()
-            && self.commercial_packaging_lots_id_fkey1.is_complete()
-            && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

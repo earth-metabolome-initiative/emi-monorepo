@@ -3,7 +3,10 @@
 
 use std::{fmt::Display, iter::empty, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     errors::EdgeError,
@@ -124,14 +127,16 @@ impl Display for GenericEdgeAttribute {
     }
 }
 
+impl<N> IsCompleteBuilder for GenericEdgeBuilder<N> {
+    fn is_complete(&self) -> bool {
+        self.source.is_some() && self.destination.is_some()
+    }
+}
+
 impl<N> Builder for GenericEdgeBuilder<N> {
     type Attribute = GenericEdgeAttribute;
     type Error = EdgeError<Self::Attribute>;
     type Object = GenericEdge<N>;
-
-    fn is_complete(&self) -> bool {
-        self.source.is_some() && self.destination.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(GenericEdge {

@@ -42,7 +42,7 @@ pub struct InsertableColor {
     pub(crate) description: String,
 }
 impl InsertableColor {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableColorBuilder {
     pub(crate) name: Option<String>,
@@ -54,6 +54,13 @@ impl From<InsertableColorBuilder>
 {
     fn from(builder: InsertableColorBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.hexadecimal_value.is_some() && self.description.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Color` or
@@ -204,9 +211,6 @@ where
         >,
 {
     type Attributes = ColorAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && self.hexadecimal_value.is_some() && self.description.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

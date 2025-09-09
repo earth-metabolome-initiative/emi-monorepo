@@ -123,7 +123,7 @@ impl InsertableCommercialVolumeMeasuringDeviceLot {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     CommercialProductLot
@@ -149,6 +149,24 @@ impl From<InsertableCommercialVolumeMeasuringDeviceLotBuilder>
 {
     fn from(builder: InsertableCommercialVolumeMeasuringDeviceLotBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<
+    CommercialProductLot,
+    VolumeMeasuringDeviceModel,
+> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceLotBuilder<
+    CommercialProductLot,
+    VolumeMeasuringDeviceModel,
+>
+where
+    CommercialProductLot: common_traits::builder::IsCompleteBuilder,
+    VolumeMeasuringDeviceModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_volume_measuring_device_lots_id_fkey.is_complete()
+            && self.commercial_volume_measuring_device_lots_id_fkey1.is_complete()
+            && self.product_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -181,10 +199,10 @@ pub trait CommercialVolumeMeasuringDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     VolumeMeasuringDeviceModel,
@@ -223,15 +241,15 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v3
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v7
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v7
     ///```
     fn product_model(
         mut self,
@@ -504,8 +522,8 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v3
     ///v3 --->|"`extends`"| v5
+    ///v4 --->|"`extends`"| v3
     ///```
     fn product_model(
         self,
@@ -567,9 +585,9 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v7 --->|"`extends`"| v4
-    ///v6 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
+    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,
@@ -647,11 +665,6 @@ where
     VolumeMeasuringDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialVolumeMeasuringDeviceLotAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_volume_measuring_device_lots_id_fkey.is_complete()
-            && self.commercial_volume_measuring_device_lots_id_fkey1.is_complete()
-            && self.product_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

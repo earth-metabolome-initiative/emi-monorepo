@@ -3,7 +3,7 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::Builder;
+use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use crate::{
     diagrams::entity_relationship::entity_relationship_node::{
@@ -52,14 +52,16 @@ impl Display for ERNodeAttribute {
     }
 }
 
+impl IsCompleteBuilder for ERNodeBuilder {
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+}
+
 impl Builder for ERNodeBuilder {
     type Attribute = ERNodeAttribute;
     type Object = ERNode;
     type Error = NodeError<Self::Attribute>;
-
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ERNode { node: self.builder.build()?, attributes: self.class_attributes })

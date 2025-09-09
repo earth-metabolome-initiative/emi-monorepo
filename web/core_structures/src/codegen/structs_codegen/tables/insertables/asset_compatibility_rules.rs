@@ -78,7 +78,7 @@ impl InsertableAssetCompatibilityRule {
         crate::User::read(self.created_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAssetCompatibilityRuleBuilder {
     pub(crate) left_asset_model: Option<i32>,
@@ -86,14 +86,11 @@ pub struct InsertableAssetCompatibilityRuleBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
-impl Default for InsertableAssetCompatibilityRuleBuilder {
-    fn default() -> Self {
-        Self {
-            left_asset_model: Default::default(),
-            right_asset_model: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleBuilder {
+    fn is_complete(&self) -> bool {
+        self.left_asset_model.is_some() && self.right_asset_model.is_some()
+            && self.created_by.is_some() && self.created_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -284,12 +281,6 @@ where
         >,
 {
     type Attributes = AssetCompatibilityRuleAttribute;
-    fn is_complete(&self) -> bool {
-        self.left_asset_model.is_some()
-            && self.right_asset_model.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

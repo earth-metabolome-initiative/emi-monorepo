@@ -408,12 +408,12 @@ impl Codegen<'_> {
                         }
                     }
                     impl web_common_traits::prelude::ForeignKeys for #foreign_keys_struct_ident {}
-                })?,
+                }),
             )?;
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_foreign_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_foreign_main_module))?;
 
         Ok(())
     }

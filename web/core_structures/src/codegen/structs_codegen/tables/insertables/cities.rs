@@ -48,7 +48,7 @@ impl InsertableCity {
         crate::Country::read(self.iso, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
@@ -59,6 +59,13 @@ impl From<InsertableCityBuilder>
 {
     fn from(builder: InsertableCityBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some() && self.iso.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `City` or descendant
@@ -156,9 +163,6 @@ where
         >,
 {
     type Attributes = CityAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && self.iso.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -58,11 +58,18 @@ impl InsertableTeamMember {
         crate::Team::read(self.team_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamMemberBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) member_id: Option<i32>,
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.team_id.is_some() && self.member_id.is_some()
+    }
 }
 /// Trait defining setters for attributes of an instance of `TeamMember` or
 /// descendant tables.
@@ -149,9 +156,6 @@ where
         >,
 {
     type Attributes = TeamMemberAttribute;
-    fn is_complete(&self) -> bool {
-        self.team_id.is_some() && self.member_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

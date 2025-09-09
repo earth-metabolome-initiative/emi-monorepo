@@ -50,7 +50,7 @@ impl InsertableTemporaryUser {
         crate::LoginProvider::read(self.login_provider_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTemporaryUserBuilder {
     pub(crate) email: Option<String>,
@@ -61,6 +61,13 @@ impl From<InsertableTemporaryUserBuilder>
 {
     fn from(builder: InsertableTemporaryUserBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.email.is_some() && self.login_provider_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `TemporaryUser` or
@@ -165,9 +172,6 @@ where
         >,
 {
     type Attributes = TemporaryUserAttribute;
-    fn is_complete(&self) -> bool {
-        self.email.is_some() && self.login_provider_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

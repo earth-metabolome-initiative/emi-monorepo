@@ -35,7 +35,6 @@ impl Codegen<'_> {
         let attributes_enum = table.attributes_enum_ident()?;
         let table_extension_network = self.table_extension_network().unwrap();
         let extension_tables = table_extension_network.extension_tables(table);
-        let extension_foreign_keys = table_extension_network.extension_foreign_keys(table, conn)?;
         let primary_key_type = table.primary_key_type(conn)?;
         let mut where_constraints = vec![quote! {
             Self: web_common_traits::database::InsertableVariant<
@@ -46,7 +45,6 @@ impl Codegen<'_> {
             >
         }];
         let mut try_insert_generic_where_constraint: HashSet<Table> = HashSet::new();
-        let mut completeness_statements = Vec::new();
         let mut table_generics = Vec::new();
 
         for extension_table in &extension_tables {
@@ -58,15 +56,6 @@ impl Codegen<'_> {
             try_insert_generic_where_constraint.insert((*extension_table).clone());
         }
 
-        // For each extension foreign key, we need to call recursively the `is_complete`
-        // method
-        for foreign_key in &extension_foreign_keys {
-            let foreign_key_ident = foreign_key.constraint_ident(conn)?;
-            completeness_statements.push(quote! {
-                self.#foreign_key_ident.is_complete()
-            });
-        }
-
         // For each of the other columns, if they are not optional, we need to check if
         // they are complete
         for column in table.insertable_columns(conn, false)? {
@@ -75,40 +64,19 @@ impl Codegen<'_> {
                 continue;
             }
 
-            // Otherwise, we need to check if the column is complete, i.e. whether
-            // it has been set in the builder
-            let column_ident = column.snake_case_ident()?;
-
-            completeness_statements.push(
-                if let Some((partial_builder_kind, _, partial_builder_constraint)) =
-                    column.requires_partial_builder(conn)?
-                {
-                    let foreign_table = partial_builder_constraint.foreign_table(conn)?;
-                    if !try_insert_generic_where_constraint.contains(&foreign_table) {
-                        let foreign_builder_type = foreign_table.insertable_builder_ty()?;
-                        where_constraints.push(quote! {
-                            #foreign_builder_type: web_common_traits::database::TryInsertGeneric<C>
-                        });
-                        try_insert_generic_where_constraint.insert(foreign_table.as_ref().clone());
-                    }
-                    quote! {
-                        self.#column_ident.is_complete()
-                    }
-                } else {
-                    quote! {
-                        self.#column_ident.is_some()
-                    }
-                },
-            );
-        }
-
-        let completeness_statement = if completeness_statements.is_empty() {
-            quote! { true }
-        } else {
-            quote! {
-                #(#completeness_statements)&&*
+            if let Some((partial_builder_kind, _, partial_builder_constraint)) =
+                column.requires_partial_builder(conn)?
+            {
+                let foreign_table = partial_builder_constraint.foreign_table(conn)?;
+                if !try_insert_generic_where_constraint.contains(&foreign_table) {
+                    let foreign_builder_type = foreign_table.insertable_builder_ty()?;
+                    where_constraints.push(quote! {
+                        #foreign_builder_type: web_common_traits::database::TryInsertGeneric<C>
+                    });
+                    try_insert_generic_where_constraint.insert(foreign_table.as_ref().clone());
+                }
             }
-        };
+        }
 
         let left_generics = {
             let mut left_generics = table_generics.clone();
@@ -128,10 +96,6 @@ impl Codegen<'_> {
                     #(#where_constraints),*
             {
                 type Attributes = #attributes_enum;
-
-                fn is_complete(&self) -> bool {
-                    #completeness_statement
-                }
 
                 fn mint_primary_key(
                     self,

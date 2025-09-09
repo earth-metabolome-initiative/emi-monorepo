@@ -63,7 +63,7 @@ impl InsertableAddress {
         crate::City::read(self.city_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableAddressBuilder {
     pub(crate) city_id: Option<i32>,
@@ -77,6 +77,17 @@ impl From<InsertableAddressBuilder>
 {
     fn from(builder: InsertableAddressBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAddressBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.city_id.is_some()
+            && self.street_name.is_some()
+            && self.street_number.is_some()
+            && self.postal_code.is_some()
+            && self.geolocation.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Address` or
@@ -303,13 +314,6 @@ where
         >,
 {
     type Attributes = AddressAttribute;
-    fn is_complete(&self) -> bool {
-        self.city_id.is_some()
-            && self.street_name.is_some()
-            && self.street_number.is_some()
-            && self.postal_code.is_some()
-            && self.geolocation.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

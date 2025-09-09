@@ -134,7 +134,7 @@ impl InsertableTeam {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableTeamBuilder {
     pub(crate) id: Option<i32>,
@@ -156,21 +156,20 @@ impl From<InsertableTeamBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableTeamBuilder {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            name: Default::default(),
-            description: Default::default(),
-            icon: Default::default(),
-            color_id: Some(15i16),
-            state_id: Some(1i16),
-            parent_team_id: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
+            && self.state_id.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Team` or descendant
@@ -648,18 +647,6 @@ where
         >,
 {
     type Attributes = TeamAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_some()
-            && self.name.is_some()
-            && self.description.is_some()
-            && self.icon.is_some()
-            && self.color_id.is_some()
-            && self.state_id.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

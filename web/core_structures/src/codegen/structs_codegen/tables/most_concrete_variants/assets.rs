@@ -1,3 +1,5 @@
+mod builder;
+pub use builder::AssetBuilderDAG;
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum representing the most concrete variant of the `assets` table DAG.
@@ -22,22 +24,22 @@
 /// v14@{shape: rect, label: "volume_measuring_devices"}
 /// v15@{shape: rect, label: "volumetric_containers"}
 /// v16@{shape: rect, label: "weighing_devices"}
-/// v16 --->|"`extends`"| v9
-/// v9 --->|"`extends`"| v0
-/// v15 --->|"`extends`"| v4
-/// v5 --->|"`extends`"| v0
-/// v6 --->|"`extends`"| v9
-/// v2 --->|"`extends`"| v9
-/// v11 --->|"`extends`"| v9
-/// v8 --->|"`extends`"| v9
-/// v4 --->|"`extends`"| v9
-/// v12 --->|"`extends`"| v5
-/// v13 --->|"`extends`"| v5
-/// v3 --->|"`extends`"| v9
-/// v7 --->|"`extends`"| v9
-/// v10 --->|"`extends`"| v9
 /// v1 --->|"`extends`"| v9
+/// v7 --->|"`extends`"| v9
+/// v6 --->|"`extends`"| v9
+/// v4 --->|"`extends`"| v9
+/// v11 --->|"`extends`"| v9
 /// v14 --->|"`extends`"| v9
+/// v5 --->|"`extends`"| v0
+/// v10 --->|"`extends`"| v9
+/// v3 --->|"`extends`"| v9
+/// v8 --->|"`extends`"| v9
+/// v9 --->|"`extends`"| v0
+/// v13 --->|"`extends`"| v5
+/// v16 --->|"`extends`"| v9
+/// v15 --->|"`extends`"| v4
+/// v2 --->|"`extends`"| v9
+/// v12 --->|"`extends`"| v5
 /// ```
 pub enum AssetDAG {
     /// Variant representing the `assets` table.

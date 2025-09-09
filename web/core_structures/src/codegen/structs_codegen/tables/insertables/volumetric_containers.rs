@@ -96,7 +96,7 @@ impl InsertableVolumetricContainer {
         crate::VolumetricContainerModel::read(self.volumetric_container_model, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableVolumetricContainerBuilder<
     Container = crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
@@ -116,6 +116,17 @@ impl From<InsertableVolumetricContainerBuilder>
 {
     fn from(builder: InsertableVolumetricContainerBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Container> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerBuilder<
+        Container,
+    >
+where
+    Container: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.volumetric_container_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -187,9 +198,9 @@ impl<
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
     /// class v2 column-of-interest
     /// end
+    /// v1 --->|"`ancestral same as`"| v3
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`inferred ancestral same as`"| v1
-    /// v1 --->|"`ancestral same as`"| v3
     /// v2 --->|"`ancestral same as`"| v3
     /// v2 -.->|"`inferred ancestral same as`"| v0
     /// v2 -.->|"`inferred ancestral same as`"| v1
@@ -449,11 +460,11 @@ where
     ///    v1@{shape: rounded, label: "volumetric_container_model"}
     ///class v1 directly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v3 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v3
+    ///v3 --->|"`extends`"| v4
     ///```
     fn container_model(
         self,
@@ -506,14 +517,14 @@ where
     ///class v1 directly-involved-column
     ///end
     ///v0 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v7 --->|"`extends`"| v5
-    ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v6
     ///```
     fn model(
         self,
@@ -554,9 +565,6 @@ where
     Container: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
     type Attributes = VolumetricContainerAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.volumetric_container_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

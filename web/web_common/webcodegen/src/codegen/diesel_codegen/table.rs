@@ -30,7 +30,7 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_content = table.to_schema(conn)?;
-            std::fs::write(&table_file, self.beautify_code(&table_content)?)?;
+            std::fs::write(&table_file, self.beautify_code(&table_content))?;
 
             table_main_module.extend(quote::quote! {
                 pub mod #table_identifier;
@@ -38,7 +38,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_main_module))?;
 
         Ok(())
     }

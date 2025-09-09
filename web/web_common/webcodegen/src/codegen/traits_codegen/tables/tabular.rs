@@ -85,7 +85,7 @@ impl Codegen<'_> {
                             #table_primary_keys_enum_path::#struct_ident(#primary_key)
                         }
                     }
-                })?,
+                }),
             )?;
 
             table_tabular_main_module.extend(quote::quote! {
@@ -94,7 +94,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_tabular_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_tabular_main_module))?;
 
         Ok(())
     }

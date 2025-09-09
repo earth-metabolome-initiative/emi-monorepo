@@ -58,7 +58,7 @@ impl InsertableUserEmail {
         crate::User::read(self.created_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserEmailBuilder {
     pub(crate) email: Option<String>,
@@ -73,14 +73,14 @@ impl From<InsertableUserEmailBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableUserEmailBuilder {
-    fn default() -> Self {
-        Self {
-            email: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            primary_email: Some(true),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserEmailBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.email.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.primary_email.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `UserEmail` or
@@ -268,12 +268,6 @@ where
         >,
 {
     type Attributes = UserEmailAttribute;
-    fn is_complete(&self) -> bool {
-        self.email.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.primary_email.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

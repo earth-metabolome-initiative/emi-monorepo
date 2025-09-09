@@ -121,7 +121,7 @@ impl InsertableCommercialCapModel {
             .first::<crate::AssetModel>(conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCommercialCapModelBuilder<
     CapModel
@@ -144,6 +144,21 @@ impl From<InsertableCommercialCapModelBuilder>
 {
     fn from(builder: InsertableCommercialCapModelBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<CapModel, CommercialProduct> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelBuilder<
+        CapModel,
+        CommercialProduct,
+    >
+where
+    CapModel: common_traits::builder::IsCompleteBuilder,
+    CommercialProduct: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.commercial_cap_models_id_fkey.is_complete()
+            && self.commercial_cap_models_id_fkey1.is_complete()
+            && self.cap_model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `CommercialCapModel`
@@ -208,9 +223,9 @@ impl<
     ///    v1@{shape: rounded, label: "parent_model"}
     /// class v1 directly-involved-column
     /// end
+    /// v1 --->|"`ancestral same as`"| v2
     /// v0 --->|"`ancestral same as`"| v2
     /// v0 -.->|"`inferred ancestral same as`"| v1
-    /// v1 --->|"`ancestral same as`"| v2
     /// v5 --->|"`extends`"| v3
     /// ```
     fn cap_model(
@@ -500,9 +515,9 @@ where
     ///    v0@{shape: rounded, label: "parent_model"}
     ///class v0 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(
@@ -559,11 +574,6 @@ where
     CommercialProduct: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     type Attributes = CommercialCapModelAttribute;
-    fn is_complete(&self) -> bool {
-        self.commercial_cap_models_id_fkey.is_complete()
-            && self.commercial_cap_models_id_fkey1.is_complete()
-            && self.cap_model.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -59,7 +59,7 @@ pub struct InsertableLoginProvider {
     pub(crate) scope: String,
 }
 impl InsertableLoginProvider {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableLoginProviderBuilder {
     pub(crate) name: Option<String>,
@@ -74,6 +74,18 @@ impl From<InsertableLoginProviderBuilder>
 {
     fn from(builder: InsertableLoginProviderBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.icon.is_some()
+            && self.client_id.is_some()
+            && self.redirect_uri.is_some()
+            && self.oauth_url.is_some()
+            && self.scope.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `LoginProvider` or
@@ -373,14 +385,6 @@ where
         >,
 {
     type Attributes = LoginProviderAttribute;
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-            && self.icon.is_some()
-            && self.client_id.is_some()
-            && self.redirect_uri.is_some()
-            && self.oauth_url.is_some()
-            && self.scope.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

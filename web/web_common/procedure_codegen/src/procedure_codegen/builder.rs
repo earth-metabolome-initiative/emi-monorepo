@@ -1,7 +1,10 @@
 //! Submodule providing implementations for the procedure code generation.
 use std::{fmt::Display, path::Path};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 use webcodegen::TableExtensionNetwork;
 
 use crate::procedure_codegen::ProcedureCodegen;
@@ -127,14 +130,16 @@ impl core::error::Error for ProcedureCodegenBuilderError {
     }
 }
 
+impl<'a> IsCompleteBuilder for ProcedureCodegenBuilder<'a> {
+    fn is_complete(&self) -> bool {
+        self.output_directory.is_some() && self.extension_network.is_some()
+    }
+}
+
 impl<'a> Builder for ProcedureCodegenBuilder<'a> {
     type Attribute = ProcedureCodegenAttribute;
     type Error = ProcedureCodegenBuilderError;
     type Object = ProcedureCodegen<'a>;
-
-    fn is_complete(&self) -> bool {
-        self.output_directory.is_some() && self.extension_network.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ProcedureCodegen {

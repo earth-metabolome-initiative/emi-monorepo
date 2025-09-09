@@ -172,7 +172,7 @@ impl InsertableProcedure {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableProcedureBuilder {
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,
@@ -192,19 +192,17 @@ impl From<InsertableProcedureBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProcedureBuilder {
-    fn default() -> Self {
-        Self {
-            procedure: Some(rosetta_uuid::Uuid::new_v4()),
-            procedure_template: Default::default(),
-            parent_procedure: Default::default(),
-            parent_procedure_template: Default::default(),
-            most_concrete_table: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_some()
+            && self.procedure_template.is_some()
+            && self.most_concrete_table.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Procedure` or
@@ -427,24 +425,6 @@ impl ProcedureSettable for InsertableProcedureBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedures.procedure_template` column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "parent_procedure_template"}
-    /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 -.->|"`foreign defines`"| v0
-    /// ```
     fn procedure_template(
         mut self,
         procedure_template: i32,
@@ -502,24 +482,6 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     }
     /// Sets the value of the `public.procedures.parent_procedure_template`
     /// column.
-    ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
-    ///
-    /// ## Mermaid illustration
-    ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "parent_procedure_template"}
-    /// class v0 column-of-interest
-    /// v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 directly-involved-column
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v0 -.->|"`foreign defines`"| v1
-    /// ```
     fn parent_procedure_template(
         mut self,
         parent_procedure_template: Option<i32>,
@@ -654,15 +616,6 @@ where
         >,
 {
     type Attributes = ProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_some()
-            && self.procedure_template.is_some()
-            && self.most_concrete_table.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

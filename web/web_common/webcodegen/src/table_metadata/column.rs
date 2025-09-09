@@ -1658,6 +1658,11 @@ impl Column {
             if !foreign_key.includes_foreign_primary_key(conn)? {
                 continue;
             }
+            if foreign_table.primary_key_columns(conn)?.len()
+                == foreign_key.foreign_columns(conn)?.len()
+            {
+                continue;
+            }
             if foreign_key.is_same_as_constraint(conn)?.is_some() {
                 foreign_definer_constraints.push(foreign_key.clone());
             }
@@ -1681,6 +1686,16 @@ impl Column {
         Ok(foreign_definer_constraints_by_table)
     }
 
+    /// Returns the set of columns which are uniquely defined by values
+    /// associated with the foreign table associated with the column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub(crate) fn foreign_defined_columns(
         &self,
         conn: &mut PgConnection,
@@ -1692,6 +1707,32 @@ impl Column {
             );
         }
         Ok(foreign_defined_columns)
+    }
+
+    /// Returns the set of columns which uniquely define the current column.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn foreign_definer_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut foreign_definer_columns = Vec::new();
+        let table = self.table(conn)?;
+        for column in table.columns(conn)?.iter() {
+            if column == self {
+                continue;
+            }
+            if column.foreign_defined_columns(conn)?.contains(self) {
+                foreign_definer_columns.push(column.clone());
+            }
+        }
+        Ok(foreign_definer_columns)
     }
 
     /// Returns the ancestral same-as columns for the column, if any.

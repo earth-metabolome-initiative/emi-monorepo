@@ -3,7 +3,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::IsCompleteBuilder,
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     errors::NodeError,
@@ -88,14 +91,16 @@ impl Display for GenericNodeAttribute {
     }
 }
 
+impl IsCompleteBuilder for GenericNodeBuilder {
+    fn is_complete(&self) -> bool {
+        self.id.is_some() && self.label.is_some()
+    }
+}
+
 impl Builder for GenericNodeBuilder {
     type Attribute = GenericNodeAttribute;
     type Error = NodeError<Self::Attribute>;
     type Object = GenericNode;
-
-    fn is_complete(&self) -> bool {
-        self.id.is_some() && self.label.is_some()
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let id = self.id.ok_or(BuilderError::IncompleteBuild(GenericNodeAttribute::Id))?;

@@ -1,8 +1,8 @@
 mod asset_models;
-pub use asset_models::AssetModelDAG;
+pub use asset_models::{AssetModelBuilderDAG, AssetModelDAG};
 mod assets;
-pub use assets::AssetDAG;
+pub use assets::{AssetBuilderDAG, AssetDAG};
 mod procedure_templates;
-pub use procedure_templates::ProcedureTemplateDAG;
+pub use procedure_templates::{ProcedureTemplateBuilderDAG, ProcedureTemplateDAG};
 mod procedures;
-pub use procedures::ProcedureDAG;
+pub use procedures::{ProcedureBuilderDAG, ProcedureDAG};

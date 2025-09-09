@@ -618,7 +618,7 @@ impl Codegen<'_> {
 
                     #try_insert
 				}
-			})?)?;
+			}))?;
 
             ifvb_main_module.extend(quote::quote! {
                 mod #table_ident;
@@ -626,7 +626,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&ifvb_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&ifvb_main_module))?;
 
         Ok(())
     }

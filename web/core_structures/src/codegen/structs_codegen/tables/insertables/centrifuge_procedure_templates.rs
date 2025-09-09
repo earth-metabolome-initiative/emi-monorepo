@@ -237,7 +237,7 @@ impl InsertableCentrifugeProcedureTemplate {
         )
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCentrifugeProcedureTemplateBuilder<
     ProcedureTemplate
@@ -266,22 +266,24 @@ impl From<InsertableCentrifugeProcedureTemplateBuilder>
         Self::Builder(builder)
     }
 }
-impl<ProcedureTemplate> Default for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate>
+impl<ProcedureTemplate> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
 where
-    ProcedureTemplate: Default,
+    ProcedureTemplate: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: common_traits::builder::IsCompleteBuilder,
 {
-    fn default() -> Self {
-        Self {
-            procedure_template: Default::default(),
-            kelvin: Some(293.15f32),
-            kelvin_tolerance_percentage: Some(1f32),
-            seconds: Some(120f32),
-            rotation_per_minute: Some(13000f32),
-            centrifuged_with_model: Default::default(),
-            procedure_template_centrifuged_with_model: Default::default(),
-            centrifuged_container_model: Default::default(),
-            procedure_template_centrifuged_container_model: Default::default(),
-        }
+    fn is_complete(&self) -> bool {
+        self.procedure_template.is_complete() && self.kelvin.is_some()
+            && self.kelvin_tolerance_percentage.is_some() && self.seconds.is_some()
+            && self.rotation_per_minute.is_some()
+            && (self.centrifuged_with_model.is_some()
+                || self.procedure_template_centrifuged_with_model.is_complete())
+            && self.procedure_template_centrifuged_with_model.is_complete()
+            && (self.centrifuged_container_model.is_some()
+                || self.procedure_template_centrifuged_container_model.is_complete())
+            && self.procedure_template_centrifuged_container_model.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -655,28 +657,23 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`centrifuge_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// subgraph v4 ["`centrifuge_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "centrifuged_with_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
-    ///    v0@{shape: rounded, label: "centrifuged_container_model"}
-    /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
-    /// class v1 column-of-interest
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// subgraph v6 ["`procedure_template_asset_models`"]
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
-    /// end
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v5 ---o|"`associated with`"| v6
+    /// v0 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn centrifuged_with_model(
         mut self,
@@ -804,28 +801,23 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`centrifuge_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "centrifuged_with_model"}
+    /// subgraph v4 ["`centrifuge_procedure_templates`"]
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_container_model"}
     /// class v0 column-of-interest
     /// end
-    /// subgraph v6 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
-    ///    v4@{shape: rounded, label: "id"}
-    /// class v4 undirectly-involved-column
+    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
+    /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 --->|"`associated same as`"| v4
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v5 ---o|"`associated with`"| v6
+    /// v0 --->|"`associated same as`"| v2
+    /// v4 ---o|"`associated with`"| v5
     /// ```
     fn centrifuged_container_model(
         mut self,
@@ -867,10 +859,10 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "centrifuged_container_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -878,10 +870,10 @@ impl<ProcedureTemplate> CentrifugeProcedureTemplateSettable
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_centrifuged_container_model<PTCCM>(
@@ -1160,15 +1152,6 @@ where
     >,
 {
     type Attributes = CentrifugeProcedureTemplateAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure_template.is_complete() && self.kelvin.is_some()
-            && self.kelvin_tolerance_percentage.is_some() && self.seconds.is_some()
-            && self.rotation_per_minute.is_some()
-            && self.centrifuged_with_model.is_some()
-            && self.procedure_template_centrifuged_with_model.is_complete()
-            && self.centrifuged_container_model.is_some()
-            && self.procedure_template_centrifuged_container_model.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

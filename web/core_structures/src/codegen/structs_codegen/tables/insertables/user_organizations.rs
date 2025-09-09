@@ -58,11 +58,18 @@ impl InsertableUserOrganization {
         crate::User::read(self.user_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableUserOrganizationBuilder {
     pub(crate) user_id: Option<i32>,
     pub(crate) organization_id: Option<i16>,
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.user_id.is_some() && self.organization_id.is_some()
+    }
 }
 /// Trait defining setters for attributes of an instance of `UserOrganization`
 /// or descendant tables.
@@ -152,9 +159,6 @@ where
         >,
 {
     type Attributes = UserOrganizationAttribute;
-    fn is_complete(&self) -> bool {
-        self.user_id.is_some() && self.organization_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

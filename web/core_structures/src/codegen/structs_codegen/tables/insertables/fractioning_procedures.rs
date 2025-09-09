@@ -454,7 +454,7 @@ impl InsertableFractioningProcedure {
         crate::WeighingDevice::read(weighed_with, conn).map(Some)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableFractioningProcedureBuilder<
     Procedure = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -489,6 +489,37 @@ impl From<InsertableFractioningProcedureBuilder>
 {
     fn from(builder: InsertableFractioningProcedureBuilder) -> Self {
         Self::Builder(builder)
+    }
+}
+impl<Procedure> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder<
+        Procedure,
+    >
+where
+    Procedure: common_traits::builder::IsCompleteBuilder,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
+        common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.procedure.is_complete()
+            && self.procedure_template.is_some()
+            && (self.fragment_container.is_some()
+                || self.procedure_fragment_container.is_complete())
+            && (self.procedure_template_fragment_container_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_fragment_container.is_complete())
+            && self.procedure_fragment_container.is_complete()
+            && (self.fragment_placed_into.is_some()
+                || self.procedure_fragment_placed_into.is_complete())
+            && (self.procedure_template_fragment_placed_into_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_fragment_placed_into.is_complete())
+            && self.procedure_fragment_placed_into.is_complete()
+            && self.kilograms.is_some()
+            && (self.procedure_template_weighed_with_model.is_some()
+                || self.procedure_template.is_some()
+                || self.procedure_weighed_with.is_complete())
+            && self.procedure_weighed_with.is_complete()
     }
 }
 /// Trait defining setters for attributes of an instance of
@@ -808,14 +839,14 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`fractioning_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v3 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
-    /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_fragment_placed_into_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
+    /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "procedure_template_asset_model"}
@@ -825,13 +856,13 @@ impl<
     ///    v4@{shape: rounded, label: "procedure_template"}
     /// class v4 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
+    /// v2 --->|"`associated same as`"| v5
     /// v0 --->|"`ancestral same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v3
-    /// v2 --->|"`associated same as`"| v5
+    /// v1 --->|"`associated same as`"| v5
+    /// v3 --->|"`associated same as`"| v5
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -872,10 +903,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -921,22 +952,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_fragment_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_fragment_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_fragment_container_model(
@@ -976,28 +1007,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`fractioning_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_fragment_container"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "fragment_container"}
     /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_fragment_container_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_fragment_container"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_fragment_container<PFC>(
@@ -1104,10 +1135,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_fragment_placed_into"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "fragment_placed_into"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_fragment_placed_into"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1115,11 +1146,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn fragment_placed_into(
@@ -1159,10 +1190,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_fragment_placed_into"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_fragment_placed_into_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_fragment_placed_into"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1170,11 +1201,11 @@ impl<
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_fragment_placed_into_model(
@@ -1214,23 +1245,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`fractioning_procedures`"]
-    ///    v0@{shape: rounded, label: "fragment_placed_into"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_fragment_placed_into_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "fragment_placed_into"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_fragment_placed_into"}
     /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
@@ -1365,10 +1396,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`fractioning_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_weighed_with"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "weighed_with"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_weighed_with"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1376,11 +1407,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn weighed_with(
@@ -1426,10 +1457,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1474,12 +1505,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`fractioning_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_weighed_with"}
-    /// class v1 column-of-interest
-    ///    v2@{shape: rounded, label: "weighed_with"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "weighed_with"}
+    /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_weighed_with"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
@@ -1489,13 +1520,13 @@ impl<
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_weighed_with<PWW>(
@@ -1800,19 +1831,6 @@ where
         web_common_traits::database::TryInsertGeneric<C>,
 {
     type Attributes = FractioningProcedureAttribute;
-    fn is_complete(&self) -> bool {
-        self.procedure.is_complete()
-            && self.procedure_template.is_some()
-            && self.fragment_container.is_some()
-            && self.procedure_template_fragment_container_model.is_some()
-            && self.procedure_fragment_container.is_complete()
-            && self.fragment_placed_into.is_some()
-            && self.procedure_template_fragment_placed_into_model.is_some()
-            && self.procedure_fragment_placed_into.is_complete()
-            && self.kilograms.is_some()
-            && self.procedure_template_weighed_with_model.is_some()
-            && self.procedure_weighed_with.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

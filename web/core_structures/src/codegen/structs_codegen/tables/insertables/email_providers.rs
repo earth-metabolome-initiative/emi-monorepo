@@ -58,11 +58,18 @@ impl InsertableEmailProvider {
         crate::LoginProvider::read(self.login_provider_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableEmailProviderBuilder {
     pub(crate) email_id: Option<i32>,
     pub(crate) login_provider_id: Option<i16>,
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableEmailProviderBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.email_id.is_some() && self.login_provider_id.is_some()
+    }
 }
 /// Trait defining setters for attributes of an instance of `EmailProvider` or
 /// descendant tables.
@@ -149,9 +156,6 @@ where
         >,
 {
     type Attributes = EmailProviderAttribute;
-    fn is_complete(&self) -> bool {
-        self.email_id.is_some() && self.login_provider_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

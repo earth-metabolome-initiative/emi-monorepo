@@ -2,16 +2,27 @@
 //! rows.
 use std::{convert::Infallible, str::FromStr};
 
-use common_traits::prelude::BuilderError;
+use common_traits::{builder::IsCompleteBuilder, prelude::BuilderError};
 use generic_backend_request_errors::GenericBackendRequestError;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Deserialize, serde::Serialize,
+)]
 /// Enumeration defining either an identifier or a builder.
 pub enum IdOrBuilder<Id, Builder> {
     /// An identifier.
     Id(Id),
     /// A builder.
     Builder(Builder),
+}
+
+impl<Id, B: IsCompleteBuilder> IsCompleteBuilder for IdOrBuilder<Id, B> {
+    fn is_complete(&self) -> bool {
+        match self {
+            IdOrBuilder::Id(_) => true,
+            IdOrBuilder::Builder(builder) => builder.is_complete(),
+        }
+    }
 }
 
 impl<Id, B: Default> Default for IdOrBuilder<Id, B> {

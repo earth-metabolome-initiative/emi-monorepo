@@ -78,7 +78,7 @@ impl InsertableOrganismTaxon {
         crate::Taxon::read(self.taxon_id, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganismTaxonBuilder {
     pub(crate) created_by: Option<i32>,
@@ -86,14 +86,14 @@ pub struct InsertableOrganismTaxonBuilder {
     pub(crate) organism_id: Option<::rosetta_uuid::Uuid>,
     pub(crate) taxon_id: Option<i32>,
 }
-impl Default for InsertableOrganismTaxonBuilder {
-    fn default() -> Self {
-        Self {
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            organism_id: Default::default(),
-            taxon_id: Default::default(),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.organism_id.is_some()
+            && self.taxon_id.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `OrganismTaxon` or
@@ -256,12 +256,6 @@ where
         >,
 {
     type Attributes = OrganismTaxonAttribute;
-    fn is_complete(&self) -> bool {
-        self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.organism_id.is_some()
-            && self.taxon_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,

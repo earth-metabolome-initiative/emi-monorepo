@@ -76,7 +76,7 @@ impl InsertableDocument {
         crate::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableDocumentBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
@@ -93,16 +93,16 @@ impl From<InsertableDocumentBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableDocumentBuilder {
-    fn default() -> Self {
-        Self {
-            id: Some(rosetta_uuid::Uuid::new_v4()),
-            mime_type: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableDocumentBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_some()
+            && self.mime_type.is_some()
+            && self.created_by.is_some()
+            && self.created_at.is_some()
+            && self.updated_by.is_some()
+            && self.updated_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Document` or
@@ -390,14 +390,6 @@ where
         >,
 {
     type Attributes = DocumentAttribute;
-    fn is_complete(&self) -> bool {
-        self.id.is_some()
-            && self.mime_type.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
