@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use crate::{
-    shared::generic_configuration::{Direction, Renderer},
+    shared::generic_configuration::{Direction, Renderer, Theme},
     traits::ConfigurationBuilder,
 };
 
@@ -16,8 +16,11 @@ pub trait Configuration: Default + Display {
     fn title(&self) -> Option<&str>;
 
     /// Returns the renderer to use for the diagram.
-    fn renderer(&self) -> &Renderer;
+    fn renderer(&self) -> Renderer;
 
     /// Returns the direction of the flowchart.
-    fn direction(&self) -> &Direction;
+    fn direction(&self) -> Direction;
+
+    /// Returns the theme to use for the diagram.
+    fn theme(&self) -> Theme;
 }

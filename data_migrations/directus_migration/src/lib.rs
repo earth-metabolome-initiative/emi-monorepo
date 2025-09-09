@@ -1,9 +1,9 @@
 mod codegen;
 mod migrations;
 use diesel::{Connection, PgConnection};
+use web_common_traits::database::BoundedRead;
 
 use crate::codegen::FieldDatum;
-use web_common_traits::database::BoundedRead;
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
 const DIRECTUS_DATABASE_PASSWORD: &str = "directus_dbgi";
@@ -48,7 +48,8 @@ pub fn directus_migration(
 //     let mut directus_conn = PgConnection::establish(DIRECTUS_DATABASE_URL)?;
 //     let mut portal_conn = PgConnection::establish(PORTAL_DATABASE_URL)?;
 
-//     portal_conn.transaction(|portal_conn| transact_migration(&mut directus_conn, portal_conn))?;
+//     portal_conn.transaction(|portal_conn| transact_migration(&mut
+// directus_conn, portal_conn))?;
 
 //     Ok(())
 // }

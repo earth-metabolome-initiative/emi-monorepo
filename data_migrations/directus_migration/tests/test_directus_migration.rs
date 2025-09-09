@@ -2,8 +2,7 @@
 //! reference docker and populated with the `init_migration`.
 
 use core_structures::LoginProvider;
-use directus_migration::directus_connection;
-use directus_migration::directus_migration;
+use directus_migration::{directus_connection, directus_migration};
 use init_db::init_database;
 use init_migration::{init_dbgi_plan, init_migration, init_root_user};
 use reference_docker::reference_docker_with_connection;
@@ -16,7 +15,8 @@ const DATABASE_PORT: u16 = 12132;
 async fn test_directus_migration() {
     dotenvy::from_path("../../web/.env_develop").unwrap();
 
-    let mut directus_conn = directus_connection().expect("Failed to connect to the Directus database");
+    let mut directus_conn =
+        directus_connection().expect("Failed to connect to the Directus database");
 
     // Get the output directory
     let (docker, mut portal_conn) = reference_docker_with_connection(DATABASE_NAME, DATABASE_PORT)
@@ -31,7 +31,6 @@ async fn test_directus_migration() {
 
     // We try to populate the DB with the init initialization
     if let Err(err) = directus_migration(&mut directus_conn, &mut portal_conn) {
-     
         docker.stop().await.expect("Failed to stop the docker container");
         panic!("Failed to execute the Directus migration: {err}");
     }

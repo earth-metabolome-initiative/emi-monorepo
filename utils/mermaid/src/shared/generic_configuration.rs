@@ -8,6 +8,8 @@ use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 pub use renderers::Renderer;
 mod direction;
 pub use direction::Direction;
+mod theme;
+pub use theme::Theme;
 
 use crate::{
     errors::ConfigError,
@@ -24,6 +26,8 @@ pub struct GenericConfiguration {
     renderer: Renderer,
     /// The direction of the flowchart.
     direction: Direction,
+    /// The theme to use for the diagram.
+    theme: Theme,
 }
 
 impl Configuration for GenericConfiguration {
@@ -33,12 +37,16 @@ impl Configuration for GenericConfiguration {
         self.title.as_deref()
     }
 
-    fn renderer(&self) -> &Renderer {
-        &self.renderer
+    fn renderer(&self) -> Renderer {
+        self.renderer
     }
 
-    fn direction(&self) -> &Direction {
-        &self.direction
+    fn direction(&self) -> Direction {
+        self.direction
+    }
+
+    fn theme(&self) -> Theme {
+        self.theme
     }
 }
 
@@ -50,6 +58,7 @@ impl Display for GenericConfiguration {
         }
         writeln!(f, "config:")?;
         writeln!(f, "  layout: {}", self.renderer)?;
+        writeln!(f, "  theme: {}", self.theme)?;
         writeln!(f, "---")?;
 
         Ok(())
@@ -66,6 +75,8 @@ pub struct GenericConfigurationBuilder {
     renderer: Renderer,
     /// The direction of the flowchart.
     direction: Direction,
+    /// The theme to use for the diagram.
+    theme: Theme,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -77,6 +88,8 @@ pub enum GenericConfigurationAttribute {
     Renderer,
     /// Direction of the flowchart.
     Direction,
+    /// Theme of the diagram.
+    Theme,
 }
 
 impl Display for GenericConfigurationAttribute {
@@ -85,6 +98,7 @@ impl Display for GenericConfigurationAttribute {
             GenericConfigurationAttribute::Title => write!(f, "title"),
             GenericConfigurationAttribute::Renderer => write!(f, "renderer"),
             GenericConfigurationAttribute::Direction => write!(f, "direction"),
+            GenericConfigurationAttribute::Theme => write!(f, "theme"),
         }
     }
 }
@@ -105,6 +119,7 @@ impl Builder for GenericConfigurationBuilder {
             title: self.title,
             renderer: self.renderer,
             direction: self.direction,
+            theme: self.theme,
         })
     }
 }
