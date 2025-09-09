@@ -10,6 +10,8 @@ mod direction;
 pub use direction::Direction;
 mod theme;
 pub use theme::Theme;
+mod look;
+pub use look::Look;
 
 use crate::{
     errors::ConfigError,
@@ -28,6 +30,8 @@ pub struct GenericConfiguration {
     direction: Direction,
     /// The theme to use for the diagram.
     theme: Theme,
+    /// The look to use for the diagram.
+    look: Look,
 }
 
 impl Configuration for GenericConfiguration {
@@ -48,6 +52,10 @@ impl Configuration for GenericConfiguration {
     fn theme(&self) -> Theme {
         self.theme
     }
+
+    fn look(&self) -> Look {
+        self.look
+    }
 }
 
 impl Display for GenericConfiguration {
@@ -59,6 +67,7 @@ impl Display for GenericConfiguration {
         writeln!(f, "config:")?;
         writeln!(f, "  layout: {}", self.renderer)?;
         writeln!(f, "  theme: {}", self.theme)?;
+        writeln!(f, "  look: {}", self.look)?;
         writeln!(f, "---")?;
 
         Ok(())
@@ -77,6 +86,8 @@ pub struct GenericConfigurationBuilder {
     direction: Direction,
     /// The theme to use for the diagram.
     theme: Theme,
+    /// The look to use for the diagram.
+    look: Look,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -90,15 +101,18 @@ pub enum GenericConfigurationAttribute {
     Direction,
     /// Theme of the diagram.
     Theme,
+    /// Look of the diagram.
+    Look,
 }
 
 impl Display for GenericConfigurationAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenericConfigurationAttribute::Title => write!(f, "title"),
-            GenericConfigurationAttribute::Renderer => write!(f, "renderer"),
-            GenericConfigurationAttribute::Direction => write!(f, "direction"),
-            GenericConfigurationAttribute::Theme => write!(f, "theme"),
+            Self::Title => write!(f, "title"),
+            Self::Renderer => write!(f, "renderer"),
+            Self::Direction => write!(f, "direction"),
+            Self::Theme => write!(f, "theme"),
+            Self::Look => write!(f, "look"),
         }
     }
 }
@@ -120,6 +134,7 @@ impl Builder for GenericConfigurationBuilder {
             renderer: self.renderer,
             direction: self.direction,
             theme: self.theme,
+            look: self.look,
         })
     }
 }

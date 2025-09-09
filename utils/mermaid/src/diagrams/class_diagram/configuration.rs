@@ -9,7 +9,7 @@ pub use builder::{ClassDiagramConfigurationAttribute, ClassDiagramConfigurationB
 use crate::{
     shared::{
         Direction, Renderer,
-        generic_configuration::{GenericConfiguration, Theme},
+        generic_configuration::{GenericConfiguration, Look, Theme},
     },
     traits::Configuration,
 };
@@ -56,5 +56,9 @@ impl Configuration for ClassDiagramConfiguration {
 
     fn theme(&self) -> Theme {
         self.generic.theme()
+    }
+
+    fn look(&self) -> Look {
+        self.generic.look()
     }
 }

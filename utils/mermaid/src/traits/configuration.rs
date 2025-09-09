@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use crate::{
-    shared::generic_configuration::{Direction, Renderer, Theme},
+    shared::generic_configuration::{Direction, Look, Renderer, Theme},
     traits::ConfigurationBuilder,
 };
 
@@ -23,4 +23,7 @@ pub trait Configuration: Default + Display {
 
     /// Returns the theme to use for the diagram.
     fn theme(&self) -> Theme;
+
+    /// Returns the look to use for the diagram.
+    fn look(&self) -> Look;
 }

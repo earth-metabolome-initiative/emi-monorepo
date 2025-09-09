@@ -4,6 +4,7 @@ use std::fmt::Display;
 
 #[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// The themes enumeration to use for rendering a Mermaid diagram.
 pub enum Theme {
     /// The classic Mermaid chart theme.
     MermaidChart,
