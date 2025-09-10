@@ -21,6 +21,7 @@ The `up.sql` should contain the SQL commands to create the new procedure templat
 
 
 
+
 ## Notes
 
 Here is a list of reserved and non-reserved words in the database that should not be used as identifiers for tables or columns.

@@ -64,7 +64,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Freezing")?
         .description("Freezing procedure template")?
         .created_by(user.id)?
-        .procedure_template_frozen_container_model(cct.id)?
+        .procedure_template_frozen_container_model(cct)?
         .procedure_template_frozen_with_model(freezer_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -72,7 +72,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .name("Freeze Drying")?
         .description("Freeze Drying procedure template")?
         .created_by(user.id)?
-        .procedure_template_freeze_dried_container_model(cct.id)?
+        .procedure_template_freeze_dried_container_model(cct)?
         .procedure_template_freeze_dried_with_model(freeze_dryer_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
@@ -83,7 +83,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .description("Falcon Storage procedure template")?
         .created_by(user.id)?
         .procedure_template_stored_into_model(cct_rack_builder(user, conn)?)?
-        .procedure_template_stored_asset_model(cct.id)?
+        .procedure_template_stored_asset_model(cct)?
         .insert(user.id, conn)?;
 
     let fractioning_procedure = FractioningProcedureTemplate::new()
@@ -92,7 +92,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .created_by(user.id)?
         .kilograms(50e-6)?
         .tolerance_percentage(5.0)?
-        .procedure_template_fragment_container_model(cct.id)?
+        .procedure_template_fragment_container_model(cct)?
         .procedure_template_fragment_placed_into_model(safelock_builder(user, conn)?)?
         .procedure_template_weighed_with_model(weighing_device_builder(user, conn)?)?
         .insert(user.id, conn)?;

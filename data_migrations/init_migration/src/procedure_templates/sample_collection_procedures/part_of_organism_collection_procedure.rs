@@ -4,8 +4,8 @@ use core_structures::{
     HarvestingProcedureTemplate, PackagingProcedureTemplate, ProcedureTemplate,
     ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
     tables::insertables::{
-        PackagingProcedureTemplateSettable, ProcedureTemplateSettable,
-        StorageProcedureTemplateSettable,
+        HarvestingProcedureTemplateSettable, PackagingProcedureTemplateSettable,
+        ProcedureTemplateSettable, StorageProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
 };
@@ -31,6 +31,7 @@ use crate::procedure_template_asset_models::{
 /// * If the procedure template building fails.
 pub(crate) fn init_part_of_organism_collection(
     user: &User,
+    organism: &ProcedureTemplateAssetModel,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
     let name = "Part of Organism Collection";
@@ -81,8 +82,10 @@ pub(crate) fn init_part_of_organism_collection(
         .name("Harvest sample")?
         .description("Harvest the cut part of the organism as a sample.")?
         .created_by(user.id)?
-        .procedure_template_harvested_from_model(sample_builder(user, conn)?)?
+        .procedure_template_sample_source_model(organism)?
+        .procedure_template_sample_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
+    let sample: i32 = sample_harvesting.procedure_template_sample_model;
 
     // Wrapping procedure with coffee filter paper
     let coffee_filter_wrapping = PackagingProcedureTemplate::new()
@@ -92,9 +95,9 @@ pub(crate) fn init_part_of_organism_collection(
         )?
         .created_by(user.id)?
         .procedure_template_packaged_with_model(coffee_wrapper_builder(user, conn)?)?
-        .procedure_template_sample_model(sample_builder(user, conn)?)?
+        .procedure_template_sample_model(sample)?
         .insert(user.id, conn)?;
-    let coffee_wrapper = coffee_filter_wrapping.procedure_template_packaged_with_model;
+    let coffee_wrapper: i32 = coffee_filter_wrapping.procedure_template_packaged_with_model;
 
     // Placing the wrapped sample in the conical centrifugal tube
     let place_in_tube = StorageProcedureTemplate::new()
