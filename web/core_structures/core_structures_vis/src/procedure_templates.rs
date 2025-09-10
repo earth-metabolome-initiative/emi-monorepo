@@ -4,7 +4,8 @@
 use std::{collections::HashMap, rc::Rc};
 
 use core_structures::{
-    NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
+    AssetModel, NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel,
 };
 use diesel::PgConnection;
 use graph::{
@@ -31,6 +32,24 @@ use web_common_traits::{
 
 use crate::MermaidDB;
 
+fn asset_model_icon(asset_model: &AssetModel) -> Option<&'static str> {
+    Some(match asset_model.most_concrete_table.as_str() {
+        "digital_asset_models" => "fa:fa-file",
+        "organism_models" => "fa:fa-bacterium",
+        "phone_models" => "fa:fa-mobile-screen-button",
+        "sample_models" => "fa:fa-vial",
+        "container_models" => "fa:fa-box",
+        "volumetric_container_models" => "fa:fa-flask-vial",
+        "packaging_models" => "fa:fa-sheet-plastic",
+        "freezer_models" => "fa:fa-snowflake",
+        "freeze_dryer_models" => "fa:fa-icicles",
+        "weighing_device_models" => "fa:fa-scale-unbalanced",
+        "bead_models" => "fa:fa-drum",
+        "pipette_models" => "fa:fa-eye-dropper",
+        _ => return None,
+    })
+}
+
 fn to_mermaid_node(
     metadata: &ProcedureTemplateMetadata,
     procedure_template_asset_model_nodes: &mut HashMap<
@@ -55,11 +74,19 @@ fn to_mermaid_node(
         for procedure_template_asset_model in
             procedure_template.procedure_template_asset_models(conn)?
         {
+            let label = if let Some(icon) =
+                asset_model_icon(&procedure_template_asset_model.asset_model(conn)?)
+            {
+                format!("{} {}", icon, procedure_template_asset_model.name)
+            } else {
+                procedure_template_asset_model.name.clone()
+            };
+
             let reference_ptam: &ProcedureTemplateAssetModel = metadata
                 .root_reference_procedure_template_asset_model(&procedure_template_asset_model);
             let (node_style_class, edge_style_class) = &ptam_classes[reference_ptam];
             let procedure_template_asset_model_node_builder = FlowchartNodeBuilder::default()
-                .label(&procedure_template_asset_model.name)?
+                .label(&label)?
                 .shape(FlowchartNodeShape::LRParallelogram)
                 .style_class(node_style_class.clone())
                 .map_err(FlowchartError::from)?;
@@ -84,7 +111,6 @@ fn to_mermaid_node(
                                 .clone(),
                         )?
                         .destination(procedure_template_asset_model_node.clone())?
-                        .label("same as")?
                         .line_style(LineStyle::Dashed)
                         .style_class(edge_style_class.clone())
                         .map_err(FlowchartError::from)?,
