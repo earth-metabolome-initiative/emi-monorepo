@@ -27,7 +27,7 @@ pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<O
     Ok(OrganismModel::new()
         .name(ORGANISM)?
         .description("Organisms used in laboratory procedures")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -51,7 +51,7 @@ pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<Sam
     Ok(SampleModel::new()
         .name(SAMPLE)?
         .description("Samples used in laboratory procedures")?
-        .sample_source_model(organism(user, conn)?.id)?
-        .created_by(user.id)?
+        .sample_source_model(organism(user, conn)?)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

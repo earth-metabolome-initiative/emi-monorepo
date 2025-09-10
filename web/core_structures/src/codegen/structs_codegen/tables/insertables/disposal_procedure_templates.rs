@@ -229,10 +229,12 @@ pub trait DisposalProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn disposed_asset_model(
+    fn disposed_asset_model<DAM>(
         self,
-        disposed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        disposed_asset_model: DAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        DAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.disposal_procedure_templates.
     /// procedure_template_disposed_asset_model` column.
@@ -303,10 +305,17 @@ impl<ProcedureTemplate> DisposalProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn disposed_asset_model(
+    fn disposed_asset_model<DAM>(
         mut self,
-        disposed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        disposed_asset_model: DAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        DAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let disposed_asset_model =
+            <DAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &disposed_asset_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_disposed_asset_model,
         ) = self.procedure_template_disposed_asset_model
@@ -488,10 +497,13 @@ for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -530,10 +542,13 @@ for InsertableDisposalProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

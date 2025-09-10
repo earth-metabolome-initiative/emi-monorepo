@@ -94,10 +94,12 @@ pub trait TeamMemberSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn team(
+    fn team<TI>(
         self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        team_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.team_members.member_id` column.
     ///
     /// # Arguments
@@ -116,26 +118,37 @@ pub trait TeamMemberSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn member(
+    fn member<MI>(
         self,
-        member_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        member_id: MI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl TeamMemberSettable for InsertableTeamMemberBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute;
     /// Sets the value of the `public.team_members.team_id` column.
-    fn team(
+    fn team<TI>(
         mut self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        team_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let team_id = <TI as web_common_traits::database::PrimaryKeyLike>::primary_key(&team_id);
         self.team_id = Some(team_id);
         Ok(self)
     }
     /// Sets the value of the `public.team_members.member_id` column.
-    fn member(
+    fn member<MI>(
         mut self,
-        member_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        member_id: MI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let member_id =
+            <MI as web_common_traits::database::PrimaryKeyLike>::primary_key(&member_id);
         self.member_id = Some(member_id);
         Ok(self)
     }

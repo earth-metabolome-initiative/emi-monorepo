@@ -68,6 +68,12 @@ impl diesel::Identifiable for CentrifugeProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CentrifugeProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl CentrifugeProcedureTemplate {
     pub fn centrifuge_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,

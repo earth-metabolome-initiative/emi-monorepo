@@ -6,15 +6,13 @@ use core_structures::{
 };
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::{
-    procedure_templates::{
-        init_data_enrichment_procedure, init_negative_ionization_lcms_procedure,
-        init_positive_ionization_lcms_procedure,
-    },
+use crate::procedure_templates::{
+    init_data_enrichment_procedure, init_negative_ionization_lcms_procedure,
+    init_positive_ionization_lcms_procedure,
 };
-mod sample_processing_procedures;
 mod organism_observation_procedure;
 mod part_of_organism_collection_procedure;
+mod sample_processing_procedures;
 use organism_observation_procedure::organism_observation_procedure;
 use part_of_organism_collection_procedure::part_of_organism_collection;
 
@@ -39,7 +37,7 @@ pub fn init_dbgi_plan(
     let dbgi_plan = ProcedureTemplate::new()
         .name(DBGI_PLAN)?
         .description("DBGI Plan procedure template")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     let (observation_procedure, organism) = organism_observation_procedure(user, conn)?;

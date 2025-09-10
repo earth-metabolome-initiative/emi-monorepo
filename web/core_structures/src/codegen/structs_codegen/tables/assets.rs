@@ -55,6 +55,12 @@ impl diesel::Identifiable for Asset {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Asset {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Asset {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

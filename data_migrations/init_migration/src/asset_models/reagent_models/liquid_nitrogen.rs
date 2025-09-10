@@ -35,6 +35,6 @@ pub(crate) fn liquid_nitrogen(
         .purity(100.0)?
         .cas_code("7727-37-9")?
         .molecular_formula("N2")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

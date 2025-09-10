@@ -35,6 +35,6 @@ pub(crate) fn absolute_ethanol(
         .purity(95.0)?
         .cas_code("64-17-5")?
         .molecular_formula("CH3CH2OH")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

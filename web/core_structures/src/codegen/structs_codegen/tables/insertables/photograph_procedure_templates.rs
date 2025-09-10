@@ -422,10 +422,12 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photographed_with_model(
+    fn photographed_with_model<PWM>(
         self,
-        photographed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photographed_with_model: PWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedure_templates.
     /// procedure_template_photographed_with_model` column.
@@ -478,10 +480,12 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photographed_asset_model(
+    fn photographed_asset_model<PAM>(
         self,
-        photographed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photographed_asset_model: PAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedure_templates.
     /// procedure_template_photographed_asset_model` column.
@@ -533,10 +537,12 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photograph_model(
+    fn photograph_model<PM>(
         self,
-        photograph_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photograph_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedure_templates.
     /// procedure_template_photograph_model` column.
@@ -607,10 +613,17 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photographed_with_model(
+    fn photographed_with_model<PWM>(
         mut self,
-        photographed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photographed_with_model: PWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let photographed_with_model =
+            <PWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &photographed_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photographed_with_model,
         ) = self.procedure_template_photographed_with_model
@@ -751,10 +764,17 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photographed_asset_model(
+    fn photographed_asset_model<PAM>(
         mut self,
-        photographed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photographed_asset_model: PAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let photographed_asset_model =
+            <PAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &photographed_asset_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photographed_asset_model,
         ) = self.procedure_template_photographed_asset_model
@@ -895,10 +915,15 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photograph_model(
+    fn photograph_model<PM>(
         mut self,
-        photograph_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photograph_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let photograph_model =
+            <PM as web_common_traits::database::PrimaryKeyLike>::primary_key(&photograph_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photograph_model,
         ) = self.procedure_template_photograph_model
@@ -1077,10 +1102,13 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1119,10 +1147,13 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

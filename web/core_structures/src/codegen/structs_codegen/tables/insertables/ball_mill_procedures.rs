@@ -809,10 +809,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.ball_mill_procedures.bead_model` column.
     ///
     /// # Arguments
@@ -831,10 +833,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn bead_model(
+    fn bead_model<BM>(
         self,
-        bead_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        bead_model: BM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        BM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.procedure_template_bead_model` column.
     ///
@@ -854,10 +858,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_bead_model(
+    fn procedure_template_bead_model<PTBM>(
         self,
-        procedure_template_bead_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_bead_model: PTBM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTBM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.ball_mill_procedures.procedure_bead`
     /// column.
     ///
@@ -908,10 +914,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn milled_with_model(
+    fn milled_with_model<MWM>(
         self,
-        milled_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        milled_with_model: MWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.procedure_template_milled_with_model`
     /// column.
@@ -933,10 +941,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_milled_with_model(
+    fn procedure_template_milled_with_model<PTMWM>(
         self,
-        procedure_template_milled_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_milled_with_model: PTMWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.procedure_milled_with` column.
     ///
@@ -987,10 +997,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn milled_with(
+    fn milled_with<MW>(
         self,
-        milled_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        milled_with: MW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.ball_mill_procedures.milled_container`
     /// column.
     ///
@@ -1011,10 +1023,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn milled_container(
+    fn milled_container<MC>(
         self,
-        milled_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        milled_container: MC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.milled_container_model` column.
     ///
@@ -1034,10 +1048,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn milled_container_model(
+    fn milled_container_model<MCM>(
         self,
-        milled_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        milled_container_model: MCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.procedure_template_milled_container_model`
     /// column.
@@ -1059,10 +1075,12 @@ pub trait BallMillProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_milled_container_model(
+    fn procedure_template_milled_container_model<PTMCM>(
         self,
-        procedure_template_milled_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_milled_container_model: PTMCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.ball_mill_procedures.procedure_milled_container` column.
     ///
@@ -1145,10 +1163,15 @@ impl<
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -1193,10 +1216,15 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn bead_model(
+    fn bead_model<BM>(
         mut self,
-        bead_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        bead_model: BM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        BM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let bead_model =
+            <BM as web_common_traits::database::PrimaryKeyLike>::primary_key(&bead_model);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_bead) =
             self.procedure_bead
         {
@@ -1247,10 +1275,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_bead_model(
+    fn procedure_template_bead_model<PTBM>(
         mut self,
-        procedure_template_bead_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_bead_model: PTBM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTBM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_bead_model =
+            <PTBM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_bead_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_bead) =
             self.procedure_bead
         {
@@ -1422,10 +1457,15 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn milled_with_model(
+    fn milled_with_model<MWM>(
         mut self,
-        milled_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        milled_with_model: MWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let milled_with_model =
+            <MWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&milled_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_with) =
             self.procedure_milled_with
         {
@@ -1478,10 +1518,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_milled_with_model(
+    fn procedure_template_milled_with_model<PTMWM>(
         mut self,
-        procedure_template_milled_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_milled_with_model: PTMWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_milled_with_model =
+            <PTMWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_milled_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_with) =
             self.procedure_milled_with
         {
@@ -1577,7 +1624,7 @@ impl<
             } else if let Some(milled_with) = self.milled_with {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(milled_with),
+                        milled_with,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1692,10 +1739,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn milled_with(
+    fn milled_with<MW>(
         mut self,
-        milled_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        milled_with: MW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let milled_with =
+            <MW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &milled_with,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_with) =
             self.procedure_milled_with
         {
@@ -1747,16 +1801,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn milled_container(
+    fn milled_container<MC>(
         mut self,
-        milled_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        milled_container: MC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let milled_container =
+            <MC as web_common_traits::database::PrimaryKeyLike>::primary_key(&milled_container);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_container) =
             self.procedure_milled_container
         {
             self.procedure_milled_container = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_milled_container,
-                    Some(milled_container),
+                    milled_container,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1802,10 +1861,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn milled_container_model(
+    fn milled_container_model<MCM>(
         mut self,
-        milled_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        milled_container_model: MCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let milled_container_model =
+            <MCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &milled_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_container) =
             self.procedure_milled_container
         {
@@ -1858,10 +1924,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_milled_container_model(
+    fn procedure_template_milled_container_model<PTMCM>(
         mut self,
-        procedure_template_milled_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_milled_container_model: PTMCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTMCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_milled_container_model =
+            <PTMCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_milled_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_milled_container) =
             self.procedure_milled_container
         {
@@ -1960,7 +2033,7 @@ impl<
             } else if let Some(milled_container) = self.milled_container {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(milled_container),
+                        milled_container,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -2063,10 +2136,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
@@ -2103,18 +2181,26 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as BallMillProcedureSettable>::procedure_template(self, procedure_template)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                 self.procedure,
                 parent_procedure,
@@ -2129,10 +2215,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
@@ -2147,10 +2236,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure` column.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                 self.procedure,
                 predecessor_procedure,
@@ -2165,10 +2259,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self.procedure,
                 predecessor_procedure_template,
@@ -2183,10 +2280,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
@@ -2225,10 +2325,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,

@@ -490,10 +490,12 @@ pub trait FractioningProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn weighed_with_model(
+    fn weighed_with_model<WWM>(
         self,
-        weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        weighed_with_model: WWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        WWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedure_templates.
     /// procedure_template_weighed_with_model` column.
@@ -547,10 +549,12 @@ pub trait FractioningProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn fragment_container_model(
+    fn fragment_container_model<FCM>(
         self,
-        fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        fragment_container_model: FCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedure_templates.
     /// procedure_template_fragment_container_model` column.
@@ -604,10 +608,12 @@ pub trait FractioningProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn fragment_placed_into_model(
+    fn fragment_placed_into_model<FPIM>(
         self,
-        fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        fragment_placed_into_model: FPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FPIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedure_templates.
     /// procedure_template_fragment_placed_into_model` column.
@@ -735,10 +741,15 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn weighed_with_model(
+    fn weighed_with_model<WWM>(
         mut self,
-        weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        weighed_with_model: WWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        WWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let weighed_with_model =
+            <WWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&weighed_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_weighed_with_model,
         ) = self.procedure_template_weighed_with_model
@@ -877,10 +888,17 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn fragment_container_model(
+    fn fragment_container_model<FCM>(
         mut self,
-        fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        fragment_container_model: FCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let fragment_container_model =
+            <FCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &fragment_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_fragment_container_model,
         ) = self.procedure_template_fragment_container_model
@@ -1022,10 +1040,17 @@ impl<ProcedureTemplate> FractioningProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn fragment_placed_into_model(
+    fn fragment_placed_into_model<FPIM>(
         mut self,
-        fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        fragment_placed_into_model: FPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FPIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let fragment_placed_into_model =
+            <FPIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &fragment_placed_into_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_fragment_placed_into_model,
         ) = self.procedure_template_fragment_placed_into_model
@@ -1210,10 +1235,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1252,10 +1280,13 @@ for InsertableFractioningProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

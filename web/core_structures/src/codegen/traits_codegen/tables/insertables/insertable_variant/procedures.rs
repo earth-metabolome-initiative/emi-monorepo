@@ -58,7 +58,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self,
-                Some(procedures.procedure_template),
+                procedures.procedure_template,
             )?;
         }
         if let Some(predecessor_procedure) = self.predecessor_procedure {
@@ -68,7 +68,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self,
-                Some(procedures.procedure_template),
+                procedures.procedure_template,
             )?;
         }
         let procedure = self

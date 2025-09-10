@@ -44,7 +44,7 @@ pub(crate) fn organism_observation_procedure(
         .description(
 			"Procedure for observing an organism, and relevant details for identification and study.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Place the colored cardboard arrow in the field pointing towards the organism
@@ -53,7 +53,7 @@ pub(crate) fn organism_observation_procedure(
         .description(
 			"Place a colored cardboard arrow in the field pointing towards the organism to facilitate its identification later.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Take a picture of organism and its panel
@@ -65,10 +65,9 @@ pub(crate) fn organism_observation_procedure(
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism and Panel Picture")?,
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
-    let organism =
-        organism_and_panel_picture.procedure_template_photographed_asset_model(conn)?;
+    let organism = organism_and_panel_picture.procedure_template_photographed_asset_model(conn)?;
     let phone = organism_and_panel_picture.procedure_template_photographed_with_model;
 
     // Take a picture of the full organism
@@ -80,7 +79,7 @@ pub(crate) fn organism_observation_procedure(
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Picture")?,
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Take a picture of details of the organism to facilitate
@@ -93,7 +92,7 @@ pub(crate) fn organism_observation_procedure(
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Details Picture")?,
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Take a picture of the part of the organism that will be
@@ -109,7 +108,7 @@ pub(crate) fn organism_observation_procedure(
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Collected Part Picture")?,
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Take a picture of the sample collection tube with a visible label
@@ -125,7 +124,7 @@ pub(crate) fn organism_observation_procedure(
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Sample Label and Panel Picture")?,
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Logging geolocation
@@ -134,7 +133,7 @@ pub(crate) fn organism_observation_procedure(
         .description("Geolocation of the organism observation.")?
         .procedure_template_geolocated_with_model(phone)?
         .procedure_template_geolocated_asset_model(&organism)?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     observation_procedure.extend(

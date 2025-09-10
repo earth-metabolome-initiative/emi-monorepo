@@ -68,6 +68,12 @@ impl diesel::Identifiable for FreezeDryingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for FreezeDryingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl FreezeDryingProcedureTemplate {
     pub fn procedure_template_freeze_dried_container_model<
         C: diesel::connection::LoadConnection,

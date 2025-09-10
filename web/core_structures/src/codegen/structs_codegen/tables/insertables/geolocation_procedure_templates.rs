@@ -326,10 +326,12 @@ pub trait GeolocationProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn geolocated_with_model(
+    fn geolocated_with_model<GWM>(
         self,
-        geolocated_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        geolocated_with_model: GWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        GWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.geolocation_procedure_templates.
     /// procedure_template_geolocated_with_model` column.
@@ -382,10 +384,12 @@ pub trait GeolocationProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn geolocated_asset_model(
+    fn geolocated_asset_model<GAM>(
         self,
-        geolocated_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        geolocated_asset_model: GAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        GAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.geolocation_procedure_templates.
     /// procedure_template_geolocated_asset_model` column.
@@ -456,10 +460,17 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn geolocated_with_model(
+    fn geolocated_with_model<GWM>(
         mut self,
-        geolocated_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        geolocated_with_model: GWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        GWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let geolocated_with_model =
+            <GWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &geolocated_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_geolocated_with_model,
         ) = self.procedure_template_geolocated_with_model
@@ -597,10 +608,17 @@ impl<ProcedureTemplate> GeolocationProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn geolocated_asset_model(
+    fn geolocated_asset_model<GAM>(
         mut self,
-        geolocated_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        geolocated_asset_model: GAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        GAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let geolocated_asset_model =
+            <GAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &geolocated_asset_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_geolocated_asset_model,
         ) = self.procedure_template_geolocated_asset_model
@@ -784,10 +802,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -826,10 +847,13 @@ for InsertableGeolocationProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

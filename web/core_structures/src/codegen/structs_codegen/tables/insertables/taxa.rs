@@ -100,10 +100,12 @@ pub trait TaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn id(
+    fn id<I>(
         self,
-        id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.taxa.name` column.
     ///
     /// # Arguments
@@ -170,21 +172,24 @@ pub trait TaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn rank(
+    fn rank<RI>(
         self,
-        rank_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        rank_id: RI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        RI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
 impl TaxonSettable for InsertableTaxonBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::TaxonAttribute;
     /// Sets the value of the `public.taxa.id` column.
-    fn id(
+    fn id<I>(
         mut self,
-        id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TaxonAttribute::Id)
-        })?;
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let id = <I as web_common_traits::database::PrimaryKeyLike>::primary_key(&id);
         self.id = Some(id);
         Ok(self)
     }
@@ -219,10 +224,14 @@ impl TaxonSettable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.rank_id` column.
-    fn rank(
+    fn rank<RI>(
         mut self,
-        rank_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        rank_id: RI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        RI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let rank_id = <RI as web_common_traits::database::PrimaryKeyLike>::primary_key(&rank_id);
         self.rank_id = Some(rank_id);
         Ok(self)
     }

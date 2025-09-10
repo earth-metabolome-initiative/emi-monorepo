@@ -1,10 +1,6 @@
 //! Submodule defining the Vinesh plan procedure template.
-use web_common_traits::database::Insertable;
-use core_structures::{ProcedureTemplate, User};
-use core_structures::tables::insertables::ProcedureTemplateSettable;
-use web_common_traits::database::InsertableVariant;
-
-
+use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// The name of the Vinesh plan procedure template.
 pub const VINESH_PLAN: &str = "Vinesh Plan";
@@ -27,7 +23,7 @@ pub fn init_vinesh_plan(
     let vinesh_plan = ProcedureTemplate::new()
         .name(VINESH_PLAN)?
         .description("Vinesh Plan procedure template")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     Ok(vinesh_plan)

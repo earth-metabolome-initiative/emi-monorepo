@@ -260,10 +260,12 @@ pub trait ProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_templates.created_at` column.
     ///
     /// # Arguments
@@ -309,10 +311,12 @@ pub trait ProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
+    fn updated_by<UB>(
         self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_templates.updated_at` column.
     ///
     /// # Arguments
@@ -441,6 +445,13 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(ProcedureTemplateAttribute::Description)
         })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
+                    )
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -451,13 +462,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
-                    )
-            })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -501,10 +505,15 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
@@ -537,10 +546,15 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
         self.updated_by = Some(updated_by);
         Ok(self)
     }

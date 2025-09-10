@@ -229,10 +229,12 @@ pub trait AssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent_model(
+    fn parent_model<PM>(
         self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_models.created_by` column.
     ///
     /// # Arguments
@@ -251,10 +253,12 @@ pub trait AssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_models.created_at` column.
     ///
     /// # Arguments
@@ -300,10 +304,12 @@ pub trait AssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
+    fn updated_by<UB>(
         self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_models.updated_at` column.
     ///
     /// # Arguments
@@ -377,6 +383,13 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::Description)
         })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
+                    )
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -387,21 +400,21 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
-                    )
-            })?;
         self.description = Some(description);
         Ok(self)
     }
     /// Sets the value of the `public.asset_models.parent_model` column.
-    fn parent_model(
+    fn parent_model<PM>(
         mut self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let parent_model =
+            <PM as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &parent_model,
+            );
         self.parent_model = parent_model;
         Ok(self)
     }
@@ -422,10 +435,15 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
@@ -458,10 +476,15 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
         self.updated_by = Some(updated_by);
         Ok(self)
     }

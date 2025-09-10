@@ -66,6 +66,12 @@ impl diesel::Identifiable for BallMillMachine {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for BallMillMachine {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl BallMillMachine {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

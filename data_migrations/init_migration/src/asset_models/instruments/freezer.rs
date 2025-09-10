@@ -29,6 +29,6 @@ pub(crate) fn freezer(user: &User, conn: &mut PgConnection) -> anyhow::Result<Fr
     Ok(FreezerModel::new()
         .name(name)?
         .description("A Freezer -80°C used for long-term storage of samples or freezing of samples prior to freeze-drying steps")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

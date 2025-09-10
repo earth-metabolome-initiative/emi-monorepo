@@ -152,10 +152,12 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn container_model(
+    fn container_model<CM>(
         self,
-        container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        container_model: CM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.container_compatibility_rules.contained_asset_model` column.
     ///
@@ -175,10 +177,12 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn contained_asset_model(
+    fn contained_asset_model<CAM>(
         self,
-        contained_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        contained_asset_model: CAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.container_compatibility_rules.quantity`
     /// column.
     ///
@@ -224,10 +228,12 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.container_compatibility_rules.created_at`
     /// column.
     ///
@@ -262,10 +268,15 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
         crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute;
     /// Sets the value of the
     /// `public.container_compatibility_rules.container_model` column.
-    fn container_model(
+    fn container_model<CM>(
         mut self,
-        container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        container_model: CM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let container_model =
+            <CM as web_common_traits::database::PrimaryKeyLike>::primary_key(&container_model);
         if let Some(contained_asset_model) = self.contained_asset_model {
             pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
@@ -281,10 +292,17 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
     }
     /// Sets the value of the
     /// `public.container_compatibility_rules.contained_asset_model` column.
-    fn contained_asset_model(
+    fn contained_asset_model<CAM>(
         mut self,
-        contained_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        contained_asset_model: CAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let contained_asset_model =
+            <CAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &contained_asset_model,
+            );
         if let Some(container_model) = self.container_model {
             pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
                 .map_err(|e| {
@@ -326,10 +344,15 @@ impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRule
     }
     /// Sets the value of the `public.container_compatibility_rules.created_by`
     /// column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self.created_by = Some(created_by);
         Ok(self)
     }

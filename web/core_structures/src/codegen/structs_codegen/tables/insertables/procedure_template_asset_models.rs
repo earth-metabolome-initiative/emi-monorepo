@@ -250,10 +250,12 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_template_asset_models.based_on`
     /// column.
     ///
@@ -273,10 +275,12 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn based_on(
+    fn based_on<BO>(
         self,
-        based_on: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        based_on: BO,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        BO: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.procedure_template_asset_models.asset_model` column.
     ///
@@ -296,10 +300,12 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn asset_model(
+    fn asset_model<AM>(
         self,
-        asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        asset_model: AM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.procedure_template_asset_models.created_by` column.
     ///
@@ -319,10 +325,12 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.procedure_template_asset_models.created_at` column.
     ///
@@ -381,10 +389,15 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
     }
     /// Sets the value of the
     /// `public.procedure_template_asset_models.procedure_template` column.
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
@@ -407,28 +420,43 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
     /// class v1 column-of-interest
     /// v1 -.->|"`foreign defines`"| v0
     /// ```
-    fn based_on(
+    fn based_on<BO>(
         mut self,
-        based_on: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        based_on: BO,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        BO: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let based_on =
+            <BO as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(&based_on);
         self.based_on = based_on;
         Ok(self)
     }
     /// Sets the value of the
     /// `public.procedure_template_asset_models.asset_model` column.
-    fn asset_model(
+    fn asset_model<AM>(
         mut self,
-        asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        asset_model: AM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let asset_model =
+            <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(&asset_model);
         self.asset_model = Some(asset_model);
         Ok(self)
     }
     /// Sets the value of the
     /// `public.procedure_template_asset_models.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self.created_by = Some(created_by);
         Ok(self)
     }

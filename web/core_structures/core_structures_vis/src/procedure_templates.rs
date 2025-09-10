@@ -18,7 +18,7 @@ use graph::{
 use mermaid::{
     FlowchartError,
     prelude::{
-        ArrowShape, Color, ConfigurationBuilder, DiagramBuilder, Direction, Flowchart,
+        ArrowShape, Color, ConfigurationBuilder, CurveStyle, DiagramBuilder, Direction, Flowchart,
         FlowchartBuilder, FlowchartConfigurationBuilder, FlowchartEdgeBuilder, FlowchartNode,
         FlowchartNodeBuilder, FlowchartNodeShape, LineStyle, Renderer, StyleClass,
         StyleClassBuilder, StyleProperty,
@@ -87,7 +87,6 @@ fn to_mermaid_node(
             let (node_style_class, edge_style_class) = &ptam_classes[reference_ptam];
             let procedure_template_asset_model_node_builder = FlowchartNodeBuilder::default()
                 .label(&label)?
-                .shape(FlowchartNodeShape::LRParallelogram)
                 .style_class(node_style_class.clone())
                 .map_err(FlowchartError::from)?;
 
@@ -112,6 +111,7 @@ fn to_mermaid_node(
                         )?
                         .destination(procedure_template_asset_model_node.clone())?
                         .line_style(LineStyle::Dashed)
+                        .curve_style(CurveStyle::Natural)
                         .style_class(edge_style_class.clone())
                         .map_err(FlowchartError::from)?,
                 )?;
@@ -151,6 +151,7 @@ fn to_mermaid_node(
             FlowchartEdgeBuilder::default()
                 .source(source_node.clone())?
                 .destination(destination_node.clone())?
+                .curve_style(CurveStyle::Natural)
                 .right_arrow_shape(ArrowShape::Normal)?,
         )?;
     }

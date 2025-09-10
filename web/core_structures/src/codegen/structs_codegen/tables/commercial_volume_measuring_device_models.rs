@@ -70,6 +70,12 @@ impl diesel::Identifiable for CommercialVolumeMeasuringDeviceModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialVolumeMeasuringDeviceModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialVolumeMeasuringDeviceModel {
     #[cfg(feature = "postgres")]
     pub fn commercial_volume_measuring_d_id_volume_measuring_device_m_fkey(

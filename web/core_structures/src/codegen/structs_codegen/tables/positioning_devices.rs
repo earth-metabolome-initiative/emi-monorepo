@@ -66,6 +66,12 @@ impl diesel::Identifiable for PositioningDevice {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PositioningDevice {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl PositioningDevice {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

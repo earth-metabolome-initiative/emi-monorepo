@@ -83,6 +83,12 @@ impl diesel::Identifiable for DigitalAssetModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for DigitalAssetModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl DigitalAssetModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

@@ -55,6 +55,12 @@ impl diesel::Identifiable for Room {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Room {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Room {
     pub fn addresses<C: diesel::connection::LoadConnection>(
         &self,

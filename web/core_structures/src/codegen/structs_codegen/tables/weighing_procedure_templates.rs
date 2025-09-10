@@ -64,6 +64,12 @@ impl diesel::Identifiable for WeighingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for WeighingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl WeighingProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,

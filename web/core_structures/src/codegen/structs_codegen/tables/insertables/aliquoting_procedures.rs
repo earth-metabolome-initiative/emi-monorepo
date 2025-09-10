@@ -887,10 +887,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.aliquoting_procedures.aliquoted_with`
     /// column.
     ///
@@ -911,10 +913,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_with(
+    fn aliquoted_with<AW>(
         self,
-        aliquoted_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_with: AW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.aliquoted_with_model` column.
     ///
@@ -934,10 +938,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_with_model(
+    fn aliquoted_with_model<AWM>(
         self,
-        aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_with_model: AWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_template_aliquoted_with_model`
     /// column.
@@ -959,10 +965,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_aliquoted_with_model(
+    fn procedure_template_aliquoted_with_model<PTAWM>(
         self,
-        procedure_template_aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_aliquoted_with_model: PTAWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_aliquoted_with` column.
     ///
@@ -1013,10 +1021,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_template_pipette_tip_model`
     /// column.
@@ -1038,10 +1048,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_pipette_tip_model(
+    fn procedure_template_pipette_tip_model<PTPTM>(
         self,
-        procedure_template_pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_pipette_tip_model: PTPTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_pipette_tip` column.
     ///
@@ -1093,10 +1105,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_from(
+    fn aliquoted_from<AF>(
         self,
-        aliquoted_from: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_from: AF,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AF: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_template_aliquoted_from_model`
     /// column.
@@ -1118,10 +1132,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_aliquoted_from_model(
+    fn procedure_template_aliquoted_from_model<PTAFM>(
         self,
-        procedure_template_aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_aliquoted_from_model: PTAFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_aliquoted_from` column.
     ///
@@ -1173,10 +1189,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_into(
+    fn aliquoted_into<AI>(
         self,
-        aliquoted_into: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_into: AI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_template_aliquoted_into_model`
     /// column.
@@ -1198,10 +1216,12 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_aliquoted_into_model(
+    fn procedure_template_aliquoted_into_model<PTAIM>(
         self,
-        procedure_template_aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_aliquoted_into_model: PTAIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedures.procedure_aliquoted_into` column.
     ///
@@ -1288,10 +1308,15 @@ impl<
     /// v7 --->|"`extends`"| v9
     /// v7 ---o|"`associated with`"| v8
     /// ```
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -1338,10 +1363,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_with(
+    fn aliquoted_with<AW>(
         mut self,
-        aliquoted_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_with: AW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let aliquoted_with =
+            <AW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &aliquoted_with,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
             self.procedure_aliquoted_with
         {
@@ -1393,10 +1425,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_with_model(
+    fn aliquoted_with_model<AWM>(
         mut self,
-        aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_with_model: AWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let aliquoted_with_model =
+            <AWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &aliquoted_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
             self.procedure_aliquoted_with
         {
@@ -1449,10 +1488,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_aliquoted_with_model(
+    fn procedure_template_aliquoted_with_model<PTAWM>(
         mut self,
-        procedure_template_aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_aliquoted_with_model: PTAWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_aliquoted_with_model =
+            <PTAWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_aliquoted_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
             self.procedure_aliquoted_with
         {
@@ -1550,7 +1596,7 @@ impl<
             } else if let Some(aliquoted_with) = self.aliquoted_with {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(aliquoted_with),
+                        aliquoted_with,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1668,10 +1714,15 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         mut self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let pipette_tip_model =
+            <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(&pipette_tip_model);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
             self.procedure_pipette_tip
         {
@@ -1723,10 +1774,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_pipette_tip_model(
+    fn procedure_template_pipette_tip_model<PTPTM>(
         mut self,
-        procedure_template_pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_pipette_tip_model: PTPTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_pipette_tip_model =
+            <PTPTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_pipette_tip_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
             self.procedure_pipette_tip
         {
@@ -1899,16 +1957,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_from(
+    fn aliquoted_from<AF>(
         mut self,
-        aliquoted_from: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_from: AF,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AF: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let aliquoted_from =
+            <AF as web_common_traits::database::PrimaryKeyLike>::primary_key(&aliquoted_from);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_from) =
             self.procedure_aliquoted_from
         {
             self.procedure_aliquoted_from = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_aliquoted_from,
-                    Some(aliquoted_from),
+                    aliquoted_from,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1954,10 +2017,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_aliquoted_from_model(
+    fn procedure_template_aliquoted_from_model<PTAFM>(
         mut self,
-        procedure_template_aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_aliquoted_from_model: PTAFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_aliquoted_from_model =
+            <PTAFM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_aliquoted_from_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_from) =
             self.procedure_aliquoted_from
         {
@@ -2047,7 +2117,7 @@ impl<
             } else if let Some(aliquoted_from) = self.aliquoted_from {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(aliquoted_from),
+                        aliquoted_from,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -2134,16 +2204,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_into(
+    fn aliquoted_into<AI>(
         mut self,
-        aliquoted_into: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_into: AI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let aliquoted_into =
+            <AI as web_common_traits::database::PrimaryKeyLike>::primary_key(&aliquoted_into);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_into) =
             self.procedure_aliquoted_into
         {
             self.procedure_aliquoted_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_aliquoted_into,
-                    Some(aliquoted_into),
+                    aliquoted_into,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -2189,10 +2264,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_aliquoted_into_model(
+    fn procedure_template_aliquoted_into_model<PTAIM>(
         mut self,
-        procedure_template_aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_aliquoted_into_model: PTAIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTAIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_aliquoted_into_model =
+            <PTAIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_aliquoted_into_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_into) =
             self.procedure_aliquoted_into
         {
@@ -2282,7 +2364,7 @@ impl<
             } else if let Some(aliquoted_into) = self.aliquoted_into {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(aliquoted_into),
+                        aliquoted_into,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -2351,10 +2433,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
@@ -2391,10 +2478,13 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as AliquotingProcedureSettable>::procedure_template(
             self,
             procedure_template,
@@ -2402,10 +2492,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                 self.procedure,
                 parent_procedure,
@@ -2420,10 +2515,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
@@ -2438,10 +2536,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure` column.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                 self.procedure,
                 predecessor_procedure,
@@ -2456,10 +2559,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self.procedure,
                 predecessor_procedure_template,
@@ -2474,10 +2580,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
@@ -2516,10 +2625,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,

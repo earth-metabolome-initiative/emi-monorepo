@@ -16,7 +16,8 @@ use crate::{
     procedure_template_asset_models::{
         coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
         conical_tubes_box::cct_box_builder, organism::sample_builder,
-    }, procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
+    },
+    procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
 };
 
 /// Initializes the part of organism collection procedure template in the
@@ -51,14 +52,14 @@ pub(crate) fn part_of_organism_collection(
         .description(
             "procedure template to collect part of organisms, such as leaves, stems, or roots.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Remind the user to wear gloves
     let gloves_reminder = ProcedureTemplate::new()
         .name("Wear gloves")?
         .description("Please wear gloves to avoid contamination and protect yourself.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     // Remind the user to sterilize / clean the scalpel and gloves with ethanol 70
@@ -68,15 +69,14 @@ pub(crate) fn part_of_organism_collection(
         .description(
             "Please sterilize the scalpel and gloves with ethanol 70 percent to avoid contamination.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
-
 
     // Harvest the sample from the sample source
     let sample_harvesting = HarvestingProcedureTemplate::new()
         .name("Harvest sample")?
         .description("Harvest the cut part of the organism as a sample.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .procedure_template_sample_source_model(&organism)?
         .procedure_template_sample_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
@@ -88,7 +88,7 @@ pub(crate) fn part_of_organism_collection(
         .description(
             "Wrap the cut part of the organism in a coffee filter paper to protect it during transport.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .procedure_template_packaged_with_model(coffee_wrapper_builder(user, conn)?)?
         .procedure_template_sample_model(sample)?
         .insert(user.id, conn)?;
@@ -102,7 +102,7 @@ pub(crate) fn part_of_organism_collection(
         )?
         .procedure_template_stored_into_model(cct_builder(user, conn)?)?
         .procedure_template_stored_asset_model(coffee_wrapper)?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
     let cct = place_in_tube.procedure_template_stored_into_model(conn)?;
 
@@ -115,8 +115,8 @@ pub(crate) fn part_of_organism_collection(
         .procedure_template_stored_into_model(
             cct_box_builder(user, conn)?
         )?
-        .procedure_template_stored_asset_model(cct.id)?
-        .created_by(user.id)?
+        .procedure_template_stored_asset_model(&cct)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     collection.extend(

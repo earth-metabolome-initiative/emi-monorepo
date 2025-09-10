@@ -38,7 +38,7 @@ pub(crate) fn safelock_centrifuge(
     Ok(CentrifugeModel::new()
         .name(name)?
         .description("Safelock centrifuge, used to precipitate solid material.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -59,8 +59,8 @@ pub(crate) fn init_eppendorf_centrifuge(
     Ok(CommercialProduct::new()
         .name(device_name)?
         .description("Eppendorf centrifuge, used to precipitate solid material.")?
-        .created_by(user.id)?
-        .parent_model(Some(centrifuge.id))?
-        .brand(brand.id)?
+        .created_by(user)?
+        .parent_model(centrifuge)?
+        .brand(brand)?
         .insert(user.id, conn)?)
 }

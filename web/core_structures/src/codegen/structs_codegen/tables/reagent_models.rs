@@ -53,6 +53,12 @@ impl diesel::Identifiable for ReagentModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ReagentModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl ReagentModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

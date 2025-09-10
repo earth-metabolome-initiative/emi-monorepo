@@ -68,6 +68,12 @@ impl diesel::Identifiable for PhoneModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PhoneModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl PhoneModel {
     pub fn phone_models_camera<C: diesel::connection::LoadConnection>(
         &self,

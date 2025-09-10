@@ -37,7 +37,7 @@ pub(crate) fn polystyrene_box(
     Ok(ContainerModel::new()
         .name(name)?
         .description("Polystyrene box, a container typically used for liquid nitrogen")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -69,7 +69,7 @@ pub(crate) fn vial_rack_1_5ml(
     Ok(ContainerModel::new()
         .name(name)?
         .description("Vial box, a container typically used for storing vials")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -93,8 +93,8 @@ pub(crate) fn init_fisherbrand_kryobox_vial_rack(
     Ok(CommercialProduct::new()
         .name(name)?
         .description("Fisherbrand Kryobox Vial Rack, used to store vials.")?
-        .created_by(user.id)?
-        .brand(fisherbrand.id)?
-        .parent_model(Some(vial_box_trackable.id))?
+        .created_by(user)?
+        .brand(fisherbrand)?
+        .parent_model(vial_box_trackable)?
         .insert(user.id, conn)?)
 }

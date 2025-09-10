@@ -48,6 +48,12 @@ impl diesel::Identifiable for LoginProvider {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for LoginProvider {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl LoginProvider {
     #[cfg(feature = "postgres")]
     pub fn from_name(

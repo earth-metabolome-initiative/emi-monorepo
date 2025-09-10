@@ -55,6 +55,12 @@ impl diesel::Identifiable for TeamMember {
         (self.team_id, self.member_id)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for TeamMember {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.team_id, self.member_id)
+    }
+}
 impl TeamMember {
     pub fn member<C: diesel::connection::LoadConnection>(
         &self,

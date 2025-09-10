@@ -62,6 +62,12 @@ impl diesel::Identifiable for FractioningProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for FractioningProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl FractioningProcedureTemplate {
     pub fn procedure_template_fragment_placed_into_model<
         C: diesel::connection::LoadConnection,

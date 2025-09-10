@@ -72,6 +72,12 @@ impl diesel::Identifiable for CommercialFreezeDryerModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialFreezeDryerModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialFreezeDryerModel {
     pub fn freeze_dryer_model<C: diesel::connection::LoadConnection>(
         &self,

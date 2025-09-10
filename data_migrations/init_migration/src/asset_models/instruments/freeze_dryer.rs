@@ -34,6 +34,6 @@ pub(crate) fn freeze_dryer(
         .description(
             "A freeze dryer (or lyophilisator) used to sublimate water content of samples.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

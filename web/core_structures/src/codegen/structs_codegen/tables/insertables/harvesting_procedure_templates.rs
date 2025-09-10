@@ -345,10 +345,12 @@ pub trait HarvestingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn sample_source_model(
+    fn sample_source_model<SSM>(
         self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        sample_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.harvesting_procedure_templates.
     /// procedure_template_sample_source_model` column.
@@ -400,10 +402,12 @@ pub trait HarvestingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn sample_model(
+    fn sample_model<SM>(
         self,
-        sample_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        sample_model: SM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.harvesting_procedure_templates.procedure_template_sample_model`
     /// column.
@@ -474,10 +478,15 @@ impl<ProcedureTemplate> HarvestingProcedureTemplateSettable
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn sample_source_model(
+    fn sample_source_model<SSM>(
         mut self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        sample_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let sample_source_model =
+            <SSM as web_common_traits::database::PrimaryKeyLike>::primary_key(&sample_source_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_sample_source_model,
         ) = self.procedure_template_sample_source_model
@@ -619,10 +628,15 @@ impl<ProcedureTemplate> HarvestingProcedureTemplateSettable
     /// v2 --->|"`associated same as`"| v3
     /// v5 ---o|"`associated with`"| v6
     /// ```
-    fn sample_model(
+    fn sample_model<SM>(
         mut self,
-        sample_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        sample_model: SM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let sample_model =
+            <SM as web_common_traits::database::PrimaryKeyLike>::primary_key(&sample_model);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_template_sample_model) =
             self.procedure_template_sample_model
         {
@@ -797,10 +811,13 @@ for InsertableHarvestingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -839,10 +856,13 @@ for InsertableHarvestingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

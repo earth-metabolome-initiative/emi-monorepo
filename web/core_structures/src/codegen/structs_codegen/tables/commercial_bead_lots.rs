@@ -82,6 +82,12 @@ impl diesel::Identifiable for CommercialBeadLot {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialBeadLot {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialBeadLot {
     pub fn commercial_bead_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

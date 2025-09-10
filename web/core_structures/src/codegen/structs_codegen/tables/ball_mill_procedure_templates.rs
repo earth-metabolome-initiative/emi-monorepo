@@ -77,6 +77,12 @@ impl diesel::Identifiable for BallMillProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for BallMillProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl BallMillProcedureTemplate {
     #[cfg(feature = "postgres")]
     pub fn ball_mill_procedure_template_procedure_template_bead_mode_fkey1(

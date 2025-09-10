@@ -462,10 +462,12 @@ pub trait FreezingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn frozen_with_model(
+    fn frozen_with_model<FWM>(
         self,
-        frozen_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        frozen_with_model: FWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.freezing_procedure_templates.
     /// procedure_template_frozen_with_model` column.
@@ -517,10 +519,12 @@ pub trait FreezingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn frozen_container_model(
+    fn frozen_container_model<FCM>(
         self,
-        frozen_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        frozen_container_model: FCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.freezing_procedure_templates.
     /// procedure_template_frozen_container_model` column.
@@ -688,10 +692,15 @@ impl<ProcedureTemplate> FreezingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn frozen_with_model(
+    fn frozen_with_model<FWM>(
         mut self,
-        frozen_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        frozen_with_model: FWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let frozen_with_model =
+            <FWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&frozen_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_frozen_with_model,
         ) = self.procedure_template_frozen_with_model
@@ -826,10 +835,17 @@ impl<ProcedureTemplate> FreezingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn frozen_container_model(
+    fn frozen_container_model<FCM>(
         mut self,
-        frozen_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        frozen_container_model: FCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let frozen_container_model =
+            <FCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &frozen_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_frozen_container_model,
         ) = self.procedure_template_frozen_container_model
@@ -1013,10 +1029,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1055,10 +1074,13 @@ for InsertableFreezingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

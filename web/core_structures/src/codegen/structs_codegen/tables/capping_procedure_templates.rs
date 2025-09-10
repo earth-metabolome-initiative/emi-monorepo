@@ -64,6 +64,12 @@ impl diesel::Identifiable for CappingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CappingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl CappingProcedureTemplate {
     pub fn capping_procedure_templates_capped_container_model_capped_fkey<
         C: diesel::connection::LoadConnection,

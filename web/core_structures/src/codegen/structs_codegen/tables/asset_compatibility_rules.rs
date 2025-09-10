@@ -54,6 +54,12 @@ impl diesel::Identifiable for AssetCompatibilityRule {
         (self.left_asset_model, self.right_asset_model)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for AssetCompatibilityRule {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.left_asset_model, self.right_asset_model)
+    }
+}
 impl AssetCompatibilityRule {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

@@ -43,6 +43,12 @@ impl diesel::Identifiable for User {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for User {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl User {
     #[cfg(feature = "postgres")]
     pub fn from_first_name(

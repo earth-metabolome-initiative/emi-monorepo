@@ -64,6 +64,12 @@ impl diesel::Identifiable for PackagingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PackagingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl PackagingProcedureTemplate {
     #[cfg(feature = "postgres")]
     pub fn packaging_procedure_template_procedure_template_packaged_fkey1(

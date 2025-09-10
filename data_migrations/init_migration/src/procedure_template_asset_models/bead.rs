@@ -22,5 +22,5 @@ pub(crate) fn bead_3mm_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, bead_3mm(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, bead_3mm(user, conn)?, conn)
 }

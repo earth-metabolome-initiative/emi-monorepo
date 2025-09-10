@@ -79,6 +79,12 @@ impl diesel::Identifiable for CommercialCentrifugeLot {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialCentrifugeLot {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialCentrifugeLot {
     pub fn commercial_centrifuge_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

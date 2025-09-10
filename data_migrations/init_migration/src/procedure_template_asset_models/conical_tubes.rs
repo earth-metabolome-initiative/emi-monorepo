@@ -23,5 +23,5 @@ pub(crate) fn cct_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, conical_centrifugal_tube_50ml(user, conn)?.id(conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, conical_centrifugal_tube_50ml(user, conn)?, conn)
 }

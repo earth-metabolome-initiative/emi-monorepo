@@ -182,10 +182,12 @@ pub trait RoleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn color(
+    fn color<CI>(
         self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        color_id: CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
 impl RoleSettable for InsertableRoleBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::RoleAttribute;
@@ -235,10 +237,14 @@ impl RoleSettable for InsertableRoleBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.roles.color_id` column.
-    fn color(
+    fn color<CI>(
         mut self,
-        color_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        color_id: CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let color_id = <CI as web_common_traits::database::PrimaryKeyLike>::primary_key(&color_id);
         self.color_id = Some(color_id);
         Ok(self)
     }

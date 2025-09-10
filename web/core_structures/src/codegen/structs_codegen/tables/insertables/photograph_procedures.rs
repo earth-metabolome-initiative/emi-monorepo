@@ -665,10 +665,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.photograph_procedures.photographed_asset`
     /// column.
     ///
@@ -689,10 +691,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photographed_asset(
+    fn photographed_asset<PA>(
         self,
-        photographed_asset: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photographed_asset: PA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PA: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.photograph_procedures.
     /// procedure_template_photographed_asset_model` column.
@@ -714,10 +718,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_photographed_asset_model(
+    fn procedure_template_photographed_asset_model<PTPAM>(
         self,
-        procedure_template_photographed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_photographed_asset_model: PTPAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedures.procedure_photographed_asset` column.
     ///
@@ -769,10 +775,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photographed_with(
+    fn photographed_with<PW>(
         self,
-        photographed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photographed_with: PW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.photograph_procedures.
     /// procedure_template_photographed_with_model` column.
@@ -794,10 +802,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_photographed_with_model(
+    fn procedure_template_photographed_with_model<PTPWM>(
         self,
-        procedure_template_photographed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_photographed_with_model: PTPWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedures.procedure_photographed_with` column.
     ///
@@ -848,10 +858,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photograph(
+    fn photograph<P>(
         self,
-        photograph: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        photograph: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.photograph_procedures.procedure_template_photograph_model`
     /// column.
@@ -873,10 +885,12 @@ pub trait PhotographProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_photograph_model(
+    fn procedure_template_photograph_model<PTPM>(
         self,
-        procedure_template_photograph_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_photograph_model: PTPM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.photograph_procedures.procedure_photograph` column.
     ///
@@ -959,10 +973,15 @@ impl<
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -1008,16 +1027,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photographed_asset(
+    fn photographed_asset<PA>(
         mut self,
-        photographed_asset: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photographed_asset: PA,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PA: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let photographed_asset =
+            <PA as web_common_traits::database::PrimaryKeyLike>::primary_key(&photographed_asset);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photographed_asset) =
             self.procedure_photographed_asset
         {
             self.procedure_photographed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_photographed_asset,
-                    Some(photographed_asset),
+                    photographed_asset,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1063,10 +1087,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_photographed_asset_model(
+    fn procedure_template_photographed_asset_model<PTPAM>(
         mut self,
-        procedure_template_photographed_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_photographed_asset_model: PTPAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_photographed_asset_model =
+            <PTPAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_photographed_asset_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photographed_asset) =
             self.procedure_photographed_asset
         {
@@ -1157,7 +1188,7 @@ impl<
             } else if let Some(photographed_asset) = self.photographed_asset {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(photographed_asset),
+                        photographed_asset,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1246,10 +1277,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photographed_with(
+    fn photographed_with<PW>(
         mut self,
-        photographed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photographed_with: PW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let photographed_with =
+            <PW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &photographed_with,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photographed_with) =
             self.procedure_photographed_with
         {
@@ -1301,10 +1339,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_photographed_with_model(
+    fn procedure_template_photographed_with_model<PTPWM>(
         mut self,
-        procedure_template_photographed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_photographed_with_model: PTPWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_photographed_with_model =
+            <PTPWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_photographed_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photographed_with) =
             self.procedure_photographed_with
         {
@@ -1395,7 +1440,7 @@ impl<
             } else if let Some(photographed_with) = self.photographed_with {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(photographed_with),
+                        photographed_with,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1483,16 +1528,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn photograph(
+    fn photograph<P>(
         mut self,
-        photograph: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        photograph: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let photograph =
+            <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&photograph);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photograph) =
             self.procedure_photograph
         {
             self.procedure_photograph = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_photograph,
-                    Some(photograph),
+                    photograph,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1538,10 +1588,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_photograph_model(
+    fn procedure_template_photograph_model<PTPM>(
         mut self,
-        procedure_template_photograph_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_photograph_model: PTPM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTPM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_photograph_model =
+            <PTPM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_photograph_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_photograph) =
             self.procedure_photograph
         {
@@ -1629,7 +1686,7 @@ impl<
             } else if let Some(photograph) = self.photograph {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(photograph),
+                        photograph,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1696,10 +1753,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
@@ -1736,10 +1798,13 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as PhotographProcedureSettable>::procedure_template(
             self,
             procedure_template,
@@ -1747,10 +1812,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                 self.procedure,
                 parent_procedure,
@@ -1765,10 +1835,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
@@ -1783,10 +1856,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure` column.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                 self.procedure,
                 predecessor_procedure,
@@ -1801,10 +1879,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self.procedure,
                 predecessor_procedure_template,
@@ -1819,10 +1900,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
@@ -1861,10 +1945,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,

@@ -427,10 +427,12 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn measured_with_model(
+    fn measured_with_model<MWM>(
         self,
-        measured_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        measured_with_model: MWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.
     /// procedure_template_measured_with_model` column.
@@ -482,10 +484,12 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn poured_from_model(
+    fn poured_from_model<PFM>(
         self,
-        poured_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        poured_from_model: PFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.
     /// procedure_template_poured_from_model` column.
@@ -537,10 +541,12 @@ pub trait PouringProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn poured_into_model(
+    fn poured_into_model<PIM>(
         self,
-        poured_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        poured_into_model: PIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.pouring_procedure_templates.
     /// procedure_template_poured_into_model` column.
@@ -637,10 +643,15 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn measured_with_model(
+    fn measured_with_model<MWM>(
         mut self,
-        measured_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        measured_with_model: MWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        MWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let measured_with_model =
+            <MWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&measured_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_measured_with_model,
         ) = self.procedure_template_measured_with_model
@@ -778,10 +789,15 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn poured_from_model(
+    fn poured_from_model<PFM>(
         mut self,
-        poured_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        poured_from_model: PFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let poured_from_model =
+            <PFM as web_common_traits::database::PrimaryKeyLike>::primary_key(&poured_from_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_poured_from_model,
         ) = self.procedure_template_poured_from_model
@@ -916,10 +932,15 @@ impl<ProcedureTemplate> PouringProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn poured_into_model(
+    fn poured_into_model<PIM>(
         mut self,
-        poured_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        poured_into_model: PIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let poured_into_model =
+            <PIM as web_common_traits::database::PrimaryKeyLike>::primary_key(&poured_into_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_poured_into_model,
         ) = self.procedure_template_poured_into_model
@@ -1122,10 +1143,13 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1164,10 +1188,13 @@ for InsertablePouringProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

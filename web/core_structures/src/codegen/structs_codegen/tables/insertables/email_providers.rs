@@ -105,10 +105,12 @@ pub trait EmailProviderSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn email(
+    fn email<EI>(
         self,
-        email_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        email_id: EI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        EI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.email_providers.login_provider_id` column.
     ///
     /// # Arguments
@@ -127,26 +129,37 @@ pub trait EmailProviderSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn login_provider(
+    fn login_provider<LPI>(
         self,
-        login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        login_provider_id: LPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
 impl EmailProviderSettable for InsertableEmailProviderBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::EmailProviderAttribute;
     /// Sets the value of the `public.email_providers.email_id` column.
-    fn email(
+    fn email<EI>(
         mut self,
-        email_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        email_id: EI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        EI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let email_id = <EI as web_common_traits::database::PrimaryKeyLike>::primary_key(&email_id);
         self.email_id = Some(email_id);
         Ok(self)
     }
     /// Sets the value of the `public.email_providers.login_provider_id` column.
-    fn login_provider(
+    fn login_provider<LPI>(
         mut self,
-        login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        login_provider_id: LPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let login_provider_id =
+            <LPI as web_common_traits::database::PrimaryKeyLike>::primary_key(&login_provider_id);
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

@@ -32,6 +32,6 @@ pub(crate) fn phone(user: &User, conn: &mut PgConnection) -> anyhow::Result<Phon
         .description(
             "A phone (smartphone) which may be used to take pictures or as a positioning device.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

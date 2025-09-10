@@ -84,6 +84,12 @@ impl diesel::Identifiable for StorageProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for StorageProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl StorageProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,

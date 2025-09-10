@@ -28,6 +28,29 @@ impl Table {
         })
     }
 
+    fn primary_key_like_impl(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<TokenStream>, WebCodeGenError> {
+        if !self.has_primary_keys(conn)? {
+            return Ok(None);
+        }
+
+        let struct_name: Ident = self.struct_ident()?;
+        let primary_key = self.primary_key_type(conn)?;
+        let primary_key_attribute = self.primary_key_attributes(true, conn)?;
+
+        Ok(Some(quote! {
+            impl web_common_traits::database::PrimaryKeyLike for #struct_name {
+                type PrimaryKey = #primary_key;
+
+                fn primary_key(&self) -> Self::PrimaryKey {
+                    #primary_key_attribute
+                }
+            }
+        }))
+    }
+
     /// Returns the Syn `TokenStream` for the struct definition.
     ///
     /// # Arguments
@@ -101,6 +124,7 @@ impl Table {
 
         let extensions_impls = self.extension_traits_impls(conn)?;
         let ancestor_impl = self.ancestor_traits_impl(conn)?;
+        let primary_key_like_impl = self.primary_key_like_impl(conn)?;
         let table_name = self.table_name.clone();
         let primary_key_type = self.primary_key_type(conn)?;
         let builder_type = self.insertable_builder_ty()?;
@@ -141,6 +165,7 @@ impl Table {
             #(#extensions_impls)*
             #ancestor_impl
             #identifiable_impl
+            #primary_key_like_impl
         })
     }
 }

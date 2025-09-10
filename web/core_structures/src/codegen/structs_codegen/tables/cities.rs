@@ -49,6 +49,12 @@ impl diesel::Identifiable for City {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for City {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl City {
     pub fn iso<C: diesel::connection::LoadConnection>(
         &self,

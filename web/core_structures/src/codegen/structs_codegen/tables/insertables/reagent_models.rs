@@ -320,10 +320,13 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.parent_model` column.
-    fn parent_model(
+    fn parent_model<PM>(
         mut self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::parent_model(
                 self.id,
                 parent_model,
@@ -338,10 +341,13 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
@@ -379,10 +385,13 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,

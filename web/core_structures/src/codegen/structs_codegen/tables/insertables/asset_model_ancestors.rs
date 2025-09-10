@@ -109,10 +109,12 @@ pub trait AssetModelAncestorSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn descendant_model(
+    fn descendant_model<DM>(
         self,
-        descendant_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        descendant_model: DM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        DM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_model_ancestors.ancestor_model`
     /// column.
     ///
@@ -132,29 +134,41 @@ pub trait AssetModelAncestorSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn ancestor_model(
+    fn ancestor_model<AM>(
         self,
-        ancestor_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        ancestor_model: AM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl AssetModelAncestorSettable for InsertableAssetModelAncestorBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`
     /// column.
-    fn descendant_model(
+    fn descendant_model<DM>(
         mut self,
-        descendant_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        descendant_model: DM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        DM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let descendant_model =
+            <DM as web_common_traits::database::PrimaryKeyLike>::primary_key(&descendant_model);
         self.descendant_model = Some(descendant_model);
         Ok(self)
     }
     /// Sets the value of the `public.asset_model_ancestors.ancestor_model`
     /// column.
-    fn ancestor_model(
+    fn ancestor_model<AM>(
         mut self,
-        ancestor_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        ancestor_model: AM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let ancestor_model =
+            <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(&ancestor_model);
         self.ancestor_model = Some(ancestor_model);
         Ok(self)
     }

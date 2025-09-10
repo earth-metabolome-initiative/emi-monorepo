@@ -141,18 +141,27 @@ pub trait SpectrumSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn spectra_collection(
+    fn spectra_collection<SCI>(
         self,
-        spectra_collection_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        spectra_collection_id: SCI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SCI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
 }
 impl<DigitalAsset> SpectrumSettable for InsertableSpectrumBuilder<DigitalAsset> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::SpectrumAttribute;
     /// Sets the value of the `public.spectra.spectra_collection_id` column.
-    fn spectra_collection(
+    fn spectra_collection<SCI>(
         mut self,
-        spectra_collection_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        spectra_collection_id: SCI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SCI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let spectra_collection_id =
+            <SCI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &spectra_collection_id,
+            );
         self.spectra_collection_id = Some(spectra_collection_id);
         Ok(self)
     }
@@ -171,10 +180,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::SpectrumAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
-    fn id(
+    fn id<I>(
         mut self,
-        id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
@@ -255,10 +269,13 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn model(
+    fn model<M>(
         self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
             self,
             model,
@@ -266,10 +283,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
@@ -308,10 +328,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
@@ -358,10 +381,13 @@ for InsertableSpectrumBuilder<DigitalAsset> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::SpectrumAttribute;
     #[inline]
     ///Sets the value of the `public.digital_assets.model` column.
-    fn model(
+    fn model<M>(
         mut self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
                 self.id,
                 model,

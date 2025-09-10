@@ -64,6 +64,12 @@ impl diesel::Identifiable for GeolocationProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for GeolocationProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl GeolocationProcedureTemplate {
     pub fn procedure_template_geolocated_asset_model<
         C: diesel::connection::LoadConnection,

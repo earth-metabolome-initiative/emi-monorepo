@@ -79,6 +79,12 @@ impl diesel::Identifiable for PhotographProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PhotographProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl PhotographProcedure {
     pub fn photograph<C: diesel::connection::LoadConnection>(
         &self,

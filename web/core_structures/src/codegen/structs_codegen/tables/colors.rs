@@ -43,6 +43,12 @@ impl diesel::Identifiable for Color {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Color {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Color {
     #[cfg(feature = "postgres")]
     pub fn from_name(

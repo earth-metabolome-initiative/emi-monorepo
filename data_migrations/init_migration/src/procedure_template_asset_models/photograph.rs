@@ -23,5 +23,5 @@ pub(crate) fn photograph_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, photograph(user, conn)?.id(conn)?)
+    default_pmt(user, photograph(user, conn)?, conn)
 }

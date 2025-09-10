@@ -36,7 +36,7 @@ fn standard_rack(user: &User, conn: &mut PgConnection) -> anyhow::Result<Contain
     Ok(ContainerModel::new()
         .name(name)?
         .description("Rack, a common container for organizing samples")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -71,8 +71,8 @@ pub(crate) fn conical_centrifugal_tube_50ml_rack(
     Ok(ContainerModel::new()
         .name(name)?
         .description("Rack for storing conical centrifugal tubes of 50ml")?
-        .parent_model(Some(standard_rack.id))?
-        .created_by(user.id)?
+        .parent_model(standard_rack)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -92,8 +92,8 @@ pub(crate) fn init_fisherbrand_cct_rack(
     Ok(CommercialProduct::new()
         .name(conical_tube)?
         .description("Rack for Conical sample tube of 50ml, used to store dried samples library.")?
-        .created_by(user.id)?
-        .brand(fisherbrand.id)?
-        .parent_model(Some(conical_tube_rack_50ml.id))?
+        .created_by(user)?
+        .brand(fisherbrand)?
+        .parent_model(conical_tube_rack_50ml)?
         .insert(user.id, conn)?)
 }

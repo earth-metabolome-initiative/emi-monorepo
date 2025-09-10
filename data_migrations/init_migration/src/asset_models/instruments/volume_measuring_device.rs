@@ -32,6 +32,6 @@ pub(crate) fn volume_measuring_device(
     Ok(VolumeMeasuringDeviceModel::new()
         .name(name)?
         .description("A generic volume measuring device")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

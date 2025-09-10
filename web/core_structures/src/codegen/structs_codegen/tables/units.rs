@@ -50,6 +50,12 @@ impl diesel::Identifiable for Unit {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Unit {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Unit {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

@@ -112,10 +112,12 @@ pub trait AddressSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn city(
+    fn city<CI>(
         self,
-        city_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        city_id: CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.addresses.street_name` column.
     ///
     /// # Arguments
@@ -225,10 +227,14 @@ pub trait AddressSettable: Sized {
 impl AddressSettable for InsertableAddressBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::AddressAttribute;
     /// Sets the value of the `public.addresses.city_id` column.
-    fn city(
+    fn city<CI>(
         mut self,
-        city_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        city_id: CI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let city_id = <CI as web_common_traits::database::PrimaryKeyLike>::primary_key(&city_id);
         self.city_id = Some(city_id);
         Ok(self)
     }

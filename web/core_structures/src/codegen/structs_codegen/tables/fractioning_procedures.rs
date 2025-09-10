@@ -68,6 +68,12 @@ impl diesel::Identifiable for FractioningProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for FractioningProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl FractioningProcedure {
     pub fn fragment_container<C: diesel::connection::LoadConnection>(
         &self,

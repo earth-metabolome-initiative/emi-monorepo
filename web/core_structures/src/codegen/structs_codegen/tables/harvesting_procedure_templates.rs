@@ -58,6 +58,12 @@ impl diesel::Identifiable for HarvestingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for HarvestingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl HarvestingProcedureTemplate {
     #[cfg(feature = "postgres")]
     pub fn harvesting_procedure_templat_procedure_template_sample_mo_fkey1(

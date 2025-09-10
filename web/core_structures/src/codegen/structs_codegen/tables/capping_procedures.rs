@@ -77,6 +77,12 @@ impl diesel::Identifiable for CappingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CappingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl CappingProcedure {
     pub fn capped_container<C: diesel::connection::LoadConnection>(
         &self,

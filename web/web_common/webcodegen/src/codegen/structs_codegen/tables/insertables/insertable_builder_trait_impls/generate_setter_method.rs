@@ -90,48 +90,66 @@ impl Table {
         let column_snake_case_ident = column.snake_case_ident()?;
         let mut maybe_column_preprocessing = None;
 
-        let column_assignment =
-            if let Some((partial_builder_kind, _, _partial_builder_foreign_key)) =
-                column.requires_partial_builder(conn)?
-            {
-                if partial_builder_kind.is_discretional() {
-                    let maybe_mut = requires_attribute_mutability.then(|| quote! { mut });
-                    maybe_column_preprocessing = Some(quote! {
-                        let #maybe_mut #column_snake_case_ident = #column_snake_case_ident.into();
-                    });
-                    requires_attribute_mutability = false;
-                }
-                quote! {
-                    self.#column_snake_case_ident = #column_snake_case_ident;
-                }
-            } else {
-                if column.foreign_primary_keys(conn)?.is_empty() {
-                    maybe_column_preprocessing = Some(quote! {
+        let column_assignment = if let Some((
+            partial_builder_kind,
+            _,
+            _partial_builder_foreign_key,
+        )) = column.requires_partial_builder(conn)?
+        {
+            if partial_builder_kind.is_discretional() {
+                let maybe_mut = requires_attribute_mutability.then(|| quote! { mut });
+                maybe_column_preprocessing = Some(quote! {
+                    let #maybe_mut #column_snake_case_ident = #column_snake_case_ident.into();
+                });
+                requires_attribute_mutability = false;
+            }
+            quote! {
+                self.#column_snake_case_ident = #column_snake_case_ident;
+            }
+        } else {
+            maybe_column_preprocessing =
+                Some(if column.is_foreign_primary_key(conn)? || column.is_primary_key(conn)? {
+                    let column_acronym = column.acronym_ident()?;
+                    if column.is_nullable() {
+                        quote! {
+                            let #column_snake_case_ident = <
+                                #column_acronym as web_common_traits::database::MaybePrimaryKeyLike
+                            >::maybe_primary_key(&#column_snake_case_ident);
+                        }
+                    } else {
+                        quote! {
+                            let #column_snake_case_ident = <
+                                #column_acronym as web_common_traits::database::PrimaryKeyLike
+                            >::primary_key(&#column_snake_case_ident);
+                        }
+                    }
+                } else {
+                    quote! {
                         let #column_snake_case_ident = #column_snake_case_ident
                             .try_into()
                             .map_err(|err| {
                                 validation_errors::SingleFieldError::from(err)
                                     .rename_field(#insertable_enum::#column_camel_case_ident)
                             })?;
-                    });
-                }
+                    }
+                });
 
-                if column.is_nullable() {
-                    quote! {
-                        self.#column_snake_case_ident = #column_snake_case_ident;
-                    }
-                } else {
-                    quote! {
-                        self.#column_snake_case_ident = Some(#column_snake_case_ident);
-                    }
+            if column.is_nullable() {
+                quote! {
+                    self.#column_snake_case_ident = #column_snake_case_ident;
                 }
-            };
+            } else {
+                quote! {
+                    self.#column_snake_case_ident = Some(#column_snake_case_ident);
+                }
+            }
+        };
 
         Ok((
             requires_attribute_mutability,
             quote! {
-                #updated_by_exception
                 #maybe_column_preprocessing
+                #updated_by_exception
                 #(#same_as_assignments)*
                 #(#check_constraints)*
                 #column_assignment;

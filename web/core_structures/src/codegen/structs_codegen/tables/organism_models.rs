@@ -60,6 +60,12 @@ impl diesel::Identifiable for OrganismModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for OrganismModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl OrganismModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

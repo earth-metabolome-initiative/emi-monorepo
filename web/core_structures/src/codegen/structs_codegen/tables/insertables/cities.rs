@@ -117,10 +117,12 @@ pub trait CitySettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::iso_codes::CountryCode`.
     /// * If the provided value does not pass schema-defined validation.
-    fn iso(
+    fn iso<I>(
         self,
-        iso: ::iso_codes::CountryCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        iso: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>;
 }
 impl CitySettable for InsertableCityBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::CityAttribute;
@@ -140,10 +142,14 @@ impl CitySettable for InsertableCityBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.cities.iso` column.
-    fn iso(
+    fn iso<I>(
         mut self,
-        iso: ::iso_codes::CountryCode,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        iso: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>,
+    {
+        let iso = <I as web_common_traits::database::PrimaryKeyLike>::primary_key(&iso);
         self.iso = Some(iso);
         Ok(self)
     }

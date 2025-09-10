@@ -37,6 +37,6 @@ pub(crate) fn bottle_1l(
         .name(name)?
         .description("Standard 1L bottle, used to store solvents and reagents.")?
         .liters(1.0)?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

@@ -64,6 +64,12 @@ impl diesel::Identifiable for VolumetricContainerModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for VolumetricContainerModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl VolumetricContainerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

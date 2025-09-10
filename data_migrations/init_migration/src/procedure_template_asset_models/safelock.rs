@@ -23,5 +23,5 @@ pub(crate) fn safelock_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, safelock_tubes_2ml(user, conn)?.id(conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, safelock_tubes_2ml(user, conn)?, conn)
 }

@@ -36,6 +36,6 @@ pub(crate) fn distilled_water(
         .purity(100.0)?
         .cas_code("7732-18-5")?
         .molecular_formula("H2O")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

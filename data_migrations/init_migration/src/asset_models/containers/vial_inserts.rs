@@ -39,7 +39,7 @@ pub(crate) fn vial_insert_200ul(
     Ok(VolumetricContainerModel::new()
         .name(name)?
         .description("Vial insert of 200μl, used to hold samples in vials.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .liters(0.0002)?
         .insert(user.id, conn)?)
 }
@@ -59,8 +59,8 @@ pub(crate) fn init_vici_schweiz_insert(
     Ok(CommercialProduct::new()
         .name(insert)?
         .description("VICI Schweiz insert, used to decrease needed amount of extract for mass spectrometry analysis.")?
-        .created_by(user.id)?
-        .brand(vici_schweiz.id)?
-        .parent_model(Some(insert_trackable.id))?
+        .created_by(user)?
+        .brand(vici_schweiz)?
+        .parent_model(insert_trackable)?
         .insert(user.id, conn)?)
 }

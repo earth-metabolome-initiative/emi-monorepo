@@ -48,6 +48,12 @@ impl diesel::Identifiable for Organization {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Organization {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Organization {
     #[cfg(feature = "postgres")]
     pub fn from_url(

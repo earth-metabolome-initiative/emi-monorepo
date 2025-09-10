@@ -33,6 +33,6 @@ pub(crate) fn bead_3mm(
         .name(METAL_BEADS_3MM)?
         .description("Metal bead of 3mm used primarely in ball milling procedures.")?
         .diameter_millimeters(3.0)?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)
 }

@@ -53,6 +53,12 @@ impl diesel::Identifiable for PermanenceCategory {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PermanenceCategory {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl PermanenceCategory {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

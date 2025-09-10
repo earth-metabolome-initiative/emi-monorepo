@@ -77,6 +77,12 @@ impl diesel::Identifiable for CommercialVolumeMeasuringDeviceLot {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialVolumeMeasuringDeviceLot {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialVolumeMeasuringDeviceLot {
     pub fn commercial_volume_measuring_device_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

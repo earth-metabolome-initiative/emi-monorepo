@@ -19,7 +19,7 @@ pub(crate) fn init_ms_maintenance_procedure(
         .description(
             "procedure template for MS maintenance, used in various analytical procedures.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 
     // Clean the source

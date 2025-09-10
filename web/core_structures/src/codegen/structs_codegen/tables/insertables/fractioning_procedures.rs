@@ -680,10 +680,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.fractioning_procedures.fragment_container`
     /// column.
     ///
@@ -704,10 +706,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn fragment_container(
+    fn fragment_container<FC>(
         self,
-        fragment_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        fragment_container: FC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.fractioning_procedures.
     /// procedure_template_fragment_container_model` column.
@@ -729,10 +733,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_fragment_container_model(
+    fn procedure_template_fragment_container_model<PTFCM>(
         self,
-        procedure_template_fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_fragment_container_model: PTFCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTFCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedures.procedure_fragment_container` column.
     ///
@@ -784,10 +790,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn fragment_placed_into(
+    fn fragment_placed_into<FPI>(
         self,
-        fragment_placed_into: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        fragment_placed_into: FPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.fractioning_procedures.
     /// procedure_template_fragment_placed_into_model` column.
@@ -809,10 +817,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_fragment_placed_into_model(
+    fn procedure_template_fragment_placed_into_model<PTFPIM>(
         self,
-        procedure_template_fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_fragment_placed_into_model: PTFPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTFPIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedures.procedure_fragment_placed_into` column.
     ///
@@ -889,10 +899,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn weighed_with(
+    fn weighed_with<WW>(
         self,
-        weighed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        weighed_with: WW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        WW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.fractioning_procedures.procedure_template_weighed_with_model`
     /// column.
@@ -914,10 +926,12 @@ pub trait FractioningProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_weighed_with_model(
+    fn procedure_template_weighed_with_model<PTWWM>(
         self,
-        procedure_template_weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_weighed_with_model: PTWWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.fractioning_procedures.procedure_weighed_with` column.
     ///
@@ -1000,10 +1014,15 @@ impl<
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -1049,16 +1068,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn fragment_container(
+    fn fragment_container<FC>(
         mut self,
-        fragment_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        fragment_container: FC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let fragment_container =
+            <FC as web_common_traits::database::PrimaryKeyLike>::primary_key(&fragment_container);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_fragment_container) =
             self.procedure_fragment_container
         {
             self.procedure_fragment_container = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_fragment_container,
-                    Some(fragment_container),
+                    fragment_container,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1104,10 +1128,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_fragment_container_model(
+    fn procedure_template_fragment_container_model<PTFCM>(
         mut self,
-        procedure_template_fragment_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_fragment_container_model: PTFCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTFCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_fragment_container_model =
+            <PTFCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_fragment_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_fragment_container) =
             self.procedure_fragment_container
         {
@@ -1198,7 +1229,7 @@ impl<
             } else if let Some(fragment_container) = self.fragment_container {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(fragment_container),
+                        fragment_container,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1287,16 +1318,23 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn fragment_placed_into(
+    fn fragment_placed_into<FPI>(
         mut self,
-        fragment_placed_into: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        fragment_placed_into: FPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        FPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let fragment_placed_into =
+            <FPI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &fragment_placed_into,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_fragment_placed_into) =
             self.procedure_fragment_placed_into
         {
             self.procedure_fragment_placed_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_fragment_placed_into,
-                    Some(fragment_placed_into),
+                    fragment_placed_into,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -1342,10 +1380,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_fragment_placed_into_model(
+    fn procedure_template_fragment_placed_into_model<PTFPIM>(
         mut self,
-        procedure_template_fragment_placed_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_fragment_placed_into_model: PTFPIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTFPIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_fragment_placed_into_model =
+            <PTFPIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_fragment_placed_into_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_fragment_placed_into) =
             self.procedure_fragment_placed_into
         {
@@ -1436,7 +1481,7 @@ impl<
             } else if let Some(fragment_placed_into) = self.fragment_placed_into {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(fragment_placed_into),
+                        fragment_placed_into,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1548,10 +1593,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn weighed_with(
+    fn weighed_with<WW>(
         mut self,
-        weighed_with: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        weighed_with: WW,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        WW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let weighed_with =
+            <WW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &weighed_with,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_weighed_with) =
             self.procedure_weighed_with
         {
@@ -1603,10 +1655,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_weighed_with_model(
+    fn procedure_template_weighed_with_model<PTWWM>(
         mut self,
-        procedure_template_weighed_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_weighed_with_model: PTWWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTWWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_weighed_with_model =
+            <PTWWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_weighed_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_weighed_with) =
             self.procedure_weighed_with
         {
@@ -1731,7 +1790,7 @@ impl<
             } else if let Some(weighed_with) = self.weighed_with {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(weighed_with),
+                        weighed_with,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1761,10 +1820,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
@@ -1801,10 +1865,13 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as FractioningProcedureSettable>::procedure_template(
             self,
             procedure_template,
@@ -1812,10 +1879,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                 self.procedure,
                 parent_procedure,
@@ -1830,10 +1902,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
@@ -1848,10 +1923,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure` column.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                 self.procedure,
                 predecessor_procedure,
@@ -1866,10 +1946,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self.procedure,
                 predecessor_procedure_template,
@@ -1884,10 +1967,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
@@ -1926,10 +2012,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,

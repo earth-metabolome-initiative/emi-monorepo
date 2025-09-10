@@ -32,6 +32,6 @@ pub(crate) fn init_ethanol_70_percent(
         .description(
 			"procedure template for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

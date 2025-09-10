@@ -83,6 +83,12 @@ impl diesel::Identifiable for SupernatantProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for SupernatantProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl SupernatantProcedure {
     pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
         &self,

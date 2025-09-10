@@ -49,6 +49,12 @@ impl diesel::Identifiable for ParentProcedureTemplate {
         (self.parent, self.child)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ParentProcedureTemplate {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.parent, self.child)
+    }
+}
 impl ParentProcedureTemplate {
     pub fn child<C: diesel::connection::LoadConnection>(
         &self,

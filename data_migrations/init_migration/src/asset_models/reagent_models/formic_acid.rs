@@ -32,6 +32,6 @@ pub(crate) fn formic_acid(user: &User, conn: &mut PgConnection) -> anyhow::Resul
         .purity(98.0)?
         .cas_code("64-18-6")?
         .molecular_formula("HCOOH")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

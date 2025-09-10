@@ -55,6 +55,12 @@ impl diesel::Identifiable for EmailProvider {
         (self.email_id, self.login_provider_id)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for EmailProvider {
+    type PrimaryKey = (i32, i16);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.email_id, self.login_provider_id)
+    }
+}
 impl EmailProvider {
     pub fn email<C: diesel::connection::LoadConnection>(
         &self,

@@ -93,6 +93,12 @@ impl diesel::Identifiable for BallMillProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for BallMillProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl BallMillProcedure {
     pub fn bead_model<C: diesel::connection::LoadConnection>(
         &self,

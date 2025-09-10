@@ -43,16 +43,10 @@ impl Codegen<'_> {
                         let foreign_column_ident = foreign_column.snake_case_ident()?;
 
                         assignments.push(match (local_column.is_nullable(), foreign_column.is_nullable()) {
-                            (true, true) | (false, false) => quote! {
+                            (true, true) | (false, false) | (true, false)=> quote! {
                                 self = <Self as #buildable_trait>::#local_column_setter(
                                     self,
                                     #foreign_table_snake_case.#foreign_column_ident
-                                )?;
-                            },
-                            (true, false) => quote! {
-                                self = <Self as #buildable_trait>::#local_column_setter(
-                                    self,
-                                    Some(#foreign_table_snake_case.#foreign_column_ident)
                                 )?;
                             },
                             (false, true) => quote! {

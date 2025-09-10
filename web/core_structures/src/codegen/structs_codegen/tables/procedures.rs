@@ -51,6 +51,12 @@ impl diesel::Identifiable for Procedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Procedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl Procedure {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

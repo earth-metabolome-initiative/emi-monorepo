@@ -207,10 +207,12 @@ pub trait CommercialCameraLotSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn product_model(
+    fn product_model<PM>(
         self,
-        product_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        product_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     CameraModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
@@ -261,10 +263,16 @@ for InsertableCommercialCameraLotBuilder<CameraModel, CommercialProductLot> {
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
-    fn product_model(
+    fn product_model<PM>(
         mut self,
-        product_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        product_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let product_model = <PM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &product_model,
+        );
         self.commercial_camera_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::product_model(
                 self.commercial_camera_lots_id_fkey,
                 product_model,
@@ -276,7 +284,7 @@ for InsertableCommercialCameraLotBuilder<CameraModel, CommercialProductLot> {
             })?;
         self.commercial_camera_lots_id_fkey1 = <CameraModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_camera_lots_id_fkey1,
-                Some(product_model),
+                product_model,
             )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
@@ -368,10 +376,13 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model(
+    fn parent_model<PM>(
         self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
@@ -379,10 +390,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.commercial_camera_lots_id_fkey1 = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_camera_lots_id_fkey1,
                 created_by,
@@ -421,10 +435,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.commercial_camera_lots_id_fkey1 = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_camera_lots_id_fkey1,
                 updated_by,
@@ -536,10 +553,13 @@ where
     ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
     ///```
-    fn product_model(
+    fn product_model<PM>(
         self,
-        product_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        product_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as CommercialCameraLotSettable>::product_model(self, product_model)
     }
 }
@@ -594,13 +614,18 @@ where
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
-    fn parent_model(
+    fn parent_model<PM>(
         self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as CommercialCameraLotSettable>::product_model(
             self,
-            parent_model
+            <PM as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                    &parent_model,
+                )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
                         Self::Attributes::ProductModel,

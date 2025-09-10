@@ -69,6 +69,12 @@ impl diesel::Identifiable for SupernatantProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for SupernatantProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl SupernatantProcedureTemplate {
     pub fn supernatant_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,

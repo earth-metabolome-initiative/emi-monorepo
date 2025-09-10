@@ -70,6 +70,12 @@ impl diesel::Identifiable for HarvestingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for HarvestingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl HarvestingProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,

@@ -53,6 +53,12 @@ impl diesel::Identifiable for InstrumentState {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for InstrumentState {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl InstrumentState {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

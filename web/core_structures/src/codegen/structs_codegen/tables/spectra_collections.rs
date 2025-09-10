@@ -52,6 +52,12 @@ impl diesel::Identifiable for SpectraCollection {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for SpectraCollection {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl SpectraCollection {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

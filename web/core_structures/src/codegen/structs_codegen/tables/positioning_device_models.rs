@@ -51,6 +51,12 @@ impl diesel::Identifiable for PositioningDeviceModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PositioningDeviceModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl PositioningDeviceModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

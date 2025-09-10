@@ -45,6 +45,12 @@ impl diesel::Identifiable for Brand {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Brand {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Brand {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

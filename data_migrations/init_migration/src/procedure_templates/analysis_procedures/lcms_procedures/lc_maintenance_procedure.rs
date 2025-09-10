@@ -18,7 +18,7 @@ pub(crate) fn init_lc_maintenance_procedure(
         .description(
             "procedure template for LC maintenance, used in various analytical procedures.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 
     // Check that the solvents on top of the LCMS are full

@@ -66,6 +66,12 @@ impl diesel::Identifiable for SampleModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for SampleModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl SampleModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

@@ -39,7 +39,7 @@ pub(crate) fn conical_centrifugal_tube_50ml(
     Ok(VolumetricContainerModel::new()
         .name(name)?
         .description("Conical tube of 50ml, used for sample collection.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .liters(0.05)?
         .insert(user.id, conn)?)
 }
@@ -60,8 +60,8 @@ pub(crate) fn init_greiner_cct(
     Ok(CommercialProduct::new()
         .name(conical_tube)?
         .description("Conical sample tube of 50ml, used for sample collection.")?
-        .created_by(user.id)?
-        .brand(greiner.id)?
-        .parent_model(Some(conical_tube_50ml.id))?
+        .created_by(user)?
+        .brand(greiner)?
+        .parent_model(conical_tube_50ml)?
         .insert(user.id, conn)?)
 }

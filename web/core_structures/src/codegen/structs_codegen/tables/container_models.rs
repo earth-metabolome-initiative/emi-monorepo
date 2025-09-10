@@ -52,6 +52,12 @@ impl diesel::Identifiable for ContainerModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ContainerModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl ContainerModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

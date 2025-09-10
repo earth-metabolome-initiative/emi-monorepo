@@ -72,6 +72,12 @@ impl diesel::Identifiable for CommercialWeighingDeviceModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialWeighingDeviceModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialWeighingDeviceModel {
     pub fn commercial_weighing_device_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

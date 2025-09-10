@@ -197,10 +197,12 @@ pub trait CommercialCapModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn cap_model(
+    fn cap_model<CM>(
         self,
-        cap_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        cap_model: CM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     CapModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
@@ -241,13 +243,18 @@ impl<
     /// v1 --->|"`ancestral same as`"| v2
     /// v5 --->|"`extends`"| v3
     /// ```
-    fn cap_model(
+    fn cap_model<CM>(
         mut self,
-        cap_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        cap_model: CM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let cap_model =
+            <CM as web_common_traits::database::PrimaryKeyLike>::primary_key(&cap_model);
         self.commercial_cap_models_id_fkey = <CapModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_cap_models_id_fkey,
-                Some(cap_model),
+                cap_model,
             )
             .map_err(|err| {
                 err.into_field_name(|attribute| Self::Attributes::Extension(
@@ -339,10 +346,13 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model(
+    fn parent_model<PM>(
         self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
             self,
             parent_model,
@@ -350,10 +360,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.commercial_cap_models_id_fkey = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.commercial_cap_models_id_fkey,
                 created_by,
@@ -392,10 +405,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.commercial_cap_models_id_fkey = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.commercial_cap_models_id_fkey,
                 updated_by,
@@ -474,10 +490,13 @@ for InsertableCommercialCapModelBuilder<CapModel, CommercialProduct> {
     }
     #[inline]
     ///Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand(
+    fn brand<BI>(
         mut self,
-        brand_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        brand_id: BI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.commercial_cap_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable>::brand(
                 self.commercial_cap_models_id_fkey1,
                 brand_id,
@@ -533,13 +552,18 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model(
+    fn parent_model<PM>(
         self,
-        parent_model: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_model: PM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as CommercialCapModelSettable>::cap_model(
             self,
-            parent_model
+            <PM as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                    &parent_model,
+                )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
                         Self::Attributes::CapModel,

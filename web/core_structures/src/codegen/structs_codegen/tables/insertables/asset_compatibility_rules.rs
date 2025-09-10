@@ -145,10 +145,12 @@ pub trait AssetCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn left_asset_model(
+    fn left_asset_model<LAM>(
         self,
-        left_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        left_asset_model: LAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.asset_compatibility_rules.right_asset_model` column.
     ///
@@ -168,10 +170,12 @@ pub trait AssetCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn right_asset_model(
+    fn right_asset_model<RAM>(
         self,
-        right_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        right_asset_model: RAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        RAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_compatibility_rules.created_by`
     /// column.
     ///
@@ -191,10 +195,12 @@ pub trait AssetCompatibilityRuleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_compatibility_rules.created_at`
     /// column.
     ///
@@ -229,10 +235,15 @@ impl AssetCompatibilityRuleSettable for InsertableAssetCompatibilityRuleBuilder 
         crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute;
     /// Sets the value of the
     /// `public.asset_compatibility_rules.left_asset_model` column.
-    fn left_asset_model(
+    fn left_asset_model<LAM>(
         mut self,
-        left_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        left_asset_model: LAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let left_asset_model =
+            <LAM as web_common_traits::database::PrimaryKeyLike>::primary_key(&left_asset_model);
         if let Some(right_asset_model) = self.right_asset_model {
             pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
                 .map_err(|e| {
@@ -248,10 +259,15 @@ impl AssetCompatibilityRuleSettable for InsertableAssetCompatibilityRuleBuilder 
     }
     /// Sets the value of the
     /// `public.asset_compatibility_rules.right_asset_model` column.
-    fn right_asset_model(
+    fn right_asset_model<RAM>(
         mut self,
-        right_asset_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        right_asset_model: RAM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        RAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let right_asset_model =
+            <RAM as web_common_traits::database::PrimaryKeyLike>::primary_key(&right_asset_model);
         if let Some(left_asset_model) = self.left_asset_model {
             pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
                 .map_err(|e| {
@@ -267,10 +283,15 @@ impl AssetCompatibilityRuleSettable for InsertableAssetCompatibilityRuleBuilder 
     }
     /// Sets the value of the `public.asset_compatibility_rules.created_by`
     /// column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self.created_by = Some(created_by);
         Ok(self)
     }

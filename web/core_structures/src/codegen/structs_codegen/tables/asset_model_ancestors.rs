@@ -37,6 +37,12 @@ impl diesel::Identifiable for AssetModelAncestor {
         (self.descendant_model, self.ancestor_model)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for AssetModelAncestor {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.descendant_model, self.ancestor_model)
+    }
+}
 impl AssetModelAncestor {
     pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,

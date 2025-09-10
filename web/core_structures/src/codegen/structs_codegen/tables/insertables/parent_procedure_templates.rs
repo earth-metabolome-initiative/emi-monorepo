@@ -139,10 +139,12 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent(
+    fn parent<P>(
         self,
-        parent: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        parent: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.child` column.
     ///
     /// # Arguments
@@ -161,10 +163,12 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn child(
+    fn child<C>(
         self,
-        child: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        child: C,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        C: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.created_by`
     /// column.
     ///
@@ -184,10 +188,12 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.created_at`
     /// column.
     ///
@@ -221,10 +227,14 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute;
     /// Sets the value of the `public.parent_procedure_templates.parent` column.
-    fn parent(
+    fn parent<P>(
         mut self,
-        parent: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let parent = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&parent);
         if let Some(child) = self.child {
             pgrx_validation::must_be_distinct_i32(parent, child)
                 .map_err(|e| {
@@ -239,10 +249,14 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
         Ok(self)
     }
     /// Sets the value of the `public.parent_procedure_templates.child` column.
-    fn child(
+    fn child<C>(
         mut self,
-        child: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        child: C,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        C: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let child = <C as web_common_traits::database::PrimaryKeyLike>::primary_key(&child);
         if let Some(parent) = self.parent {
             pgrx_validation::must_be_distinct_i32(parent, child)
                 .map_err(|e| {
@@ -258,10 +272,15 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
     }
     /// Sets the value of the `public.parent_procedure_templates.created_by`
     /// column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self.created_by = Some(created_by);
         Ok(self)
     }

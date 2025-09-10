@@ -341,10 +341,12 @@ pub trait CappingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn capped_container_model(
+    fn capped_container_model<CCM>(
         self,
-        capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        capped_container_model: CCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.capping_procedure_templates.
     /// procedure_template_capped_container_model` column.
@@ -396,10 +398,12 @@ pub trait CappingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn capped_with_model(
+    fn capped_with_model<CWM>(
         self,
-        capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        capped_with_model: CWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.capping_procedure_templates.
     /// procedure_template_capped_with_model` column.
@@ -470,10 +474,17 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn capped_container_model(
+    fn capped_container_model<CCM>(
         mut self,
-        capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        capped_container_model: CCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let capped_container_model =
+            <CCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &capped_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_capped_container_model,
         ) = self.procedure_template_capped_container_model
@@ -613,10 +624,15 @@ impl<ProcedureTemplate> CappingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn capped_with_model(
+    fn capped_with_model<CWM>(
         mut self,
-        capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        capped_with_model: CWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let capped_with_model =
+            <CWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&capped_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_capped_with_model,
         ) = self.procedure_template_capped_with_model
@@ -795,10 +811,13 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -837,10 +856,13 @@ for InsertableCappingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

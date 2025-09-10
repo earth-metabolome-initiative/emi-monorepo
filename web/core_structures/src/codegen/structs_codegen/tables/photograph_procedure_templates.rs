@@ -72,6 +72,12 @@ impl diesel::Identifiable for PhotographProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PhotographProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl PhotographProcedureTemplate {
     pub fn procedure_template_photographed_asset_model<
         C: diesel::connection::LoadConnection,

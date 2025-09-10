@@ -556,10 +556,12 @@ pub trait CappingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.capping_procedures.capped_container`
     /// column.
     ///
@@ -580,10 +582,12 @@ pub trait CappingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn capped_container(
+    fn capped_container<CC>(
         self,
-        capped_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        capped_container: CC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.capping_procedures.capped_container_model`
     /// column.
     ///
@@ -603,10 +607,12 @@ pub trait CappingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn capped_container_model(
+    fn capped_container_model<CCM>(
         self,
-        capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        capped_container_model: CCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.capping_procedures.procedure_template_capped_container_model`
     /// column.
@@ -628,10 +634,12 @@ pub trait CappingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_capped_container_model(
+    fn procedure_template_capped_container_model<PTCCM>(
         self,
-        procedure_template_capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_capped_container_model: PTCCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.capping_procedures.procedure_capped_container` column.
     ///
@@ -682,10 +690,12 @@ pub trait CappingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn capped_with_model(
+    fn capped_with_model<CWM>(
         self,
-        capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        capped_with_model: CWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.capping_procedures.procedure_template_capped_with_model` column.
     ///
@@ -706,10 +716,12 @@ pub trait CappingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template_capped_with_model(
+    fn procedure_template_capped_with_model<PTCWM>(
         self,
-        procedure_template_capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template_capped_with_model: PTCWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.capping_procedures.procedure_capped_with`
     /// column.
     ///
@@ -788,10 +800,15 @@ impl<
     /// v5 --->|"`extends`"| v7
     /// v5 ---o|"`associated with`"| v6
     /// ```
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
@@ -838,16 +855,21 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn capped_container(
+    fn capped_container<CC>(
         mut self,
-        capped_container: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        capped_container: CC,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CC: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let capped_container =
+            <CC as web_common_traits::database::PrimaryKeyLike>::primary_key(&capped_container);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_capped_container) =
             self.procedure_capped_container
         {
             self.procedure_capped_container = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_capped_container,
-                    Some(capped_container),
+                    capped_container,
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
@@ -893,10 +915,17 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn capped_container_model(
+    fn capped_container_model<CCM>(
         mut self,
-        capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        capped_container_model: CCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let capped_container_model =
+            <CCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &capped_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_capped_container) =
             self.procedure_capped_container
         {
@@ -949,10 +978,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_capped_container_model(
+    fn procedure_template_capped_container_model<PTCCM>(
         mut self,
-        procedure_template_capped_container_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_capped_container_model: PTCCM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_capped_container_model =
+            <PTCCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_capped_container_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_capped_container) =
             self.procedure_capped_container
         {
@@ -1051,7 +1087,7 @@ impl<
             } else if let Some(capped_container) = self.capped_container {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        Some(capped_container),
+                        capped_container,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1172,10 +1208,15 @@ impl<
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn capped_with_model(
+    fn capped_with_model<CWM>(
         mut self,
-        capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        capped_with_model: CWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let capped_with_model =
+            <CWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&capped_with_model);
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_capped_with) =
             self.procedure_capped_with
         {
@@ -1226,10 +1267,17 @@ impl<
     /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn procedure_template_capped_with_model(
+    fn procedure_template_capped_with_model<PTCWM>(
         mut self,
-        procedure_template_capped_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template_capped_with_model: PTCWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTCWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template_capped_with_model =
+            <PTCWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &procedure_template_capped_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(procedure_capped_with) =
             self.procedure_capped_with
         {
@@ -1384,10 +1432,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                 self.procedure,
                 procedure,
@@ -1424,18 +1477,26 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as CappingProcedureSettable>::procedure_template(self, procedure_template)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                 self.procedure,
                 parent_procedure,
@@ -1450,10 +1511,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure_template` column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
@@ -1468,10 +1532,15 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure` column.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                 self.procedure,
                 predecessor_procedure,
@@ -1486,10 +1555,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                 self.procedure,
                 predecessor_procedure_template,
@@ -1504,10 +1576,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                 self.procedure,
                 created_by,
@@ -1546,10 +1621,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                 self.procedure,
                 updated_by,

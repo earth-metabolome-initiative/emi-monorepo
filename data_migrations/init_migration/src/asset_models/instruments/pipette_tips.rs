@@ -37,7 +37,7 @@ pub(crate) fn pipette_tip_200ul(
         .description(
             "A 200μl pipette tip used to manipulate and transfer liquids when adapted to a pipette",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -69,7 +69,7 @@ pub(crate) fn pipette_tip_1000ul(
     Ok(PipetteTipModel::new()
         .name(name)?
         .description("A 1000μl pipette tip used to manipulate and transfer liquids when adapted to a pipette")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -90,9 +90,9 @@ pub(crate) fn init_sarstedt_pipette_tip_200(
     Ok(CommercialProduct::new()
         .name(device_name)?
         .description("Tip for Gilson Pipette 200µl to manipulate liquids")?
-        .created_by(user.id)?
-        .parent_model(Some(pipette_tip.id))?
-        .brand(brand.id)?
+        .created_by(user)?
+        .parent_model(pipette_tip)?
+        .brand(brand)?
         .insert(user.id, conn)?)
 }
 
@@ -113,8 +113,8 @@ pub(crate) fn init_sarstedt_pipette_tip_1000(
     Ok(CommercialProduct::new()
         .name(device_name)?
         .description("Sarstedt Tip for Gilson Pipette 1000μl.")?
-        .created_by(user.id)?
-        .parent_model(Some(pipette_tip.id))?
-        .brand(brand.id)?
+        .created_by(user)?
+        .parent_model(pipette_tip)?
+        .brand(brand)?
         .insert(user.id, conn)?)
 }

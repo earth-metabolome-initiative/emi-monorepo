@@ -83,6 +83,12 @@ impl diesel::Identifiable for AliquotingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for AliquotingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl AliquotingProcedure {
     pub fn aliquoted_from<C: diesel::connection::LoadConnection>(
         &self,

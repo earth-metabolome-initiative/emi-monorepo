@@ -55,6 +55,12 @@ impl diesel::Identifiable for UserOrganization {
         (self.user_id, self.organization_id)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for UserOrganization {
+    type PrimaryKey = (i32, i16);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.user_id, self.organization_id)
+    }
+}
 impl UserOrganization {
     pub fn organization<C: diesel::connection::LoadConnection>(
         &self,

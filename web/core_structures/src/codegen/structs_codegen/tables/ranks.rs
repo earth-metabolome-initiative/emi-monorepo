@@ -41,6 +41,12 @@ impl diesel::Identifiable for Rank {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Rank {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Rank {
     #[cfg(feature = "postgres")]
     pub fn from_name(

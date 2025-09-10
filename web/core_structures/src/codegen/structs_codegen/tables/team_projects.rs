@@ -55,6 +55,12 @@ impl diesel::Identifiable for TeamProject {
         (self.team_id, self.project_id)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for TeamProject {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.team_id, self.project_id)
+    }
+}
 impl TeamProject {
     pub fn project<C: diesel::connection::LoadConnection>(
         &self,

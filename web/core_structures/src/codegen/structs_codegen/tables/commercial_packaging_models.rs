@@ -72,6 +72,12 @@ impl diesel::Identifiable for CommercialPackagingModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialPackagingModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialPackagingModel {
     pub fn commercial_packaging_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

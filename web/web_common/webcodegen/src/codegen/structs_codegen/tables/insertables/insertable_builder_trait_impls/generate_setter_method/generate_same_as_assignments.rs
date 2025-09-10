@@ -79,15 +79,6 @@ impl Table {
             let foreign_key_ident = foreign_key.constraint_ident(conn)?;
             let column_setter = required_ancestor_column.getter_ident()?;
 
-            // If the current column is not nullable and the foreign column is, we
-            // need to wrap the current column in `Some(...)` to match the type.
-            let wrapped_current_column_ident =
-                if !current_column.is_nullable() && required_ancestor_column.is_nullable() {
-                    quote! { Some(#current_column_ident) }
-                } else {
-                    quote! { #current_column_ident }
-                };
-
             // The current column is in a same-as relationship with a column
             // from a direct ancestor table.
             extension_table_traits
@@ -97,7 +88,7 @@ impl Table {
             assignments.push(quote! {
                 self.#foreign_key_ident = <#generic_ident as #buildable_trait>::#column_setter(
                     self.#foreign_key_ident,
-                    #wrapped_current_column_ident
+                    #current_column_ident
                 ).map_err(|err| {
                     err.into_field_name(|attribute| Self::Attributes::Extension(attribute.into()))
                 })?;
@@ -158,15 +149,6 @@ impl Table {
                         )
                     };
 
-                // When the remote column is nullable, when we call its setter method
-                // we need to wrap the current column in `Some(...)` to match the type.
-                let wrapper_current_column_ident =
-                    if !current_column.is_nullable() && foreign_column.is_nullable() {
-                        quote! { Some(#local_column_ident) }
-                    } else {
-                        quote! { #local_column_ident }
-                    };
-
                 assignments.push(match partial_builder_kind {
                     PartialBuilderKind::Mandatory => {
                         quote! {
@@ -185,7 +167,7 @@ impl Table {
                             } else if let Some(#local_column_ident) = self.#local_column_ident {
                                 #current_column_ident = <#foreign_builder as #foreign_table_trait>::#foreign_column_setter_ident(
                                     #current_column_ident,
-                                    #wrapper_current_column_ident
+                                    #local_column_ident
                                 ).map_err(|e| {
                                     e.into_field_name(|attribute| {
                                         Self::Attributes::#current_column_camel_case_ident(attribute)
@@ -214,7 +196,7 @@ impl Table {
                                 } else if let Some(#local_column_ident) = self.#local_column_ident {
                                     <#foreign_builder as #foreign_table_trait>::#foreign_column_setter_ident(
                                         builder,
-                                        #wrapper_current_column_ident
+                                        #local_column_ident
                                     ).map_err(|e| {
                                         e.into_field_name(|attribute| {
                                             Self::Attributes::#current_column_camel_case_ident(attribute)
@@ -262,19 +244,12 @@ impl Table {
 
                 let foreign_column_setter_ident = foreign_column.getter_ident()?;
 
-                let wrapper_current_column_ident =
-                    if !current_column.is_nullable() && foreign_column.is_nullable() {
-                        quote! { Some(#current_column_ident) }
-                    } else {
-                        quote! { #current_column_ident }
-                    };
-
                 assignments.push(match partial_builder_kind {
                     PartialBuilderKind::Mandatory => {
                         quote! {
                             self.#local_column_ident = <#foreign_builder as #foreign_table_trait>::#foreign_column_setter_ident(
                                 self.#local_column_ident,
-                                #wrapper_current_column_ident
+                                #current_column_ident
                             ).map_err(|e| {
                                 e.into_field_name(|attribute| {
                                     Self::Attributes::#local_column_camel_case_ident(attribute)
@@ -287,7 +262,7 @@ impl Table {
                             if let web_common_traits::database::IdOrBuilder::Builder(#local_column_ident) = self.#local_column_ident {
                                 self.#local_column_ident = <#foreign_builder as #foreign_table_trait>::#foreign_column_setter_ident(
                                     #local_column_ident,
-                                    #wrapper_current_column_ident
+                                    #current_column_ident
                                 ).map_err(|e| {
                                     e.into_field_name(|attribute| {
                                         Self::Attributes::#local_column_camel_case_ident(attribute)

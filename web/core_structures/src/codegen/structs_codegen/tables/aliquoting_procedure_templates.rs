@@ -69,6 +69,12 @@ impl diesel::Identifiable for AliquotingProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for AliquotingProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl AliquotingProcedureTemplate {
     pub fn procedure_template_aliquoted_into_model<
         C: diesel::connection::LoadConnection,

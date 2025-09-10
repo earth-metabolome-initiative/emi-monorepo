@@ -146,10 +146,23 @@ impl Table {
                     false,
                     vec![insertable_column.clone(), closest_same_as_column.clone()],
                     if insertable_column.is_nullable() && !closest_same_as_column.is_nullable() {
+                        let maybe_primary_key = if insertable_column.is_primary_key(conn)?
+                            || insertable_column.is_foreign_primary_key(conn)?
+                        {
+                            let column_acronym = insertable_column.acronym_ident()?;
+                            quote! {
+                                <
+                                    #column_acronym as web_common_traits::database::MaybePrimaryKeyLike
+                                >::maybe_primary_key(&#snake_case_ident)
+                            }
+                        } else {
+                            quote! { #snake_case_ident }
+                        };
+
                         quote! {
                             <Self as #setter_trait>::#setter_method(
                                 self,
-                                #snake_case_ident.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
+                                #maybe_primary_key.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
                                     Self::Attributes::#camel_case_ident,
                                 ))?
                             )

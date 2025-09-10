@@ -72,6 +72,12 @@ impl diesel::Identifiable for CommercialPositioningDeviceModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialPositioningDeviceModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialPositioningDeviceModel {
     #[cfg(feature = "postgres")]
     pub fn commercial_positioning_device_id_positioning_device_model_fkey(

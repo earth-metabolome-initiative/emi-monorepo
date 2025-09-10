@@ -253,10 +253,12 @@ pub trait RoomSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn addresses(
+    fn addresses<AI>(
         self,
-        addresses_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        addresses_id: AI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.rooms.geolocation` column.
     ///
     /// # Arguments
@@ -302,10 +304,12 @@ pub trait RoomSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.rooms.created_at` column.
     ///
     /// # Arguments
@@ -351,10 +355,12 @@ pub trait RoomSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
+    fn updated_by<UB>(
         self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.rooms.updated_at` column.
     ///
     /// # Arguments
@@ -441,10 +447,15 @@ impl RoomSettable for InsertableRoomBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.rooms.addresses_id` column.
-    fn addresses(
+    fn addresses<AI>(
         mut self,
-        addresses_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        addresses_id: AI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let addresses_id =
+            <AI as web_common_traits::database::PrimaryKeyLike>::primary_key(&addresses_id);
         self.addresses_id = Some(addresses_id);
         Ok(self)
     }
@@ -481,10 +492,15 @@ impl RoomSettable for InsertableRoomBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
@@ -514,10 +530,15 @@ impl RoomSettable for InsertableRoomBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.rooms.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
         self.updated_by = Some(updated_by);
         Ok(self)
     }

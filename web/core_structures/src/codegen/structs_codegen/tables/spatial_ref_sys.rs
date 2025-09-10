@@ -46,6 +46,12 @@ impl diesel::Identifiable for SpatialRefSy {
         self.srid
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for SpatialRefSy {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.srid
+    }
+}
 impl SpatialRefSy {
     #[cfg(feature = "postgres")]
     pub fn from_auth_name(

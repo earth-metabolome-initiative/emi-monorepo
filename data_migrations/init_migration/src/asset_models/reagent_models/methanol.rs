@@ -32,6 +32,6 @@ pub(crate) fn methanol_hplc(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .purity(99.8)?
         .cas_code("67-56-1")?
         .molecular_formula("CH3OH")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

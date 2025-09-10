@@ -21,7 +21,7 @@ pub(crate) fn init_lcms_sample_procedure(
 		.description(
 			"procedure template for Negative Ionization LC-MS analysis, used in various analytical procedures.",
 		)?
-		.created_by(user.id)?
+		.created_by(user)?
 		.insert(user.id, conn)?)
 
     // Take out the vial rack from the freezer

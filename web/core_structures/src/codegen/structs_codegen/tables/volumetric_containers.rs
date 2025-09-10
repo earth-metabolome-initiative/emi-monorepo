@@ -74,6 +74,12 @@ impl diesel::Identifiable for VolumetricContainer {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for VolumetricContainer {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl VolumetricContainer {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

@@ -22,7 +22,7 @@ pub(crate) fn safelock_tubes_2ml(
     Ok(VolumetricContainerModel::new()
         .name(name)?
         .description("Safelock tube of 2ml, used for sample extraction.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .liters(0.002)?
         .insert(user.id, conn)?)
 }
@@ -46,8 +46,8 @@ pub(crate) fn init_eppendorf_safelock_tube(
     Ok(CommercialProduct::new()
         .name(eppendorf_safelock_tube)?
         .description("Eppendorf Safe-Lock Tube 2ml used for extraction.")?
-        .created_by(user.id)?
-        .brand(eppendorf.id)?
-        .parent_model(Some(safelock_tube.id))?
+        .created_by(user)?
+        .brand(eppendorf)?
+        .parent_model(safelock_tube)?
         .insert(user.id, conn)?)
 }

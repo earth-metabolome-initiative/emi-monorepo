@@ -65,6 +65,12 @@ impl diesel::Identifiable for ContainerCompatibilityRule {
         (self.container_model, self.contained_asset_model)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ContainerCompatibilityRule {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.container_model, self.contained_asset_model)
+    }
+}
 impl ContainerCompatibilityRule {
     pub fn contained_asset_model<C: diesel::connection::LoadConnection>(
         &self,

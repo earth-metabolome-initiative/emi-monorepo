@@ -34,6 +34,6 @@ pub(crate) fn coffee_filter_wrapper(
         .description(
             "Coffee filters used to wrap sample in the field prior to storage in Falcon tubes",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

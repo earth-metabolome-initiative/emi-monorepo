@@ -63,6 +63,12 @@ impl diesel::Identifiable for ProcedureAsset {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ProcedureAsset {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl ProcedureAsset {
     pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,

@@ -126,10 +126,12 @@ pub trait TemporaryUserSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn login_provider(
+    fn login_provider<LPI>(
         self,
-        login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        login_provider_id: LPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
 impl TemporaryUserSettable for InsertableTemporaryUserBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute;
@@ -155,10 +157,15 @@ impl TemporaryUserSettable for InsertableTemporaryUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.temporary_user.login_provider_id` column.
-    fn login_provider(
+    fn login_provider<LPI>(
         mut self,
-        login_provider_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        login_provider_id: LPI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let login_provider_id =
+            <LPI as web_common_traits::database::PrimaryKeyLike>::primary_key(&login_provider_id);
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }

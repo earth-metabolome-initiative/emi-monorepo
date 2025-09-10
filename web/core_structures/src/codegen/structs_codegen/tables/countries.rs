@@ -41,6 +41,12 @@ impl diesel::Identifiable for Country {
         self.iso
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Country {
+    type PrimaryKey = ::iso_codes::CountryCode;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.iso
+    }
+}
 impl Country {
     #[cfg(feature = "postgres")]
     pub fn from_name(

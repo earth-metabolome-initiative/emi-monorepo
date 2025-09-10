@@ -95,10 +95,12 @@ pub trait TeamProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn team(
+    fn team<TI>(
         self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        team_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.team_projects.project_id` column.
     ///
     /// # Arguments
@@ -117,26 +119,37 @@ pub trait TeamProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn project(
+    fn project<PI>(
         self,
-        project_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        project_id: PI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl TeamProjectSettable for InsertableTeamProjectBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute;
     /// Sets the value of the `public.team_projects.team_id` column.
-    fn team(
+    fn team<TI>(
         mut self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        team_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let team_id = <TI as web_common_traits::database::PrimaryKeyLike>::primary_key(&team_id);
         self.team_id = Some(team_id);
         Ok(self)
     }
     /// Sets the value of the `public.team_projects.project_id` column.
-    fn project(
+    fn project<PI>(
         mut self,
-        project_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        project_id: PI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let project_id =
+            <PI as web_common_traits::database::PrimaryKeyLike>::primary_key(&project_id);
         self.project_id = Some(project_id);
         Ok(self)
     }

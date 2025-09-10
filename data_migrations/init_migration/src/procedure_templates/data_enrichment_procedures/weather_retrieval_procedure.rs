@@ -32,6 +32,6 @@ pub(crate) fn init_weather_retrieval_procedure(
         .description(
             "procedure template for retrieving and storing weather data associated with sample collection events. This procedure ensures that relevant meteorological information is linked to each sample, supporting downstream data enrichment and analysis."
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

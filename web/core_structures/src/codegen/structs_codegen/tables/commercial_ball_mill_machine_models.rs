@@ -72,6 +72,12 @@ impl diesel::Identifiable for CommercialBallMillMachineModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialBallMillMachineModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialBallMillMachineModel {
     #[cfg(feature = "postgres")]
     pub fn commercial_ball_mill_machine_mo_id_ball_mill_machine_model_fkey(

@@ -36,14 +36,14 @@ pub(crate) fn sample_extraction_solvent_procedure(
         .description(
 			"procedure template for sample extraction solvent preparation, used in various laboratory and field procedures.",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     let ptam = ProcedureTemplateAssetModel::new()
-        .procedure_template(procedure_template.procedure_template)?
-        .asset_model(bottle_1l(user, conn)?.id)?
+        .procedure_template(&procedure_template)?
+        .asset_model(bottle_1l(user, conn)?)?
         .name(SAMPLE_EXTRACTION_SOLVENT)?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?;
 
     Ok((procedure_template, ptam))

@@ -67,6 +67,12 @@ impl diesel::Identifiable for DisposalProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for DisposalProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl DisposalProcedure {
     pub fn disposed_asset<C: diesel::connection::LoadConnection>(
         &self,

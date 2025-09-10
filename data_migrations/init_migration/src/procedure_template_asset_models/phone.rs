@@ -23,5 +23,5 @@ pub(crate) fn phone_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, phone(user, conn)?.phone_models_camera(conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, phone(user, conn)?, conn)
 }

@@ -571,10 +571,12 @@ pub trait AliquotingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_from_model(
+    fn aliquoted_from_model<AFM>(
         self,
-        aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_from_model: AFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.
     /// procedure_template_aliquoted_from_model` column.
@@ -626,10 +628,12 @@ pub trait AliquotingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_into_model(
+    fn aliquoted_into_model<AIM>(
         self,
-        aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_into_model: AIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.
     /// procedure_template_aliquoted_into_model` column.
@@ -681,10 +685,12 @@ pub trait AliquotingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_with_model(
+    fn aliquoted_with_model<AWM>(
         self,
-        aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        aliquoted_with_model: AWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.
     /// procedure_template_aliquoted_with_model` column.
@@ -736,10 +742,12 @@ pub trait AliquotingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.aliquoting_procedure_templates.
     /// procedure_template_pipette_tip_model` column.
@@ -834,10 +842,17 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_from_model(
+    fn aliquoted_from_model<AFM>(
         mut self,
-        aliquoted_from_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_from_model: AFM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let aliquoted_from_model =
+            <AFM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &aliquoted_from_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_aliquoted_from_model,
         ) = self.procedure_template_aliquoted_from_model
@@ -975,10 +990,17 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_into_model(
+    fn aliquoted_into_model<AIM>(
         mut self,
-        aliquoted_into_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_into_model: AIM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let aliquoted_into_model =
+            <AIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &aliquoted_into_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_aliquoted_into_model,
         ) = self.procedure_template_aliquoted_into_model
@@ -1116,10 +1138,17 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn aliquoted_with_model(
+    fn aliquoted_with_model<AWM>(
         mut self,
-        aliquoted_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        aliquoted_with_model: AWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let aliquoted_with_model =
+            <AWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &aliquoted_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_aliquoted_with_model,
         ) = self.procedure_template_aliquoted_with_model
@@ -1257,10 +1286,15 @@ impl<ProcedureTemplate> AliquotingProcedureTemplateSettable
     /// v1 -.->|"`foreign defines`"| v0
     /// v4 ---o|"`associated with`"| v5
     /// ```
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         mut self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let pipette_tip_model =
+            <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(&pipette_tip_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_pipette_tip_model,
         ) = self.procedure_template_pipette_tip_model
@@ -1439,10 +1473,13 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1481,10 +1518,13 @@ for InsertableAliquotingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

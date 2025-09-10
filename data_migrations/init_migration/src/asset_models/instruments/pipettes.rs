@@ -34,7 +34,7 @@ pub(crate) fn pipette_200ul(user: &User, conn: &mut PgConnection) -> anyhow::Res
         .description(
             "A pipette used to manipulate liquids (needs to be equipped with a pipette tip).",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -65,7 +65,7 @@ pub(crate) fn pipette_1000ul(user: &User, conn: &mut PgConnection) -> anyhow::Re
         .description(
             "A pipette used to manipulate liquids (needs to be equipped with a pipette tip).",
         )?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -86,9 +86,9 @@ pub(crate) fn init_gilson_pipette_200(
     Ok(CommercialProduct::new()
         .name(device_name)?
         .description("Gilson pipette 200, used to precipitate solid material.")?
-        .created_by(user.id)?
-        .parent_model(Some(pipette.id))?
-        .brand(brand.id)?
+        .created_by(user)?
+        .parent_model(pipette)?
+        .brand(brand)?
         .insert(user.id, conn)?)
 }
 
@@ -109,8 +109,8 @@ pub(crate) fn init_gilson_pipette_1000(
     Ok(CommercialProduct::new()
         .name(device_name)?
         .description("Gilson Pipette 1000μl to manipulate liquids.")?
-        .created_by(user.id)?
-        .parent_model(Some(pipette.id))?
-        .brand(brand.id)?
+        .created_by(user)?
+        .parent_model(pipette)?
+        .brand(brand)?
         .insert(user.id, conn)?)
 }

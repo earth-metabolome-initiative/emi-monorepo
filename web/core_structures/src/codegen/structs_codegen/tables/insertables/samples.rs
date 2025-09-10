@@ -245,10 +245,12 @@ pub trait SampleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn model(
+    fn model<M>(
         self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.samples.sample_source` column.
     ///
     /// # Arguments
@@ -268,10 +270,12 @@ pub trait SampleSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn sample_source(
+    fn sample_source<SS>(
         self,
-        sample_source: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        sample_source: SS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SS: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.samples.sample_source_model` column.
     ///
     /// # Arguments
@@ -290,10 +294,12 @@ pub trait SampleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn sample_source_model(
+    fn sample_source_model<SSM>(
         self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        sample_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
@@ -335,10 +341,16 @@ impl<
     ///v5 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v5
     ///```
-    fn model(
+    fn model<M>(
         mut self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let model = <M as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &model,
+        );
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 model,
@@ -369,18 +381,32 @@ impl<
     ///class v1 directly-involved-column
     ///v0 -.->|"`foreign defines`"| v1
     ///```
-    fn sample_source(
+    fn sample_source<SS>(
         mut self,
-        sample_source: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        sample_source: SS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SS: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
+        let sample_source = <SS as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &sample_source,
+        );
         self.sample_source = Some(sample_source);
         Ok(self)
     }
     ///Sets the value of the `public.samples.sample_source_model` column.
-    fn sample_source_model(
+    fn sample_source_model<SSM>(
         mut self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        sample_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let sample_source_model = <SSM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &sample_source_model,
+        );
         self.sample_source_model = Some(sample_source_model);
         Ok(self)
     }
@@ -399,10 +425,15 @@ where
     type Attributes = crate::codegen::structs_codegen::tables::insertables::SampleAttribute;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
-    fn id(
+    fn id<I>(
         mut self,
-        id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
                 id,
@@ -483,10 +514,13 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn model(
+    fn model<M>(
         self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
             self,
             model,
@@ -494,10 +528,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
                 self.id,
                 created_by,
@@ -536,10 +573,13 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
                 self.id,
                 updated_by,
@@ -617,10 +657,13 @@ where
     /// v4 --->|"`extends`"| v3
     /// v5 --->|"`extends`"| v4
     /// ```
-    fn model(
+    fn model<M>(
         self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         <Self as SampleSettable>::model(self, model)
     }
 }

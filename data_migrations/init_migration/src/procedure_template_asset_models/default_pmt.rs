@@ -7,7 +7,11 @@ use core_structures::{
         InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelSettable,
     },
 };
-use web_common_traits::database::Insertable;
+use diesel::PgConnection;
+use web_common_traits::{
+    database::{Insertable, Read},
+    prelude::ExtensionTable,
+};
 
 /// Returns a partial builder for a default procedure template asset_model.
 ///
@@ -20,16 +24,20 @@ use web_common_traits::database::Insertable;
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(super) fn default_pmt<T>(
+pub(super) fn default_pmt<AssetModelLike>(
     user: &User,
-    asset_model: T,
+    asset_model_like: AssetModelLike,
+    conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder>
 where
-    T: AsRef<AssetModel>,
+    AssetModelLike: ExtensionTable<AssetModel>,
+    for<'a> &'a AssetModelLike:
+        diesel::Identifiable<Id = <&'a AssetModel as diesel::Identifiable>::Id>,
 {
-    let asset_model = asset_model.as_ref();
+    use diesel::Identifiable;
+    let asset_model = AssetModel::read(*asset_model_like.id(), conn)?;
     Ok(ProcedureTemplateAssetModel::new()
         .name(&asset_model.name)?
-        .asset_model(asset_model.id)?
-        .created_by(user.id)?)
+        .asset_model(asset_model)?
+        .created_by(user)?)
 }

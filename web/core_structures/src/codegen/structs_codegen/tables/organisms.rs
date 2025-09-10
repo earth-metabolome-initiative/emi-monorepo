@@ -72,6 +72,12 @@ impl diesel::Identifiable for Organism {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Organism {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Organism {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

@@ -64,6 +64,12 @@ impl diesel::Identifiable for OrganismTaxon {
         (self.organism_id, self.taxon_id)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for OrganismTaxon {
+    type PrimaryKey = (::rosetta_uuid::Uuid, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.organism_id, self.taxon_id)
+    }
+}
 impl OrganismTaxon {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

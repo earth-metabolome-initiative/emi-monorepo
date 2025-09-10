@@ -23,5 +23,5 @@ pub(crate) fn freezer_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, freezer(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, freezer(user, conn)?, conn)
 }

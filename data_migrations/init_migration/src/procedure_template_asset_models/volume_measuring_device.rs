@@ -23,5 +23,5 @@ pub(crate) fn volume_measuring_device_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, volume_measuring_device(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, volume_measuring_device(user, conn)?, conn)
 }

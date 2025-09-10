@@ -23,7 +23,7 @@ pub(crate) fn pipette_tips_1000ul_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, pipette_tip_1000ul(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, pipette_tip_1000ul(user, conn)?, conn)
 }
 
 /// Returns a partial builder for a pipette tips 200ul trackable.
@@ -40,5 +40,5 @@ pub(crate) fn pipette_tips_200ul_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, pipette_tip_200ul(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, pipette_tip_200ul(user, conn)?, conn)
 }

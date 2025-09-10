@@ -82,6 +82,12 @@ impl diesel::Identifiable for CommercialCameraLot {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CommercialCameraLot {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CommercialCameraLot {
     pub fn commercial_camera_lots_id_fkey<C: diesel::connection::LoadConnection>(
         &self,

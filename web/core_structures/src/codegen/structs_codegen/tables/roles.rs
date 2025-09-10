@@ -50,6 +50,12 @@ impl diesel::Identifiable for Role {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Role {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Role {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

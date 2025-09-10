@@ -71,6 +71,12 @@ impl diesel::Identifiable for WeighingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for WeighingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl WeighingProcedure {
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,

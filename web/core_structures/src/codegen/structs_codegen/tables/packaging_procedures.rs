@@ -77,6 +77,12 @@ impl diesel::Identifiable for PackagingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PackagingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl PackagingProcedure {
     pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
         &self,

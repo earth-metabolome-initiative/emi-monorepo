@@ -56,6 +56,12 @@ impl diesel::Identifiable for NextProcedureTemplate {
         (self.parent, self.predecessor, self.successor)
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for NextProcedureTemplate {
+    type PrimaryKey = (i32, i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.parent, self.predecessor, self.successor)
+    }
+}
 impl NextProcedureTemplate {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

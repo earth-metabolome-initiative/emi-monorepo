@@ -49,6 +49,12 @@ impl diesel::Identifiable for Taxon {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Taxon {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Taxon {
     pub fn rank<C: diesel::connection::LoadConnection>(
         &self,

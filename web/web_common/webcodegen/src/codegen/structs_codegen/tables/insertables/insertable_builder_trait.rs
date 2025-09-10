@@ -62,12 +62,6 @@ impl Table {
             };
         }
 
-        if insertable_column.is_foreign_primary_key(conn)?
-            || insertable_column.is_part_of_primary_key(conn)?
-        {
-            return Ok(None);
-        }
-
         Ok(Some(quote! {
             <#column_acronym>
         }))
@@ -78,6 +72,7 @@ impl Table {
         insertable_column: &Column,
         conn: &mut diesel::PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
+        let column_acronym = insertable_column.acronym_ident()?;
         if let Some((partial_builder_kind, _, partial_builder_foreign_key)) =
             insertable_column.requires_partial_builder(conn)?
         {
@@ -86,18 +81,9 @@ impl Table {
                     let foreign_table = partial_builder_foreign_key.foreign_table(conn)?;
                     partial_builder_kind.formatted_type(&foreign_table, conn)
                 }
-                PartialBuilderKind::Discretional => {
-                    let column_acronym = insertable_column.acronym_ident()?;
-                    Ok(quote! { #column_acronym })
-                }
+                PartialBuilderKind::Discretional => Ok(quote! { #column_acronym }),
             }
-        } else if insertable_column.is_foreign_primary_key(conn)?
-            || insertable_column.is_part_of_primary_key(conn)?
-        {
-            let rust_type = insertable_column.rust_data_type(conn)?;
-            Ok(quote! { #rust_type })
         } else {
-            let column_acronym = insertable_column.acronym_ident()?;
             Ok(quote! { #column_acronym })
         }
     }
@@ -129,16 +115,27 @@ impl Table {
         if insertable_column.is_foreign_primary_key(conn)?
             || insertable_column.is_part_of_primary_key(conn)?
         {
-            return Ok(None);
+            let argument_type = insertable_column.to_non_nullable().rust_data_type(conn)?;
+            if insertable_column.is_nullable() {
+                Ok(Some(quote! {
+                    where
+                        #column_acronym: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey=#argument_type>,
+                }))
+            } else {
+                Ok(Some(quote! {
+                    where
+                        #column_acronym: web_common_traits::database::PrimaryKeyLike<PrimaryKey=#argument_type>,
+                }))
+            }
+        } else {
+            let argument_type = insertable_column.rust_data_type(conn)?;
+
+            Ok(Some(quote! {
+                where
+                    #column_acronym: TryInto<#argument_type>,
+                    validation_errors::SingleFieldError: From<<#column_acronym as TryInto<#argument_type>>::Error>
+            }))
         }
-
-        let argument_type = insertable_column.rust_data_type(conn)?;
-
-        Ok(Some(quote! {
-            where
-                #column_acronym: TryInto<#argument_type>,
-                validation_errors::SingleFieldError: From<<#column_acronym as TryInto<#argument_type>>::Error>
-        }))
     }
 
     /// Returns the trait definition for the builder associated to the current

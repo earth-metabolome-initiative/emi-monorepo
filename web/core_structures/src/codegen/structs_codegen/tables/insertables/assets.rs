@@ -176,10 +176,12 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn id(
+    fn id<I>(
         self,
-        id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.assets.name` column.
     ///
     /// # Arguments
@@ -248,10 +250,12 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn model(
+    fn model<M>(
         self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.created_by` column.
     ///
     /// # Arguments
@@ -270,10 +274,12 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.created_at` column.
     ///
     /// # Arguments
@@ -319,10 +325,12 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
+    fn updated_by<UB>(
         self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.updated_at` column.
     ///
     /// # Arguments
@@ -354,13 +362,14 @@ pub trait AssetSettable: Sized {
 impl AssetSettable for InsertableAssetBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::AssetAttribute;
     /// Sets the value of the `public.assets.id` column.
-    fn id(
+    fn id<I>(
         mut self,
-        id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let id = id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(AssetAttribute::Id)
-        })?;
+        id: I,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let id = <I as web_common_traits::database::PrimaryKeyLike>::primary_key(&id);
         self.id = Some(id);
         Ok(self)
     }
@@ -431,10 +440,14 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.model` column.
-    fn model(
+    fn model<M>(
         mut self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        model: M,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let model = <M as web_common_traits::database::PrimaryKeyLike>::primary_key(&model);
         self.model = Some(model);
         Ok(self)
     }
@@ -455,10 +468,15 @@ impl AssetSettable for InsertableAssetBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
@@ -488,10 +506,15 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
         self.updated_by = Some(updated_by);
         Ok(self)
     }

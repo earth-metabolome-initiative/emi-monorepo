@@ -418,10 +418,12 @@ pub trait ProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure(
+    fn procedure<P>(
         self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.procedures.procedure_template` column.
     ///
     /// # Arguments
@@ -440,10 +442,12 @@ pub trait ProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template(
+    fn procedure_template<PT>(
         self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedures.parent_procedure` column.
     ///
     /// # Arguments
@@ -463,10 +467,12 @@ pub trait ProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.procedures.parent_procedure_template`
     /// column.
     ///
@@ -486,10 +492,12 @@ pub trait ProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedures.predecessor_procedure` column.
     ///
     /// # Arguments
@@ -509,10 +517,12 @@ pub trait ProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.procedures.predecessor_procedure_template`
     /// column.
     ///
@@ -532,10 +542,12 @@ pub trait ProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedures.created_by` column.
     ///
     /// # Arguments
@@ -554,10 +566,12 @@ pub trait ProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedures.created_at` column.
     ///
     /// # Arguments
@@ -603,10 +617,12 @@ pub trait ProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by(
+    fn updated_by<UB>(
         self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedures.updated_at` column.
     ///
     /// # Arguments
@@ -664,14 +680,14 @@ pub trait ProcedureSettable: Sized {
 impl ProcedureSettable for InsertableProcedureBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute;
     /// Sets the value of the `public.procedures.procedure` column.
-    fn procedure(
+    fn procedure<P>(
         mut self,
-        procedure: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let procedure = procedure.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureAttribute::Procedure)
-        })?;
+        procedure: P,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let procedure = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure);
         if let Some(parent_procedure) = self.parent_procedure {
             pgrx_validation::must_be_distinct_uuid(procedure, parent_procedure)
                 .map_err(|e| {
@@ -696,23 +712,15 @@ impl ProcedureSettable for InsertableProcedureBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedures.procedure_template` column.
-    fn procedure_template(
+    fn procedure_template<PT>(
         mut self,
-        procedure_template: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(parent_procedure_template) = self.parent_procedure_template {
-            pgrx_validation::must_be_distinct_i32(
-                    procedure_template,
-                    parent_procedure_template,
-                )
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ParentProcedureTemplate,
-                        )
-                })?;
-        }
+        procedure_template: PT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let procedure_template =
+            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
         if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -723,6 +731,19 @@ impl ProcedureSettable for InsertableProcedureBuilder {
                         .rename_fields(
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::PredecessorProcedureTemplate,
+                        )
+                })?;
+        }
+        if let Some(parent_procedure_template) = self.parent_procedure_template {
+            pgrx_validation::must_be_distinct_i32(
+                    procedure_template,
+                    parent_procedure_template,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ParentProcedureTemplate,
                         )
                 })?;
         }
@@ -747,10 +768,17 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     /// class v1 directly-involved-column
     /// v0 -.->|"`foreign defines`"| v1
     /// ```
-    fn parent_procedure(
+    fn parent_procedure<PP>(
         mut self,
-        parent_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let parent_procedure =
+            <PP as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &parent_procedure,
+            );
         if let (Some(parent_procedure), Some(procedure)) = (parent_procedure, self.procedure) {
             pgrx_validation::must_be_distinct_uuid(procedure, parent_procedure)
                 .map_err(|e| {
@@ -766,10 +794,17 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     }
     /// Sets the value of the `public.procedures.parent_procedure_template`
     /// column.
-    fn parent_procedure_template(
+    fn parent_procedure_template<PPT>(
         mut self,
-        parent_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        parent_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let parent_procedure_template =
+            <PPT as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &parent_procedure_template,
+            );
         if let (Some(procedure_template), Some(parent_procedure_template)) =
             (self.procedure_template, parent_procedure_template)
         {
@@ -806,10 +841,17 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     /// class v1 directly-involved-column
     /// v0 -.->|"`foreign defines`"| v1
     /// ```
-    fn predecessor_procedure(
+    fn predecessor_procedure<PP>(
         mut self,
-        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure: PP,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PP: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let predecessor_procedure =
+            <PP as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &predecessor_procedure,
+            );
         if let (Some(predecessor_procedure), Some(procedure)) =
             (predecessor_procedure, self.procedure)
         {
@@ -827,10 +869,17 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     }
     /// Sets the value of the `public.procedures.predecessor_procedure_template`
     /// column.
-    fn predecessor_procedure_template(
+    fn predecessor_procedure_template<PPT>(
         mut self,
-        predecessor_procedure_template: Option<i32>,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        predecessor_procedure_template: PPT,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let predecessor_procedure_template =
+            <PPT as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+                &predecessor_procedure_template,
+            );
         if let (Some(procedure_template), Some(predecessor_procedure_template)) =
             (self.procedure_template, predecessor_procedure_template)
         {
@@ -866,10 +915,15 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
@@ -902,10 +956,15 @@ impl ProcedureSettable for InsertableProcedureBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
         self.updated_by = Some(updated_by);
         Ok(self)
     }

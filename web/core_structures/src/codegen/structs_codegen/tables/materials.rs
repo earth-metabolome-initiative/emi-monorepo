@@ -51,6 +51,12 @@ impl diesel::Identifiable for Material {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Material {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Material {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

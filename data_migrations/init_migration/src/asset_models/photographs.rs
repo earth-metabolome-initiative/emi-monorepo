@@ -31,6 +31,6 @@ pub(crate) fn photograph(
         .name(PHOTOGRAPHS)?
         .description("Photograph for documenting organisms and their habitats")?
         .mime_type("image/jpeg")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

@@ -92,6 +92,12 @@ impl diesel::Identifiable for Team {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Team {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Team {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

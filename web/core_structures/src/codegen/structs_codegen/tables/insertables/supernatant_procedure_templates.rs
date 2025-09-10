@@ -570,10 +570,12 @@ pub trait SupernatantProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stratified_source_model(
+    fn stratified_source_model<SSM>(
         self,
-        stratified_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        stratified_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.supernatant_procedure_templates.
     /// procedure_template_stratified_source_model` column.
@@ -627,10 +629,12 @@ pub trait SupernatantProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn supernatant_destination_model(
+    fn supernatant_destination_model<SDM>(
         self,
-        supernatant_destination_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        supernatant_destination_model: SDM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.supernatant_procedure_templates.
     /// procedure_template_supernatant_destination_model` column.
@@ -683,10 +687,12 @@ pub trait SupernatantProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn transferred_with_model(
+    fn transferred_with_model<TWM>(
         self,
-        transferred_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        transferred_with_model: TWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.supernatant_procedure_templates.
     /// procedure_template_transferred_with_model` column.
@@ -738,10 +744,12 @@ pub trait SupernatantProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
     /// `public.supernatant_procedure_templates.
     /// procedure_template_pipette_tip_model` column.
@@ -836,10 +844,17 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn stratified_source_model(
+    fn stratified_source_model<SSM>(
         mut self,
-        stratified_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        stratified_source_model: SSM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let stratified_source_model =
+            <SSM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &stratified_source_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_stratified_source_model,
         ) = self.procedure_template_stratified_source_model
@@ -981,10 +996,17 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn supernatant_destination_model(
+    fn supernatant_destination_model<SDM>(
         mut self,
-        supernatant_destination_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        supernatant_destination_model: SDM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        SDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let supernatant_destination_model =
+            <SDM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &supernatant_destination_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_supernatant_destination_model,
         ) = self.procedure_template_supernatant_destination_model
@@ -1125,10 +1147,17 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn transferred_with_model(
+    fn transferred_with_model<TWM>(
         mut self,
-        transferred_with_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        transferred_with_model: TWM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let transferred_with_model =
+            <TWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+                &transferred_with_model,
+            );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_transferred_with_model,
         ) = self.procedure_template_transferred_with_model
@@ -1268,10 +1297,15 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// v2 -.->|"`foreign defines`"| v1
     /// v5 ---o|"`associated with`"| v4
     /// ```
-    fn pipette_tip_model(
+    fn pipette_tip_model<PTM>(
         mut self,
-        pipette_tip_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        pipette_tip_model: PTM,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let pipette_tip_model =
+            <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(&pipette_tip_model);
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_pipette_tip_model,
         ) = self.procedure_template_pipette_tip_model
@@ -1450,10 +1484,13 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                 self.procedure_template,
                 created_by,
@@ -1492,10 +1529,13 @@ for InsertableSupernatantProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by(
+    fn updated_by<UB>(
         mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        updated_by: UB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                 self.procedure_template,
                 updated_by,

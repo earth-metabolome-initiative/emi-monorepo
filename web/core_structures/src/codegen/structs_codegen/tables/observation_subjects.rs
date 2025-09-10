@@ -53,6 +53,12 @@ impl diesel::Identifiable for ObservationSubject {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for ObservationSubject {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl ObservationSubject {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,

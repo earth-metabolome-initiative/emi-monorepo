@@ -66,6 +66,12 @@ impl diesel::Identifiable for StorageProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for StorageProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl StorageProcedureTemplate {
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,

@@ -39,7 +39,7 @@ pub(crate) fn vial_1_5ml(
     Ok(VolumetricContainerModel::new()
         .name(name)?
         .description("Vial of 1.5 ml used for extracts storage")?
-        .created_by(user.id)?
+        .created_by(user)?
         .liters(0.0015)?
         .insert(user.id, conn)?)
 }
@@ -61,8 +61,8 @@ pub(crate) fn init_macherey_nagel_vial(
         .description(
             "Macherey Nagel Vial 1.5ml, used for extract library and mass spectrometry analysis.",
         )?
-        .created_by(user.id)?
-        .brand(macherey_nagel.id)?
-        .parent_model(Some(vial_1_5ml.id))?
+        .created_by(user)?
+        .brand(macherey_nagel)?
+        .parent_model(vial_1_5ml)?
         .insert(user.id, conn)?)
 }

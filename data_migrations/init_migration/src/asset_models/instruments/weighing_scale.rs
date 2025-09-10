@@ -32,6 +32,6 @@ pub(crate) fn weighing_scale(
     Ok(WeighingDeviceModel::new()
         .name(name)?
         .description("A weighing scale used to measure the amount of samples.")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }

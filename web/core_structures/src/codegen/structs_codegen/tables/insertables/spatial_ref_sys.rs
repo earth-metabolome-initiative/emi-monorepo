@@ -97,10 +97,12 @@ pub trait SpatialRefSySettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn srid(
+    fn srid<S>(
         self,
-        srid: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        srid: S,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.spatial_ref_sys.auth_name` column.
     ///
     /// # Arguments
@@ -208,13 +210,14 @@ pub trait SpatialRefSySettable: Sized {
 impl SpatialRefSySettable for InsertableSpatialRefSyBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::SpatialRefSyAttribute;
     /// Sets the value of the `public.spatial_ref_sys.srid` column.
-    fn srid(
+    fn srid<S>(
         mut self,
-        srid: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        let srid = srid.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(SpatialRefSyAttribute::Srid)
-        })?;
+        srid: S,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let srid = <S as web_common_traits::database::PrimaryKeyLike>::primary_key(&srid);
         self.srid = Some(srid);
         Ok(self)
     }

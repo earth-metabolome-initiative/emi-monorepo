@@ -11,6 +11,7 @@ pub use builder::FlowchartBuilder;
 pub use configuration::{
     FlowchartConfiguration, FlowchartConfigurationAttribute, FlowchartConfigurationBuilder,
 };
+pub use curve_styles::CurveStyle;
 pub use flowchart_edge::{FlowchartEdge, FlowchartEdgeAttribute, FlowchartEdgeBuilder};
 pub use flowchart_node::{
     FlowchartNode, FlowchartNodeAttribute, FlowchartNodeBuilder, FlowchartNodeShape,

@@ -23,5 +23,5 @@ pub(crate) fn safelock_centrifuge_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, safelock_centrifuge(user, conn)?.id(conn)?.id(conn)?)
+    default_pmt(user, safelock_centrifuge(user, conn)?, conn)
 }

@@ -130,10 +130,12 @@ pub trait OrganismTaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by(
+    fn created_by<CB>(
         self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.organism_taxa.created_at` column.
     ///
     /// # Arguments
@@ -180,10 +182,12 @@ pub trait OrganismTaxonSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn organism(
+    fn organism<OI>(
         self,
-        organism_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        organism_id: OI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.organism_taxa.taxon_id` column.
     ///
     /// # Arguments
@@ -202,18 +206,25 @@ pub trait OrganismTaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn taxon(
+    fn taxon<TI>(
         self,
-        taxon_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        taxon_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl OrganismTaxonSettable for InsertableOrganismTaxonBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismTaxonAttribute;
     /// Sets the value of the `public.organism_taxa.created_by` column.
-    fn created_by(
+    fn created_by<CB>(
         mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        created_by: CB,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
         self.created_by = Some(created_by);
         Ok(self)
     }
@@ -235,18 +246,27 @@ impl OrganismTaxonSettable for InsertableOrganismTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organism_taxa.organism_id` column.
-    fn organism(
+    fn organism<OI>(
         mut self,
-        organism_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        organism_id: OI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+    {
+        let organism_id =
+            <OI as web_common_traits::database::PrimaryKeyLike>::primary_key(&organism_id);
         self.organism_id = Some(organism_id);
         Ok(self)
     }
     /// Sets the value of the `public.organism_taxa.taxon_id` column.
-    fn taxon(
+    fn taxon<TI>(
         mut self,
-        taxon_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        taxon_id: TI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let taxon_id = <TI as web_common_traits::database::PrimaryKeyLike>::primary_key(&taxon_id);
         self.taxon_id = Some(taxon_id);
         Ok(self)
     }

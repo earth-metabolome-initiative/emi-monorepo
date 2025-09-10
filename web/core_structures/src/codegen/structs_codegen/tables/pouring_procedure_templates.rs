@@ -61,6 +61,12 @@ impl diesel::Identifiable for PouringProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PouringProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl PouringProcedureTemplate {
     pub fn measured_with_model<C: diesel::connection::LoadConnection>(
         &self,

@@ -50,6 +50,12 @@ impl diesel::Identifiable for CapModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CapModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl CapModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

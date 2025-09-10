@@ -101,10 +101,12 @@ pub trait UserOrganizationSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn user(
+    fn user<UI>(
         self,
-        user_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        user_id: UI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.user_organizations.organization_id`
     /// column.
     ///
@@ -124,28 +126,39 @@ pub trait UserOrganizationSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn organization(
+    fn organization<OI>(
         self,
-        organization_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+        organization_id: OI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
 impl UserOrganizationSettable for InsertableUserOrganizationBuilder {
     type Attributes =
         crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute;
     /// Sets the value of the `public.user_organizations.user_id` column.
-    fn user(
+    fn user<UI>(
         mut self,
-        user_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        user_id: UI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        UI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let user_id = <UI as web_common_traits::database::PrimaryKeyLike>::primary_key(&user_id);
         self.user_id = Some(user_id);
         Ok(self)
     }
     /// Sets the value of the `public.user_organizations.organization_id`
     /// column.
-    fn organization(
+    fn organization<OI>(
         mut self,
-        organization_id: i16,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        organization_id: OI,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let organization_id =
+            <OI as web_common_traits::database::PrimaryKeyLike>::primary_key(&organization_id);
         self.organization_id = Some(organization_id);
         Ok(self)
     }

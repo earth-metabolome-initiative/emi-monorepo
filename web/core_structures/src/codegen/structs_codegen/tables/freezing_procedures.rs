@@ -84,6 +84,12 @@ impl diesel::Identifiable for FreezingProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for FreezingProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl FreezingProcedure {
     pub fn frozen_container<C: diesel::connection::LoadConnection>(
         &self,

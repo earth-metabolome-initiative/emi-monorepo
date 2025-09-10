@@ -39,7 +39,7 @@ pub(crate) fn splitted_cap_vial_1_5ml(
     Ok(CapModel::new()
         .name(name)?
         .description("Splitted cap for Vial of 1.5 ml used for extracts storage")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -68,7 +68,7 @@ pub(crate) fn sealed_cap_vial_1_5ml(
     Ok(CapModel::new()
         .name(name)?
         .description("Sealed cap for Vial of 1.5 ml used for extracts storage")?
-        .created_by(user.id)?
+        .created_by(user)?
         .insert(user.id, conn)?)
 }
 
@@ -87,9 +87,9 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
     Ok(CommercialCapModel::new()
         .name(splitted_cap_name)?
         .description("Machinery Nagel Splitted Cap 1.5ml, used to partially seal Vial 1.5ml and allows mass spectrometry analysis.")?
-        .created_by(user.id)?
-        .brand(macherey_nagel.id)?
-        .cap_model(splitted_cap.id)?
+        .created_by(user)?
+        .brand(macherey_nagel)?
+        .cap_model(splitted_cap)?
         .insert(user.id, conn)?)
 }
 
@@ -108,8 +108,8 @@ pub(crate) fn init_advion_interchim_sealed_cap(
     Ok(CommercialCapModel::new()
         .name(sealed_cap_name)?
         .description("Avion Interchim Sealed Cap 1.5ml, used to seal Vial 1.5ml for storage.")?
-        .created_by(user.id)?
-        .brand(advion_interchim.id)?
-        .cap_model(sealed_cap.id)?
+        .created_by(user)?
+        .brand(advion_interchim)?
+        .cap_model(sealed_cap)?
         .insert(user.id, conn)?)
 }

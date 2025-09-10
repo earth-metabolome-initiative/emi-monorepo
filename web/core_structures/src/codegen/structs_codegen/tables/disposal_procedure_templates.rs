@@ -56,6 +56,12 @@ impl diesel::Identifiable for DisposalProcedureTemplate {
         self.procedure_template
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for DisposalProcedureTemplate {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure_template
+    }
+}
 impl DisposalProcedureTemplate {
     pub fn disposed_asset_model<C: diesel::connection::LoadConnection>(
         &self,

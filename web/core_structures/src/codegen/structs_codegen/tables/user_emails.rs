@@ -51,6 +51,12 @@ impl diesel::Identifiable for UserEmail {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for UserEmail {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl UserEmail {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,

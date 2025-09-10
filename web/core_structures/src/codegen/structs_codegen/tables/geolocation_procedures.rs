@@ -71,6 +71,12 @@ impl diesel::Identifiable for GeolocationProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for GeolocationProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl GeolocationProcedure {
     pub fn geolocated_asset<C: diesel::connection::LoadConnection>(
         &self,

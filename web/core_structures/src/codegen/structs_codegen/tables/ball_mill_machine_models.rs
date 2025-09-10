@@ -52,6 +52,12 @@ impl diesel::Identifiable for BallMillMachineModel {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for BallMillMachineModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl BallMillMachineModel {
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,

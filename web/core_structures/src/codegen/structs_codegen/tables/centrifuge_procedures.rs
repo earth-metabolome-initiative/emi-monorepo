@@ -84,6 +84,12 @@ impl diesel::Identifiable for CentrifugeProcedure {
         self.procedure
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for CentrifugeProcedure {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.procedure
+    }
+}
 impl CentrifugeProcedure {
     pub fn centrifuged_container<C: diesel::connection::LoadConnection>(
         &self,

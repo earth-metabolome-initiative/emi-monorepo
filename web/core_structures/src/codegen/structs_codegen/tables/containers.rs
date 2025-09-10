@@ -64,6 +64,12 @@ impl diesel::Identifiable for Container {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Container {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Container {
     pub fn container_model<C: diesel::connection::LoadConnection>(
         &self,
